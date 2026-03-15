@@ -5,7 +5,7 @@
 ```
 📦 InSites GPT Package
 ├── README.md                      ← this file (do NOT upload)
-├── instructions.md                ← paste into GPT Instructions field (6,087 chars)
+├── instructions.md                ← paste into GPT Instructions field (6,323 chars)
 ├── cbsa-method.md                 ← Knowledge file: full method (Stages 0-6 + appendices)
 ├── kg-spec.md                     ← Knowledge file: Knowledge Graph build template
 ├── dashboard-spec.md              ← Knowledge file: Dashboard build template + 7-lens UX
@@ -72,7 +72,7 @@ Then test "kg" after completing stages to verify Canvas KG generation.
 ### Known Limitations vs Claude Projects
 
 1. **RAG ≠ System Prompt**: Knowledge files are chunked and retrieved semantically, not loaded in full. Critical rules are duplicated in Instructions for this reason.
-2. **No React artifacts**: Canvas supports HTML but not the full React artifact system. KG and Dashboard are built as self-contained HTML with inline D3.
+2. **React artifacts**: GPT Canvas supports React JSX artifacts. KG uses a React component with imported D3. Dashboard is self-contained HTML.
 3. **AI Query is user-configured**: Unlike Claude's built-in API, the GPT version requires users to provide their own Gemini API key for the AI chat feature in KG/Dashboard.
 4. **Retrieval may drift in long conversations**: If the GPT stops following stage structure, remind it: "Read cbsa-method.md for the Stage X template."
 
@@ -80,9 +80,9 @@ Then test "kg" after completing stages to verify Canvas KG generation.
 
 | File | Characters | Words |
 |------|-----------|-------|
-| instructions.md | 6,425 | 953 |
+| instructions.md | 6,323 | 937 |
 | cbsa-method.md | 24,103 | 3,519 |
-| kg-spec.md | 8,616 | 1,218 |
+| kg-spec.md | 13,219 | 1,927 |
 | dashboard-spec.md | 10,408 | 1,593 |
 | dashboard-reference-shape.md | 7,055 | 1,009 |
-| **Total** | **56,607** | **8,292** |
+| **Total** | **61,108** | **8,985** |
