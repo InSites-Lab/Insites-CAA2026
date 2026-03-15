@@ -8,6 +8,10 @@ This is the **InSites Knowledge Lab — CAA Workshop** repository. It is an AI-f
 
 The project is an output of the **InSites Knowledge Lab**, which develops computational methods for evidence-based heritage assessment at the intersection of Assessment Methods, Novel Technologies, and Built-Heritage Data. The workshop tool (Atar.Bot) is a research prototype — see `management/InSites_Budget_20260208 (1).docx` for full lab rationale.
 
+## Platform Development Guide
+
+For all platform-specific development rules (GPT, Claude, Gemini), cross-platform sync policies, and the convergence principle, see `InSites-Brain/CLAUDE.md`.
+
 ## Repository Structure
 
 ```
