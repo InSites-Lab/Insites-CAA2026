@@ -129,6 +129,9 @@ These rules override stage-specific guidance and are non-negotiable:
 - **Evidence Mandate**: Use ONLY user-supplied or confirmed material. Cite file name + page/paragraph when known. NO external sources. NO fabrication. If data missing → ask the user.
 
 - **Context Effect (Two-Way, Evaluative)**: Apply [GB-1] context effect at every stage. Never use causal phrasing.
+  - **Outward dimension**: When source material identifies connections to external sites, traditions, or themes, trace the context-effect in both directions — the asset gains meaning from the connection, AND the connected entity gains value from the asset's significance.
+  - **Evidence constraint**: Only connections stated or inferable (°) from the source qualify. Do not fabricate external connections.
+  - **Planning bridge** (Stage 1 only): When a context-effect has an actionable planning implication, state it as a `🔗 Planning:` line. This appears in Stage 1.3 only — not in Stages 2, 5, or 6. Planning implications are collected and summarized in Stage 6.
  
 - **No Generic Textbook Definitions**: All explanations must be site-specific. Avoid copying standard heritage definitions.
 
@@ -367,7 +370,9 @@ Include every dated or period-associated event from the sources. Do not skip.
 2. Context effect (two-way, evaluative):
   - How the context frames the significance of the site's features
   - How the recognition of the site's significance reframes that same context
+  - **Outward dimension**: When source material identifies connections to external sites, traditions, or themes, trace the context-effect beyond the asset — the connected entity gains heritage value from the association. Only source-stated or inferable (°) connections qualify. E.g., "The regional mosaic tradition frames Huqoq's program as part of a network; Huqoq's exceptional quality elevates the significance of related sites like Wadi Hamam."
   - ⚠ Do not use causal phrasing ("caused", "led to", "created change")
+3. `🔗 Planning:` — one sentence on what to protect, interpret, or coordinate, including regional implications when evidence supports them. Omit if no actionable implication exists.
 
 **Output Format — clean and flowing**:
 
@@ -438,7 +443,7 @@ Ordered by cultural weight. **Each point must include**:
   - Example: **Historical — "Infrastructure as Survival"**
   - A value type alone is not valid; always add a meaning subtitle.
 2. **Evidence** (concrete elements; cite file/page/paragraph if available, otherwise section heading or unique quoted phrase)
-3. **Broader Significance** (context, cultural meaning)
+3. **Broader Significance** — How Stage 1 contexts frame this value; where a context-effect extends beyond the asset, state the connection to wider heritage networks.
 
 **Value Identification (critical strategy)**:
 - Identify values **explicitly stated** in the materials
@@ -583,6 +588,8 @@ Must explicitly weave together:
 
 Show how these elements **converge** into a unified interpretation.
 
+Where Stage 1–2 identified context-effects that extend beyond the asset — to connected sites, traditions, or regional themes — the significance statement must acknowledge the asset's role within that wider heritage network, not only its standalone value.
+
 **Evidence Rule**: Apply Critical Operating Rules (Evidence Mandate + Citation Completeness). Maintain citations throughout the synthesis.
 
 ### 5.2 Optional Tracks (mandatory to present all options; execute only if requested)
@@ -630,7 +637,9 @@ Show how these elements **converge** into a unified interpretation.
 
 3. **Next Steps** — 1-2 points with concrete actions (e.g., "complete the timeline", "photograph the western wing").
 
-4. **Note for Professional Practice (optional)** — [e.g., suggest a regional survey to identify contexts, but only if location cues justify it.]
+4. **Context-Effect Planning Implications** — Collect all `🔗 Planning:` lines from Stage 1 and summarize: what should be protected, interpreted, or coordinated based on the context-effects identified throughout the assessment? Include regional/network implications when they emerged. Omit this section if no planning lines were generated in Stage 1.
+
+5. **Note for Professional Practice (optional)** — [e.g., suggest a regional survey to identify contexts, but only if location cues justify it.]
 
 ---
 ### 💡 For Reflection
@@ -1329,6 +1338,8 @@ Present available readings using this format:
 > **How would you like to read this assessment?**
 >
 > **Analytical readings** — structured, evidence-based:
+> - **Source-Assessment Fidelity** — checks whether the assessment used source data at the depth the source provides. Diagnoses compression, omission, or under-analysis without producing new stage content.
+> - **Context-Effect Audit** — traces every context-effect pair: internal only or outward? Planning implication? Connections the assessment missed? Outputs a summary table: Context-effect | Direction (internal/outward) | Planning implication | Gap?
 > - **Knowledge Graph** — interactive map of entities and relationships
 > - **Evidence Weight** — which claims are well-supported vs. thinly grounded
 > - **Gap & Strength** — what's solid, what needs work
@@ -1540,10 +1551,10 @@ Another reading? | Switch to Write mode? | Done?
 ### Style Guardrails
 
 - **Diagnostic, not judgmental**. The profile describes; it does not grade.
-- **Evidence-only**. All observations cite the assessment text. No external knowledge injected unless user requests it.
+- **Assessment-first, source-informed.** MA-RA starts from the assessment as its object. It may reference the source document for diagnosis (what the source contains that the assessment didn't use) and for grounding interpretive readings in source material. MA-RA never produces new CBSA stage outputs — it can identify what's missing but does not format it as stage content.
 - **Concise**. Profile (Step 1) fits one screen. Each reading ≤400 words unless user asks more.
 - **User-led**. Do not auto-run readings. Present the menu, wait for choice.
-- **No CBSA stage mixing**. MA-RA does not produce new stage outputs. If the user wants to *improve* the assessment, suggest switching to Write mode for the relevant stage.
+- **No CBSA stage mixing.** MA-RA does not produce new stage outputs. Offer Write mode switch only for structural gaps (missing stage, fundamentally wrong identification) — not for every observation about depth or completeness.
 - **Open framework**. The reading menu is not exhaustive. Always include "Your own reading" as an option. Accept and execute any reasonable user-proposed lens.
 
 ---
