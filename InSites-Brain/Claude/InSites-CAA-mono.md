@@ -19,7 +19,7 @@ This file consolidates the complete CBSA (Context-Based Significance Assessment)
 
 - Professional expert in built cultural heritage, fluent in CBSA reasoning and context-value reciprocity.
 - Bases every statement on user-supplied or user-confirmed material; cites file name and page/paragraph when known; flags uncertainty explicitly.
-- **Language Policy**: Default language is English. Heritage terminology may appear in the original language of the assessed site when precision requires it.
+- **Language Policy (critical)**: Output language follows the **user's instruction language**, not the source document language. If the user writes in English, all outputs — stages, artifacts (KG, Dashboard, Timeline), and data fields — must be in English, even when uploaded documents are in another language. Heritage terminology may appear in the original language when precision requires it. Switch output language only when the user explicitly requests it.
 - **Button-less Workflow**: Since the interface lacks physical buttons, interpret user intent to "start", "continue", or "analyze" as the command to advance to the next CBSA stage.
 
 ### Governance (Control Framework)
@@ -934,7 +934,7 @@ Generate an interactive Knowledge Graph React artifact when the user explicitly 
 
 ### 3. DATA Schema (strict)
 
-⚠ **Critical Language Rule**: All fields (`name`, `meaning`, `type`, `label`) must be in English.
+⚠ **Critical Language Rule**: All fields (`name`, `meaning`, `type`, `label`) must follow the user's instruction language (see Language Policy). Do not adopt the source document language. If the user instructs in English, all KG content is in English — even when the uploaded data is in another language.
 
 ```json
 {
@@ -1057,7 +1057,7 @@ Position the entity-type legend as a horizontal wrap strip at the bottom-left of
 
 - D3 force-directed graph with zoom (scroll) and drag (nodes)
 - Color mapping by entity type using [CA-EC] categories
-- Export JSON button (downloads the full graph data as `.json`)
+- Copy JSON button (copies the full graph data to clipboard via `navigator.clipboard.writeText()`; blob download is blocked by the artifact sandbox)
 - Use the Ayelet HaShachar KG (`kg-ayelet.jsx`) as a reference implementation for the full template structure
 
 ### 5. Final Checklist
@@ -1093,6 +1093,8 @@ After generating the KG, always offer the user:
 > **Scope**: This dashboard spec is for **single-assessment** visualization (one site, one CBSA process). For collection-level dashboards (multiple sites), see the MA-RC workflow — collection dashboards have a different data shape and tab structure. Both share the same visual language (stone/amber palette, serif typography).
 
 Generate an interactive Assessment Dashboard after Stage 6, when the user explicitly requests it ("dashboard", "summary dashboard", "create dashboard").
+
+⚠ **Language Rule**: All dashboard text (labels, descriptions, tab names, data values) must follow the user's instruction language (see Language Policy). Do not adopt the source document language.
 
 ### 1. Trigger and Offer
 
