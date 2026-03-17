@@ -78,15 +78,24 @@ When changing a **platform constraint** or adding a **platform-specific feature*
 
 ```
 InSites-Brain/
-  Claude/            # Claude.ai bot — InSites-CAA.md prompt, Skills, KG artifacts
+  Claude/            # Claude.ai bot
+    InSites-CAA.md   # Core system prompt (~870 lines, always loaded)
+    skills/          # Project Skills (loaded on demand)
+      KG-skill.md                  # Knowledge Graph [CA-KG] — merged SKILL.md + CA-KG
+      Dashboard-skill-generate.md  # Assessment Dashboard [CA-DB]
+      MA-RA-skill.md               # Read-Assessment [MA-RA]
+      MA-RC-skill.md               # Read-Collection [MA-RC]
+      Dashboard-review-skill.md    # UX review framework (Claude Code tool)
+    KG-Skill-en/     # Legacy KG skill (reference — superseded by skills/KG-skill.md)
+    KG-artifacts/    # Frontend: kg.js, knowledge-graph.css, test HTML files
   Gemini/            # Google Gemini — prompts, OPAL
   GPTs/              # OpenAI GPT — system prompts, knowledge files
     CAA-GTPs (Claude.ai-Spilts)/  # GPT installation package (upload-ready)
       Original/      # Frozen backup — do not modify
   agent-for-agents/  # "The Architect" — cross-platform meta-agent
   design/            # Cross-platform design specs (source of truth for mini-agents)
-    MA-RA-spec-v2.md             # Read-Assessment workflow (NOT YET in bot prompts)
-    MA-RC-spec-v2.md             # Read-Collection bot instructions (v2 in Claude; GPT/Gemini = v1)
+    MA-RA-spec-v2.md             # Read-Assessment spec (source of truth)
+    MA-RC-spec-v2.md             # Read-Collection spec (source of truth)
     MA-RC-guide.md               # Read-Collection rationale + workshop usage
     Single-Dashboard-example.html # Single-assessment dashboard reference
     less-is-more.md              # LIM verbosity reductions
@@ -96,6 +105,18 @@ InSites-Brain/
       small-dataset-4-benchmark/  # EAC11 test data (3 formats + README)
       result/        # MA-RC execution output (15 sites)
 ```
+
+## Skill Architecture (v2)
+
+InSites-CAA.md v2 splits the monolithic prompt into a core (~870 lines, always loaded) + 4 Project Skills (loaded on demand when triggered). This reduces the always-loaded token count by ~43%.
+
+| Component | Lines | When loaded |
+|-----------|-------|-------------|
+| InSites-CAA.md (core) | ~870 | Always |
+| KG-skill.md | ~620 | On "kg", "knowledge graph" |
+| Dashboard-skill-generate.md | ~200 | On "dashboard" |
+| MA-RA-skill.md | ~270 | On "read assessment" |
+| MA-RC-skill.md | ~50 | On "read collection" |
 
 ## Mini-Agent Sync Status
 

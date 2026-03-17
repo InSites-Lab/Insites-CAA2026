@@ -56,7 +56,12 @@ Upload to `/atar.bot/canvas/`:
 
 ### Claude Bot (Claude.ai Projects)
 - Set `InSites-Brain/Claude/InSites-CAA.md` as the Project prompt
-- Add `InSites-Brain/Claude/KG-Skill-en/SKILL.md` as a Claude Skill
+- Add 4 Project Skills from `InSites-Brain/Claude/skills/`:
+  - `KG-skill.md` — Knowledge Graph generation
+  - `Dashboard-skill-generate.md` — Assessment Dashboard generation
+  - `MA-RA-skill.md` — Read-Assessment workflow
+  - `MA-RC-skill.md` — Read-Collection workflow
+- Optional: `Dashboard-review-skill.md` (UX review tool, not bot-facing)
 
 ### Testing KG Rendering
 Open in a browser to verify:
@@ -79,11 +84,15 @@ Verify: correct node colors per entity type, click-to-info panel, Escape to clos
 - Expected: Assessment Profile (coverage table), Reading Menu, selected reading execution
 - Dashboard reference: `InSites-Brain/design/Single-Dashboard-example.html`
 
-**Claude.ai Project deployment:**
-1. Set `InSites-Brain/Claude/InSites-CAA.md` as Project prompt
-2. Add `InSites-Brain/Claude/KG-Skill-en/SKILL.md` as a Claude Skill
-3. Upload test data files to the project conversation
-4. Test triggers: "start", "read collection", "read assessment", "kg", "dashboard"
+**Claude.ai Project deployment (v2):**
+1. Disable any global skills that overlap (e.g., `cbsa-knowledge-graph`, dashboard review) via Settings → Skills toggle
+2. Create a new Claude.ai Project
+3. Set `InSites-Brain/Claude/InSites-CAA.md` as the Project prompt (custom instructions)
+4. Add 4 Project Skills from `InSites-Brain/Claude/skills/`:
+   - `KG-skill.md`, `Dashboard-skill-generate.md`, `MA-RA-skill.md`, `MA-RC-skill.md`
+5. Upload test data files to the project conversation
+6. Test triggers: "start", "read collection", "read assessment", "kg", "dashboard"
+7. See `InSites-Brain/Claude/SETUP-GUIDE.md` for full step-by-step instructions
 
 ## Core Architecture
 
