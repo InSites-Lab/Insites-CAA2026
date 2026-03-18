@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinneret Sites · Heritage Collection Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --stone-50:#fafaf9;--stone-100:#f5f5f4;--stone-200:#e7e5e4;--stone-300:#d6d3d1;
+  --stone-400:#a8a29e;--stone-500:#78716c;--stone-600:#57534e;--stone-700:#44403c;
+  --stone-800:#292524;--stone-900:#1c1917;
+  --amber-100:#fef3c7;--amber-200:#fde68a;--amber-300:#fcd34d;--amber-400:#fbbf24;
+  --amber-500:#f59e0b;--amber-600:#d97706;--amber-700:#b45309;
+  --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--stone-100);color:var(--stone-900);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+/* Layout */
+.page-wrap{max-width:1320px;margin:0 auto;padding:24px 20px 40px;}
+
+/* Header — rounded card */
+.header{background:var(--stone-800);color:var(--stone-50);padding:24px 28px;border-radius:var(--radius);margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;box-shadow:var(--shadow);}
+.header h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;}
+.header-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--stone-400);margin-top:4px;}
+.header-meta span{display:flex;align-items:center;gap:4px;}
+.badge{background:var(--amber-500);color:var(--stone-900);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+/* Tabs — pill/card style */
+.tab-bar{display:flex;gap:2px;margin-bottom:0;}
+.tab-btn{padding:9px 20px;font-size:12.5px;font-family:var(--font-sans);font-weight:500;border:none;background:var(--stone-200);cursor:pointer;color:var(--stone-600);border-radius:8px 8px 0 0;transition:all 0.15s ease;letter-spacing:-0.1px;}
+.tab-btn:hover{color:var(--stone-800);background:var(--stone-300);}
+.tab-btn.active{color:var(--stone-900);background:white;font-weight:600;box-shadow:0 -2px 6px rgba(0,0,0,.06);}
+
+/* Tab content container */
+.tab-content{background:white;border-radius:0 var(--radius) var(--radius) var(--radius);padding:24px;box-shadow:var(--shadow);}
+.tab-panel{display:none;animation:fadeIn 0.2s ease;}
+.tab-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* Guide boxes — left-border accent, compact, collapsible */
+.guide-box{background:var(--amber-100);border-left:3px solid var(--amber-500);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:20px;font-size:13px;color:var(--stone-700);cursor:pointer;position:relative;}
+.guide-box::after{content:'▾';position:absolute;right:12px;top:12px;font-size:11px;color:var(--amber-600);}
+.guide-box.collapsed .guide-body{display:none;}
+.guide-box.collapsed::after{content:'▸';}
+.guide-title{font-weight:600;font-size:13px;margin-bottom:4px;}
+.guide-body{margin-top:6px;font-size:12px;line-height:1.6;}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px;}
+.kpi{background:var(--stone-50);border:1px solid var(--stone-200);border-radius:var(--radius);padding:16px;text-align:center;}
+.kpi-val{font-size:26px;font-weight:700;color:var(--stone-800);font-family:var(--font-mono);letter-spacing:-1px;}
+.kpi-label{font-size:11px;color:var(--stone-500);font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:0.3px;}
+
+/* Chart cards */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chart-card{background:var(--stone-50);border:1px solid var(--stone-200);border-radius:var(--radius);padding:16px;}
+.chart-card h3{font-size:13px;font-weight:600;color:var(--stone-800);margin-bottom:10px;letter-spacing:-0.1px;}
+canvas{max-height:280px;}
+
+/* Map */
+#map{height:520px;width:100%;border-radius:var(--radius);border:1px solid var(--stone-200);box-shadow:var(--shadow);}
+.map-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.map-filters label{font-size:11px;color:var(--stone-600);font-weight:600;margin-right:4px;text-transform:uppercase;letter-spacing:0.3px;}
+.fbtn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--stone-300);background:white;font-size:11px;cursor:pointer;font-family:var(--font-sans);font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s ease;box-shadow:var(--shadow);}
+.fbtn:hover{border-color:var(--stone-500);}
+.fbtn.active{background:var(--stone-800);color:white;border-color:var(--stone-800);}
+.fdot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+/* Popup */
+.leaflet-popup-content{font-family:var(--font-sans);max-width:320px;line-height:1.5;font-size:12px;}
+.leaflet-popup-content-wrapper{border-radius:var(--radius) !important;box-shadow:var(--shadow) !important;}
+.p-title{font-size:14px;font-weight:700;color:var(--stone-900);margin-bottom:2px;}
+.p-sub{font-size:11px;color:var(--stone-500);margin-bottom:6px;font-weight:500;}
+.p-desc{font-size:11.5px;color:var(--stone-700);margin-bottom:6px;line-height:1.5;}
+.p-hl{background:var(--amber-100);border-left:3px solid var(--amber-500);padding:6px 10px;font-size:11px;color:var(--amber-700);margin-bottom:6px;border-radius:0 6px 6px 0;font-weight:500;}
+
+/* Tables */
+.dtable{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;}
+.dtable th{background:var(--stone-50);padding:8px 10px;text-align:left;font-weight:600;color:var(--stone-600);border-bottom:2px solid var(--stone-200);position:sticky;top:0;font-size:11px;letter-spacing:0.1px;z-index:1;}
+.dtable td{padding:7px 10px;border-bottom:1px solid var(--stone-200);transition:background 0.1s;}
+.dtable tr:hover td{background:var(--amber-100);}
+.dtable .num{text-align:center;font-weight:600;font-family:var(--font-mono);font-size:11px;}
+.dot{font-size:16px;text-align:center;}
+.dot-e{color:var(--amber-600);}.dot-i{color:var(--stone-400);}.dot-a{color:var(--stone-300);}
+.scroll-x{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--stone-200);background:white;box-shadow:var(--shadow);}
+.sticky-col{position:sticky;left:0;background:white;z-index:2;border-right:1px solid var(--stone-200);}
+.dtable tr:hover .sticky-col{background:var(--amber-100);}
+
+/* Site link */
+.site-link{background:none;border:none;font-family:var(--font-sans);font-size:inherit;font-weight:600;color:var(--stone-900);cursor:pointer;text-decoration:none;padding:0;text-align:left;transition:color 0.15s;}
+.site-link:hover{color:var(--amber-700);}
+
+/* Value specs panel */
+.value-specs{margin-top:16px;background:var(--stone-50);border:1px solid var(--stone-200);border-radius:var(--radius);padding:16px;animation:fadeIn 0.2s ease;}
+.value-specs h4{font-size:13px;font-weight:700;color:var(--stone-800);margin-bottom:10px;}
+.spec-item{padding:6px 0;border-bottom:1px solid var(--stone-200);font-size:12px;}
+.spec-item:last-child{border:none;}
+.spec-type{font-weight:600;color:var(--stone-700);}
+.spec-desc{color:var(--stone-600);}
+
+/* Gap colors */
+.g-green{background:#dcfce7;color:#166534;text-align:center;font-weight:600;font-size:11px;}
+.g-yellow{background:#fef9c3;color:#854d0e;text-align:center;font-weight:600;font-size:11px;}
+.g-red{background:#fee2e2;color:#991b1b;text-align:center;font-weight:600;font-size:11px;}
+
+/* Strength colors */
+.str-strong{color:#16a34a;font-weight:600;}
+.str-moderate{color:#d97706;font-weight:600;}
+.str-weak{color:#dc2626;font-weight:600;}
+
+/* Per-site tags */
+.site-tag{display:inline-block;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:500;margin:2px 4px 2px 0;cursor:pointer;transition:all .12s;}
+.site-tag:hover{transform:scale(1.05);}
+.tag-beatitudes{background:#fef3c7;color:#92400e}
+.tag-capernaum{background:#dbeafe;color:#1e40af}
+.tag-chorazin{background:#dcfce7;color:#166534}
+.tag-kanna{background:#fce7f3;color:#9d174d}
+.tag-magdala{background:#e0e7ff;color:#3730a3}
+.tag-mt_tabor{background:#f3e8ff;color:#6b21a8}
+.tag-tabgha{background:#ffedd5;color:#9a3412}
+
+/* Cluster cards */
+.cluster-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.cluster-card{padding:16px;border-radius:var(--radius);background:var(--stone-50);border:1px solid var(--stone-200);box-shadow:var(--shadow);}
+.cl-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cl-icon{font-size:16px;}
+.cl-title{font-size:14px;font-weight:700;color:var(--stone-800);letter-spacing:-0.2px;}
+.cl-desc{font-size:12px;color:var(--stone-600);margin-bottom:10px;line-height:1.55;}
+.cl-sites{display:flex;flex-wrap:wrap;gap:4px;}
+
+/* Section titles */
+.stitle{font-size:14px;font-weight:700;color:var(--stone-900);margin-bottom:8px;letter-spacing:-0.2px;}
+.sdesc{font-size:12px;color:var(--stone-500);margin-bottom:14px;}
+
+/* Legend */
+.legend-row{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--stone-500);font-weight:500;}
+.legend-row span{display:flex;align-items:center;gap:5px;}
+.legend-swatch{width:14px;height:10px;border-radius:3px;display:inline-block;}
+
+/* Back navigation */
+.back-nav{margin-bottom:12px;}
+.back-btn{background:var(--stone-800);color:white;border:none;padding:6px 16px;border-radius:20px;font-size:12px;font-family:var(--font-sans);font-weight:500;cursor:pointer;transition:all .15s;}
+.back-btn:hover{background:var(--stone-700);transform:translateX(-2px);}
+
+/* Footer */
+.footer{text-align:center;padding:16px;font-size:11px;color:var(--stone-400);margin-top:8px;}
+
+/* Responsive */
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .chart-grid,.cluster-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .tab-btn{padding:7px 12px;font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>Kinneret Sites — Heritage Collection Dashboard</h1>
+    <div class="header-meta">
+      <span>📚 7 sites</span>
+      <span>🌍 Israel, Galilee</span>
+      <span>📊 Depth: <span class="badge">Rich</span></span>
+      <span>📅 2026-03-18</span>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--stone-400);text-align:right">
+    Source: Site description documents<br>Method: MA-RC Read-Collection
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar" id="tab-bar"></div>
+
+<!-- Tab content container -->
+<div class="tab-content">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="tab-overview" class="tab-panel active">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">📖 Overview</div>
+    <div class="guide-body">Collection-level orientation: headline numbers and distribution charts. Look for imbalances in type, period, ownership or evidence strength that might affect a nomination strategy.</div>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="chart-grid" id="overview-charts">
+    <div class="chart-card"><h3>Heritage Character</h3><canvas id="ch-heritage"></canvas></div>
+    <div class="chart-card"><h3>Argument Strength</h3><canvas id="ch-argstrength"></canvas></div>
+    <div class="chart-card"><h3>Evidence Basis</h3><canvas id="ch-evidence"></canvas></div>
+    <div class="chart-card"><h3>Ownership Distribution</h3><canvas id="ch-ownership"></canvas></div>
+  </div>
+</div>
+
+<!-- Back navigation pill (shown after cross-tab jump to map) -->
+<div class="back-nav" id="back-nav" style="display:none">
+  <button class="back-btn" onclick="goBack()">← Back to <span id="back-label"></span></button>
+</div>
+
+<!-- ===== MAP ===== -->
+<div id="tab-map" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">🗺️ Map</div>
+    <div class="guide-body">Geographic distribution. Filter by value type to see which sites carry which values. Click markers for significance summaries. Notice the tight NW-shore cluster vs. the two outliers.</div>
+  </div>
+  <div class="map-filters" id="map-filters"></div>
+  <div id="map"></div>
+</div>
+
+<!-- ===== VALUES ===== -->
+<div id="tab-values" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">💎 Values Matrix</div>
+    <div class="guide-body">Sites × value types. ● = explicit in text, ◐ = implied, ○ = absent. Click a site name to see its value specifications — what each value actually means for that site.</div>
+  </div>
+  <div class="scroll-x"><table class="dtable" id="values-table"></table></div>
+  <div id="value-specs-panel"></div>
+</div>
+
+<!-- ===== ARGUMENTS ===== -->
+<div id="tab-arguments" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">⚖️ Significance Arguments</div>
+    <div class="guide-body">What each site's significance claim rests on, how strong it is, and how far it reaches. Look for sites where argument strength doesn't match claim scope — those need work.</div>
+  </div>
+  <div class="chart-grid" style="margin-bottom:20px;">
+    <div class="chart-card"><h3>Significance Premises</h3><canvas id="ch-premises"></canvas></div>
+    <div class="chart-card"><h3>Claim Scope</h3><canvas id="ch-scope"></canvas></div>
+  </div>
+  <div class="stitle">Argument Assessment</div>
+  <div class="scroll-x"><table class="dtable" id="args-table"></table></div>
+</div>
+
+<!-- ===== GAPS ===== -->
+<div id="tab-gaps" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">🚦 Documentation Gaps</div>
+    <div class="guide-body">Traffic-light matrix: green = documented, yellow = partial, red = missing. Identifies which sites need priority documentation work before a dossier submission.</div>
+  </div>
+  <div class="scroll-x"><table class="dtable" id="gaps-table"></table></div>
+</div>
+
+<!-- ===== CROSS-TABS ===== -->
+<div id="tab-crosstabs" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">📊 Cross-Tabs</div>
+    <div class="guide-body">Stacked breakdowns: values by heritage character, values by argument strength, values by landscape relationship. Shows where value coverage is thin or concentrated.</div>
+  </div>
+  <div class="chart-grid" id="ct-charts">
+    <div class="chart-card"><h3>Values by Heritage Character</h3><canvas id="ch-ct-heritage"></canvas></div>
+    <div class="chart-card"><h3>Values by Argument Strength</h3><canvas id="ch-ct-argstr"></canvas></div>
+    <div class="chart-card"><h3>Values by Landscape Relationship</h3><canvas id="ch-ct-landscape"></canvas></div>
+    <div class="chart-card"><h3>Values by Evidence Basis</h3><canvas id="ch-ct-evidence"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== CLUSTERS ===== -->
+<div id="tab-clusters" class="tab-panel">
+  <div class="guide-box" onclick="this.classList.toggle('collapsed')">
+    <div class="guide-title">🏷️ Management Clusters</div>
+    <div class="guide-body">Groupings for coordinated management. Sites appear in multiple clusters — that's intentional. Each cluster implies a different management priority.</div>
+  </div>
+  <div class="cluster-grid" id="cluster-grid"></div>
+</div>
+
+</div><!-- end tab-content -->
+
+<div class="footer">Kinneret Sites Heritage Collection Dashboard &middot; Generated by InSites CBSA &middot; CA-DB-C</div>
+
+</div><!-- end page-wrap -->
+
+<script>
+/* ===== DATA ===== */
+const DATA = [
+  {id:"beatitudes",name:"Mt. of Beatitudes",lat:32.8808,lng:35.5556,type:"Religious memorial",typeCategory:"single",period:"4th c. CE – modern",periodCategory:"multiperiod",description:"Modern octagonal memorial church (1936–38) on a spur 1 km NE of Tabgha, with hospice, pastoral gardens and panoramic view.",significanceSummary:"The Sermon on the Mount is a prime symbol of Jesus' ministry, laying the basis for Christian Charity, Piety and Grace. The site preserves spiritual significance through its serene landscape and association with the 'sacred triangle.'",highlight:"Spiritual significance carried entirely by landscape, tradition and setting.",values:{Historical:"i",Scientific:"a",Landscape:"e",Community:"i",Intangible:"e",Architectural:"i",Nature:"i",Educational:"a"},valueSpecs:[{type:"Spiritual-theological",spec:"Sermon on the Mount = foundation of Christian Charity, Piety and Grace; Beatitudes replace Mosaic commandments"},{type:"Landscape-experiential",spec:"Serene qualities preserve spiritual significance; panoramic view over ministry area"},{type:"Pilgrimage continuity",spec:"Tradition since early Christianity; Egeria's testimony; papal visits 1964, 2000"}],integrity:"variable",owners:["Franciscan Missionary Sisters"],ownerCount:1,claimScope:"regional",premises:["cultural_landscape","community","pilgrimage_continuity"],argType:"event-memorial",argStrength:"moderate",argNote:"No archaeological trace of event; depends on tradition + setting",evidenceBasis:"tradition_and_landscape",heritageChar:"commemoration-dominant",landscape:"lakeshore_cluster",clusters:["sacred_triangle_corridor","landscape_integrity"],docScore:50,protection:"Church property"},
+  {id:"capernaum",name:"Capernaum",lat:32.8813,lng:35.5753,type:"Archaeological site + compounds",typeCategory:"ensemble",period:"5th c. BCE – Byzantine",periodCategory:"ancient",description:"Large site: Franciscan compound with 1st c. CE village remains, House of St. Peter, Byzantine octagonal church and monumental white-limestone synagogue; Greek-Orthodox compound.",significanceSummary:"The most important Holy site on the N shore; Jesus' 'home away from home.' Mentioned 21 times in the Gospels; second only to Jerusalem in narrative intensity.",highlight:"Strongest evidential basis — archaeological corroboration + dense Gospel narrative.",values:{Historical:"e",Scientific:"e",Landscape:"i",Community:"e",Intangible:"e",Architectural:"e",Nature:"a",Educational:"e"},valueSpecs:[{type:"Biographical-narrative",spec:"Jesus' 'home away from home'; 21 Gospel mentions; more than half of Gospel narratives located here"},{type:"Archaeological-evidential",spec:"Fishing village from time of Jesus confirmed; House of St. Peter identified"},{type:"Coexistence",spec:"Jewish and Christian monumental architecture standing side-by-side in Byzantine period"},{type:"Architectural",spec:"Largest and most magnificent Byzantine synagogue in Galilee"}],integrity:"good",owners:["Franciscan Custody","Greek Orthodox Patriarchate","Israel NPA"],ownerCount:3,claimScope:"international",premises:["uniqueness","archive","completeness","community"],argType:"place-as-character",argStrength:"strong",argNote:"Identification solid; archaeological + textual evidence converge",evidenceBasis:"archaeological_and_textual",heritageChar:"archaeological-dominant",landscape:"lakeshore_cluster",clusters:["sacred_triangle_corridor","archaeological_research","multi_owner_compound"],docScore:67,protection:"Mixed: Church + NPA"},
+  {id:"chorazin",name:"Chorazin",lat:32.9103,lng:35.5644,type:"Archaeological National Park",typeCategory:"single",period:"Iron Age II – Byzantine",periodCategory:"ancient",description:"Archaeological site on basaltic spur. Partly restored late-Roman/Byzantine village with monumental basalt synagogue, richly carved elements, megalithic dolmen tombs.",significanceSummary:"Jesus preached and performed miracles here ('Woe to you, Chorazin!'). A rare example of a typical Talmudic village in a pristine landscape virtually unchanged in 4,000 years.",highlight:"Dual argument: Gospel association + typological rarity of intact Talmudic village-landscape.",values:{Historical:"e",Scientific:"e",Landscape:"e",Community:"i",Intangible:"i",Architectural:"e",Nature:"e",Educational:"i"},valueSpecs:[{type:"Biblical-narrative",spec:"Chastisement passage: 'Woe to you, Chorazin!' — Jesus preached, was refused"},{type:"Typological rarity",spec:"Rare example of a typical Talmudic late Roman – Byzantine village"},{type:"Landscape integrity",spec:"Pristine landscape unchanged in 4,000 years"},{type:"Spatial-contextual",spec:"Illustrates the spatial frame of Jesus' activity in the region"}],integrity:"good",owners:["Israel NPA"],ownerCount:1,claimScope:"national",premises:["uniqueness","cultural_landscape","archive"],argType:"place-as-character",argStrength:"strong",argNote:"Dual argument (Gospel + typological) is robust",evidenceBasis:"archaeological_and_textual",heritageChar:"archaeological-dominant",landscape:"hilltop_isolate",clusters:["archaeological_research","landscape_integrity"],docScore:67,protection:"National Park"},
+  {id:"kanna",name:"Kafr Kanna",lat:32.7475,lng:35.3397,type:"Living village + churches",typeCategory:"urban",period:"Bronze Age – present",periodCategory:"multiperiod",description:"Living village with churches in ancient nucleus, including Franciscan Wedding Church (1880s) over archaeological remains; Greek Orthodox church; mosques.",significanceSummary:"Long revered as site of Jesus' first miracle — turning water into wine. Continuous pilgrimage since Byzantine period. Authenticity questioned but is an ancient tradition.",highlight:"Only living-heritage site; acknowledged doubt about identification is part of its record.",values:{Historical:"e",Scientific:"i",Landscape:"i",Community:"e",Intangible:"e",Architectural:"i",Nature:"a",Educational:"i"},valueSpecs:[{type:"Miraculous-foundational",spec:"First miracle of Jesus — water into wine; 'the event where Jesus went public'"},{type:"Pilgrimage continuity",spec:"From the Byzantine period onwards, repeatedly visited by pilgrims"},{type:"Living heritage",spec:"Functioning village; Muslim majority + Christian minority; churches and mosques in ancient nucleus"},{type:"Contested authenticity",spec:"Text itself states 'its authenticity has been questioned'"}],integrity:"variable",owners:["Franciscan Custody","Greek Orthodox","Muslim Waqf","Private","Municipality"],ownerCount:5,claimScope:"regional",premises:["community","pilgrimage_continuity","uniqueness"],argType:"event-memorial",argStrength:"weak",argNote:"Text acknowledges identification is questioned; weakest evidentiary basis",evidenceBasis:"tradition_only",heritageChar:"living-heritage",landscape:"valley_embedded",clusters:["multi_owner_compound"],docScore:50,protection:"Mixed: Church + Waqf + Municipal"},
+  {id:"magdala",name:"Magdala",lat:32.8403,lng:35.5150,type:"Archaeological site",typeCategory:"single",period:"Hellenistic – Byzantine",periodCategory:"ancient",description:"Archaeological site along W lakeshore: 1st c. CE public/private buildings, paved Cardo Maximus, harbor, 1st c. fishing boat, Byzantine monastery with mosaic floor.",significanceSummary:"Hometown of Mary Magdalene. Best-preserved 1st c. CE Roman town-center in Eastern Galilee — complementing scriptures and deepening understanding of Jesus' context.",highlight:"Best-preserved 1st c. urban fabric — archaeology speaks independently of tradition.",values:{Historical:"e",Scientific:"e",Landscape:"i",Community:"e",Intangible:"e",Architectural:"e",Nature:"a",Educational:"e"},valueSpecs:[{type:"Personal-associative",spec:"Hometown of Mary Magdalene — 'one of the most revered disciples, consecrated worldwide'"},{type:"Archaeological-scientific",spec:"Best-preserved 1st century CE Roman town-center in Eastern Galilee"},{type:"Contextual-interpretive",spec:"Remains 'complement the scriptures and provide deeper understanding of the cultural context'"}],integrity:"good",owners:["Franciscan Custody","Israel Lands Authority","Private"],ownerCount:3,claimScope:"regional",premises:["archive","completeness","uniqueness"],argType:"place-as-character",argStrength:"strong",argNote:"Identification solid; evidence is strong",evidenceBasis:"archaeological_and_textual",heritageChar:"archaeological-dominant",landscape:"lakeshore_cluster",clusters:["archaeological_research","multi_owner_compound"],docScore:67,protection:"Mixed: Franciscan + Govt + Private"},
+  {id:"mt_tabor",name:"Mt. Tabor",lat:32.6868,lng:35.3932,type:"Mountain + religious compounds",typeCategory:"landscape",period:"4th c. CE – modern",periodCategory:"multiperiod",description:"Uniquely rounded mountain (~1,800 ft) in Jezreel Valley. Franciscan Church of Transfiguration + monastery; Greek Orthodox church + monastery.",significanceSummary:"Traditional site of the Transfiguration — Jesus revealed as divine, renewing hope of the Parousia. Tradition from earliest Christianity (4th c. remains). Natural beauty.",highlight:"Geographic outlier; competing identification with Mt. Hermon not addressed.",values:{Historical:"e",Scientific:"i",Landscape:"e",Community:"e",Intangible:"e",Architectural:"e",Nature:"e",Educational:"i"},valueSpecs:[{type:"Theological-eschatological",spec:"Transfiguration = Jesus revealed as divine; 'renewed hope of the Parousia, the Second Coming'"},{type:"Natural grandeur",spec:"Uniquely rounded mountain; natural beauty; likely hosted pagan worship before Christianity"},{type:"Pilgrimage-architectural",spec:"Multiple church phases from 4th c.; Franciscan + Greek Orthodox; continuous sacred use"}],integrity:"good",owners:["Franciscan Custody","Greek Orthodox Patriarchate"],ownerCount:2,claimScope:"international",premises:["community","pilgrimage_continuity","cultural_landscape"],argType:"event-memorial",argStrength:"moderate",argNote:"Ancient tradition but competing identification (Mt. Hermon) not addressed",evidenceBasis:"tradition_and_landscape",heritageChar:"commemoration-dominant",landscape:"hilltop_isolate",clusters:["outlier"],docScore:50,protection:"Church property"},
+  {id:"tabgha",name:"Tabgha",lat:32.8739,lng:35.5481,type:"Compound complex + archaeological",typeCategory:"ensemble",period:"Roman – Crusader – modern",periodCategory:"multiperiod",description:"Multiple compounds: Benedictine Church of Multiplication (over 5th c. basilica with famous mosaics); Franciscan Church of Primacy; ANSMI spring; Byzantine Beatitude chapel; lush valley.",significanceSummary:"Since 4th c. CE, identified with three Gospel events: multiplication of loaves, Sermon on the Mount, post-resurrection appearance. Magnificent 5th c. mosaics. Layered palimpsest of sacred commemoration.",highlight:"Richest layered site: three events, five church phases, outstanding mosaics, Egeria's eyewitness.",values:{Historical:"e",Scientific:"e",Landscape:"e",Community:"e",Intangible:"e",Architectural:"e",Nature:"e",Educational:"e"},valueSpecs:[{type:"Multi-event commemorative",spec:"Three Gospel events at one site: multiplication, Sermon on the Mount, resurrection appearance"},{type:"Artistic",spec:"5th c. mosaic floors — 'most admirable'; basket with loaves and fish; Nile-landscape transepts"},{type:"Archaeological-stratigraphic",spec:"Five chapel phases at Church of Primacy; palimpsest from 4th–13th c."},{type:"Literary-evidential",spec:"Egeria's 4th c. testimony anchors traditions to specific physical locations"},{type:"Landscape-productive",spec:"Superb winter fishing ground; springs for agriculture; rural scene reminiscent of ancient landscape"}],integrity:"good",owners:["Benedictine / German Catholic Society","Franciscan Custody","ANSMI"],ownerCount:3,claimScope:"international",premises:["uniqueness","archive","completeness","assessment_impact","cultural_landscape"],argType:"event-memorial",argStrength:"strong",argNote:"Multiple independent evidence lines: Egeria, five phases, mosaics, stratigraphy",evidenceBasis:"archaeological_and_textual",heritageChar:"commemoration-dominant",landscape:"lakeshore_cluster",clusters:["sacred_triangle_corridor","landscape_integrity","multi_owner_compound"],docScore:67,protection:"Multiple church properties"}
+];
+
+const VALUE_TYPES = ["Historical","Scientific","Landscape","Community","Intangible","Architectural","Nature","Educational"];
+const VALUE_COLORS = ["#b45309","#0369a1","#15803d","#9333ea","#be185d","#c2410c","#047857","#4338ca"];
+
+const CLUSTER_DEFS = {
+  sacred_triangle_corridor: {title:"Sacred Triangle — NW Shore Corridor",desc:"Shared pilgrim circuit linking Tabgha, Mt. of Beatitudes, and Capernaum along the NW shore. These three sites form a unified spiritual landscape visited sequentially since Byzantine times.",icon:"\u26EA"},
+  archaeological_research: {title:"Archaeological-Research Priority",desc:"Sites with active or recent excavation programs yielding significant material evidence. Archaeological findings directly support significance arguments.",icon:"\uD83D\uDD2C"},
+  landscape_integrity: {title:"Landscape Integrity",desc:"Sites where the physical setting is cited as a core component of significance. The landscape itself carries heritage value beyond the built or excavated remains.",icon:"\uD83C\uDF3F"},
+  multi_owner_compound: {title:"Multi-Owner Compounds",desc:"Sites with 2–5 distinct owners or custodians. Coordination between religious orders, government agencies, and private parties is essential for coherent management.",icon:"\uD83C\uDFDB"},
+  outlier: {title:"Geographic Outlier",desc:"Separate from the Sea of Galilee cluster. Geographic distance creates distinct management and interpretive challenges.",icon:"\uD83D\uDCCD"}
+};
+
+const TAG_CLASS = {beatitudes:"tag-beatitudes",capernaum:"tag-capernaum",chorazin:"tag-chorazin",kanna:"tag-kanna",magdala:"tag-magdala",mt_tabor:"tag-mt_tabor",tabgha:"tag-tabgha"};
+
+/* ===== TABS ===== */
+const TABS = [
+  {id:"overview",label:"Overview"},
+  {id:"map",label:"Map"},
+  {id:"values",label:"Values"},
+  {id:"arguments",label:"Arguments"},
+  {id:"gaps",label:"Gaps"},
+  {id:"crosstabs",label:"Cross-Tabs"},
+  {id:"clusters",label:"Clusters"}
+];
+
+let mapInstance = null;
+let mapMarkers = [];
+let currentTab = 'overview';
+let prevTab = null;
+
+function initTabs(){
+  const bar = document.getElementById('tab-bar');
+  TABS.forEach((t,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i===0?' active':'');
+    btn.textContent = t.label;
+    btn.dataset.tab = t.id;
+    btn.onclick = () => showTab(t.id);
+    bar.appendChild(btn);
+  });
+  // Handle browser back/forward
+  window.addEventListener('popstate', (e) => {
+    if(e.state && e.state.tab) showTab(e.state.tab, false);
+  });
+  // Set initial state
+  const hash = location.hash.replace('#','');
+  if(hash && TABS.find(t=>t.id===hash)) showTab(hash, false);
+}
+
+function showTab(id, pushState){
+  if(pushState === undefined) pushState = true;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const btn = document.querySelector('.tab-btn[data-tab="'+id+'"]');
+  if(btn) btn.classList.add('active');
+  if(id==='map' && !mapInstance) initMap();
+  if(id==='map' && mapInstance) setTimeout(()=>mapInstance.invalidateSize(),100);
+  // Hide back-nav when user manually switches tabs (not via cross-tab jump)
+  if(id !== 'map'){ document.getElementById('back-nav').style.display='none'; prevTab=null; }
+  if(pushState) history.pushState({tab:id}, '', '#'+id);
+  currentTab = id;
+}
+
+function selectSiteOnMap(siteId){
+  // Track origin tab for back-navigation
+  if(currentTab !== 'map'){
+    prevTab = currentTab;
+    const tabObj = TABS.find(t=>t.id===currentTab);
+    const label = tabObj ? tabObj.label : currentTab;
+    document.getElementById('back-label').textContent = label;
+    document.getElementById('back-nav').style.display = '';
+  }
+  showTab('map');
+  setTimeout(() => {
+    const m = mapMarkers.find(mk => mk._siteData.id === siteId);
+    if(m){
+      mapInstance.setView(m.getLatLng(), 13, {animate:true});
+      setTimeout(() => m.openPopup(), 300);
+    }
+  }, 150);
+}
+
+function goBack(){
+  if(prevTab){ showTab(prevTab); prevTab=null; }
+  document.getElementById('back-nav').style.display='none';
+}
+
+
+/* ===== OVERVIEW ===== */
+function initOverview(){
+  // KPIs
+  const totalOwners = DATA.reduce((s,d)=>s+d.ownerCount,0);
+  const strongCount = DATA.filter(d=>d.argStrength==='strong').length;
+  const avgDoc = Math.round(DATA.reduce((s,d)=>s+d.docScore,0)/DATA.length);
+
+  const kpis = [
+    {val:"7",label:"Sites"},
+    {val:"1",label:"Country"},
+    {val:"Iron Age–Present",label:"Time Span"},
+    {val:String(totalOwners),label:"Owners/Stakeholders"},
+    {val:String(strongCount),label:"Strong Arguments"},
+    {val:avgDoc+"%",label:"Avg Doc Completeness"}
+  ];
+  const grid = document.getElementById('kpi-grid');
+  kpis.forEach(k=>{
+    const div = document.createElement('div');
+    div.className = 'kpi';
+    div.innerHTML = '<div class="kpi-val">'+k.val+'</div><div class="kpi-label">'+k.label+'</div>';
+    grid.appendChild(div);
+  });
+
+  // Doughnut charts
+  const charCount = {};
+  DATA.forEach(d=>{charCount[d.heritageChar]=(charCount[d.heritageChar]||0)+1;});
+  makeDoughnut('ch-heritage',Object.keys(charCount).map(formatLabel),Object.values(charCount),['#b45309','#0369a1','#15803d','#9333ea']);
+
+  const strCount = {};
+  DATA.forEach(d=>{strCount[d.argStrength]=(strCount[d.argStrength]||0)+1;});
+  makeDoughnut('ch-argstrength',Object.keys(strCount).map(formatLabel),Object.values(strCount),['#16a34a','#d97706','#dc2626']);
+
+  const evCount = {};
+  DATA.forEach(d=>{evCount[d.evidenceBasis]=(evCount[d.evidenceBasis]||0)+1;});
+  makeDoughnut('ch-evidence',Object.keys(evCount).map(formatLabel),Object.values(evCount),['#0369a1','#b45309','#9333ea']);
+
+  const ownerBuckets = {"1 owner":0,"2 owners":0,"3 owners":0,"5 owners":0};
+  DATA.forEach(d=>{
+    const k = d.ownerCount + (d.ownerCount===1?" owner":" owners");
+    ownerBuckets[k] = (ownerBuckets[k]||0)+1;
+  });
+  makeDoughnut('ch-ownership',Object.keys(ownerBuckets),Object.values(ownerBuckets),['#15803d','#0369a1','#b45309','#9333ea']);
+}
+
+function formatLabel(s){return s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+
+function siteTag(d){
+  return '<span class="site-tag '+TAG_CLASS[d.id]+'" onclick="selectSiteOnMap(\''+d.id+'\')" title="Show on map">'+d.name+'</span>';
+}
+
+function makeDoughnut(canvasId, labels, data, colors){
+  new Chart(document.getElementById(canvasId),{
+    type:'doughnut',
+    data:{labels:labels,datasets:[{data:data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:12,usePointStyle:true,pointStyleWidth:8}}}}
+  });
+}
+
+/* ===== MAP ===== */
+function initMap(){
+  if(typeof L === 'undefined') return;
+  mapInstance = L.map('map').setView([32.83, 35.50], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; OpenStreetMap',maxZoom:18
+  }).addTo(mapInstance);
+
+  DATA.forEach(d=>{
+    const expCount = Object.values(d.values).filter(v=>v==='e').length;
+    const r = 12 + expCount * 3;
+    const siteColor = getSiteColor(d.id);
+    const marker = L.circleMarker([d.lat,d.lng],{
+      radius:r,fillColor:siteColor,color:'#fff',weight:2,fillOpacity:0.85,opacity:1
+    }).addTo(mapInstance);
+    marker._siteData = d;
+    marker._baseRadius = r;
+    marker.bindPopup(makePopup(d));
+    mapMarkers.push(marker);
+  });
+
+  // Value filter buttons
+  const filterDiv = document.getElementById('map-filters');
+  filterDiv.innerHTML = '<label>Filter by value:</label>';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'fbtn active';
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => filterMap(null, allBtn);
+  filterDiv.appendChild(allBtn);
+
+  VALUE_TYPES.forEach((vt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'fbtn';
+    btn.innerHTML = '<span class="fdot" style="background:'+VALUE_COLORS[i]+'"></span>'+vt;
+    btn.onclick = () => filterMap(vt, btn);
+    filterDiv.appendChild(btn);
+  });
+}
+
+function getSiteColor(id){
+  const colors = {beatitudes:'#d97706',capernaum:'#2563eb',chorazin:'#16a34a',kanna:'#db2777',magdala:'#4f46e5',mt_tabor:'#7c3aed',tabgha:'#ea580c'};
+  return colors[id]||'#78716c';
+}
+
+function filterMap(valueType, btn){
+  document.querySelectorAll('#map-filters .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+
+  mapMarkers.forEach(m=>{
+    const d = m._siteData;
+    if(!valueType){
+      m.setStyle({fillOpacity:0.85,opacity:1});
+      m.setRadius(m._baseRadius);
+    } else {
+      const v = d.values[valueType];
+      if(v==='e'){
+        m.setStyle({fillOpacity:0.9,opacity:1});
+        m.setRadius(m._baseRadius);
+      } else if(v==='i'){
+        m.setStyle({fillOpacity:0.4,opacity:0.6});
+        m.setRadius(m._baseRadius * 0.7);
+      } else {
+        m.setStyle({fillOpacity:0.15,opacity:0.3});
+        m.setRadius(m._baseRadius * 0.4);
+      }
+    }
+  });
+}
+
+function makePopup(d){
+  const valTags = VALUE_TYPES.map((vt,i) => {
+    if(d.values[vt]==='a') return '';
+    const cls = d.values[vt]==='i'?' style="opacity:0.5"':'';
+    return '<span style="display:inline-block;padding:2px 7px;border-radius:12px;font-size:10px;color:#fff;font-weight:600;background:'+VALUE_COLORS[i]+'"'+cls+'>'+vt+'</span>';
+  }).filter(Boolean).join(' ');
+
+  return '<div class="p-title">'+d.name+'</div>'+
+    '<div class="p-sub">'+d.type+' &middot; '+d.period+'</div>'+
+    '<div class="p-desc">'+d.description+'</div>'+
+    '<div class="p-hl">'+d.highlight+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;">'+valTags+'</div>'+
+    '<div style="font-size:10.5px;color:#78716c;line-height:1.7;">'+
+    '<b>Claim scope:</b> '+formatLabel(d.claimScope)+' &middot; <b>Strength:</b> '+formatLabel(d.argStrength)+' &middot; <b>Owners:</b> '+d.ownerCount+'</div>';
+}
+
+/* ===== VALUES ===== */
+function initValues(){
+  const table = document.getElementById('values-table');
+  let html = '<thead><tr><th class="sticky-col">Site</th>';
+  VALUE_TYPES.forEach(vt=>{html+='<th style="text-align:center">'+vt+'</th>';});
+  html += '<th style="text-align:center">Explicit</th></tr></thead><tbody>';
+
+  DATA.forEach(d=>{
+    const expCount = Object.values(d.values).filter(v=>v==='e').length;
+    html += '<tr><td class="sticky-col"><button class="site-link" onclick="showValueSpecs(\''+d.id+'\')">'+d.name+'</button></td>';
+    VALUE_TYPES.forEach(vt=>{
+      const v = d.values[vt];
+      const sym = v==='e'?'\u25CF':v==='i'?'\u25D0':'\u25CB';
+      const cls = v==='e'?'dot-e':v==='i'?'dot-i':'dot-a';
+      html += '<td class="dot '+cls+'">'+sym+'</td>';
+    });
+    html += '<td class="num">'+expCount+'</td></tr>';
+  });
+
+  // Footer: explicit counts per type
+  html += '</tbody><tfoot><tr><td class="sticky-col" style="font-weight:600;background:var(--stone-50)">Explicit count</td>';
+  VALUE_TYPES.forEach(vt=>{
+    const count = DATA.filter(d=>d.values[vt]==='e').length;
+    html += '<td class="num" style="background:var(--stone-50)">'+count+'</td>';
+  });
+  html += '<td class="num" style="background:var(--stone-50)">'+DATA.reduce((s,d)=>s+Object.values(d.values).filter(v=>v==='e').length,0)+'</td></tr></tfoot>';
+
+  table.innerHTML = html;
+}
+
+function showValueSpecs(siteId){
+  const d = DATA.find(s=>s.id===siteId);
+  if(!d) return;
+  const panel = document.getElementById('value-specs-panel');
+  let html = '<div class="value-specs"><h4><span class="site-tag '+TAG_CLASS[d.id]+'">'+d.name+'</span> Value Specifications</h4>';
+  d.valueSpecs.forEach(vs=>{
+    html += '<div class="spec-item"><span class="spec-type">'+vs.type+':</span> <span class="spec-desc">'+vs.spec+'</span></div>';
+  });
+  html += '</div>';
+  panel.innerHTML = html;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ===== ARGUMENTS ===== */
+function initArguments(){
+  // Premises bar chart
+  const premiseCounts = {};
+  DATA.forEach(d=>d.premises.forEach(p=>{premiseCounts[p]=(premiseCounts[p]||0)+1;}));
+  const premLabels = Object.keys(premiseCounts).sort((a,b)=>premiseCounts[b]-premiseCounts[a]);
+  const premValues = premLabels.map(l=>premiseCounts[l]);
+
+  new Chart(document.getElementById('ch-premises'),{
+    type:'bar',
+    data:{labels:premLabels.map(formatLabel),datasets:[{data:premValues,backgroundColor:'#b45309',borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1,font:{family:'JetBrains Mono',size:11}}},y:{ticks:{font:{family:'Inter',size:11}}}}}
+  });
+
+  // Claim scope doughnut
+  const scopeCount = {};
+  DATA.forEach(d=>{scopeCount[d.claimScope]=(scopeCount[d.claimScope]||0)+1;});
+  makeDoughnut('ch-scope',Object.keys(scopeCount).map(formatLabel),Object.values(scopeCount),['#b45309','#0369a1','#15803d']);
+
+  // Argument assessment table
+  const table = document.getElementById('args-table');
+  let html = '<thead><tr><th>Site</th><th>Argument Type</th><th>Strength</th><th>Evidence Basis</th><th>Claim Scope</th><th>Assessment Note</th></tr></thead><tbody>';
+  DATA.forEach(d=>{
+    const strCls = d.argStrength==='strong'?'str-strong':d.argStrength==='moderate'?'str-moderate':'str-weak';
+    html += '<tr><td>'+siteTag(d)+'</td>'+
+      '<td>'+formatLabel(d.argType)+'</td>'+
+      '<td class="'+strCls+'">'+formatLabel(d.argStrength)+'</td>'+
+      '<td>'+formatLabel(d.evidenceBasis)+'</td>'+
+      '<td>'+formatLabel(d.claimScope)+'</td>'+
+      '<td style="font-size:11px;color:var(--stone-600)">'+d.argNote+'</td></tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+/* ===== GAPS ===== */
+function initGaps(){
+  const dims = ["Values","Significance","Integrity","Threats","Method","Comparisons"];
+  const table = document.getElementById('gaps-table');
+  let html = '<thead><tr><th>Site</th>';
+  dims.forEach(dim=>{html+='<th style="text-align:center">'+dim+'</th>';});
+  html += '<th style="text-align:center">Doc Score</th></tr></thead><tbody>';
+
+  DATA.forEach(d=>{
+    html += '<tr><td>'+siteTag(d)+'</td>';
+    dims.forEach(dim=>{
+      let cls, label;
+      if(dim==='Values'||dim==='Significance'){
+        cls='g-green'; label='Good';
+      } else if(dim==='Integrity'){
+        cls = d.integrity==='good'?'g-green':'g-yellow';
+        label = d.integrity==='good'?'Good':'Partial';
+      } else if(dim==='Threats'||dim==='Method'){
+        cls='g-red'; label='Missing';
+      } else if(dim==='Comparisons'){
+        cls = d.id==='mt_tabor'?'g-red':'g-green';
+        label = d.id==='mt_tabor'?'Missing':'Good';
+      }
+      html += '<td class="'+cls+'">'+label+'</td>';
+    });
+    html += '<td class="num">'+d.docScore+'%</td></tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+/* ===== CROSS-TABS ===== */
+function initCrossTabs(){
+  // Helper: group sites by a property, count explicit values per type
+  function crossTab(propKey){
+    const groups = {};
+    DATA.forEach(d=>{
+      const g = formatLabel(d[propKey]);
+      if(!groups[g]) groups[g] = new Array(VALUE_TYPES.length).fill(0);
+      VALUE_TYPES.forEach((vt,i)=>{
+        if(d.values[vt]==='e') groups[g][i]++;
+      });
+    });
+    return groups;
+  }
+
+  function makeStackedBar(canvasId, groups){
+    const labels = Object.keys(groups);
+    const datasets = VALUE_TYPES.map((vt,i)=>({
+      label:vt,
+      data:labels.map(l=>groups[l][i]),
+      backgroundColor:VALUE_COLORS[i],
+      borderRadius:2
+    }));
+    new Chart(document.getElementById(canvasId),{
+      type:'bar',
+      data:{labels:labels,datasets:datasets},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},usePointStyle:true,pointStyleWidth:8,padding:8}}},scales:{x:{stacked:true,ticks:{font:{family:'Inter',size:10}}},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1,font:{family:'JetBrains Mono',size:10}}}}}
+    });
+  }
+
+  makeStackedBar('ch-ct-heritage', crossTab('heritageChar'));
+  makeStackedBar('ch-ct-argstr', crossTab('argStrength'));
+  makeStackedBar('ch-ct-landscape', crossTab('landscape'));
+  makeStackedBar('ch-ct-evidence', crossTab('evidenceBasis'));
+}
+
+/* ===== CLUSTERS ===== */
+function initClusters(){
+  const grid = document.getElementById('cluster-grid');
+  const clusterIds = Object.keys(CLUSTER_DEFS);
+
+  clusterIds.forEach(cid=>{
+    const def = CLUSTER_DEFS[cid];
+    const sites = DATA.filter(d=>d.clusters.includes(cid));
+    const card = document.createElement('div');
+    card.className = 'cluster-card';
+    let tagsHtml = sites.map(s=>siteTag(s)).join('');
+    card.innerHTML = '<div class="cl-head"><span class="cl-icon">'+def.icon+'</span><span class="cl-title">'+def.title+'</span></div>'+
+      '<div class="cl-desc">'+def.desc+'</div>'+
+      '<div class="cl-sites">'+tagsHtml+'</div>';
+    grid.appendChild(card);
+  });
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', function(){
+  initTabs();
+  initOverview();
+  initValues();
+  initArguments();
+  initGaps();
+  initCrossTabs();
+  initClusters();
+});
+</script>
+</body>
+</html>
