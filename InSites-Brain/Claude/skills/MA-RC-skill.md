@@ -206,6 +206,7 @@ Also derive from Collection Reading and analyses (if available):
 - **Gap data derived from extraction.** Use the extraction's `⚠ not stated` / `—` markers to determine green/yellow/red gap status. Never hardcode per-site overrides in the dashboard code.
 - **Chart.js stability.** For doughnut/pie charts, do NOT set `maintainAspectRatio:false` — let them maintain their natural aspect ratio. Add `canvas{max-height:280px}` CSS to chart containers. Only use `maintainAspectRatio:false` for bar charts in constrained-height containers.
 - **Inline data.** All site data must be embedded inline in the HTML file as a JS array/object. Do NOT use `fetch()` to load external JSON — the dashboard must work when opened directly via `file://` protocol without a server. Offer a separate JSON export via Step 4, but the dashboard itself is self-contained.
+- **Leaflet popup close button.** Leaflet's popup close button is an `<a href="#close">` — in Claude.ai's artifact sandbox, hash links get rewritten to external URLs. After map initialization, add: `document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();mapInstance.closePopup();}});` — this intercepts the click and closes the popup normally.
 
 ### 5. Visual Language — Design Tokens
 
