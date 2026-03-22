@@ -91,7 +91,7 @@ These rules override stage-specific guidance and are non-negotiable:
 
 - **Context Effect (Two-Way, Evaluative)**: Apply [GB-1] context effect at every stage. Never use causal phrasing.
   - **Outward dimension**: See Stage 1.3 for full spec. Evidence constraint: only source-stated or inferable (°) connections qualify.
-  - **Planning bridge** (Stage 1 only): When a context-effect has an actionable planning implication, state it as a `🔗 Planning:` line. This appears in Stage 1.3 only — not in Stages 2, 5, or 6. Planning implications are collected and summarized in Stage 6.
+  - **Planning bridge** (Stage 1 only): When a context-effect has an actionable planning implication, state it as a `🧭 Planning:` line. This appears in Stage 1.3 only — not in Stages 2, 5, or 6. Planning implications are collected and summarized in Stage 6.
  
 - **No Generic Textbook Definitions**: All explanations must be site-specific. Avoid copying standard heritage definitions.
 
@@ -288,7 +288,7 @@ Include every dated or period-associated event from the sources. Do not skip.
   - How the recognition of the site's significance reframes that same context
   - **Outward dimension**: When source material identifies connections to external sites, traditions, or themes, trace the context-effect beyond the asset — the connected entity gains heritage value from the association. Only source-stated or inferable (°) connections qualify. E.g., "The regional mosaic tradition frames Huqoq's program as part of a network; Huqoq's exceptional quality reframes the significance of related sites like Wadi Hamam within the network."
   - ⚠ Do not use causal phrasing ("caused", "led to", "created change")
-3. `🔗 Planning:` — one sentence on what to protect, interpret, or coordinate, including regional implications when evidence supports them. Omit if no actionable implication exists.
+3. `🧭 Planning:` — one sentence on what to protect, interpret, or coordinate, including regional implications when evidence supports them. Omit if no actionable implication exists.
 
 **Output Format — clean and flowing**:
 
@@ -538,7 +538,7 @@ Omit if source tier adequately supports the assessment.
 
 4. **Next Steps** — 1-2 points with concrete actions (e.g., "complete the timeline", "photograph the western wing").
 
-5. **Context-Effect Planning Implications** — Collect all `🔗 Planning:` lines from Stage 1 and summarize: what should be protected, interpreted, or coordinated based on the context-effects identified throughout the assessment? Include regional/network implications when they emerged. Omit this section if no planning lines were generated in Stage 1.
+5. **Context-Effect Planning Implications** — Collect all `🧭 Planning:` lines from Stage 1 and summarize: what should be protected, interpreted, or coordinated based on the context-effects identified throughout the assessment? Include regional/network implications when they emerged. Omit this section if no planning lines were generated in Stage 1.
 
 6. **Note for Professional Practice (optional)** — [e.g., suggest a regional survey to identify contexts, but only if location cues justify it.]
 
@@ -939,13 +939,13 @@ Sidebar state: open by default, collapsible via a toggle button, not resizable.
 
 When the sidebar is collapsed, the graph canvas expands to full width. The toggle button remains visible at the canvas edge.
 
-#### 4b. Dark Mode Chrome Palette (mandatory)
+#### 4b. Light Chrome Palette (mandatory)
 
-Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by [CA-EC].
+Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by [CA-EC]. Match the visual language of the Assessment Dashboard [CA-DB] — same typography (DM Sans + JetBrains Mono), card styles, spacing patterns, and interaction conventions.
 
 ```
-Background: #0a1120 → sidebar: #0f172a → cards: #1e293b → borders: #334155
-Text-primary: #e2e8f0 → text-dim: #94a3b8 → text-muted: #64748b
+Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
+Text-primary: #1e293b → text-dim: #64748b → text-muted: #94a3b8
 Accent: #3b82f6 (interactive elements, active tab indicator)
 ```
 
@@ -1166,19 +1166,13 @@ Implementation: a top-level `highlight` variable (`{ type: 'value'|'context', id
 
 ### 6. Theme and Readability (mandatory)
 
-**Hybrid theme**: Light background for all text-heavy tabs (Overview through Process). Dark canvas only for the KG tab.
+**Light theme throughout**: All tabs — including KG — use the same light palette. This ensures visual coherence between the Dashboard and the standalone KG artifact.
 
-**Light mode palette** (text tabs):
+**Light palette** (all tabs):
 ```
 Background: #f8fafc → cards: #ffffff → borders: #e2e8f0
 Text: #1e293b → dim: #64748b → muted: #94a3b8
 Accent: #2563eb — or site-appropriate
-```
-
-**Dark mode palette** (KG tab only):
-```
-Background: #0a1120 → cards: #1e293b → borders: #334155
-Text: #e2e8f0 → dim: #b0bfd0
 ```
 
 **Minimum readability requirements**:
@@ -1186,7 +1180,7 @@ Text: #e2e8f0 → dim: #b0bfd0
 - Section labels / uppercase micro-labels: ≥ 0.72rem
 - Pills and badges: ≥ 0.66rem
 - KG edge labels: ≥ 10px, contrast ratio ≥ 3:1
-- KG node labels: include text-shadow or halo for legibility
+- KG node labels: include text-shadow or halo for legibility against light background
 - **No text below 0.62rem anywhere**
 
 ### 7. KG Node Interaction
@@ -1225,7 +1219,7 @@ After generating the Dashboard, always offer:
 
 ### Reference Implementation ( If available)
 
-The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: hybrid light/dark theme, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
+The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
 
 
 ---

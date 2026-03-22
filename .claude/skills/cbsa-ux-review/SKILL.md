@@ -136,10 +136,10 @@ Organize findings into three groups. Not every lens will produce findings — sk
 
 **Lens 13: Visual Language Coherence**
 - Do all artifacts feel like they belong to the same product family?
-- **Design anchor**: The Assessment Dashboard (stone/amber palette, serif typography, hybrid light/dark theme) is the current reference point for visual identity. Other artifacts should converge toward this language — not the other way around.
+- **Design anchor**: The Assessment Dashboard (light palette, DM Sans typography) is the reference point for visual identity. All CBSA artifacts — including the standalone KG — use the same light chrome palette for coherence.
 - Check: palette consistency, card styles, typography scale, spacing rhythm, interaction patterns (hover, click, select), color semantics (what does green/red/amber mean across artifacts).
 - When reviewing a specific artifact, cross-reference against the Dashboard-review-skill (InSites-Brain/Claude/skills/Dashboard-review-skill.md) for detailed visual and interaction standards.
-- Known gap: KG uses a dark chrome palette that diverges from the Dashboard's hybrid theme. This is a coherence debt to track.
+- KG light palette converged with Dashboard as of mono v2.2. If divergence reappears, flag it.
 
 ---
 

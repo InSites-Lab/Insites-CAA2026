@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBSA Dashboard — Ayelet HaShachar Water Tower (E2E Test v2.2)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-card-alt: #f0f4f8;
+  --bg-hover: #edf2f7;
+  --border: #dfe4ea;
+  --border-active: #3b82f6;
+  --text: #1e293b;
+  --text-dim: #475569;
+  --text-muted: #94a3b8;
+  --accent: #2563eb;
+  --accent-light: #dbeafe;
+  --red: #dc2626;
+  --green: #16a34a;
+  --amber: #d97706;
+  --purple: #7c3aed;
+  --pink: #db2777;
+  --cyan: #0891b2;
+  --orange: #ea580c;
+  --kg-bg: #f1f5f9;
+  --kg-card: #ffffff;
+  --kg-border: #e2e8f0;
+  --kg-text: #1e293b;
+  --kg-dim: #64748b;
+  --kg-muted: #94a3b8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #c1c9d4; border-radius: 3px; }
+
+.header { background: #1e293b; padding: 16px 28px; border-bottom: 1px solid #334155; color: #f1f5f9; }
+.header-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+.header h1 { font-size: 1.28rem; color: #f8fafc; font-weight: 700; margin-bottom: 3px; }
+.header-sub { font-size: 0.84rem; color: #94a3b8; }
+
+.stagebar { display: flex; gap: 4px; padding: 10px 28px 8px; background: #fff; border-bottom: 1px solid var(--border); }
+.stagebar-item { flex: 1; text-align: center; }
+.stagebar-track { height: 3px; border-radius: 2px; margin-bottom: 4px; }
+.stagebar-track.done { background: var(--green); }
+.stagebar-track.pending { background: #e2e8f0; }
+.stagebar-label { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; }
+
+.layout { display: flex; flex: 1; }
+.sidebar { width: 180px; background: #fff; border-right: 1px solid var(--border); padding-top: 6px; flex-shrink: 0; overflow-y: auto; }
+.sidebar-btn { display: block; width: 100%; padding: 10px 14px; border: none; cursor: pointer; text-align: left; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; background: transparent; color: var(--text-dim); border-left: 3px solid transparent; transition: all 0.15s; }
+.sidebar-btn:hover { background: var(--bg-hover); color: var(--text); }
+.sidebar-btn.active { background: var(--accent-light); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.main { flex: 1; padding: 24px 28px; max-width: 920px; overflow-y: auto; }
+
+.pill { display: inline-block; font-size: 0.66rem; padding: 3px 8px; border-radius: 8px; color: #fff; white-space: nowrap; font-weight: 600; }
+.pill-md { font-size: 0.72rem; padding: 3px 10px; border-radius: 10px; }
+.card { background: var(--bg-card); border-radius: 10px; padding: 16px 18px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.card-hl { border-color: var(--accent); background: #eff6ff; box-shadow: 0 0 0 1px rgba(37,99,235,0.1); }
+h2.section-title { color: var(--text); font-size: 1.02rem; font-weight: 700; margin-bottom: 18px; }
+.section-sub { color: var(--text-muted); font-size: 0.84rem; margin-bottom: 16px; line-height: 1.55; }
+
+.hl-banner { background: #eff6ff; padding: 8px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #bfdbfe; font-size: 0.78rem; color: var(--accent); }
+.hl-banner strong { color: #1d4ed8; }
+.hl-banner button { background: #dbeafe; border: none; color: var(--accent); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.76rem; font-family: 'DM Sans', sans-serif; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi { background: var(--bg-card); border-radius: 10px; padding: 16px 12px; text-align: center; border: 1px solid var(--border); }
+.kpi-value { font-size: 1.8rem; font-weight: 700; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+.kpi-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; }
+
+.tl-legend { display: flex; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.tl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-dim); }
+.tl-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.tl-track { position: relative; padding-left: 40px; }
+.tl-line { position: absolute; left: 14px; top: 8px; bottom: 8px; width: 2px; background: #e2e8f0; }
+.tl-marker { position: absolute; left: -30px; top: 4px; width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--bg); }
+.tl-year { font-size: 0.76rem; font-weight: 700; min-width: 75px; letter-spacing: 0.04em; font-family: 'JetBrains Mono', monospace; }
+.tl-text { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
+
+.ctx-card { cursor: pointer; transition: border-color 0.2s; }
+.ctx-card:hover { border-color: var(--accent); }
+.val-card { display: flex; gap: 14px; cursor: pointer; transition: all 0.2s; }
+.val-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.4rem; }
+.val-card:hover { border-color: var(--accent); }
+.attr-row { background: var(--bg-card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+.attr-impl { font-size: 0.82rem; color: #92400e; line-height: 1.55; background: #fffbeb; padding: 10px 14px; border-radius: 6px; border-left: 3px solid var(--amber); margin-top: 8px; }
+
+.nara-card { border-radius: 12px; padding: 18px; border: 1px solid var(--border); background: var(--bg-card); }
+.nara-badge { font-size: 0.76rem; padding: 5px 14px; border-radius: 20px; color: #fff; font-weight: 600; }
+
+.comp-card { background: var(--bg-card); border-radius: 12px; padding: 18px; border: 1px solid var(--border); }
+.comp-criteria { display: flex; gap: 6px; }
+.comp-crit { text-align: center; padding: 4px 10px; border-radius: 8px; background: var(--bg-card-alt); border: 1px solid var(--border); }
+.comp-crit-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+.comp-crit-val { font-size: 0.78rem; font-weight: 600; }
+
+.vuln-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 0.84rem; }
+.vuln-table th { text-align: center; padding: 8px; color: var(--text-dim); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.vuln-table th:first-child { text-align: left; }
+.vuln-table td { padding: 10px 8px; border-radius: 6px; text-align: center; font-weight: 500; }
+.vuln-table td:first-child { text-align: left; background: var(--bg-card); border: 1px solid var(--border); }
+
+.kg-wrap { background: var(--kg-bg); border-radius: 14px; padding: 20px; color: var(--kg-text); }
+.kg-svg { width: 100%; height: 500px; background: var(--kg-bg); border-radius: 12px; display: block; }
+.kg-container { position: relative; }
+.kg-legend { position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.92); padding: 10px 14px; border-radius: 8px; font-size: 0.72rem; border: 1px solid var(--kg-border); }
+.kg-legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; color: var(--kg-dim); }
+.kg-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.kg-hint { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.85); padding: 5px 10px; border-radius: 6px; font-size: 0.65rem; color: var(--kg-muted); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--kg-border); }
+.kg-banner { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border); background: var(--bg-card); }
+.kg-popover {
+  position: absolute; width: 310px; background: #ffffff; border: 1px solid #cbd5e1;
+  border-radius: 12px; padding: 18px 20px; z-index: 100; pointer-events: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12); animation: popIn 0.18s ease-out; color: var(--kg-text);
+}
+@keyframes popIn { from { opacity:0; transform:scale(0.92) translateY(4px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.kg-popover-close { position: absolute; top: 10px; right: 12px; background: #f1f5f9; border: 1px solid var(--kg-border); color: var(--kg-dim); cursor: pointer; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.kg-popover-close:hover { color: #fff; background: var(--red); border-color: var(--red); }
+.kg-popover-name { font-size: 1.02rem; color: #1e293b; font-weight: 700; margin-bottom: 8px; padding-right: 30px; line-height: 1.35; }
+.kg-popover-meaning { font-size: 0.88rem; color: #64748b; line-height: 1.65; margin-bottom: 14px; }
+.kg-popover-conn { font-size: 0.82rem; color: var(--kg-dim); line-height: 1.7; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+.kg-popover-conn-label { font-size: 0.72rem; color: var(--kg-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.kg-popover-conn-item { margin-bottom: 5px; padding: 4px 8px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.82rem; }
+.kg-popover-conn-item .dir { color: #dc2626; margin-right: 4px; font-weight: 600; }
+.kg-popover-conn-item .verb { color: #2563eb; font-weight: 500; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mb-sm { margin-bottom: 10px; }
+.mb-md { margin-bottom: 16px; }
+.flex-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-label">CBSA Assessment Dashboard · E2E Test v2.2</div>
+  <h1>Water Tower · Kibbutz Ayelet HaShachar</h1>
+  <div class="header-sub">Upper Galilee, Israel · 1923–1924</div>
+</div>
+<div class="stagebar" id="stagebar"></div>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content"></main>
+</div>
+<script>
+const DATA = {
+  asset: { name:"Ayelet HaShachar Water Tower", location:"Kibbutz Ayelet HaShachar, Upper Galilee", type:"Water infrastructure", period:"1923–24", description:"Reinforced concrete water tower with neo-classical ornaments, center of kibbutz horseshoe plan. Built by Ahva Group (Gdud HaAvoda) under supervisor Michael Arlich." },
+  dataQuality: { sources:["Ayelet-WaterTower.pdf"], gaps:["No current-condition photos","No architectural plans","2018 preservation undocumented"] },
+  timeline: [
+    { year:"1915", ys:1915, label:"First workers at Nijmat al-Subah", ct:"use" },
+    { year:"1918", ys:1918, label:"Kibbutz founded", ct:"use" },
+    { year:"1922", ys:1922, label:"Move to permanent site, horseshoe plan", ct:"setting" },
+    { year:"1923–24", ys:1923, label:"Water tower + first buildings constructed", ct:"structure" },
+    { year:"1936", ys:1936, label:"Well A operational", ct:"infrastructure" },
+    { year:"1940", ys:1940, label:"Well B operational", ct:"infrastructure" },
+    { year:"1951", ys:1951, label:"Mekorot Einan project", ct:"infrastructure" },
+    { year:"1957", ys:1957, label:"Mekorot Ayun — water security", ct:"infrastructure" },
+    { year:"2018", ys:2018, label:"Preservation project initiated", ct:"use" }
+  ],
+  contexts: [
+    { id:"ctx_hist", type:"historical", label:"Second Aliya settlement founding phase (1918–1924)", rv:["Historical","Technological"], ts:"1915–1924" },
+    { id:"ctx_social", type:"social", label:"Communal water struggle and shared scarcity", rv:["Social"], ts:"1918–1957" },
+    { id:"ctx_tech", type:"technological", label:"Pioneer construction by inexperienced workers", rv:["Technological","Documentary"], ts:"1923–1924" },
+    { id:"ctx_polit", type:"political", label:"JCA/PICA funding tensions and narrative control", rv:["Documentary","Historical"], ts:"1920s–1940s" },
+    { id:"ctx_land", type:"general", label:"Horseshoe plan with tower at apex", rv:["Symbolic"], ts:"1922–present" }
+  ],
+  values: [
+    { id:"v_hist", name:"Infrastructure as Settlement Act", cat:"Historical", ev:"sourced", summary:"Tower documents transition from temporary to permanent settlement" },
+    { id:"v_tech", name:"Learning by Building", cat:"Technological", ev:"sourced", summary:"Inexperienced Ahva group built RC structure under Arlich; unusual ornaments" },
+    { id:"v_social", name:"Water as Communal Bond", cat:"Social", ev:"sourced", summary:"40-year water struggle made tower the locus of collective survival" },
+    { id:"v_doc", name:"The Plaque as Counter-Narrative", cat:"Documentary", ev:"sourced", summary:"Selective credit on plaque — ideological narration embedded in structure" },
+    { id:"v_symb", name:"Centrality by Design", cat:"Symbolic", ev:"inferred", summary:"Neo-classical ornaments dignify infrastructure; horseshoe apex position" }
+  ],
+  attrTable: [
+    { attr:"Reinforced concrete structure", vals:["Technological","Historical"], sig:"Earliest RC in kibbutz context", impl:"Loss removes pioneer technique evidence" },
+    { attr:"Neo-classical ornaments", vals:["Technological","Symbolic"], sig:"Atypical for water tower typology", impl:"Damage erases intentional dignification" },
+    { attr:"Concrete plaque", vals:["Documentary","Historical"], sig:"Workers credited, funders omitted", impl:"Loss destroys counter-narrative" },
+    { attr:"Horseshoe centrality", vals:["Symbolic","Social"], sig:"Tower as settlement apex", impl:"Development could obscure hierarchy" }
+  ],
+  nara: [
+    { aspect:"Form & Design", desc:"Basin on columns with pediments, corner cubes intact per source", ve:"Technological, Symbolic", rating:"medium" },
+    { aspect:"Material & Fabric", desc:"1923 reinforced concrete, age deterioration assumed", ve:"Technological, Historical", rating:"medium" },
+    { aspect:"Use & Function", desc:"Water distribution ceased c.1951–57", ve:"Social", rating:"low" },
+    { aspect:"Setting & Location", desc:"Horseshoe plan centrality, modern changes uncertain", ve:"Symbolic", rating:"medium" }
+  ],
+  naraSummary: "Documentary integrity is the strongest dimension. Form integrity is medium (construction method precedent for cracking). Functional integrity lost.",
+  comparative: {
+    summary:"Distinguished by ornamental elaboration, documented construction narrative, and ideological plaque inscription — none found in comparable water tower types.",
+    sites:[
+      { name:"British military camp towers", period:"Mandate era", arch:"Unknown", dist:"Temporary metal, no architectural ambition", crit:{rarity:"low",documentation:"low",condition:"mostly removed"} },
+      { name:"Homa U'Migdal towers", period:"1936–39", arch:"Various", dist:"Fortified functional towers, no ornamental intent", crit:{rarity:"moderate",documentation:"high",condition:"variable"} },
+      { name:"1960s urban towers", period:"1960s", arch:"Various", dist:"Complex engineering but no pioneer narrative", crit:{rarity:"low",documentation:"moderate",condition:"many survive"} }
+    ]
+  },
+  significance: "The Ayelet HaShachar water tower is culturally significant as a material expression of Second Aliya settlement ideology, combining pioneer construction achievement, communal water struggle narrative, and intentional dignification of infrastructure through neo-classical ornaments — marking the everyday as worthy of permanence.",
+  vuln: [
+    { value:"Historical", form:2, material:2, use:1, setting:1 },
+    { value:"Technological", form:3, material:3, use:1, setting:1 },
+    { value:"Social", form:1, material:1, use:3, setting:2 },
+    { value:"Documentary", form:2, material:2, use:1, setting:1 },
+    { value:"Symbolic", form:2, material:1, use:1, setting:3 }
+  ],
+  pq: { strengths:3, boosts:["Photograph tower current condition","Obtain Shusterman 1993 thesis","Request 2018 preservation report"], next:["Complete post-1961 timeline","Photograph western and southern facades"] },
+  stages: [0,1,2,3,4,5,6],
+  kg: {
+    nodes:[
+      {id:"water_tower",name:"Ayelet HaShachar Water Tower",type:"asset",meaning:"1923 reinforced concrete tower — functional and ideological landmark of the kibbutz"},
+      {id:"ayelet",name:"Kibbutz Ayelet HaShachar",type:"place",meaning:"Founded 1918, Upper Galilee — Second Aliya pioneer settlement"},
+      {id:"horseshoe",name:"Horseshoe Road Plan",type:"structure",meaning:"JCA engineer's layout encircling the historic core — tower at apex"},
+      {id:"wadi",name:"Wadi Waqaz (Nahal Hatzor)",type:"place",meaning:"Sole early water source — site of inter-communal disputes"},
+      {id:"arlich",name:"Michael Arlich",type:"person",meaning:"Construction supervisor 1879–1945 — pioneer builder"},
+      {id:"ahva",name:"Ahva Group",type:"group",meaning:"Gdud HaAvoda builders — inexperienced workers who conquered the profession"},
+      {id:"pica",name:"JCA / PICA",type:"group",meaning:"Funded settlement and infrastructure — omitted from the tower's plaque"},
+      {id:"solel_boneh",name:"Solel Boneh",type:"group",meaning:"Histadrut public works office — contracted Ahva for construction"},
+      {id:"well_a",name:"Well A (1936)",type:"structure",meaning:"Hand-dug well — its opening triggered spontaneous celebration"},
+      {id:"water_struggle",name:"Water Struggle 1918–1957",type:"event",meaning:"40-year communal struggle over water access and supply"},
+      {id:"mekorot",name:"Mekorot",type:"group",meaning:"National water company — resolved chronic shortage (1951–57)"},
+      {id:"second_aliya",name:"Second Aliya Ideology",type:"event",meaning:"Pioneer labor, communal equality, conquest of work — founding ethos"},
+      {id:"plaque",name:"Concrete Plaque",type:"structure",meaning:"Credits workers and supervisor, omits funders — ideological narration in stone"},
+      {id:"construction_value",name:"Pioneer Construction Value",type:"cultural_value",meaning:"Building without experience as ideological act"}
+    ],
+    edges:[
+      {from:"water_tower",to:"ayelet",label:"landmark_of"},
+      {from:"water_tower",to:"horseshoe",label:"centered_in"},
+      {from:"ahva",to:"water_tower",label:"built"},
+      {from:"arlich",to:"water_tower",label:"supervised"},
+      {from:"arlich",to:"ahva",label:"directed"},
+      {from:"solel_boneh",to:"ahva",label:"contracted"},
+      {from:"pica",to:"ayelet",label:"funded"},
+      {from:"wadi",to:"water_tower",label:"fed"},
+      {from:"well_a",to:"water_tower",label:"pumped_to"},
+      {from:"water_struggle",to:"wadi",label:"centered_on"},
+      {from:"water_struggle",to:"pica",label:"appealed_to"},
+      {from:"mekorot",to:"water_struggle",label:"resolved"},
+      {from:"second_aliya",to:"ayelet",label:"motivated"},
+      {from:"second_aliya",to:"construction_value",label:"expressed_through"},
+      {from:"construction_value",to:"water_tower",label:"embodied_in"},
+      {from:"plaque",to:"water_tower",label:"inscribed_on"},
+      {from:"plaque",to:"pica",label:"omits"}
+    ]
+  }
+};
+
+const VC = { Historical:'#2563eb', Social:'#16a34a', Symbolic:'#7c3aed', Technological:'#ea580c', Aesthetic:'#db2777', Scientific:'#0891b2', Documentary:'#78716c', Functional:'#64748b', Landscape:'#65a30d' };
+const EV = { sourced:{i:'\u25CF',c:'#16a34a'}, inferred:{i:'\u25D0',c:'#d97706'}, uncertain:{i:'\u25CB',c:'#94a3b8'} };
+const CC = { use:'#2563eb', structure:'#dc2626', setting:'#d97706', infrastructure:'#7c3aed' };
+const CL = { use:'Use', structure:'Structure', setting:'Setting', infrastructure:'Infrastructure' };
+const RC = { high:'#16a34a', medium:'#d97706', 'low-medium':'#ea580c', low:'#dc2626' };
+const RL = { high:'High', medium:'Medium', 'low-medium':'Low\u2013Med', low:'Low' };
+const VU = { 3:'#fecaca', 2:'#fef3c7', 1:'#f1f5f9', 0:'#f8fafc' };
+const VT = { 3:'#991b1b', 2:'#92400e', 1:'#94a3b8', 0:'#cbd5e1' };
+const VL = { 3:'High', 2:'Medium', 1:'Low', 0:'\u2013' };
+const CTC = { historical:'#2563eb', social:'#16a34a', political:'#4f46e5', technological:'#ea580c', general:'#64748b' };
+const CTL = { historical:'Historical', social:'Social', political:'Political', technological:'Technological', general:'General' };
+const KC = { asset:'#dc2626', cultural_value:'#ca8a04', structure:'#db2777', place:'#7c3aed', event:'#ea580c', period:'#78716c', person:'#0891b2', group:'#16a34a' };
+const KL = { asset:'Asset', cultural_value:'Cultural Value', structure:'Structure', place:'Place', event:'Event', period:'Period', person:'Person', group:'Group' };
+const SN = ['Preliminary','Contexts','Values','Integrity','Comparative','Significance','Quality'];
+const SI = ['\uD83D\uDCCB','\uD83D\uDD0D','\uD83D\uDC8E','\uD83D\uDD10','\u2696\uFE0F','\uD83D\uDCDC','\u2705'];
+
+let activeTab = 'overview', highlight = null;
+
+const h = (tag, attrs, ...kids) => { const el = document.createElement(tag); if (attrs) Object.entries(attrs).forEach(([k,v]) => { if (k==='style'&&typeof v==='object') Object.assign(el.style, v); else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v); else if (k==='className') el.className = v; else if (k==='html') el.innerHTML = v; else el.setAttribute(k,v); }); kids.flat(9).forEach(c => { if (c==null) return; el.appendChild(typeof c==='string'?document.createTextNode(c):c); }); return el; };
+const pill = (label, color, small) => h('span', { className: small?'pill':'pill pill-md', style:{ background: color||'#64748b' } }, label);
+function setTab(t) { activeTab=t; highlight=null; renderSidebar(); renderMain(); }
+function setHighlight(hl) { highlight = (highlight&&highlight.id===hl.id&&highlight.type===hl.type)?null:hl; renderMain(); }
+function clearHighlight() { highlight=null; renderMain(); }
+function navigateTo(t,hl) { activeTab=t; highlight=hl||null; renderSidebar(); renderMain(); }
+
+function renderStageBar() {
+  const bar=document.getElementById('stagebar'); bar.innerHTML='';
+  SN.forEach((name,i) => { const done=DATA.stages.includes(i);
+    bar.appendChild(h('div',{className:'stagebar-item'}, h('div',{className:'stagebar-track '+(done?'done':'pending')}), h('span',{className:'stagebar-label',style:{color:done?'#16a34a':'#cbd5e1'}},SI[i]+' '+name)));
+  });
+}
+
+function renderSidebar() {
+  const nav=document.getElementById('sidebar'); nav.innerHTML='';
+  [{id:'overview',label:'Overview',icon:'\uD83C\uDFDB\uFE0F'},{id:'timeline',label:'Timeline',icon:'\uD83D\uDCC5'},{id:'contexts',label:'Contexts',icon:'\uD83C\uDF0D'},{id:'values',label:'Values',icon:'\uD83D\uDC8E'},{id:'integrity',label:'Integrity',icon:'\uD83D\uDD10'},{id:'comparative',label:'Comparative',icon:'\u2696\uFE0F'},{id:'significance',label:'Significance',icon:'\uD83D\uDCDC'},{id:'vulnerability',label:'Vulnerability',icon:'\uD83D\uDD25'},{id:'quality',label:'Process',icon:'\uD83D\uDCCA'},{id:'kg',label:'Knowledge Graph',icon:'\uD83D\uDD78\uFE0F'}]
+  .forEach(s => nav.appendChild(h('button',{className:'sidebar-btn'+(activeTab===s.id?' active':''),onClick:()=>setTab(s.id)},s.icon+' '+s.label)));
+}
+
+function renderMain() {
+  const m=document.getElementById('main-content'); m.innerHTML='';
+  if (highlight) m.appendChild(h('div',{className:'hl-banner'},h('span',{html:'Highlighting: <strong>'+highlight.id+'</strong>'}),h('button',{onClick:clearHighlight},'\u2715 Clear')));
+  ({overview:rOverview,timeline:rTimeline,contexts:rContexts,values:rValues,integrity:rIntegrity,comparative:rComparative,significance:rSignificance,vulnerability:rVulnerability,quality:rQuality,kg:rKG})[activeTab]?.(m);
+}
+
+function rOverview(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Assessment Overview'));
+  const kg=h('div',{className:'kpi-grid'});
+  [{v:DATA.values.length,l:'Values Identified',c:VC.Historical},{v:Math.round(DATA.values.filter(v=>v.ev==='sourced').length/DATA.values.length*100)+'%',l:'Evidence Rate',c:'#16a34a'},{v:DATA.contexts.length,l:'Contexts',c:'#7c3aed'},{v:DATA.dataQuality.gaps.length,l:'Data Gaps',c:'#d97706'}]
+  .forEach(k=>kg.appendChild(h('div',{className:'kpi'},h('div',{className:'kpi-value',style:{color:k.c}},String(k.v)),h('div',{className:'kpi-label'},k.l))));
+  el.appendChild(kg);
+  el.appendChild(h('div',{className:'card mb-md'},
+    h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}},'Asset'),
+    h('div',{style:{fontSize:'0.78rem',color:'var(--accent)',marginBottom:'8px'}},DATA.asset.type),
+    h('p',{style:{lineHeight:'1.75',fontSize:'0.88rem',color:'var(--text-dim)'}},DATA.asset.description)));
+  const row=h('div',{className:'grid-2 mb-md'});
+  const ib=h('div',{className:'card',style:{cursor:'pointer'},onClick:()=>navigateTo('integrity')},h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}},'Integrity Range'));
+  DATA.nara.forEach(g=>ib.appendChild(h('div',{style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'4px'}},h('span',{style:{width:'8px',height:'8px',borderRadius:'50%',background:RC[g.rating]}}),h('span',{style:{fontSize:'0.82rem',color:'var(--text-dim)'},html:g.aspect+': <strong style="color:'+RC[g.rating]+'">'+RL[g.rating]+'</strong>'}))));
+  row.appendChild(ib);
+  const eb=h('div',{className:'card'},h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}},'Values by Evidence'));
+  const er=h('div',{style:{display:'flex',gap:'14px'}});
+  Object.entries(EV).forEach(([k,v])=>{const c=DATA.values.filter(val=>val.ev===k).length;if(c)er.appendChild(h('span',{style:{fontSize:'0.84rem',color:v.c,fontWeight:'600'}},v.i+' '+k+': '+c));});
+  eb.appendChild(er); row.appendChild(eb); el.appendChild(row);
+  const gp=h('div',{className:'card',style:{borderColor:'#fbbf24',background:'#fffbeb'}},h('div',{style:{fontSize:'0.73rem',color:'var(--amber)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}},'\u26A0 Data Gaps ('+DATA.dataQuality.gaps.length+')'));
+  DATA.dataQuality.gaps.forEach((g,i)=>gp.appendChild(h('div',{style:{padding:'5px 0',fontSize:'0.84rem',color:'#92400e',borderBottom:i<DATA.dataQuality.gaps.length-1?'1px solid #fde68a':'none'}},'\u2022 '+g)));
+  el.appendChild(gp);
+}
+
+function rTimeline(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Historical Timeline'));
+  const leg=h('div',{className:'tl-legend'});
+  Object.entries(CL).forEach(([k,v])=>leg.appendChild(h('div',{className:'tl-legend-item'},h('div',{className:'tl-legend-dot',style:{background:CC[k]}}),v)));
+  el.appendChild(leg);
+  const tr=h('div',{className:'tl-track'}); tr.appendChild(h('div',{className:'tl-line'}));
+  DATA.timeline.forEach((ev,i)=>{const nx=DATA.timeline[i+1];const gap=nx?Math.max(16,Math.min(60,(nx.ys-ev.ys)*2.5)):20;
+    tr.appendChild(h('div',{style:{position:'relative',marginBottom:gap+'px'}},h('div',{className:'tl-marker',style:{background:CC[ev.ct]}}),h('div',{style:{display:'flex',alignItems:'baseline',gap:'10px',marginBottom:'3px'}},h('span',{className:'tl-year',style:{color:CC[ev.ct]}},ev.year),pill(CL[ev.ct],CC[ev.ct],true)),h('div',{className:'tl-text'},ev.label)));});
+  el.appendChild(tr);
+  const ds=h('div',{className:'card',style:{marginTop:'24px'}},h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}},'Change Type Distribution'));
+  const dr=h('div',{style:{display:'flex',gap:'20px'}});
+  Object.entries(CL).forEach(([k])=>{const c=DATA.timeline.filter(t=>t.ct===k).length;dr.appendChild(h('div',{style:{textAlign:'center'}},h('div',{style:{fontSize:'1.4rem',fontWeight:'700',color:CC[k],fontFamily:'JetBrains Mono, monospace'}},String(c)),h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)'}},CL[k])));});
+  ds.appendChild(dr); el.appendChild(ds);
+}
+
+function rContexts(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Identified Contexts'));
+  el.appendChild(h('p',{className:'section-sub'},'Click a context to highlight its related values. Click value pills to jump to Values tab.'));
+  DATA.contexts.forEach(ctx=>{
+    const isHl=highlight&&highlight.type==='context'&&highlight.id===ctx.id;
+    const cd=h('div',{className:'card ctx-card '+(isHl?'card-hl':''),style:{marginBottom:'10px'},onClick:()=>setHighlight({type:'context',id:ctx.id})});
+    cd.appendChild(h('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}},
+      h('span',{style:{width:'10px',height:'10px',borderRadius:'50%',background:CTC[ctx.type],flexShrink:'0'}}),
+      h('span',{style:{fontSize:'0.73rem',color:CTC[ctx.type],fontWeight:'700',textTransform:'uppercase',letterSpacing:'0.07em'}},CTL[ctx.type]||'Context'),
+      h('span',{style:{fontSize:'0.72rem',color:'var(--text-muted)',marginLeft:'auto',fontFamily:'JetBrains Mono, monospace'}},ctx.ts)));
+    cd.appendChild(h('div',{style:{fontSize:'0.88rem',color:'var(--text)',marginBottom:'10px'}},ctx.label));
+    const ps=h('div',{className:'flex-wrap'});
+    ctx.rv.forEach(v=>{const p=pill(v,VC[v],true);p.style.cursor='pointer';p.addEventListener('click',e=>{e.stopPropagation();navigateTo('values',{type:'value',id:v});});ps.appendChild(p);});
+    cd.appendChild(ps); el.appendChild(cd);});
+}
+
+function rValues(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Cultural Values'));
+  DATA.values.forEach(val=>{
+    const isHl=(highlight&&highlight.type==='value'&&highlight.id===val.cat)||(highlight&&highlight.type==='context'&&DATA.contexts.find(c=>c.id===highlight.id)?.rv?.includes(val.cat));
+    const cd=h('div',{className:'card val-card '+(isHl?'card-hl':''),style:{marginBottom:'12px'},onClick:()=>setHighlight({type:'value',id:val.cat})});
+    cd.appendChild(h('div',{className:'val-icon',style:{background:VC[val.cat]}},h('span',{style:{color:'#fff',fontSize:'1.4rem'}},EV[val.ev].i)));
+    cd.appendChild(h('div',{style:{flex:'1'}},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'6px',gap:'8px',flexWrap:'wrap'}},h('span',{style:{fontSize:'0.92rem',color:'var(--text)',fontWeight:'600',lineHeight:'1.3'}},val.name),pill(val.cat,VC[val.cat])),
+      h('p',{style:{margin:'0',fontSize:'0.84rem',color:'var(--text-dim)',lineHeight:'1.6'}},val.summary)));
+    el.appendChild(cd);});
+  const evl=h('div',{className:'card',style:{display:'flex',gap:'20px',marginBottom:'28px',fontSize:'0.78rem'}});
+  Object.entries(EV).forEach(([k,v])=>evl.appendChild(h('span',{style:{color:v.c,fontWeight:'600'}},v.i+' '+k.charAt(0).toUpperCase()+k.slice(1))));
+  el.appendChild(evl);
+  el.appendChild(h('h3',{style:{color:'var(--text)',marginBottom:'14px',fontSize:'0.92rem',fontWeight:'600'}},'\u2192 Attribute \u2192 Value \u2192 Implication'));
+  DATA.attrTable.forEach(row=>{
+    const cd=h('div',{className:'attr-row',style:{marginBottom:'10px'}},h('div',{style:{fontSize:'0.88rem',color:'var(--text)',fontWeight:'600',marginBottom:'8px'}},row.attr));
+    const mid=h('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap',alignItems:'center'}});
+    row.vals.forEach(v=>mid.appendChild(pill(v,VC[v],true)));
+    mid.appendChild(h('span',{style:{fontSize:'0.8rem',color:'var(--text-muted)',marginLeft:'4px'}},'\u2192 '+row.sig));
+    cd.appendChild(mid); cd.appendChild(h('div',{className:'attr-impl'},'\u26A0 '+row.impl)); el.appendChild(cd);});
+}
+
+function rIntegrity(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Authenticity & Integrity \u2014 Nara Grid'));
+  DATA.nara.forEach(row=>{
+    const cd=h('div',{className:'nara-card',style:{marginBottom:'14px',borderLeft:'4px solid '+RC[row.rating]}},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}},h('span',{style:{fontSize:'0.92rem',color:'var(--text)',fontWeight:'600'}},row.aspect),h('span',{className:'nara-badge',style:{background:RC[row.rating]}},RL[row.rating])),
+      h('div',{style:{fontSize:'0.84rem',color:'var(--text-dim)',lineHeight:'1.6',marginBottom:'10px'}},row.desc));
+    const ps=h('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap',alignItems:'center'}},h('span',{style:{fontSize:'0.72rem',color:'var(--text-muted)',marginRight:'4px'}},'Values affected:'));
+    row.ve.split(', ').forEach(v=>ps.appendChild(pill(v,VC[v]||'#64748b',true)));
+    cd.appendChild(ps); el.appendChild(cd);});
+  el.appendChild(h('div',{className:'card',style:{background:'#f0f4f8',borderColor:'var(--accent)',borderLeft:'4px solid var(--accent)'}},
+    h('div',{style:{fontSize:'0.73rem',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}},'Integrity Summary'),
+    h('p',{style:{lineHeight:'1.75',fontSize:'0.88rem',color:'var(--text)'}},DATA.naraSummary)));
+}
+
+function rComparative(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Comparative Analysis'));
+  el.appendChild(h('p',{className:'section-sub'},DATA.comparative.summary));
+  DATA.comparative.sites.forEach(comp=>{
+    const cd=h('div',{className:'comp-card',style:{marginBottom:'14px'}});
+    const tp=h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'10px',flexWrap:'wrap',gap:'8px'}});
+    tp.appendChild(h('div',{},h('div',{style:{fontSize:'0.95rem',color:'var(--text)',fontWeight:'600'}},comp.name),h('div',{style:{fontSize:'0.75rem',color:'var(--text-muted)',marginTop:'2px',fontFamily:'JetBrains Mono, monospace'}},comp.period+(comp.arch?' \u00B7 '+comp.arch:''))));
+    const cr=h('div',{className:'comp-criteria'});
+    Object.entries(comp.crit).forEach(([k,v])=>{const c=v==='high'?'var(--green)':v==='moderate'?'var(--amber)':v==='low'?'var(--red)':'var(--text-muted)';cr.appendChild(h('div',{className:'comp-crit'},h('div',{className:'comp-crit-label'},k),h('div',{className:'comp-crit-val',style:{color:c}},v)));});
+    tp.appendChild(cr); cd.appendChild(tp);
+    cd.appendChild(h('div',{style:{fontSize:'0.84rem',color:'var(--text-dim)',lineHeight:'1.6'}},comp.dist));
+    el.appendChild(cd);});
+}
+
+function rSignificance(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Cultural Significance Statement'));
+  el.appendChild(h('div',{className:'card',style:{background:'#eff6ff',borderColor:'var(--accent)',borderLeft:'4px solid var(--accent)'}},
+    h('div',{style:{fontSize:'0.73rem',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:'14px',fontFamily:'JetBrains Mono, monospace'}},'Statement of Cultural Significance'),
+    h('p',{style:{lineHeight:'1.85',fontSize:'0.93rem',color:'var(--text)',fontStyle:'italic'}},DATA.significance)));
+}
+
+function rVulnerability(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Value Vulnerability Matrix'));
+  el.appendChild(h('p',{className:'section-sub'},'How much would a loss of integrity in each Nara aspect affect each cultural value?'));
+  const aspects=['Form & Design','Material & Fabric','Use & Function','Location & Setting'], keys=['form','material','use','setting'];
+  const tbl=document.createElement('table'); tbl.className='vuln-table';
+  const thd=h('thead'); const hr=h('tr',{},h('th',{style:{textAlign:'left'}},'Value'));
+  aspects.forEach((a,i)=>hr.appendChild(h('th',{},h('div',{},a),h('div',{style:{width:'8px',height:'8px',borderRadius:'50%',background:RC[DATA.nara[i].rating],margin:'4px auto 0'}}))));
+  thd.appendChild(hr); tbl.appendChild(thd);
+  const tbd=document.createElement('tbody');
+  DATA.vuln.forEach(row=>{const tr=h('tr',{},h('td',{},h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},h('span',{style:{width:'8px',height:'8px',borderRadius:'50%',background:VC[row.value]}}),h('span',{style:{fontWeight:'500'}},row.value))));
+    keys.forEach(k=>{const v=row[k];tr.appendChild(h('td',{style:{background:VU[v],color:VT[v],fontWeight:v>=2?'600':'400'}},VL[v]));});tbd.appendChild(tr);});
+  tbl.appendChild(tbd); const w=h('div',{style:{overflowX:'auto',marginBottom:'16px'}}); w.appendChild(tbl); el.appendChild(w);
+  const lg=h('div',{className:'card',style:{display:'flex',gap:'16px',fontSize:'0.78rem',marginBottom:'16px'}});
+  [{l:'High impact',c:'#fecaca',t:'#991b1b'},{l:'Medium impact',c:'#fef3c7',t:'#92400e'},{l:'Low impact',c:'#f1f5f9',t:'#94a3b8'}].forEach(x=>lg.appendChild(h('span',{style:{display:'flex',alignItems:'center',gap:'5px'}},h('span',{style:{width:'14px',height:'14px',borderRadius:'3px',background:x.c,border:'1px solid #e2e8f0'}}),h('span',{style:{color:x.t}},x.l))));
+  el.appendChild(lg);
+}
+
+function rQuality(el) {
+  el.appendChild(h('h2',{className:'section-title'},'Process Quality'));
+  const kg=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'12px',marginBottom:'22px'}});
+  [{v:DATA.pq.strengths,l:'Strengths',c:'var(--green)'},{v:DATA.dataQuality.gaps.length,l:'Data Gaps',c:'var(--amber)'},{v:DATA.pq.boosts.length,l:'Quick Boosts',c:'var(--accent)'}].forEach(s=>kg.appendChild(h('div',{className:'kpi'},h('div',{className:'kpi-value',style:{color:s.c}},String(s.v)),h('div',{className:'kpi-label'},s.l))));
+  el.appendChild(kg);
+  const gr=h('div',{className:'grid-2 mb-md'});
+  const ns=h('div',{className:'card'},h('div',{style:{fontSize:'0.73rem',color:'var(--green)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px',fontFamily:'JetBrains Mono, monospace'}},'\u2705 Next Steps'));
+  DATA.pq.next.forEach((s,i)=>ns.appendChild(h('div',{style:{padding:'7px 0',fontSize:'0.84rem',borderBottom:i<DATA.pq.next.length-1?'1px solid var(--border)':'none',lineHeight:'1.55',color:'var(--text-dim)'}},(i+1)+'. '+s)));
+  gr.appendChild(ns);
+  const qb=h('div',{className:'card'},h('div',{style:{fontSize:'0.73rem',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px',fontFamily:'JetBrains Mono, monospace'}},'\uD83D\uDD27 Quick Boosts'));
+  DATA.pq.boosts.forEach((b,i)=>qb.appendChild(h('div',{style:{padding:'7px 0',fontSize:'0.84rem',borderBottom:i<DATA.pq.boosts.length-1?'1px solid var(--border)':'none',lineHeight:'1.55',color:'var(--text-dim)'}},'\u2022 '+b)));
+  gr.appendChild(qb); el.appendChild(gr);
+  const src=h('div',{className:'card'},h('div',{style:{fontSize:'0.73rem',color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px',fontFamily:'JetBrains Mono, monospace'}},'\uD83D\uDCC1 Sources'));
+  DATA.dataQuality.sources.forEach(s=>src.appendChild(h('div',{style:{padding:'5px 0',fontSize:'0.84rem',color:'var(--text-dim)'}},'\u2022 '+s)));
+  el.appendChild(src);
+}
+
+function rKG(el) {
+  const hdr=h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+    h('h2',{className:'section-title',style:{margin:'0'}},'Knowledge Graph'),
+    h('div',{className:'kg-banner'},'Embedded view \u00B7 14 nodes \u00B7 17 edges'));
+  el.appendChild(hdr);
+  el.appendChild(h('p',{className:'section-sub'},DATA.kg.nodes.length+' entities and '+DATA.kg.edges.length+' relationships. Click any node to inspect.'));
+
+  const wrap=h('div',{className:'kg-wrap'});
+  const container=h('div',{className:'kg-container'});
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','kg-svg');
+  container.appendChild(svg);
+  const types=[...new Set(DATA.kg.nodes.map(n=>n.type))];
+  const legend=h('div',{className:'kg-legend'});
+  types.forEach(t=>legend.appendChild(h('div',{className:'kg-legend-item'},h('div',{className:'kg-legend-dot',style:{background:KC[t]}}),KL[t]||t)));
+  container.appendChild(legend);
+  container.appendChild(h('div',{className:'kg-hint'},'Drag \u00B7 Scroll to zoom \u00B7 Click node'));
+  wrap.appendChild(container);
+  el.appendChild(wrap);
+  requestAnimationFrame(()=>initKG(svg,container));
+}
+
+function initKG(svgEl,container) {
+  const W=container.clientWidth, H=500;
+  const svg=d3.select(svgEl).attr('width',W).attr('height',H);
+  svg.selectAll('*').remove();
+  const g=svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.25,3]).on('zoom',e=>g.attr('transform',e.transform)));
+  svg.append('defs').append('marker').attr('id','ka').attr('viewBox','-0 -5 10 10').attr('refX',20).attr('refY',0).attr('orient','auto').attr('markerWidth',6).attr('markerHeight',6).append('path').attr('d','M 0,-5 L 10,0 L 0,5').attr('fill','#94a3b8');
+  const nd=DATA.kg.nodes.map(n=>({...n})), ed=DATA.kg.edges.map(e=>({...e,source:e.from,target:e.to}));
+  const sim=d3.forceSimulation(nd).force('link',d3.forceLink(ed).id(d=>d.id).distance(110)).force('charge',d3.forceManyBody().strength(-320)).force('center',d3.forceCenter(W/2,H/2)).force('col',d3.forceCollide().radius(42));
+  const link=g.append('g').selectAll('line').data(ed).join('line').attr('stroke','#cbd5e1').attr('stroke-width',1.5).attr('marker-end','url(#ka)');
+  const llab=g.append('g').selectAll('text').data(ed).join('text').attr('font-size',10).attr('fill','#64748b').attr('text-anchor','middle').attr('dy',-5).attr('font-family','DM Sans, sans-serif').text(d=>d.label);
+  const node=g.append('g').selectAll('g').data(nd).join('g').style('cursor','pointer')
+    .call(d3.drag().on('start',(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;}).on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+  node.append('circle').attr('r',d=>d.type==='asset'?22:d.type==='cultural_value'?16:12).attr('fill',d=>KC[d.type]||'#777').attr('stroke','#ffffff').attr('stroke-width',2);
+  node.filter(d=>d.type==='asset').append('text').attr('text-anchor','middle').attr('dy',5).attr('font-size',13).attr('fill','#fff').text('\u2605');
+  node.append('text').attr('dy',d=>d.type==='asset'?36:26).attr('text-anchor','middle').attr('font-size',11).attr('fill','#1e293b').attr('font-weight','500').attr('font-family','DM Sans, sans-serif').style('text-shadow','0 1px 3px rgba(255,255,255,0.8)').text(d=>d.name.length>18?d.name.slice(0,18)+'\u2026':d.name);
+
+  node.on('click',function(event,d){
+    event.stopPropagation(); rmPop();
+    const nd=DATA.kg.nodes.find(n=>n.id===d.id); if(!nd) return;
+    const sr=svgEl.getBoundingClientRect(), cr=container.getBoundingClientRect();
+    const tr=d3.zoomTransform(svgEl);
+    const sx=tr.applyX(d.x)-cr.left+sr.left, sy=tr.applyY(d.y)-cr.top+sr.top;
+    const conns=DATA.kg.edges.filter(e=>e.from===d.id||e.to===d.id).map(e=>{const is=e.from===d.id;return{dir:is?'\u2192':'\u2190',verb:e.label,name:(DATA.kg.nodes.find(n=>n.id===(is?e.to:e.from)))?.name||'?'};});
+    const pop=h('div',{className:'kg-popover'});
+    pop.appendChild(h('button',{className:'kg-popover-close',onClick:rmPop},'\u2715'));
+    pop.appendChild(h('div',{className:'kg-popover-name'},nd.name));
+    pop.appendChild(h('div',{style:{marginBottom:'12px'}},h('span',{className:'pill pill-md',style:{background:KC[nd.type],fontSize:'0.72rem'}},KL[nd.type]||nd.type)));
+    pop.appendChild(h('div',{className:'kg-popover-meaning'},nd.meaning));
+    if(conns.length){const cd=h('div',{className:'kg-popover-conn'});cd.appendChild(h('div',{className:'kg-popover-conn-label'},'Connections ('+conns.length+')'));
+      conns.forEach(c=>cd.appendChild(h('div',{className:'kg-popover-conn-item'},h('span',{className:'dir'},c.dir),h('span',{className:'verb'},'['+c.verb+'] '),h('span',{style:{color:'#1e293b'}},c.name))));pop.appendChild(cd);}
+    let left=sx+30,top=sy-40;
+    if(left+310>container.clientWidth-10) left=sx-340;
+    if(top<10) top=10; if(top+300>500-10) top=190;
+    pop.style.left=left+'px'; pop.style.top=top+'px'; container.appendChild(pop);
+  });
+  svg.on('click',()=>rmPop());
+  function rmPop(){const p=container.querySelector('.kg-popover');if(p)p.remove();}
+  sim.on('tick',()=>{link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);llab.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2);node.attr('transform',d=>'translate('+d.x+','+d.y+')');});
+}
+
+renderStageBar(); renderSidebar(); renderMain();
+</script>
+</body>
+</html>
