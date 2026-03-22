@@ -39,7 +39,7 @@ workshop-site/
 ```
 InSites-Brain/
   Claude/InSites-CAA.md                        # Primary Claude bot prompt (skills-split, ~870 lines)
-  Claude/InSites-CAA-mono-v2.1.md              # Monolithic version (development/testing)
+  Claude/InSites-CAA-mono-v2.2.md              # Monolithic version (development/testing)
   Claude/skills/*.md                           # 7 Claude.ai Project Skills (on-demand)
   GPTs/CAA-GTPs (Claude.ai-Spilts)/            # OpenAI GPT package (instructions.md + knowledge files)
   Gemini/*.md                                  # Google Gemini bot prompts (4 files)
@@ -226,7 +226,7 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 When context is compacted, preserve:
 - Current task description and which files are being modified
-- Which bot prompt version is being edited (mono `InSites-CAA-mono-v2.1.md` vs skills-split `InSites-CAA.md`)
+- Which bot prompt version is being edited (mono `InSites-CAA-mono-v2.2.md` vs skills-split `InSites-CAA.md`)
 - Active platform target (Claude / GPT / Gemini / workshop-site)
 - Any cross-platform sync obligations triggered by the current edit
 
