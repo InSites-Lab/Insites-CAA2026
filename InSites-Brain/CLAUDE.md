@@ -82,7 +82,14 @@ InSites-Brain/
   Claude/            # Claude.ai bot
     InSites-CAA-mono.md  # Monolithic bot prompt (current working version — edit this first)
     InSites-CAA.md       # Skills-split version (core ~870 lines + 4 skills on demand)
-    skills/              # Project Skills (loaded on demand)
+    claude-ai-project/   # Self-contained deployment package (built from mono v2.2)
+      InSites-CAA.md               # Core prompt (~845 lines, includes [CA-IP])
+      skills/KG-skill.md           # Knowledge Graph [CA-KG] + [CA-EC]
+      skills/Dashboard-skill.md    # Assessment Dashboard [CA-DB]
+      skills/MA-RA-skill.md        # Read-Assessment [MA-RA]
+      skills/MA-RC-skill.md        # Read-Collection [MA-RC] + [CA-DB-C]
+      SETUP-GUIDE.md               # Step-by-step deployment instructions
+    skills/              # Project Skills (development versions)
       KG-skill.md                  # Knowledge Graph [CA-KG] — merged SKILL.md + CA-KG
       Dashboard-skill-generate.md  # Assessment Dashboard [CA-DB]
       MA-RA-skill.md               # Read-Assessment [MA-RA]
