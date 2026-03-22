@@ -15,6 +15,23 @@ Audit a system prompt file and produce a prioritized edit plan that reduces toke
 - After adding new features/sections to check for accumulated redundancy
 - Periodic health check on prompt efficiency
 
+## Review Lenses — Single Pass, All Perspectives
+
+Each finding is evaluated through all lenses simultaneously. Not separate passes — one read, multiple perspectives.
+
+| Lens | Question | Targets |
+|------|----------|---------|
+| **Prompt Engineer** | Does this line change model behavior? | Default-behavior instructions, decorative phrasing, hedging that adds tokens not precision |
+| **Information Architect** | Is this rule stated elsewhere? | Cross-section duplication, rules enforceable by structure alone, merge candidates |
+| **Token Economist** | Cost-to-impact ratio? | Verbosity >20 tokens with low impact. Skip micro-savings <5 tokens |
+| **UX Expert** | Does this improve what the user sees? | Formatting clutter, tone directives that dilute assessment clarity |
+| **HITL & Learning** | Does this support user agency and reflection? | Over-automated decisions, mechanical pauses, lecture-mode instead of teach-through-work |
+| **CBSA Domain Expert** | Is this archaeologically/methodologically precise? | Imprecise terminology, missing edge cases from real assessments, domain logic errors |
+
+**Team Leader** (= user): final authority. Domain-critical items flagged, never cut without approval.
+
+**Rule:** Structural enforcement > prose instruction. If the template already forces a behavior, the prose rule is redundant.
+
 ## Process
 
 ### Step 1: Measure
