@@ -29,3 +29,6 @@ workshop-site/.vite/
 
 # Verification screenshots (temporary, root-level)
 /*.png
+
+# Claude Code worktrees
+.claude/worktrees/
