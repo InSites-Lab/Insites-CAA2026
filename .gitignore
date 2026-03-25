@@ -1,14 +1,25 @@
 # Excluded from repo — all OLD/ folders anywhere
 **/OLD/
+
+# === Internal logistics ===
+management/
+content-dev/
 promptsEngineering/
 sakem-li/
 InSites Budget.md
 .vscode/
 *.code-workspace
 
+# === Developer tooling ===
+.claude/
+TODO.md
+CLAUDE.md
+InSites-Brain/CLAUDE.md
+
 # Temp files
 ~$*
 .tmp.driveupload/
+.tmp.drivedownload/
 
 # Environment / API keys
 .env*
@@ -20,15 +31,50 @@ workshop-site/dist/
 workshop-site/.vite/
 
 # Local tooling config
-.claude/settings.local.json
-.claude/settings.json
 .playwright-mcp/
 
-# Binary content (presentations)
+# Binary content (presentations, design exports)
 *.pptx
+InSites-Design-Principles*.pdf
+InSites-Brain/MANIFEST.md
 
 # Verification screenshots (temporary, root-level)
 /*.png
 
-# Claude Code worktrees
-.claude/worktrees/
+# === Paper content (gitignore for now) ===
+InSites-Brain/Heritage4.0/
+
+# === Claude: keep only user-facing files ===
+# Public: InSites-CAA.md, InSites-CAA-mono v3.md, WORKSHOP-README.md, SETUP-GUIDE.md
+# Public: skills/ (4 bot skills), claude-ai-project/ (self-contained package)
+InSites-Brain/Claude/InSites-CAA-mono-v2.2.md
+InSites-Brain/Claude/tests/
+InSites-Brain/Claude/plans/
+InSites-Brain/Claude/KG-Skill-en/
+InSites-Brain/Claude/KG-artifacts/
+InSites-Brain/Claude/global-claude-ai-skills/
+InSites-Brain/Claude/claude skills/
+# Dev-only skills (keep the 4 bot skills public)
+InSites-Brain/Claude/skills/Dashboard-review-skill.md
+InSites-Brain/Claude/skills/LIM-skill.md
+InSites-Brain/Claude/skills/agent-builder-skill.md
+InSites-Brain/Claude/skills/prompt-qa-skill.md
+InSites-Brain/Claude/skills/.vscode/
+
+# === GPTs: keep only root files, gitignore subdirectories ===
+InSites-Brain/GPTs/CAA/
+InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/Original/
+InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/.claude/
+InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/.vscode/
+
+# === Gemini: keep root files only ===
+InSites-Brain/Gemini/MISC-CHECK/
+
+# === Design: internal-only files ===
+InSites-Brain/design/less-is-more.md
+InSites-Brain/design/prompt-qa-principles.md
+InSites-Brain/design/claude code system/
+InSites-Brain/design/InSites-CAA bot brain Upgrades*
+InSites-Brain/design/dev-tracking-notion.md
+InSites-Brain/design/Scout-prompt.md
+InSites-Brain/design/agent4agents/

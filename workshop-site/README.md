@@ -1,49 +1,60 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# InSites-CAA Workshop Companion Site
 
-# Run and deploy your AI Studio app
+The companion site at **[alephplace.com/CAA26](https://alephplace.com/CAA26)** provides an interactive guide to the CBSA heritage assessment methodology and the CAA 2026 workshop.
 
-This contains everything you need to run your app locally.
+**No installation needed** — just visit the link.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1qWNJlUxkGv2ncFt4JzQd_LHt7OoziArg
+---
 
-## Run Locally
+## What's on the Site
 
-**Prerequisites:**  Node.js
+- **Workshop Program** — session timeline with linked resources and tools
+- **CBSA Stages (0-6)** — walkthrough of each assessment stage with agent descriptions
+- **Design Principles** — the "Looking Glass" conceptual frame: Mirror Not Magic, Low Floor High Ceiling, Stay Current Stay in Control
+- **Knowledge Graph Demo** — create and visualize entity relationships
+- **Glossary** — key CBSA terms with definitions
+- **Bot Links** — quick access to InSites-CAA on all platforms
 
+### Direct Links (Hash Routes)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The site supports deep linking:
 
-## Deep links (Hash routes)
+| Route | Content |
+|-------|---------|
+| `#program` | Workshop program timeline |
+| `#principles` | Design principles |
+| `#step-0` ... `#step-6` | Individual CBSA stages |
+| `#graph-create` | Knowledge Graph input |
+| `#visual` | Visual analysis |
+| `#glossary` | CBSA glossary |
 
-The app supports direct links using URL hashes (everything after `#`).
+---
 
-Examples:
+## For Developers
 
-- `http://localhost:5173/#visual`
-- `http://localhost:5173/#graph-create`
-- `http://localhost:5173/#step-2`
+**Tech stack:** Vite + React 19 + TypeScript + Tailwind CSS 4
 
-Supported hashes:
+### Run locally
 
-- `#welcome` – About / welcome overlay
-- `#tools` – "הרחבות וכלים" screen
-- `#q-narratives` – Query: נרטיבים חלופיים
-- `#q-sentiment` – Query: סנטימנט קהילתי / ערכי קהילה
-- `#q-education` – Query: המסרה וחינוך
-- `#q-semiotics` – Query: ניתוח סמיוטי
-- `#q-jester` – Query: ליצן החצר
-- `#q-chorus` – Query: מקהלה יוונית
-- `#q-jester-chorus` – Query group: ליצן החצר / מקהלה יוונית
-- `#graph-create` – Knowledge Graph input
-- `#graph` – Knowledge Graph results modal (after generation)
-- `#visual` – Visual analysis modal
-- `#inventory` – [MA-RC] inventory instructions modal
-- `#prompts` – Prompts workshop modal
-- `#principles` – Principles modal
-- `#step-0` … `#step-6` – CBSA stages
+```bash
+npm install
+npm run dev
+```
+
+Requires a Gemini API key in `.env.local` for the live AI features:
+
+```
+GEMINI_API_KEY=your_key_here
+```
+
+### Build
+
+```bash
+npm run build
+```
+
+Output goes to `dist/` (gitignored).
+
+---
+
+*InSites Knowledge Lab — [CC-BY 4.0](../LICENSE)*
