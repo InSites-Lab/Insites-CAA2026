@@ -1,5 +1,6 @@
-import React from 'react';
-import { Clock, BookOpen, PenTool, MessageSquare, Presentation, Coffee } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, BookOpen, PenTool, MessageSquare, Presentation, Coffee, ChevronDown } from 'lucide-react';
+import { SESSION_RESOURCES } from '../../constants';
 
 interface ProgramBlock {
   number: number | null;
@@ -159,6 +160,40 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
                     </div>
                     {block.description && (
                       <p className="text-xs text-slate-600 leading-relaxed">{block.description}</p>
+                    )}
+                    {block.number !== null && SESSION_RESOURCES[block.number] && (
+                      <details className="mt-2 group/res">
+                        <summary className="text-[11px] font-bold text-slate-400 cursor-pointer flex items-center gap-1 hover:text-slate-600 transition-colors select-none">
+                          <span>Resources</span>
+                          <ChevronDown size={12} className="group-open/res:rotate-180 transition-transform" />
+                        </summary>
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {SESSION_RESOURCES[block.number]?.stages?.map((s) => (
+                            <button
+                              key={`s-${s}`}
+                              onClick={() => onNavigate?.(`step-${s}`)}
+                              className="text-[10px] font-bold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+                            >
+                              Stage {s}
+                            </button>
+                          ))}
+                          {SESSION_RESOURCES[block.number]?.hashLinks?.map((link) => (
+                            link.hash ? (
+                              <button
+                                key={link.hash}
+                                onClick={() => onNavigate?.(link.hash)}
+                                className="text-[10px] font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+                              >
+                                {link.label}
+                              </button>
+                            ) : (
+                              <span key={link.label} className="text-[10px] font-bold bg-slate-50 text-slate-400 px-2 py-0.5 rounded-full">
+                                {link.label}
+                              </span>
+                            )
+                          ))}
+                        </div>
+                      </details>
                     )}
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Cpu, CheckCircle2, Zap, BookOpen, ExternalLink, Eye } from 'lucide-react';
+import { Cpu, CheckCircle2, Zap, BookOpen, ExternalLink, Eye, Layers, Users, Sparkles, Share2 } from 'lucide-react';
+import { LAB_TEAM, EXPERIENCE_COMPONENTS } from '../../constants';
 
 export interface AboutViewProps {
     onNavigate?: (route: string) => void;
@@ -46,6 +47,48 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate, hideHeader = f
                         <p>
                             The system is developed for research purposes by Dr. Yael Alef and Yuval Shafriri, and will be integrated into <b>InSites</b> — a new research lab at the Faculty of Architecture, Technion. The lab investigates assessment aspects of heritage assets, for decision-making on their integration into planning and understanding their place in culture, society, and community.
                         </p>
+                    </div>
+
+                    {/* Lab Team */}
+                    <div className="space-y-3 mb-6">
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Lab Team</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {LAB_TEAM.map((member) => (
+                                <div key={member.name} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                    <h4 className="font-bold text-sm text-slate-800">{member.name}</h4>
+                                    <p className="text-[11px] text-indigo-600 font-medium">{member.role}</p>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">{member.affiliation}</p>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">{member.bio}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Experience Components */}
+                    <div className="space-y-3 mb-6">
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">5 Experience Components</h3>
+                        <div className="space-y-2">
+                            {EXPERIENCE_COMPONENTS.map((comp, idx) => {
+                                const icons: Record<string, React.ReactNode> = {
+                                    layers: <Layers size={14} />,
+                                    users: <Users size={14} />,
+                                    eye: <Eye size={14} />,
+                                    sparkles: <Sparkles size={14} />,
+                                    share: <Share2 size={14} />,
+                                };
+                                return (
+                                    <div key={comp.label} className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                        <div className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center shrink-0 text-xs font-black">
+                                            {icons[comp.icon] || (idx + 1)}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-xs text-slate-800">{comp.label}</h4>
+                                            <p className="text-[11px] text-slate-500">{comp.description}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     <div className="space-y-4">

@@ -637,3 +637,103 @@ export const getNodeColor = (type: string) => {
     default: return { background: '#94a3b8', border: '#475569', highlight: '#cbd5e1' };
   }
 };
+
+// ─── Looking Glass Cards ──────────────────────────────────────────
+export const LOOKING_GLASS_CARDS = [
+  {
+    id: 'mirror',
+    title: 'Mirror, Not Magic',
+    tagline: 'The LLM is a looking glass — more than a wonderland.',
+    color: 'rose',
+    content: `It reflects your material back, structured through CBSA.\nEvery claim sourced. Every step approved by you.\nAlice decides where and when to step.`,
+  },
+  {
+    id: 'low-floor',
+    title: 'Low Floor, High Ceiling',
+    tagline: 'After Mitchel Resnick\'s design principles for Scratch',
+    color: 'indigo',
+    content: `**Chat-native platforms** — Claude Projects · Gemini · GPTs\n- Every step is a conversation — maximum human-in-the-loop\n- Full prompt transparency — readable, editable, challengeable\n- You control the LLM directly in natural language\n\n**Not a standalone app** — No React + Node + API production stack.\nWe gave up polished agentic UX — which has real advantages — because CBSA should be driven by human judgment, not automated by agent workflows.`,
+  },
+  {
+    id: 'stay-current',
+    title: 'Stay Current, Stay in Control',
+    tagline: 'LLMs evolve fast. Our platform choice keeps us on the edge.',
+    color: 'emerald',
+    content: `- Test the latest models the moment they ship — no migration, no refactoring\n- No API costs that make us conservative with the deep, multi-stage analysis CBSA demands\n- No architectural lock-in — what works today doesn't constrain tomorrow\n\n*The tool serves the assessor. The assessor doesn't serve the tool.*`,
+  },
+];
+
+// ─── Glossary ─────────────────────────────────────────────────────
+export const GLOSSARY: { term: string; definition: string; relatedHash?: string }[] = [
+  { term: 'CBSA', definition: 'Context-Based Significance Assessment — a structured methodology for evaluating cultural heritage through contexts, values, authenticity, and comparison.', relatedHash: 'step-0' },
+  { term: 'Context Effect', definition: 'Bidirectional analysis: how context frames the asset\'s meaning AND how the asset reframes its context.', relatedHash: 'step-1' },
+  { term: 'Epistemic Notation', definition: 'Three-tier evidence marking: explicit (sourced), inferred°, uncertain💭 — making the bot\'s confidence visible.', relatedHash: 'notation' },
+  { term: 'HITL', definition: 'Human-in-the-Loop — the assessor approves every stage transition. The bot proposes; the human decides.', relatedHash: 'governance' },
+  { term: 'Nara Grid', definition: 'Authenticity framework (form, material, use, setting) graded High/Medium/Low/Lost per row.', relatedHash: 'step-3' },
+  { term: 'Knowledge Graph', definition: 'Interactive visual mapping of entities (places, events, values) and their semantic relationships.', relatedHash: 'graph' },
+  { term: 'Significance Statement', definition: 'The synthesis (Stage 5): a coherent narrative weaving contexts, values, integrity and distinctiveness into "why conserve."', relatedHash: 'step-5' },
+  { term: 'MA-RA', definition: 'Read-Assessment workflow — structured analytical readings of a single completed assessment.', relatedHash: 'read-assessment' },
+  { term: 'MA-RC', definition: 'Read-Collection workflow — cross-sectional analysis scanning a collection of heritage assessments.', relatedHash: 'inventory' },
+  { term: 'Value Dynamics', definition: 'Cohesion or tension between identified heritage values — does a value reinforce or compete with another?', relatedHash: 'step-2' },
+  { term: 'Session Debrief', definition: 'Post-assessment reflection: 3 questions + interaction map creating a research-grade trust profile.', relatedHash: 'session-report' },
+];
+
+// ─── Session Resources ────────────────────────────────────────────
+export const SESSION_RESOURCES: Record<number, { prep?: string[]; stages?: number[]; tools?: string[]; hashLinks?: { label: string; hash: string }[] }> = {
+  1: {
+    stages: [0, 1, 2, 3, 4, 5, 6],
+    hashLinks: [
+      { label: 'Design Principles', hash: 'design' },
+      { label: 'Epistemic Notation', hash: 'notation' },
+    ],
+  },
+  2: {
+    stages: [0, 1, 2, 3, 4, 5],
+    tools: ['Prompt Advisor', 'Knowledge Graph'],
+    hashLinks: [
+      { label: 'Atar.Bot (GPT)', hash: '' },
+      { label: 'Atar.Bot (Gemini)', hash: '' },
+    ],
+  },
+  3: {
+    stages: [5, 6],
+    tools: ['Dashboard', 'Collection Analysis', 'Read Assessment'],
+    hashLinks: [
+      { label: 'Assessment Dashboard', hash: 'dashboard-preview' },
+      { label: 'Collection Dashboard', hash: 'inventory' },
+      { label: 'Read Assessment', hash: 'read-assessment' },
+    ],
+  },
+  4: {
+    tools: ['Agent Builder'],
+    hashLinks: [
+      { label: 'Build Agent (GPT)', hash: '' },
+      { label: 'Build Agent (Gemini)', hash: '' },
+    ],
+  },
+};
+
+// ─── Lab Team ─────────────────────────────────────────────────────
+export const LAB_TEAM = [
+  {
+    name: 'Dr. Yael Alef',
+    role: 'Principal Investigator',
+    affiliation: 'Faculty of Architecture, Technion',
+    bio: 'Heritage assessment methodology, CBSA development, conservation planning.',
+  },
+  {
+    name: 'Yuval Shafriri',
+    role: 'AI & Development Lead',
+    affiliation: 'InSites Knowledge Lab',
+    bio: 'AI system design, prompt engineering, knowledge representation for heritage.',
+  },
+];
+
+// ─── Experience Components ────────────────────────────────────────
+export const EXPERIENCE_COMPONENTS = [
+  { label: 'CBSA Experience', description: 'Structured stages, each building on the last', icon: 'layers' },
+  { label: 'Human-AI Collaboration', description: 'HITL as an explicit value, not a safety guardrail', icon: 'users' },
+  { label: 'Design Principles in Action', description: 'Transparency and grounding shown through the work', icon: 'eye' },
+  { label: 'New Representations', description: 'KG, timeline, dashboard, narrative create the insight moment', icon: 'sparkles' },
+  { label: 'Transfer', description: 'Participants leave able to apply the approach themselves', icon: 'share' },
+];

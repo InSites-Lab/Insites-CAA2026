@@ -43,6 +43,8 @@ import {
   Share2,
   Library,
   Mail,
+  ChevronDown,
+  BookText,
 } from "lucide-react";
 import MarkdownRenderer from "./components/MarkdownRenderer";
 import {
@@ -59,6 +61,9 @@ import {
   StepsList,
   StepDetailView,
   WorkshopProgramView,
+  WorkshopOpeningView,
+  WorkshopOpeningViewV2,
+  WorkshopOpeningViewV3,
 } from "./components/views";
 import {
   PrinciplesModal,
@@ -73,6 +78,7 @@ import {
   SessionReportModal,
   DashboardPreviewModal,
   ReadAssessmentModal,
+  GlossaryModal,
 } from "./components/modals";
 import {
   CORE_AGENTS,
@@ -87,6 +93,7 @@ import {
   RESEARCH_QUERIES,
   getNodeColor,
   ResearchQuerySelection,
+  LOOKING_GLASS_CARDS,
 } from "./constants";
 import { callGemini } from "./services/geminiService";
 import { PREBUILT_GRAPHS } from "./config/prebuiltGraphs";
@@ -223,6 +230,9 @@ const getAgentChipTheme = (colorName: string) => {
   return style.chip;
 };
 
+// Toggle: true = slide-style opening + program, false = compact program only
+const USE_OPENING_VIEW = true;
+
 const App: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
   const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
@@ -271,6 +281,7 @@ const App: React.FC = () => {
   const [isSessionReportModalOpen, setIsSessionReportModalOpen] = useState(false);
   const [isDashboardPreviewModalOpen, setIsDashboardPreviewModalOpen] = useState(false);
   const [isReadAssessmentModalOpen, setIsReadAssessmentModalOpen] = useState(false);
+  const [isGlossaryModalOpen, setIsGlossaryModalOpen] = useState(false);
   const [readAssessmentInitialRoute, setReadAssessmentInitialRoute] = useState<string | null>(null);
   const [inventoryModalLang, setInventoryModalLang] = useState<"he" | "en">(
     "en"
@@ -335,6 +346,7 @@ const App: React.FC = () => {
     "session-report": () => setIsSessionReportModalOpen(true),
     "dashboard-preview": () => setIsDashboardPreviewModalOpen(true),
     "read-assessment": () => { setReadAssessmentInitialRoute(null); setIsReadAssessmentModalOpen(true); },
+    glossary: () => setIsGlossaryModalOpen(true),
     design: () => {
       openDesignView();
       setMobileView(window.innerWidth < 768 ? "DESIGN" : "HOME");
@@ -438,6 +450,7 @@ const App: React.FC = () => {
     setIsSessionReportModalOpen(false);
     setIsDashboardPreviewModalOpen(false);
     setIsReadAssessmentModalOpen(false);
+    setIsGlossaryModalOpen(false);
   }, []);
 
   // Handle hash change
@@ -679,6 +692,9 @@ const App: React.FC = () => {
         onResearchAidsClick={() => {
           navigateTo("tools");
         }}
+        onProgramClick={() => {
+          navigateTo("program");
+        }}
         onDesignClick={() => {
           navigateTo("design");
         }}
@@ -762,7 +778,9 @@ const App: React.FC = () => {
                 <AboutView onNavigate={navigateTo} />
               </div>
             ) : mobileView === "PROGRAM" ? (
-              <WorkshopProgramView onNavigate={navigateTo} />
+              USE_OPENING_VIEW
+                ? <WorkshopOpeningViewV3 onNavigate={navigateTo} />
+                : <WorkshopProgramView onNavigate={navigateTo} />
             ) : mobileView === "STEP_DETAIL" ||
               (selectedAgentId !== null && currentAgent) ? (
               // Unified Step Detail View logic
@@ -1073,6 +1091,60 @@ const App: React.FC = () => {
                     <p className="text-slate-500">How transparency, control, and evidence governance work in Atar.Bot</p>
                   </div>
 
+                  {/* Through the Looking Glass */}
+                  <div className="space-y-3">
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                      Through the Looking Glass
+                    </h4>
+                    <p className="text-sm text-slate-500 italic">
+                      "The LLM is a looking glass — more than a wonderland"
+                    </p>
+                    {LOOKING_GLASS_CARDS.map((card) => {
+                      const colorMap: Record<string, { border: string; bg: string; icon: string; text: string }> = {
+                        rose: { border: 'border-rose-200', bg: 'bg-rose-50', icon: 'bg-rose-100 text-rose-600', text: 'text-rose-900' },
+                        indigo: { border: 'border-indigo-200', bg: 'bg-indigo-50', icon: 'bg-indigo-100 text-indigo-600', text: 'text-indigo-900' },
+                        emerald: { border: 'border-emerald-200', bg: 'bg-emerald-50', icon: 'bg-emerald-100 text-emerald-600', text: 'text-emerald-900' },
+                      };
+                      const c = colorMap[card.color] || colorMap.indigo;
+                      return (
+                        <details key={card.id} className={`bg-white border ${c.border} rounded-xl overflow-hidden group`}>
+                          <summary className={`p-4 cursor-pointer flex items-center justify-between hover:${c.bg} transition-colors select-none`}>
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 ${c.icon} rounded-lg flex items-center justify-center shrink-0`}>
+                                <Eye size={16} />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-slate-800 text-sm">{card.title}</h4>
+                                <p className="text-[11px] text-slate-500">{card.tagline}</p>
+                              </div>
+                            </div>
+                            <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+                          </summary>
+                          <div className={`px-4 pb-4 pt-2 border-t ${c.border}`}>
+                            <div className={`text-sm ${c.text}/80 leading-relaxed whitespace-pre-line`}>
+                              {card.content.split('\\n').map((line, i) => {
+                                if (line.startsWith('**') && line.includes('**')) {
+                                  const parts = line.split('**');
+                                  return <p key={i} className="mt-2"><strong>{parts[1]}</strong>{parts[2]}</p>;
+                                }
+                                if (line.startsWith('- ')) return <p key={i} className="ml-3">{line}</p>;
+                                if (line.startsWith('*') && line.endsWith('*')) return <p key={i} className="italic mt-2">{line.slice(1, -1)}</p>;
+                                return <p key={i}>{line}</p>;
+                              })}
+                            </div>
+                          </div>
+                        </details>
+                      );
+                    })}
+                  </div>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <div className="flex-1 h-px bg-slate-200" />
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">How the Bot Works</span>
+                    <div className="flex-1 h-px bg-slate-200" />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {/* Epistemic Notation */}
                     <button
@@ -1321,13 +1393,20 @@ const App: React.FC = () => {
                 </div>
               </div>
             ) : (
-              /* DEFAULT HOME VIEW (Resource List) */
+              /* DEFAULT HOME VIEW */
               <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-xl mx-auto w-full px-6 py-2 md:py-3 space-y-6">
-                  <div className="text-left pt-2 md:pt-3">
-                    <h3 className="text-lg sm:text-l font-black text-slate-500 mb-0.5 leading-tight truncate">
-                      Resources for CAA Workshop — Atar.Bot
-                    </h3>
+                <div className="max-w-xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
+
+                  {/* Poster Hero */}
+                  <div className="pt-2 md:pt-3">
+                    <img
+                      src="/poster.png"
+                      alt="Atar.Bot — CBSA Workshop Poster"
+                      className="w-full rounded-2xl border border-slate-200 shadow-sm"
+                    />
+                    <p className="text-center text-sm text-slate-500 italic mt-2">
+                      "The LLM is a looking glass — more than a wonderland"
+                    </p>
                   </div>
 
                   {/* Workshop Program Card */}
@@ -1344,11 +1423,11 @@ const App: React.FC = () => {
                     </div>
                   </button>
 
+                  {/* Bot Links */}
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4">
- <ResourceGroup title="Links to Atar.Bot">
-  <p className="text-xs text-slate-500 px-4 -mt-2">Recommended: paid account with reasoning mode</p>
-                         {" "}
+                      <ResourceGroup title="Links to Atar.Bot">
+                        <p className="text-xs text-slate-500 px-4 -mt-2">Recommended: paid account with reasoning mode</p>
                         <ResourceLink
                           href="https://chatgpt.com/g/g-695d3567400c8191a402087b38c7b6b7-tr-bvt-h-rkt-mshm-vt-lshymvr"
                           icon={<Bot size={16} />}
@@ -1383,97 +1462,120 @@ const App: React.FC = () => {
                         />
                       </ResourceGroup>
 
-                      <ResourceGroup title="Beyond Atar.Bot — Customization">
-                        <ResourceLink
-                          href="https://chatgpt.com/g/g-69492aebb530819199628bb444d024f3-svkn-lbnyyt-svkn-yqvmvs"
-                          icon={<Bot size={16} />}
-                          label="Build Agent (GPTs)"
-                          noBorder
-                          colorScheme="emerald"
-                        />
-                        <ResourceLink
-                          href="https://gemini.google.com/gem/1LbC3oHGIS83rP8uWdIEEeaU9_ixfEMh1?usp=sharing"
-                          icon={<Sparkles size={16} />}
-                          label={
-                            <span className="flex items-center gap-2">
-                              Build Agent (Gemini)
-                              <span
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  window.open(
-                                    "https://gemini.google.com/gem/1No_FbNaQmz5khR51dl7NHFOXAFQ5x5Pu?usp=sharing",
-                                    "_blank"
-                                  );
-                                }}
-                                className="text-[11px] text-slate-500 bg-emerald-20 px-1.5 py-0.5 rounded-md hover:bg-emerald-100 transition-colors cursor-pointer border border-emerald-200 shadow-sm"
-                              >
-                                Example: image generator from architectural description
-                              </span>
-                            </span>
-                          }
-                          noBorder
-                          colorScheme="emerald"
-                        />
-                      </ResourceGroup>
-
-                      <ResourceGroup title="Alternative Representation — Writing & Reading Assessments">
-                        <div className="sm:hidden">
-                          <ResourceLink
-                            icon={<LayoutDashboard size={16} />}
-                            label="Cultural Assessment Dashboard — Demo"
-                            secondaryLabel="Not available on mobile (open on desktop)"
-                            noBorder
-                          />
-                          <ResourceLink
-                            icon={<PieChart size={16} />}
-                            label="Collection Analysis Dashboard — Demo"
-                            secondaryLabel="Not available on mobile (open on desktop)"
-                            noBorder
-                          />
+                      {/* Key Terms button */}
+                      <button
+                        onClick={() => navigateTo("glossary")}
+                        className="w-full flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 hover:border-slate-300 transition-all group cursor-pointer text-left"
+                      >
+                        <div className="w-8 h-8 bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <BookText size={16} />
                         </div>
-
-                        <div className="hidden sm:block">
-                          <ResourceLink
-                            onClick={() => navigateTo("dashboard-preview")}
-                            icon={<LayoutDashboard size={16} />}
-                            label="Cultural Assessment Dashboard — Demo"
-                            noBorder
-                          />
-                          <ResourceLink
-                            onClick={() => navigateTo("inventory")}
-                            icon={<PieChart size={16} />}
-                            label="Collection Analysis Dashboard — Demo"
-                            secondaryLabel="Collection analysis combining NotebookLM and Atar.Bot in Gemini"
-                            noBorder
-                          />
+                        <div>
+                          <h4 className="font-bold text-sm text-slate-700">Key Terms</h4>
+                          <p className="text-[11px] text-slate-500">CBSA, HITL, Context Effect, Nara Grid and more</p>
                         </div>
-                      </ResourceGroup>
+                      </button>
 
-                      <SectionDivider
-                        label="Inspiration"
-                        colorClass="text-emerald-500"
-                        bgColor="bg-slate-50/30"
-                      />
+                      {/* Collapsible More Resources */}
+                      <details className="bg-white border border-slate-200 rounded-xl overflow-hidden group">
+                        <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-slate-50 transition-colors select-none">
+                          <span className="font-bold text-sm text-slate-600">More Resources</span>
+                          <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform" />
+                        </summary>
+                        <div className="px-4 pb-4 space-y-4 border-t border-slate-100">
+                          <ResourceGroup title="Beyond Atar.Bot — Customization">
+                            <ResourceLink
+                              href="https://chatgpt.com/g/g-69492aebb530819199628bb444d024f3-svkn-lbnyyt-svkn-yqvmvs"
+                              icon={<Bot size={16} />}
+                              label="Build Agent (GPTs)"
+                              noBorder
+                              colorScheme="emerald"
+                            />
+                            <ResourceLink
+                              href="https://gemini.google.com/gem/1LbC3oHGIS83rP8uWdIEEeaU9_ixfEMh1?usp=sharing"
+                              icon={<Sparkles size={16} />}
+                              label={
+                                <span className="flex items-center gap-2">
+                                  Build Agent (Gemini)
+                                  <span
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      window.open(
+                                        "https://gemini.google.com/gem/1No_FbNaQmz5khR51dl7NHFOXAFQ5x5Pu?usp=sharing",
+                                        "_blank"
+                                      );
+                                    }}
+                                    className="text-[11px] text-slate-500 bg-emerald-20 px-1.5 py-0.5 rounded-md hover:bg-emerald-100 transition-colors cursor-pointer border border-emerald-200 shadow-sm"
+                                  >
+                                    Example: image generator from architectural description
+                                  </span>
+                                </span>
+                              }
+                              noBorder
+                              colorScheme="emerald"
+                            />
+                          </ResourceGroup>
 
-                      <div className="grid grid-cols-1 gap-2.5">
-                        <ResourceLink
-                          href="https://drive.google.com/drive/folders/1AOu_r9towgJwqgQfrLEI8JcbOltprpJH?usp=sharing"
-                          icon={<LayoutDashboard size={16} />}
-                          label="Workshop Presentations"
-                          secondaryLabel="Workshop presentations and follow-up session"
-                          colorScheme="indigo"
-                          highlight
-                        />
-                        <ResourceLink
-                          href="https://bit.ly/49huqGS"
-                          icon={<BookOpen size={16} />}
-                          label="Alakhson: Another Organ of Consciousness"
-                          secondaryLabel="Article on place experience and consciousness with AI"
-                          colorScheme="emerald"
-                          highlight
-                        />
-                      </div>
+                          <ResourceGroup title="Alternative Representation — Writing & Reading Assessments">
+                            <div className="sm:hidden">
+                              <ResourceLink
+                                icon={<LayoutDashboard size={16} />}
+                                label="Cultural Assessment Dashboard — Demo"
+                                secondaryLabel="Not available on mobile (open on desktop)"
+                                noBorder
+                              />
+                              <ResourceLink
+                                icon={<PieChart size={16} />}
+                                label="Collection Analysis Dashboard — Demo"
+                                secondaryLabel="Not available on mobile (open on desktop)"
+                                noBorder
+                              />
+                            </div>
+
+                            <div className="hidden sm:block">
+                              <ResourceLink
+                                onClick={() => navigateTo("dashboard-preview")}
+                                icon={<LayoutDashboard size={16} />}
+                                label="Cultural Assessment Dashboard — Demo"
+                                noBorder
+                              />
+                              <ResourceLink
+                                onClick={() => navigateTo("inventory")}
+                                icon={<PieChart size={16} />}
+                                label="Collection Analysis Dashboard — Demo"
+                                secondaryLabel="Collection analysis combining NotebookLM and Atar.Bot in Gemini"
+                                noBorder
+                              />
+                            </div>
+                          </ResourceGroup>
+
+                          <SectionDivider
+                            label="Inspiration"
+                            colorClass="text-emerald-500"
+                            bgColor="bg-slate-50/30"
+                          />
+
+                          <div className="grid grid-cols-1 gap-2.5">
+                            <ResourceLink
+                              href="https://drive.google.com/drive/folders/1AOu_r9towgJwqgQfrLEI8JcbOltprpJH?usp=sharing"
+                              icon={<LayoutDashboard size={16} />}
+                              label="Workshop Presentations"
+                              secondaryLabel="Workshop presentations and follow-up session"
+                              colorScheme="indigo"
+                              highlight
+                            />
+                            <ResourceLink
+                              href="https://bit.ly/49huqGS"
+                              icon={<BookOpen size={16} />}
+                              label="Alakhson: Another Organ of Consciousness"
+                              secondaryLabel="Article on place experience and consciousness with AI"
+                              colorScheme="emerald"
+                              highlight
+                            />
+                          </div>
+                        </div>
+                      </details>
                     </div>
                   </div>
                 </div>
@@ -1601,6 +1703,12 @@ const App: React.FC = () => {
         onClose={() => { setIsReadAssessmentModalOpen(false); setReadAssessmentInitialRoute(null); window.location.hash = ""; }}
         initialReadingRoute={readAssessmentInitialRoute}
         onOpenGraph={() => navigateTo("graph")}
+      />
+
+      <GlossaryModal
+        isOpen={isGlossaryModalOpen}
+        onClose={() => { setIsGlossaryModalOpen(false); window.location.hash = ""; }}
+        onNavigate={navigateTo}
       />
 
       <style

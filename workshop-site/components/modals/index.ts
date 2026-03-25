@@ -22,3 +22,5 @@ export { DashboardPreviewModal } from './DashboardPreviewModal';
 export type { DashboardPreviewModalProps } from './DashboardPreviewModal';
 export { ReadAssessmentModal } from './ReadAssessmentModal';
 export type { ReadAssessmentModalProps } from './ReadAssessmentModal';
+export { GlossaryModal } from './GlossaryModal';
+export type { GlossaryModalProps } from './GlossaryModal';

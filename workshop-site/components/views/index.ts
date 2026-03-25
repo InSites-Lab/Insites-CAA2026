@@ -4,3 +4,6 @@ export { AboutView } from './AboutView';
 export { StepsList } from './StepsList';
 export { StepDetailView } from './StepDetailView';
 export { WorkshopProgramView } from './WorkshopProgramView';
+export { WorkshopOpeningView } from './WorkshopOpeningView';
+export { WorkshopOpeningViewV2 } from './WorkshopOpeningViewV2';
+export { WorkshopOpeningViewV3 } from './WorkshopOpeningViewV3';

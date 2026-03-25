@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Home, Info, ListOrdered, Zap, Eye } from 'lucide-react';
+import { Home, ListOrdered, Zap, Eye, Presentation } from 'lucide-react';
 import { AgentConfig } from '../../types';
 
 export interface MobileNavProps {
@@ -8,6 +8,7 @@ export interface MobileNavProps {
   agents: AgentConfig[];
   onHomeClick: () => void;
   onAboutClick: () => void;
+  onProgramClick: () => void;
   onResearchAidsClick: () => void;
   onDesignClick: () => void;
   onStepsClick: () => void;
@@ -22,6 +23,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   agents,
   onHomeClick,
   onAboutClick,
+  onProgramClick,
   onResearchAidsClick,
   onDesignClick,
   onStepsClick,
@@ -83,12 +85,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           </button>
 
           <button
-            onClick={onAboutClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'ABOUT' ? 'text-indigo-600' : 'text-slate-600'}`}
-            aria-label="About"
+            onClick={onProgramClick}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'PROGRAM' ? 'text-indigo-600' : 'text-slate-600'}`}
+            aria-label="Program"
           >
-            <Info size={18} />
-            <span className="text-[10px] font-bold">About</span>
+            <Presentation size={18} />
+            <span className="text-[10px] font-bold">Program</span>
           </button>
         </div>
 
