@@ -1,48 +1,52 @@
 # [CA-DB] Assessment Dashboard — CBSA Integration
 
-Generate an interactive Assessment Dashboard as a Canvas document (HTML) after Stage 6, when the user explicitly requests it.
+> **Scope**: This dashboard spec is for **single-assessment** visualization (one site, one CBSA process). For collection-level dashboards (multiple sites), see the MA-RC workflow — collection dashboards have a different data shape and tab structure. Both share the same visual language (stone/amber palette, serif typography).
+
+Generate an interactive Assessment Dashboard as a **Canvas document (HTML)** after Stage 6, when the user explicitly requests it ("dashboard", "summary dashboard", "create dashboard").
+
+⚠ Apply Language Policy to all dashboard text.
 
 ---
 
 ## 1. Trigger and Offer
 
-- **Mandatory offer** at end of Stage 6: "Would you like me to generate an interactive Assessment Dashboard?"
-- Execute only on acceptance.
+- **Mandatory offer** at end of Stage 6: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
+- Execute only on acceptance — do not auto-generate.
 - Output as a **Canvas document** (self-contained HTML with inline CSS/JS, D3 from CDN).
-- No surrounding prose — deliver the Canvas directly.
+- Respond **only** with the Canvas directly — no surrounding prose.
 
 ## 2. Data Extraction
 
-Re-read all stage outputs and extract:
+Re-read all stage outputs from the conversation and extract:
 
 | Section | Source | Data to extract |
 | --- | --- | --- |
 | Asset Identity | Stage 0 | Name, location, type, period, brief description (~20 words) |
-| Data Quality | Stage 0 | Sources uploaded, identified gaps |
-| Timeline | Stage 1 | 5–10 key dated events with year, label, and change type |
-| Contexts | Stage 1 | Each: type label, description, related value categories, timespan |
-| Values | Stage 2 | Each: name, category, evidence strength, 1-line summary |
-| Attribute Table | Stage 2.1 | Each: attribute, associated values, significance, implication |
-| Authenticity | Stage 3 | Nara Grid as structured objects + summary sentence |
-| Comparative | Stage 4 | Per-comparator objects with criteria ratings + summary |
+| Data Quality | Stage 0 | Sources uploaded, identified gaps (list) |
+| Timeline | Stage 1 | 5–10 key dated events with **year, label, and change type** (use / structure / setting / infrastructure) |
+| Contexts | Stage 1 | Each context: type label, description, **related value categories**, **timespan** |
+| Values | Stage 2 | Each value: name, category ([CA-V]), evidence strength (sourced/inferred/uncertain), 1-line summary |
+| Attribute Table | Stage 2.2 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
+| Authenticity | Stage 3 | Nara Grid as **structured objects**: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary sentence. |
+| Comparative | Stage 4 | Each comparator: name, period, architect (if known), distinction narrative, criteria ratings (rarity, documentation, condition). Plus overall summary. |
 | Significance | Stage 5 | Full statement text |
-| Vulnerability | Stages 2+3 | Cross-matrix: each value × each Nara aspect → impact level |
-| Process Quality | Stage 6 | Quick boosts, next steps, strengths count, gaps count |
-| Knowledge Graph | [CA-KG] | If KG was generated: full nodes/edges JSON. If not: null |
+| Vulnerability | Stages 2+3 | Cross-matrix: each value × each Nara aspect → impact level (3=high, 2=medium, 1=low). Derived from Stage 2 implications and Stage 3 ratings. |
+| Process Quality | Stage 6 | Quick boosts (list), next steps (list), strengths count, gaps count |
+| Knowledge Graph | [CA-KG] | If KG was generated: full nodes and edges JSON. If not: null. |
 
-**Rule**: Only include data from the conversation. Never fabricate. If a stage was skipped, show "Not completed".
+**Rule**: Only include data that actually appeared in the conversation. Do not fabricate. If a stage was skipped or incomplete, show it as "Not completed" with a visual indicator.
 
-## 3. Data Schema
+## 3. Data Schema (strict)
 
 ```json
 {
   "asset": { "name": "", "location": "", "type": "", "period": "", "description": "" },
   "dataQuality": { "sources": ["filename.pdf"], "gaps": ["missing X"] },
   "timeline": [
-    { "year": "1923–1924", "yearStart": 1923, "label": "...", "changeType": "fabric" }
+    { "year": "1923–1924", "yearStart": 1923, "label": "...", "changeType": "structure" }
   ],
   "contexts": [
-    { "id": "ctx_hist", "type": "historical", "label": "...", "relatedValues": ["Historical"], "timespan": "1915–1960s" }
+    { "id": "ctx_hist", "type": "historical", "label": "...", "relatedValues": ["Historical", "Technological"], "timespan": "1915–1960s" }
   ],
   "values": [
     { "id": "v_hist", "name": "...", "category": "Historical", "evidence": "sourced", "summary": "..." }
@@ -72,79 +76,76 @@ Re-read all stage outputs and extract:
 }
 ```
 
-**Schema rules:**
-- `authenticity.grid` must be structured objects — never flatten to strings.
-- `comparative.comparators` must be per-site objects with criteria — never a flat name list.
-- `timeline[].changeType` is mandatory (fabric / infrastructure / use / setting / interpretation). Values match [CA-T] in cbsa-method.md.
-- `contexts[].relatedValues` links each context to value categories.
-- `vulnerability` impact levels: 3 = severe damage, 2 = moderate, 1 = minor.
+**Schema rules**:
+- `authenticity.grid` must be **structured objects** — never flatten the Nara Grid to strings.
+- `comparative.comparators` must be **per-site objects** with criteria — never a flat name list.
+- `timeline[].changeType` is mandatory — every event classifies what kind of change occurred.
+- `contexts[].relatedValues` links each context to the value categories it generates — this enables cross-referencing.
+- `vulnerability` is derived by cross-reading Stage 2 implications against Stage 3 ratings. Impact levels: 3 = loss of this integrity aspect severely damages this value; 2 = moderate damage; 1 = minor or indirect.
 
-## 4. Tab Structure
+## 4. Tab Structure (mandatory)
 
-Each CBSA stage has its own tab. Never merge stages.
+Each CBSA stage must have its own tab. Do not merge stages.
 
 ```
 Overview → Timeline → Contexts → Values → Integrity → Comparative → Significance → [Vulnerability] → Process → [KG]
 ```
 
-Brackets = conditional (Vulnerability only if data exists; KG only if generated).
+Brackets = conditional (Vulnerability only if data exists; KG only if generated during session).
 
 | Tab | Content | Key features |
 | --- | --- | --- |
-| **Overview** | KPIs, asset description, integrity range, data gaps | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count. Integrity range: color-coded per aspect. |
-| **Timeline** | Chronological events | Proportional spacing by year. Color-coded by change type. Distribution summary. |
-| **Contexts** | Context cards with related values | Type label, description, timespan, clickable value pills. |
-| **Values** | Value cards + Attribute table | Cards: category pill, evidence indicator (●/◐/○), summary. Below: full attribute table with implications. |
-| **Integrity** | Nara Grid cards + summary | Each card: aspect, description, value expression pills, color-coded rating badge. Left border matches rating. |
-| **Comparative** | Per-comparator cards + summary | Name, period, architect, criteria ratings (color-coded), distinction. |
-| **Significance** | Statement | Styled as featured block. |
-| **Vulnerability** | Heat matrix | Rows = values, columns = Nara aspects with current rating. Cells by impact (red/amber/neutral). 2-3 sentence callout. |
-| **Process** | KPIs, next steps, quick boosts | Three-column KPI. Two-column: next steps + quick boosts. Sources list. |
-| **KG** | Embedded MiniKG with popover | D3 force-directed. Banner: "Standalone KG has richer features." See §7. |
+| **Overview** | KPIs, asset description, integrity range, data gaps | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. |
+| **Timeline** | Chronological events | **Proportional spacing** based on year gaps. **Color-coded** by change type (use/structure/setting/infrastructure). Distribution summary. |
+| **Contexts** | Context cards with related values | Each card shows: type label, description, timespan, **clickable value pills**. Clicking a context highlights related values in Values tab. |
+| **Values** | Value cards + Attribute-Value-Implication table | Cards: name, category pill, evidence indicator (●/◐/○), summary. Below: full attribute table with implication warnings. |
+| **Integrity** | Nara Grid cards + summary | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. |
+| **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. |
+| **Significance** | Statement of cultural significance | Styled as a featured block. |
+| **Vulnerability** | Heat matrix: values × Nara aspects | Rows = value categories, columns = Nara aspects. Column headers show current integrity rating. Cells colored by impact (red/amber/neutral). 2–3 sentence interpretive callout. |
+| **Process** | KPIs, next steps, quick boosts, sources | Three-column KPI (strengths/gaps/boosts). Two-column layout: next steps + quick boosts. Sources list. |
+| **KG** | Embedded MiniKG with floating popover | D3 force-directed graph. Banner noting standalone KG has richer features. See §7 for interaction. |
 
 ## 5. Cross-Referencing (mandatory)
 
-Implement a shared selection state:
-- Clicking a context → highlights its related values in Values tab
-- Clicking a value → highlights matching contexts and integrity aspects
-- Tab navigation preserves active highlight
-- Banner shows what is highlighted + Clear action
+The dashboard must implement a shared selection state:
 
-Implementation: top-level `highlight` variable checked by each tab renderer.
+- **Clicking a context** → highlights its related values in the Values tab.
+- **Clicking a value** → highlights matching contexts and integrity aspects.
+- **Navigating between tabs** preserves the active highlight.
+- **Visible indicator** (banner) shows what is currently highlighted, with a Clear action.
 
-## 6. Theme and Readability
+Implementation: a top-level `highlight` variable (`{ type: 'value'|'context', id: string } | null`) checked by each tab renderer.
 
-**Hybrid theme**: Light background for text-heavy tabs. Dark canvas only for KG tab.
+## 6. Theme and Readability (mandatory)
 
-**Light mode (text tabs):**
+**Light theme throughout**: All tabs — including KG — use the same light palette. This ensures visual coherence between the Dashboard and the standalone KG artifact.
+
+**Light palette** (all tabs):
 ```
 Background: #f8fafc → cards: #ffffff → borders: #e2e8f0
 Text: #1e293b → dim: #64748b → muted: #94a3b8
-Accent: #2563eb
+Accent: #2563eb — or site-appropriate
 ```
 
-**Dark mode (KG tab only):**
-```
-Background: #0a1120 → cards: #1e293b → borders: #334155
-Text: #e2e8f0 → dim: #b0bfd0
-```
-
-**Readability requirements:**
-- Body text: ≥ 0.84rem, contrast ≥ 4.5:1
-- Section labels: ≥ 0.72rem
-- Pills/badges: ≥ 0.66rem
-- KG labels: ≥ 10px, contrast ≥ 3:1, text-shadow for legibility
-- No text below 0.62rem anywhere
+**Minimum readability requirements**:
+- Body text: ≥ 0.84rem, contrast ratio ≥ 4.5:1
+- Section labels / uppercase micro-labels: ≥ 0.72rem
+- Pills and badges: ≥ 0.66rem
+- KG edge labels: ≥ 10px, contrast ratio ≥ 3:1
+- KG node labels: include text-shadow or halo for legibility against light background
+- **No text below 0.62rem anywhere**
 
 ## 7. KG Node Interaction (MiniKG)
 
-On click, display a floating popover adjacent to the node:
-- Position: prefer right; flip near edges; clamp vertically
-- Content: node name (≥1rem bold), type badge, meaning (≥0.88rem), connections with arrows and verbs
-- Connection items: mini-cards with colored verbs, white entity names
-- Animate: scale+fade ≤200ms
-- Dismiss: close button, background click, or clicking another node
-- Never require scrolling to read node info
+When a user clicks a KG node, display a **floating popover** adjacent to the clicked node:
+
+- **Position**: prefer right of node; flip left near container edge; clamp vertically within SVG bounds.
+- **Content**: node name (≥1rem, bold), type badge, meaning (≥0.88rem), connections list with directional arrows and verb labels.
+- **Connection items**: styled as mini-cards (background + border), colored verb labels, white entity names.
+- **Animate entrance**: scale+fade, ≤200ms.
+- **Dismiss on**: close button, background click, or clicking another node.
+- **Never require scrolling** to read node info — all content visible within the graph viewport.
 
 ## 8. Dashboard UX — 7-Lens Design Constraints
 
@@ -210,27 +211,188 @@ When building the dashboard (not reviewing), apply these lenses as design constr
 
 ## 9. AI Query in Dashboard
 
-If KG tab is present, include the same Gemini AI Query capability as described in kg-spec.md §5:
+If the KG tab is present, include the same Gemini AI Query capability as described in `kg-spec.md` §5:
+
 - Configuration panel (collapsible, Gemini 2.0 Flash)
+- User-provided Gemini API key stored in localStorage (`insites_gemini_key`)
 - System prompt referencing the KG data JSON
 - Chat interface within the KG tab sidebar
+- Starter prompts when chat is empty
+
+> **GPT v1 note**: In GPT v1 the AI Query tab is placeholder-only — visible and styled but does not execute live API calls. Route interpretation requests to GPT chat instead. See `kg-spec.md` §13 for full placeholder behaviour.
 
 ## 10. Final Checklist
 
-1. Only data from conversation — never fabricate.
-2. Incomplete stages: show "Not completed" in tab.
-3. Evidence indicators match Stage 2 markers.
-4. KG tab only if KG generated; Vulnerability only if data exists.
-5. All CBSA stages (1-6) have dedicated tabs.
-6. Attribute-Value-Implication table in Values tab.
-7. Cross-referencing: Context↔Value linking functional.
-8. Readability: no text below 0.62rem; contrast ≥ 3:1.
-9. Nara Grid as structured objects.
-10. 7-lens build checklist items verified.
+1. Only include data from the conversation — never fabricate.
+2. If a stage was not completed, show as incomplete in progress bar and mark "Not completed" in its tab.
+3. Evidence indicators (●/◐/○) must match Stage 2 markers and appear consistently in all tabs that reference values.
+4. KG tab appears only if KG was generated during the session; Vulnerability tab only if data exists.
+5. Replace `__DATA__` and `__ASSET_NAME__` placeholders with extracted content.
+6. **All CBSA stages (1–6) have dedicated tabs** — no merged stages.
+7. **Attribute-Value-Implication table** present in Values tab.
+8. **Cross-referencing** implemented: at least Context↔Value linking functional.
+9. **Readability**: no text below 0.62rem; no contrast ratio below 3:1.
+10. **Nara Grid** stored as structured objects, not parsed strings.
+11. **CDN source**: Use `cdnjs.cloudflare.com` exclusively for all external libraries (D3, Leaflet, Chart.js). Do NOT use unpkg.com or jsdelivr.net. Add a `typeof` guard before initializing CDN-dependent features.
+12. **Inline data**: All extracted data must be embedded inline as JS objects. Do NOT use `fetch()` — the dashboard must work when opened via `file://` protocol without a server.
+13. **Leaflet popup close button**: Leaflet's popup close is `<a href="#close">` — in sandbox environments, hash links get rewritten. After map init, add: `document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();mapInstance.closePopup();}});`
+14. **Chart.js stability**: For doughnut/pie charts, do NOT set `maintainAspectRatio:false` — it causes infinite expansion. Add `canvas{max-height:280px}` CSS to chart containers. Only use `maintainAspectRatio:false` for bar charts in constrained-height containers.
 
 ## 11. Post-Dashboard Offers (mandatory)
 
-After generating: "Would you like me to export this assessment as a formatted Word document?"
+After generating the Dashboard, always offer:
+
+> "Would you like me to export this assessment as a formatted Word document?"
+
+Use **Code Interpreter** for the export — generate a styled `.docx` file with all dashboard content formatted for print.
+
+---
+
+## 12. Reference Data Shape — Ayelet HaShachar
+
+The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
+
+This section describes the data shape and rendering approach used in that reference. Your generated data must follow this shape exactly.
+
+---
+
+### Asset Identity
+
+The `asset` object is a flat dictionary with five string fields: `name`, `location`, `type`, `period`, and `description` (~20 words).
+
+Example:
+- name: "Water Tower, Kibbutz Ayelet HaShachar"
+- type: "Rural Water Tower — Kibbutz Infrastructure"
+- period: "1923–1924 (Mandatory Palestine)"
+
+This populates the Overview tab header.
+
+### Data Quality
+
+`dataQuality` contains two arrays: `sources` (filenames as strings) and `gaps` (concise gap descriptions). The Ayelet assessment had 2 sources and 6 gaps. The Overview tab renders sources as a list and gaps as warning badges.
+
+### Timeline
+
+`timeline` is an array of event objects. Each must have:
+- `year` (display string, e.g., "1923–1924")
+- `yearStart` (integer for proportional positioning)
+- `label` (what happened)
+- `changeType` (one of: "fabric", "infrastructure", "use", "setting", "interpretation" — matching [CA-T] in `cbsa-method.md`)
+
+The Ayelet timeline had 8 events spanning 1915–1961. Change types were: 3× fabric, 2× use, 2× infrastructure, 1× setting.
+
+**Rendering**: The Timeline tab renders events on a proportional horizontal axis where spacing reflects actual year gaps. Events are color-coded by `changeType` (e.g., fabric=blue, use=green, setting=amber, infrastructure=purple, interpretation=teal). A distribution summary below shows the count per change type.
+
+### Contexts
+
+`contexts` is an array of context objects. Each must have:
+- `id` (e.g., "ctx_hist")
+- `type` (from [CA-C]: "historical", "social", etc.)
+- `label` (the site-specific context description, 2–4 sentences)
+- `relatedValues` (array of value category names from [CA-V])
+- `timespan` (e.g., "1915–1960s")
+
+The Ayelet assessment identified 6 contexts, each linked to 1–3 value categories.
+
+**Rendering**: Cards with type badge, description, timespan, and clickable value pills. Clicking a context card activates cross-referencing: it highlights matching values in the Values tab.
+
+### Values
+
+`values` is an array. Each must have:
+- `id` (e.g., "v_hist")
+- `name` (the "Value Type — Value Meaning" compound, e.g., "Historical — Infrastructure as Survival")
+- `category` (the [CA-V] type name)
+- `evidence` (one of: "sourced", "inferred", "uncertain")
+- `summary` (one-line description)
+
+The Ayelet assessment identified 5 values with evidence: 3 sourced, 2 inferred.
+
+**Rendering**: Cards show the value name, a category-colored pill, an evidence indicator (● sourced, ◐ inferred, ○ uncertain), and the summary. Below the cards: the full Attribute-Value-Implication table from `attributeTable`.
+
+### Attribute Table
+
+`attributeTable` is an array. Each row:
+- `attribute` (the physical or conceptual attribute)
+- `values` (array of value category names)
+- `significance` (≤9 words)
+- `implication` (what happens if this attribute is compromised)
+
+**Rendering**: Styled table with value pills in the second column and the implication as a warning-toned text.
+
+### Authenticity (Nara Grid)
+
+`authenticity` contains:
+- `grid`: array of structured objects, each with `aspect`, `description`, `valueExpression`, and `rating` (high / medium / low-medium / low)
+- `summary`: one paragraph
+
+The four aspects are always: Form & Design, Material & Fabric, Use & Function, Location & Setting.
+
+**Rendering**: Cards with left border colored by rating (green→high, amber→medium, orange→low-medium, red→low). Each card shows the aspect name as header, description as body, value expression as pills, and a rating badge. The summary appears below.
+
+### Comparative
+
+`comparative` contains:
+- `summary`: overall comparison narrative
+- `comparators`: array of objects, each with `name`, `period`, `architect` (may be null), `distinction` (narrative), and `criteria` (object with keys like `rarity`, `documentation`, `condition` — values are "high", "moderate", "low", "unknown")
+
+The Ayelet assessment compared 3 water towers.
+
+**Rendering**: Per-comparator cards. Each shows name/period header, architect (if known), criteria as color-coded badges, and distinction text. Summary paragraph above.
+
+### Significance
+
+`significance` has one field: `statement` (the full Stage 5 text, 3–5 paragraphs).
+
+**Rendering**: Featured block with distinct typography — larger font, left accent border, generous padding. Treat as the centerpiece of the dashboard.
+
+### Vulnerability Matrix
+
+`vulnerability` is an array. Each row:
+- `value` (value category name)
+- `form` (impact level 1–3)
+- `material` (impact level 1–3)
+- `use` (impact level 1–3)
+- `setting` (impact level 1–3)
+
+Impact levels: 3 = loss severely damages this value, 2 = moderate damage, 1 = minor.
+
+**Rendering**: Heat matrix table. Column headers show the Nara aspect name AND its current integrity rating from the authenticity grid. Cells colored: 3=red, 2=amber, 1=neutral/grey. Below: 2–3 sentence interpretive callout identifying the most critical vulnerability intersection.
+
+### Process Quality
+
+`processQuality` contains:
+- `strengths` (integer count)
+- `gaps` (integer count)
+- `quickBoosts` (array of strings)
+- `nextSteps` (array of strings)
+
+**Rendering**: Three-column KPI row (strengths / gaps / boosts count). Below: two-column layout with next steps (left) and quick boosts (right). Sources list at bottom.
+
+### KG (conditional)
+
+`kg` is either `null` (no KG generated) or the full `{ nodes, edges }` object from the KG spec.
+
+**Rendering**: If present, render a MiniKG tab with D3 force-directed graph (light theme), floating popover on node click, and a banner: "The standalone Knowledge Graph has richer features including analytics and AI queries." If KG included AI capability, include the Gemini chat panel here too.
+
+### Stages Completed
+
+`stagesCompleted` is an array of integers [0,1,2,3,4,5,6]. Any stage not in this array renders as "Not completed" in its tab with a muted indicator.
+
+---
+
+### Key Rendering Principles
+
+1. **Single source of truth**: All data lives in one `DATA` object at the top of the HTML. Every statistic, count, and label is computed from this object — never hardcoded.
+
+2. **Cross-referencing**: A global `highlight` state (value or context ID) propagates across tabs. When active, matching elements get a visual highlight and non-matching elements are dimmed.
+
+3. **Proportional timeline**: Year gaps determine spacing. A 40-year gap gets more horizontal space than a 2-year gap.
+
+4. **Consistent evidence indicators**: ● / ◐ / ○ appear everywhere a value is referenced — cards, tables, pills.
+
+5. **Structured Nara Grid**: The grid is always an array of objects with typed fields — never a flat string or paragraph.
+
+6. **Tab navigation**: Hash-based routing. Each tab switch updates `location.hash`. On load, read hash to restore tab state.
 
 ---
 

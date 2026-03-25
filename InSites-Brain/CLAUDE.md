@@ -80,7 +80,7 @@ When changing a **platform constraint** or adding a **platform-specific feature*
 ```
 InSites-Brain/
   Claude/            # Claude.ai bot
-    InSites-CAA-mono.md  # Monolithic bot prompt (current working version — edit this first)
+    InSites-CAA-mono v3.md  # Monolithic bot prompt (current working version — edit this first)
     InSites-CAA.md       # Skills-split version (core ~870 lines + 4 skills on demand)
     claude-ai-project/   # Self-contained deployment package (built from mono v2.2)
       InSites-CAA.md               # Core prompt (~845 lines, includes [CA-IP])

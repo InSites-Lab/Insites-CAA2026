@@ -4,7 +4,7 @@ Generate an interactive Knowledge Graph as a **Canvas React artifact** when the 
 
 ---
 
-## 1. Trigger and Output
+## §1. Trigger and Output
 
 - Execute this appendix **only** on explicit Knowledge Graph requests.
 - Output as a **Canvas React document** (`code/react`).
@@ -14,12 +14,12 @@ Generate an interactive Knowledge Graph as a **Canvas React artifact** when the 
   - `import * as d3 from 'd3';`
 - Do **not** use CDN `<script>` tags for D3.
 - The React artifact must recreate the CA-KG shell defined below exactly:
-  - top collapsible AI configuration panel
   - left graph canvas / right sidebar layout
   - collapsible sidebar
+  - top collapsible AI configuration panel
   - bottom-left legend
   - Info / Analytics / AI Query tabs
-  - JSON export
+  - JSON export (download)
   - D3 force-directed graph with curved edges, zoom, drag, hover, select/dim
 - In GPT v1, the **AI Query tab is placeholder-only**:
   - keep the visible configuration panel
@@ -30,15 +30,15 @@ Generate an interactive Knowledge Graph as a **Canvas React artifact** when the 
 
 ---
 
-## 2. CBSA Data Extraction → DATA
+## §2. CBSA Data Extraction → DATA
 
 1. Re-read stage outputs (contexts, timeline, values, comparisons).
 2. List candidate nodes (target **10–15**, maximum **18**) in this priority order:
-   - **Value-bearing entities** central to Stage 2
-   - **Key places/structures** and **major events**
-   - **Context anchors** (geographic, social, political, historical)
-   - **Social actors** (individuals, groups, communities)
-   - **Up to 3 Cultural Value nodes**
+   - **Value-bearing entities** central to Stage 2 (the things that carry identified values)
+   - **Key places/structures** and **major events** (the central heritage subject and temporal anchors)
+   - **Context anchors** (geographic, social, political entities that shape significance)
+   - **Social actors** (individuals, groups, communities relevant to the asset)
+   - **Up to 3 Cultural Value nodes** (abstract value entities for KG illustration)
 3. Capture relationship verbs that show CBSA logic:
    - `located_in`
    - `expresses_value`
@@ -48,11 +48,13 @@ Generate an interactive Knowledge Graph as a **Canvas React artifact** when the 
    - `supports`
 4. Drop weak or duplicate nodes.
 5. No orphan nodes: every node must connect at least once.
-6. Assign each node a `type` from the CA-EC entity categories.
+6. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
 
 ---
 
-## 3. DATA Schema (strict)
+## §3. DATA Schema (strict)
+
+⚠ Apply Language Policy to all KG fields.
 
 **Critical language rule:** All fields (`name`, `meaning`, `type`, `label`) must be in **English**.
 
@@ -74,16 +76,16 @@ Generate an interactive Knowledge Graph as a **Canvas React artifact** when the 
 ```
 
 ### Rules
-- `type` must use English tokens from [CA-EC].
+- `type` must use English tokens from [CA-EC] for colour mapping (the renderer automatically translates to display labels when needed).
 - `meaning` must be concise, site-specific, and in English.
 - Optional `value_type` must match [CA-V].
 - Edge labels must be lowercase verbs.
-- Total edges: **≤24**.
+- Total edges: **≤ 20**.
 - Maximum cultural value nodes: **3**.
 
 ---
 
-## 4. React JSX Artifact Contract
+## §4. React JSX Artifact Contract
 
 ### 4a. Artifact Type
 Generate a **single-file React component** that:
@@ -107,7 +109,7 @@ The file must define:
 
 ---
 
-## 5. Layout Contract
+## §5. Layout Contract
 
 ### 5a. Main Split
 - Graph canvas: **65–70%** width
@@ -145,24 +147,21 @@ Rules:
 
 ---
 
-## 6. Dark Mode Chrome Palette
+## §6. Light Chrome Palette
 
-Use this exact shell palette:
+Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by `TYPE_COLORS` / [CA-EC]. Match the visual language of the Assessment Dashboard [CA-DB] — same typography (DM Sans + JetBrains Mono), card styles, spacing patterns, and interaction conventions.
 
-- Background: `#0a1120`
-- Sidebar: `#0f172a`
-- Cards: `#1e293b`
-- Borders: `#334155`
-- Text primary: `#e2e8f0`
-- Text dim: `#94a3b8`
-- Text muted: `#64748b`
-- Accent: `#3b82f6`
+```
+Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
+Text-primary: #1e293b → text-dim: #64748b → text-muted: #94a3b8
+Accent: #3b82f6 (interactive elements, active tab indicator)
+```
 
-Entity colours come from `TYPE_COLORS`.
+> **v3 change**: This replaces the v1 Dark Mode Chrome palette. All UI chrome elements (sidebar, cards, legend background, assistant message cards, analytics panels) must use the light values above. Entity node colours are unchanged.
 
 ---
 
-## 7. Node Types and Colour Mapping
+## §7. Node Types and Colour Mapping
 
 The component must define the full mapping:
 
@@ -208,7 +207,7 @@ const TYPE_LABELS = {
 
 ---
 
-## 8. Node Sizing
+## §8. Node Sizing
 
 | Tier | Applies to | Radius |
 |------|-----------|--------|
@@ -224,7 +223,7 @@ Additional rules:
 
 ---
 
-## 9. Edge Geometry and Physics
+## §9. Edge Geometry and Physics
 
 Use a D3 force-directed graph.
 
@@ -245,7 +244,7 @@ Use a D3 force-directed graph.
 
 ---
 
-## 10. Graph Interaction States
+## §10. Graph Interaction States
 
 ### Hover
 - Increase node radius by **+4px**
@@ -267,7 +266,7 @@ Use a D3 force-directed graph.
 
 ---
 
-## 11. Legend
+## §11. Legend
 
 A horizontal wrapped legend strip at the **bottom-left** of the graph pane.
 
@@ -276,14 +275,15 @@ Each item:
 - type label
 
 Legend styling:
-- background: `rgba(30,41,59,0.85)`
+- background: `rgba(241,245,249,0.92)` (light chrome, semi-transparent)
 - backdrop blur
 - small rounded container
 - font-size: **≥0.66rem**
+- text colour: `#1e293b`
 
 ---
 
-## 12. Sidebar Tabs
+## §12. Sidebar Tabs
 
 The sidebar must contain exactly **three tabs**:
 
@@ -296,28 +296,29 @@ When no node is selected:
 - show placeholder text: `Click a node to inspect it.`
 
 When a node is selected:
-- node name
-- colored type badge
+- node name (≥ 1rem, bold)
+- colored type badge (coloured by [CA-EC])
 - optional value badge if `value_type` exists
-- meaning text
+- meaning text (≥ 0.88rem)
 - connections grouped:
   - **Outgoing**
   - **Incoming**
-- each connection row clickable and selects that node
+- each connection row shows the verb label and target/source node name, styled as a clickable mini-card
+- clicking a connection selects that node
 
 ### 12b. Analytics Tab
 Must include:
 - search input filtering by node `name` or `meaning`
 - type filter chips with counts
-- clear button
+- clear button when any filter is active
 - statistics cards:
   - node count
   - edge count
   - entity type count
   - graph density
-- “Most connected” list:
+- "Most connected" list:
   - top 5 by degree
-  - clickable
+  - clickable (navigates to Info tab on click)
 
 ### 12c. AI Query Tab
 Must include:
@@ -331,7 +332,7 @@ Must include:
 
 ---
 
-## 13. AI Query Behaviour (GPT v1 Placeholder)
+## §13. AI Query Behaviour (GPT v1 Placeholder)
 
 ### 13a. Required Behaviour
 The AI Query tab must be visible and styled as if it is future-ready.
@@ -353,7 +354,7 @@ const STORAGE_KEY = 'insites_gemini_key';
 
 This is only for UI continuity in GPT v1.
 
-> **Future implementation note:** When AI Query becomes live, the system prompt and API integration pattern are documented in the original HTML spec (`Original/kg-spec.md` §5). Use Gemini 2.0 Flash endpoint with graph data JSON injected into the system prompt.
+> **Future implementation note:** When AI Query becomes live, the system prompt and API integration pattern are documented in the original HTML spec. Use Gemini 2.0 Flash endpoint with graph data JSON injected into the system prompt.
 
 ### 13c. Starter Prompts
 When the AI tab is otherwise empty, show starter prompts such as:
@@ -363,19 +364,24 @@ When the AI tab is otherwise empty, show starter prompts such as:
 
 ---
 
-## 14. Assistant Message Rendering
+## §14. Assistant Message Rendering
 
 Assistant messages must render as full-width cards with:
-- left border: 3px accent
-- card background: `#1e293b`
+- left border: 3px accent (`#3b82f6`)
+- card background: `#ffffff` (light chrome cards)
+- border: `1px solid #e2e8f0`
 - padding: 12px
 - line-height: **≥1.55**
+- text colour: `#1e293b`
 
-Minimal markdown parsing required:
+Minimal markdown parsing required (no external library):
 - `**bold**` → `<strong>`
-- `` `code` `` → `<code>`
-- `\n\n` → paragraph splits
-- list items beginning with `- ` or `* ` → `<ul><li>`
+- `` `code` `` → `<code>` (monospace, background `#f1f5f9`, border-radius 3px, padding 1px 5px)
+- `\n\n` → paragraph splits (≥ 8px between paragraphs)
+- `\n` preceded by `- ` or `N. ` → list items
+- Discard all other markdown tokens.
+
+Maximum response height: 60% of sidebar content area, scrollable overflow. User must not lose access to the input field.
 
 User messages:
 - right-aligned compact bubbles
@@ -383,17 +389,18 @@ User messages:
 
 ---
 
-## 15. Export
+## §15. Export
 
 The sidebar header must include an **Export JSON** button.
 
 Behaviour:
-- download `GRAPH_DATA` as `.json`
+- download `GRAPH_DATA` as `.json` file
 - filename based on the graph name where possible
+- GPT Canvas supports file download — use blob download, not clipboard copy
 
 ---
 
-## 16. React State Requirements
+## §16. React State Requirements
 
 The artifact must manage at least these states:
 
@@ -420,7 +427,7 @@ Use React hooks:
 
 ---
 
-## 17. D3 Implementation Requirements
+## §17. D3 Implementation Requirements
 
 The React artifact must:
 - render the graph inside an `<svg ref={svgRef}>`
@@ -438,7 +445,7 @@ The React artifact must:
 
 ---
 
-## 18. Output Template Requirement
+## §18. Output Template Requirement
 
 Generate the artifact as a **single-file React component** following this structure:
 
@@ -463,7 +470,7 @@ export default function KnowledgeGraph() {
   // callbacks: save/clear config, toggle filters, reset view, export, send placeholder AI reply
   return (
     <div className="kg-root">
-      <style>{`...full CA-KG shell styles...`}</style>
+      <style>{`...full CA-KG shell styles using Light Chrome palette...`}</style>
       {/* full CA-KG shell */}
     </div>
   );
@@ -472,41 +479,44 @@ export default function KnowledgeGraph() {
 
 Replace:
 - `__GRAPH_DATA__` with the extracted JSON
-- graph title text with the asset name
+- `__GRAPH_TITLE__` with the asset name
 
 ---
 
-## 19. Final Checklist
+## §19. Final Checklist
 
-1. **Counts**: 10–15 nodes (≤18), ≤24 edges, ≤3 Cultural Value nodes.
-2. **Fields**: every node has `id`, `name`, `type`, `meaning` in English.
-3. **Semantics**: relationship verbs reflect actual CBSA logic.
-4. **Output**: single Canvas React artifact only.
-5. **D3**: imported in JSX, not CDN-loaded.
-6. **Layout**: graph 65–70%, sidebar 30–35%, collapsible.
-7. **Palette**: CA-KG dark chrome palette.
-8. **Edges**: curved arcs with labels and arrowheads.
-9. **Interaction**: hover enlarge, click-select, dim unrelated edges/nodes, background deselect.
-10. **Sidebar**: Info / Analytics / AI Query tabs.
-11. **AI panel**: visible config shell, placeholder-only in GPT v1.
-12. **Legend**: bottom-left wrap strip.
-13. **Export**: JSON download button present.
+1. **Counts**: 10–15 nodes (≤ 18), ≤ 20 edges, ≤ 3 Cultural Value nodes.
+2. **Fields**: every node has `id`, `name`, `type`, `meaning` (English). No orphan nodes.
+3. **Semantics**: relationship verbs describe actual CBSA links (avoid duplicate `related_to` unless necessary).
+4. **Output**: single Canvas React artifact only; no surrounding explanation.
+5. **Placeholders**: replace `__GRAPH_DATA__` with JSON object and `__GRAPH_TITLE__` with asset name.
+6. **Layout**: graph canvas 65–70%, sidebar 30–35%. Sidebar collapsible, open by default. Per §5.
+7. **Palette**: UI chrome uses Light Chrome palette (§6). Entity colours use [CA-EC] / `TYPE_COLORS`.
+8. **Node sizes**: asset 14–16px, cultural value 11px, others 8–10px. Per §8.
+9. **Edges**: curved arcs (not straight lines), link distance 130–152px. Per §9.
+10. **Interaction**: hover enlargement, click-to-select with edge dimming, background-click deselect. Per §10.
+11. **AI responses**: rendered as left-bordered cards with parsed markdown — not raw-text bubbles. Per §14.
+
+GPT-specific additions:
+- **D3**: imported in JSX (`import * as d3 from 'd3'`), not CDN-loaded.
+- **AI panel**: visible config shell, placeholder-only in GPT v1. Per §13.
+- **Export**: JSON download button (blob download). Per §15.
 
 ---
 
-## 20. Context Effect Clarification Offer (mandatory post-KG offer)
+## §20. Context Effect Clarification Offer (mandatory post-KG offer)
 
 After generating the KG, always offer:
 
-> “Would you like me to explain the context-effect relationships shown in the graph? I’ll use one example from the graph to illustrate the two-way influence.”
+> "Would you like me to explain the context-effect relationships shown in the graph? I'll use one example from the graph to illustrate the two-way influence."
 
 When the user accepts, provide:
-1. **Definition (2–3 sentences)**: context effect as bidirectional flow.
-2. **One graph example**:
-   - **Context → Asset**
-   - **Asset → Context**
-3. Keep the explanation **≤100 words**.
+1. **Definition (2–3 sentences)**: Explain context effect as the bidirectional flow where contexts generate the asset's cultural significances, and the valued asset reciprocally reinforces, legitimizes, or transforms its context entities as they appear in the graph.
+2. **One graph-based example**: Select one context node and one asset node from the generated KG. Describe:
+   - **Context → Asset**: How this context shaped/imbued the asset with specific values.
+   - **Asset → Context**: How the valued asset, in turn, influenced, commemorated, or elevated that context.
+3. Keep the explanation **≤100 words** total.
 
 ---
 
-**END OF CA-KG JSX SPEC**
+**END OF CA-KG JSX SPEC (v3)**
