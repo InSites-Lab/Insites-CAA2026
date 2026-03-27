@@ -1,0 +1,511 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Noto Sans", "Noto Sans Hebrew", "Noto Sans Arabic", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#kg-app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+/* ── Toolbar ── */
+#kg-toolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  min-height: 96px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── Graph canvas ── */
+#kg-network {
+  position: absolute;
+  top: 96px;
+  right: 0;
+  bottom: 0;
+  left: 360px;
+  background: #f8fafc;
+}
+
+/* ── Sidebar ── */
+#kg-sidebar {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  bottom: 0;
+  width: 360px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.97);
+  border-right: 1px solid #e2e8f0;
+}
+
+/* ── Tab bar ── */
+.kg-tab-bar {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+  min-height: 40px;
+  width: 100%;
+}
+
+.kg-tab {
+  flex: 1 1 0%;
+  padding: 10px 8px;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #64748b;
+  line-height: 1.2;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.kg-tab.is-active {
+  background: #ffffff;
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.kg-tab:hover:not(.is-active) {
+  color: #334155;
+}
+
+/* ── Tab content area ── */
+.kg-tab-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* ── Toolbar layout ── */
+.kg-toolbar-main,
+.kg-toolbar-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kg-toolbar-controls {
+  align-items: flex-end;
+}
+
+.kg-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+}
+
+.kg-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.kg-status-pills,
+.kg-filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kg-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid #dbe3ef;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kg-pill-accent {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #4338ca;
+}
+
+.kg-pill-strong {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* ── Search ── */
+.kg-search-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kg-search-wrap input {
+  min-width: 260px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+}
+
+.kg-search-wrap button,
+.kg-filter-btn,
+.kg-result-btn {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kg-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.kg-filter-btn.is-active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.kg-show-all {
+  background: #f8fafc;
+}
+
+.kg-filter-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Sidebar panels ── */
+.kg-panel-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+}
+
+.kg-panel-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.kg-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.kg-panel-text,
+.kg-meta-row,
+.kg-empty {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #334155;
+  margin-top: 8px;
+}
+
+/* ── Type badge dot ── */
+.kg-type-badge {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin: 0 4px;
+}
+
+/* ── Result buttons ── */
+.kg-result-btn {
+  width: 100%;
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  text-align: right;
+}
+
+.kg-result-name {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.kg-result-type {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.kg-edge-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Analytics: stat grid ── */
+.kg-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.kg-stat-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.kg-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #3b82f6;
+  line-height: 1.2;
+}
+
+.kg-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+/* ── AI Query tab ── */
+.kg-ai-panel {
+  padding: 20px 8px;
+  text-align: center;
+}
+
+.kg-ai-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+.kg-ai-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.kg-ai-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.kg-ai-suggestions {
+  text-align: left;
+}
+
+body.rtl .kg-ai-suggestions {
+  text-align: right;
+}
+
+.kg-ai-suggestion-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.kg-ai-example {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: #334155;
+  margin-bottom: 6px;
+  line-height: 1.45;
+}
+
+/* ── Legend strip ── */
+#kg-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 372px;
+  z-index: 18;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 14px;
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  max-width: calc(100% - 396px);
+}
+
+.kg-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.kg-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Scrollbar ── */
+.kg-tab-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.kg-tab-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.kg-tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── RTL layout overrides ── */
+body.rtl #kg-sidebar {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: 1px solid #e2e8f0;
+}
+
+body.rtl #kg-network {
+  left: 0;
+  right: 360px;
+}
+
+body.rtl #kg-legend {
+  left: 12px;
+  right: 372px;
+}
+
+body.rtl .kg-result-btn {
+  text-align: right;
+}
+
+body.rtl .kg-toolbar-controls {
+  align-items: flex-start;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1180px) {
+  #kg-toolbar {
+    min-height: 140px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #kg-network {
+    top: 140px;
+    left: 0;
+    bottom: 280px;
+  }
+
+  #kg-sidebar {
+    top: auto;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: auto;
+    height: 280px;
+    border-right: none;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  #kg-legend {
+    left: 12px;
+    right: 12px;
+    bottom: 292px;
+    max-width: calc(100% - 24px);
+  }
+
+  .kg-toolbar-controls {
+    align-items: stretch;
+  }
+
+  .kg-search-wrap input {
+    min-width: 0;
+    flex: 1;
+  }
+
+  body.rtl #kg-sidebar {
+    left: 0;
+    right: 0;
+    border-left: none;
+  }
+
+  body.rtl #kg-network {
+    right: 0;
+  }
+
+  body.rtl #kg-legend {
+    left: 12px;
+    right: 12px;
+  }
+}

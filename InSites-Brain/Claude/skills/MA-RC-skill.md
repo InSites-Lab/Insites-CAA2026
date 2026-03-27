@@ -150,7 +150,9 @@ If user requests Stages 0–6 on one item, switch to Write mode. Offer return to
 
 ## [CA-DB-C] Collection Dashboard
 
-> **Scope**: Collection-level visualization (multiple sites from MA-RC analysis). For single-assessment dashboards (one site, one CBSA process), see [CA-DB]. Both share the same visual language (stone/amber palette, Inter typography).
+> **Scope**: Collection-level visualization (multiple sites from MA-RC analysis). For single-assessment dashboards (one site, one CBSA process), see [CA-DB]. Both share the same UX foundation ([CA-DB-F] in mono v4) — guide boxes, navigation/history, cross-tab entity linking — but have different data shapes, tab structures, and visual palettes. Collection: Inter + stone/amber.
+>
+> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `[CA-EC]`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
 
 ### 1. Trigger and Offer
 
@@ -193,6 +195,7 @@ Also derive from Collection Reading and analyses (if available):
 | 5 | **Gaps** | Traffic-light matrix: sites × data dimensions (values, significance, integrity, threats, method, comparisons). Green/yellow/red. | Per-site completeness score. Identifies documentation gaps. |
 | 6 | **Cross-Tabs** | Stacked bar charts: values by country, values by type, values by period | Show ALL categories — no silent truncation. |
 | 7 | **Clusters** | Management-oriented grouping cards with site tags | Derived from visible patterns. Sites may appear in multiple clusters. |
+| 8 | **AI Query** | In-artifact heritage analysis chat | Implements `[CA-AIQ]` contract. Claude: Anthropic endpoint. Gemini: swap endpoint per `[CA-AIQ]`. GPT: placeholder mode. See §9 below. |
 
 ### 4. Mandatory Rules
 
@@ -312,8 +315,35 @@ Use this page structure. Adapt tab names and content to the collection:
 - **Overview charts**: Heritage Character, Argument Strength, Evidence Basis, Ownership — analytically useful dimensions, not raw type/period.
 - **Site tag colors**: Assign a unique pastel palette per site (blue, green, pink, purple, orange, etc.) — NOT uniform amber. Consistent across all tabs.
 - **Cross-tab navigation**: All site tags get `onclick="selectSiteOnMap('[id]')"`. Implement `selectSiteOnMap()`, `goBack()`, `history.pushState()` for back-button support.
-- **Guide boxes**: One per tab. Emoji title + single paragraph. Collapsible via `.collapsed` class toggle. NOT multi-zone (no "What you see / How to interact" sections).
+- **Guide boxes**: One per tab. Collapsible via `.collapsed` class toggle with localStorage persistence (`guide_[tabId]`). 3-zone structure: "What you see" / "How to interact" / "What to look for" (insight callout with amber accent). First visit = expanded; returning = collapsed.
 - **Chart.js**: Do NOT set `maintainAspectRatio:false` on doughnut/pie. The `canvas{max-height:280px}` rule prevents scroll expansion.
+
+### 9. AI Query Tab `[CA-AIQ]`
+
+The AI Query tab implements the generic AI Query contract from `artifact-ux-contract.md` §2.
+
+**Platform behavior:**
+- **Claude**: Live analysis via Anthropic API. No API key needed in artifact context.
+- **Gemini**: Live analysis via Gemini API. Swap the API call block per `[CA-AIQ]` contract.
+- **GPT**: Placeholder mode — display starter prompts, route queries to GPT conversation.
+
+**System prompt**: "You are a heritage expert analyzing a Collection Dashboard. Be concise (max 150 words). Format using markdown lists and bold text. Base your answer ONLY on this data JSON: {dataJSON}"
+
+**Starter prompts** (Collection Dashboard):
+1. "What value patterns are shared across sites?"
+2. "How does the geographic distribution look?"
+3. "Compare the assessment methodologies used"
+4. "Where are the biggest data gaps?"
+5. "What management clusters emerge?"
+
+**UI elements**: Chat-style message list, input field + Send button, 5 starter prompt cards. See `[CA-AIQ]` for full shared UI spec.
+
+### 10. Gemini Deployment
+
+This skill file works for both Claude and Gemini. When deploying to Gemini:
+1. Activate canvas mode before generating artifacts (otherwise Gemini outputs code as text)
+2. Swap the AI Query API call block from Anthropic to Gemini endpoint per `[CA-AIQ]` §2
+3. Everything else — visual language, tabs, interactions — is identical
 
 ### 6. Checklist
 
@@ -327,6 +357,7 @@ Before delivering the artifact, verify:
 6. ☐ Guide box present on every tab
 7. ☐ Collection metadata (source, depth, N items) shown in header
 8. ☐ Responsive: 2-column grids collapse to 1-column below 768px
+9. ☐ AI Query tab implements `[CA-AIQ]` contract with correct platform mode
 
 ### 7. Reference Implementation
 

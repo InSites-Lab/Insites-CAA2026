@@ -90,20 +90,20 @@ Assign each node a `type` from these categories. Default to the closest existing
 | type | Colour | Label | When to use |
 |------|--------|-------|-------------|
 | asset | #E53935 | Asset | The central heritage asset under assessment (always one) |
-| cultural_value | #FFD700 | Cultural Value | Abstract values — historical, aesthetic, social (up to 3) |
-| structure | #D81B60 | Structure / Building | Physical structures, buildings, architectural ensembles |
-| architectural_element | #AD1457 | Architectural Element | Specific component of a structure (column, arch, frieze) |
-| place | #9C27B0 | Place | Geographic locations, areas, regions |
-| event | #FB8C00 | Event | Specific historical events |
-| period | #6D4C41 | Historical Period | Historical periods or chronological eras |
-| person | #00ACC1 | Person | Specific individuals |
-| group | #7CB342 | Social Group | Communities, organisations, social groups |
-| story | #8D6E63 | Story / Narrative | Oral traditions, legends, documented accounts |
-| natural_phenomenon | #26A69A | Natural Phenomenon | Geological, ecological, or climatic features |
-| artwork | #EC407A | Artwork / Artefact | Movable objects, inscriptions, decorative elements |
-| tradition | #AB47BC | Tradition / Custom | Recurring cultural practices |
-| religion | #5C6BC0 | Religion / Belief | Faith systems, cosmology, spiritual practices |
-| collective_memory | #78909C | Collective Memory | Shared remembrance, commemoration |
+| cultural_value | #6366f1 | Cultural Value | Abstract values — historical, aesthetic, social (up to 3) |
+| structure | #f59e0b | Structure / Building | Physical structures, buildings, architectural ensembles |
+| architectural_element | #d97706 | Architectural Element | Specific component of a structure (column, arch, frieze) |
+| place | #10b981 | Place | Geographic locations, areas, regions |
+| event | #ef4444 | Event | Specific historical events |
+| period | #64748b | Historical Period | Historical periods or chronological eras |
+| person | #ec4899 | Person | Specific individuals |
+| group | #3b82f6 | Social Group | Communities, organisations, social groups |
+| story | #8b5cf6 | Story / Narrative | Oral traditions, legends, documented accounts |
+| natural_phenomenon | #0ea5e9 | Natural Phenomenon | Geological, ecological, or climatic features |
+| artwork | #f43f5e | Artwork / Artefact | Movable objects, inscriptions, decorative elements |
+| tradition | #14b8a6 | Tradition / Custom | Recurring cultural practices |
+| religion | #a855f7 | Religion / Belief | Faith systems, cosmology, spiritual practices |
+| collective_memory | #84cc16 | Collective Memory | Shared remembrance, commemoration |
 
 ### Context types
 
@@ -136,14 +136,15 @@ Sidebar state: open by default, collapsible via a toggle button, not resizable.
 
 When the sidebar is collapsed, the graph canvas expands to full width. The toggle button remains visible at the canvas edge.
 
-#### Dark Mode Chrome Palette (mandatory)
+#### Light Palette (mandatory) `[CA-UX]`
 
-Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by the entity categories above.
+Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by the entity categories above. See `artifact-ux-contract.md` §1 for full token definitions.
 
 ```
-Background: #0a1120 → sidebar: #0f172a → cards: #1e293b → borders: #334155
-Text-primary: #e2e8f0 → text-dim: #94a3b8 → text-muted: #64748b
+Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
+Text-primary: #1e293b → text-dim: #64748b → text-muted: #94a3b8
 Accent: #3b82f6 (interactive elements, active tab indicator)
+Legend: slate-800/85 with backdrop-blur (dark chip on light canvas)
 ```
 
 #### Node Sizing (mandatory)
@@ -188,12 +189,14 @@ Three tabs — **Info**, **Analytics**, **AI Query**:
 - **Statistics**: node count, edge count, entity type count, graph density.
 - **Most connected**: top 5 nodes by degree, clickable (navigates to Info tab on click).
 
-**AI Query tab**:
+**AI Query tab** (per `[CA-AIQ]` contract — see `artifact-ux-contract.md` §2):
 - Prompt field + submit button at the bottom. Pressing Enter also submits.
 - System prompt: instructs the model to answer based on the graph data JSON, referencing specific nodes and edges, concise (≤ 150 words).
 - User messages: right-aligned compact bubbles (accent background).
-- Assistant messages: rendered as full-width cards with left border (3px, accent), card background (#1e293b), parsed markdown (**bold** → `<strong>`, `code` → `<code>`, paragraph breaks, list items). Maximum response height: 60% of sidebar content area, scrollable.
+- Assistant messages: rendered as full-width cards with left border (4px, accent), card background (`#ffffff`), parsed markdown. Maximum response height: 60% of sidebar content area, scrollable.
 - Suggested starter prompts when the message list is empty.
+- **Claude deployment**: use Anthropic API endpoint per `[CA-AIQ]`.
+- **Gemini deployment**: swap API call to Gemini endpoint per `[CA-AIQ]`. Activate canvas mode before generating.
 
 #### Legend Placement (recommended)
 
@@ -207,22 +210,23 @@ import * as d3 from 'd3';
 
 const GRAPH_DATA = __GRAPH_DATA__;
 
+// Entity type colours — canonical [CA-EC] palette (see artifact-ux-contract.md §3)
 const TYPE_COLORS = {
   asset: '#E53935',
-  cultural_value: '#FFD700',
-  structure: '#D81B60',
-  architectural_element: '#AD1457',
-  place: '#9C27B0',
-  event: '#FB8C00',
-  period: '#6D4C41',
-  person: '#00ACC1',
-  group: '#7CB342',
-  story: '#8D6E63',
-  natural_phenomenon: '#26A69A',
-  artwork: '#EC407A',
-  tradition: '#AB47BC',
-  religion: '#5C6BC0',
-  collective_memory: '#78909C',
+  cultural_value: '#6366f1',
+  structure: '#f59e0b',
+  architectural_element: '#d97706',
+  place: '#10b981',
+  event: '#ef4444',
+  period: '#64748b',
+  person: '#ec4899',
+  group: '#3b82f6',
+  story: '#8b5cf6',
+  natural_phenomenon: '#0ea5e9',
+  artwork: '#f43f5e',
+  tradition: '#14b8a6',
+  religion: '#a855f7',
+  collective_memory: '#84cc16',
   historical_context: '#1E88E5',
   social_context: '#43A047',
   political_context: '#3949AB',
@@ -401,7 +405,7 @@ export default function KnowledgeGraph() {
       .attr('dy', d => d.type === 'asset' ? 32 : 24)
       .attr('text-anchor', 'middle')
       .attr('font-size', 11)
-      .attr('fill', '#eee')
+      .attr('fill', '#1e293b')
       .attr('font-weight', d => d.type === 'asset' ? 'bold' : 'normal')
       .text(d => d.name.length > 20 ? d.name.substring(0, 20) + '…' : d.name);
 
@@ -504,20 +508,20 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
   const contextEffectCount = GRAPH_DATA.edges.filter(e => e.label === 'frames' || e.label === 'reframes').length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0a1120', color: '#e2e8f0', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f8fafc', color: '#1e293b', fontFamily: '"Noto Sans", "Noto Sans Hebrew", system-ui, sans-serif' }}>
       {/* Header */}
-      <header style={{ background: '#0f172a', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #334155' }}>
-        <h1 style={{ fontSize: '1.3rem', color: '#3b82f6', margin: 0 }}>__GRAPH_TITLE__</h1>
+      <header style={{ background: '#ffffff', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+        <h1 style={{ fontSize: '1.3rem', color: '#1e293b', margin: 0, fontWeight: 800 }}>__GRAPH_TITLE__</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={resetView} style={{ background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>Reset</button>
-          <button onClick={exportData} style={{ background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>Export JSON</button>
+          <button onClick={resetView} style={{ background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>Reset</button>
+          <button onClick={exportData} style={{ background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>Export JSON</button>
         </div>
       </header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Graph Area */}
         <div style={{ flex: 1, position: 'relative' }}>
-          <svg ref={svgRef} style={{ width: '100%', height: '100%', background: '#0a1120' }} />
+          <svg ref={svgRef} style={{ width: '100%', height: '100%', background: '#f8fafc' }} />
 
           {/* Legend */}
           <div style={{ position: 'absolute', bottom: 20, left: 20, background: 'rgba(30,41,59,0.85)', backdropFilter: 'blur(8px)', padding: 12, borderRadius: 8, fontSize: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '8px 16px', maxWidth: '60%' }}>
@@ -537,18 +541,18 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
         </div>
 
         {/* Side Panel */}
-        <aside style={{ width: 320, minWidth: 300, background: '#0f172a', borderLeft: '1px solid #334155', display: 'flex', flexDirection: 'column' }}>
+        <aside style={{ width: 320, minWidth: 300, background: '#f1f5f9', borderLeft: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
           {/* Tabs */}
-          <div style={{ display: 'flex', background: '#1e293b' }}>
+          <div style={{ display: 'flex', background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
             {['info', 'analytics', 'ai'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
                   flex: 1, padding: 12, border: 'none', cursor: 'pointer',
-                  background: activeTab === tab ? '#0f172a' : 'transparent',
-                  color: activeTab === tab ? '#3b82f6' : '#94a3b8',
-                  fontSize: '0.85rem',
+                  background: activeTab === tab ? 'rgba(59,130,246,0.06)' : 'transparent',
+                  color: activeTab === tab ? '#3b82f6' : '#64748b',
+                  fontSize: '0.85rem', fontWeight: 700,
                   borderBottom: activeTab === tab ? '2px solid #3b82f6' : '2px solid transparent'
                 }}
               >
@@ -563,15 +567,15 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
             {activeTab === 'info' && (
               selectedNode ? (
                 <div>
-                  <h2 style={{ color: '#3b82f6', marginBottom: 10, fontSize: '1.2rem' }}>{selectedNode.name}</h2>
+                  <h2 style={{ color: '#1e293b', marginBottom: 10, fontSize: '1.2rem', fontWeight: 800 }}>{selectedNode.name}</h2>
                   <span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: '0.8rem', marginBottom: 15, background: TYPE_COLORS[selectedNode.type], color: '#fff' }}>
                     {TYPE_LABELS[selectedNode.type]}
                   </span>
-                  <p style={{ lineHeight: 1.6, color: '#94a3b8', marginBottom: 15, fontSize: '0.9rem' }}>{selectedNode.meaning}</p>
+                  <p style={{ lineHeight: 1.6, color: '#64748b', marginBottom: 15, fontSize: '0.9rem' }}>{selectedNode.meaning}</p>
 
                   {/* Source traceability */}
                   {(selectedNode.source_stage || selectedNode.source_ref) && (
-                    <div style={{ background: '#1e293b', padding: 10, borderRadius: 6, marginBottom: 15, fontSize: '0.85rem', border: '1px solid #334155' }}>
+                    <div style={{ background: '#ffffff', padding: 10, borderRadius: 6, marginBottom: 15, fontSize: '0.85rem', border: '1px solid #e2e8f0' }}>
                       <span style={{ color: '#64748b' }}>Source: </span>
                       {selectedNode.source_stage && <span style={{ color: '#3b82f6' }}>Stage {selectedNode.source_stage}</span>}
                       {selectedNode.source_stage && selectedNode.source_ref && <span style={{ color: '#64748b' }}> | </span>}
@@ -579,13 +583,13 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                     </div>
                   )}
 
-                  <div style={{ borderTop: '1px solid #334155', paddingTop: 15 }}>
+                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 15 }}>
                     <h3 style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: 10 }}>Connections ({getConnections(selectedNode.id).length})</h3>
                     {getConnections(selectedNode.id).map((conn, i) => (
                       <div key={i} style={{
                         padding: 8, borderRadius: 6, marginBottom: 6, fontSize: '0.85rem', cursor: 'pointer',
-                        background: conn.isContextEffect ? '#1e1a3e' : '#1e293b',
-                        border: conn.isContextEffect ? '1px dashed #e94560' : '1px solid #334155'
+                        background: conn.isContextEffect ? '#fef2f2' : '#ffffff',
+                        border: conn.isContextEffect ? '1px dashed #e94560' : '1px solid #e2e8f0'
                       }}
                       onClick={() => conn.node && setSelectedNode(conn.node)}
                       >
@@ -596,7 +600,7 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                   </div>
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', color: '#64748b', padding: '40px 20px' }}>
+                <div style={{ textAlign: 'center', color: '#94a3b8', padding: '40px 20px' }}>
                   Click a node in the graph to view details
                 </div>
               )
@@ -612,9 +616,9 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                     { value: density, label: 'Density' },
                     { value: contextEffectCount, label: 'Context Effects' }
                   ].map(stat => (
-                    <div key={stat.label} style={{ background: '#1e293b', padding: 15, borderRadius: 8, textAlign: 'center', border: '1px solid #334155' }}>
-                      <div style={{ fontSize: '1.8rem', color: '#3b82f6' }}>{stat.value}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{stat.label}</div>
+                    <div key={stat.label} style={{ background: '#ffffff', padding: 15, borderRadius: 8, textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                      <div style={{ fontSize: '1.8rem', color: '#3b82f6', fontWeight: 800 }}>{stat.value}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -624,7 +628,7 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                   placeholder="Search nodes..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  style={{ width: '100%', padding: 10, border: '1px solid #334155', borderRadius: 6, background: '#0a1120', color: '#e2e8f0', marginBottom: 15 }}
+                  style={{ width: '100%', padding: 10, border: '1px solid #e2e8f0', borderRadius: 6, background: '#ffffff', color: '#1e293b', marginBottom: 15 }}
                 />
 
                 <h3 style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: 10 }}>Filter by type</h3>
@@ -664,7 +668,7 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                     <button
                       key={q}
                       onClick={() => sendAIQuery(q)}
-                      style={{ background: '#1e293b', border: '1px solid #334155', color: '#94a3b8', padding: '6px 12px', borderRadius: 20, fontSize: '0.75rem', cursor: 'pointer' }}
+                      style={{ background: '#ffffff', border: '1px solid #e2e8f0', color: '#64748b', padding: '6px 12px', borderRadius: 20, fontSize: '0.75rem', cursor: 'pointer' }}
                     >
                       {q}
                     </button>
@@ -677,21 +681,21 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                       key={i}
                       style={{
                         padding: 12, borderRadius: 8, marginBottom: 10, fontSize: '0.9rem', lineHeight: 1.55,
-                        background: msg.role === 'user' ? '#3b82f6' : msg.role === 'error' ? '#4a1a1a' : '#1e293b',
-                        border: msg.role === 'assistant' ? '1px solid #334155' : 'none',
-                        borderLeft: msg.role === 'assistant' ? '3px solid #3b82f6' : undefined,
+                        background: msg.role === 'user' ? '#3b82f6' : msg.role === 'error' ? '#fef2f2' : '#ffffff',
+                        border: msg.role === 'assistant' ? '1px solid #e2e8f0' : 'none',
+                        borderLeft: msg.role === 'assistant' ? '4px solid #3b82f6' : undefined,
                         marginLeft: msg.role === 'user' ? 20 : 0,
                         marginRight: msg.role === 'user' ? 0 : 20,
-                        color: msg.role === 'user' ? '#fff' : '#e2e8f0'
+                        color: msg.role === 'user' ? '#fff' : '#1e293b'
                       }}
                     >
                       {msg.content}
                     </div>
                   ))}
                   {isLoading && (
-                    <div style={{ padding: 12, background: '#1e293b', border: '1px solid #334155', borderRadius: 8, marginRight: 20 }}>
+                    <div style={{ padding: 12, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, marginRight: 20 }}>
                       <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid #3b82f6', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
-                      <span style={{ marginLeft: 8 }}>Processing...</span>
+                      <span style={{ marginLeft: 8, color: '#64748b' }}>Processing...</span>
                     </div>
                   )}
                 </div>
@@ -702,7 +706,7 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
                     onChange={e => setAiInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIQuery(); } }}
                     placeholder="Ask about the graph..."
-                    style={{ flex: 1, padding: 10, border: '1px solid #334155', borderRadius: 6, background: '#0a1120', color: '#e2e8f0', resize: 'none', height: 50, fontFamily: 'inherit' }}
+                    style={{ flex: 1, padding: 10, border: '1px solid #e2e8f0', borderRadius: 6, background: '#ffffff', color: '#1e293b', resize: 'none', height: 50, fontFamily: 'inherit' }}
                   />
                   <button
                     onClick={() => sendAIQuery()}
@@ -743,7 +747,7 @@ Before creating the Artifact, verify:
 - [ ] `__GRAPH_TITLE__` replaced with asset name
 - [ ] `reframes` edges render as dashed lines in the graph
 - [ ] Layout: graph canvas 65–70%, sidebar 30–35%, collapsible. Per Layout Contract.
-- [ ] Palette: UI chrome uses Dark Mode Chrome Palette hex values. Entity colours use entity categories.
+- [ ] Palette: UI chrome uses Light Palette `[CA-UX]` hex values. Entity colours use `[CA-EC]` categories.
 - [ ] Node sizes: asset 14–16px, cultural value 11px, others 8–10px. Per Node Sizing.
 - [ ] Edges: curved arcs preferred, link distance 130–152px. Per Edge Geometry.
 - [ ] Interaction: hover enlargement, click-to-select with edge dimming, background-click deselect.
@@ -815,7 +819,17 @@ When user says "kg" after a CBSA assessment of "Khan al-Umdan, Acre":
 | Node search | Text-based filtering |
 | Type filtering | Coloured chip buttons |
 | Analytics | Statistics, density, context effect count |
-| AI queries | Sends to Claude API with CBSA-aware prompt |
+| AI queries | Per `[CA-AIQ]`: Claude uses Anthropic API, Gemini uses Gemini API |
 | JSON export | Download graph data |
 | Legend | Active types + context effect indicator |
 | Clickable connections | Navigate between nodes via connection list |
+
+---
+
+## Gemini Deployment
+
+This skill file works for both Claude and Gemini. When deploying to Gemini:
+
+1. **Activate canvas mode** before generating artifacts (otherwise Gemini outputs code as text)
+2. **Swap the AI Query API call** from Anthropic to Gemini endpoint per `[CA-AIQ]` contract (`artifact-ux-contract.md` §2)
+3. Everything else — visual language, sidebar, tabs, interactions, entity types — is identical
