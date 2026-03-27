@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>גרף ידע — מגדל הטחנה (בדיקה)</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Hebrew:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../runtime/kg-runtime.css" />
+  <style>
+    #kg-app { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="kg-app">
+    <div id="kg-toolbar"></div>
+    <div id="kg-network"></div>
+    <aside id="kg-sidebar"></aside>
+  </div>
+
+  <script>
+    window.__DATA_JSON__ = {
+      "title": "מגדל הטחנה — גרף ידע מורשתי",
+      "nodes": [
+        {
+          "id": "asset_tower",
+          "name": "מגדל הטחנה",
+          "type": "נכס מורשת",
+          "meaning": "מגדל טחנה מבוצר מהמאה ה-14 על נהר אוז"
+        },
+        {
+          "id": "river_ouse",
+          "name": "נהר אוז",
+          "type": "תופעה טבעית",
+          "meaning": "מקור המים שהניע את הטחנה ועיצב את הנוף"
+        },
+        {
+          "id": "period_medieval",
+          "name": "התקופה המדיבאלית (1300–1500)",
+          "type": "תקופה היסטורית",
+          "meaning": "עידן הטחינה בשליטת גילדות ותשתיות מבוצרות"
+        },
+        {
+          "id": "guild_millers",
+          "name": "גילדת הטוחנים",
+          "type": "קבוצה חברתית",
+          "meaning": "גילדת מסחר שבנתה והפעילה את מגדל הטחנה"
+        },
+        {
+          "id": "wheel_mechanism",
+          "name": "מנגנון גלגל המים",
+          "type": "אלמנט אדריכלי",
+          "meaning": "גלגל תחתון מקורי, שריד חלקי בחדר התחתון"
+        },
+        {
+          "id": "milling_tradition",
+          "name": "מסורת טחינת דגן",
+          "type": "מסורת / מנהג",
+          "meaning": "מסורת טחינה רציפה מהמאה ה-14 עד המאה ה-19"
+        },
+        {
+          "id": "value_tech",
+          "name": "מורשת טכנולוגית",
+          "type": "ערך תרבותי",
+          "value_type": "היסטורי",
+          "meaning": "עדות לידע הנדסי הידראולי מימי הביניים"
+        },
+        {
+          "id": "value_social",
+          "name": "פרנסת הקהילה",
+          "type": "ערך תרבותי",
+          "value_type": "חברתי",
+          "meaning": "הטחנה קיימה את הכלכלה המקומית במשך חמש מאות שנה"
+        },
+        {
+          "id": "place_york",
+          "name": "יורק",
+          "type": "מקום",
+          "meaning": "עיר השוק האזורית שהטחנה שירתה"
+        },
+        {
+          "id": "event_flood",
+          "name": "השיטפון הגדול של 1421",
+          "type": "אירוע",
+          "meaning": "שיטפון שפגע בגלגל המקורי והוביל לשחזור"
+        },
+        {
+          "id": "story_ghost",
+          "name": "אגדת הטוחן הלילי",
+          "type": "סיפור / נרטיב",
+          "meaning": "סיפור עממי על טוחן רפאים שנשמע טוחן בחצות"
+        },
+        {
+          "id": "person_abbot",
+          "name": "האב וויליאם דה סלבי",
+          "type": "דמות",
+          "meaning": "העניק את זכיון הטחינה לגילדה ב-1312"
+        }
+      ],
+      "edges": [
+        { "from": "asset_tower",     "to": "river_ouse",       "label": "מונע_על_ידי" },
+        { "from": "asset_tower",     "to": "period_medieval",   "label": "מתוארך_ל" },
+        { "from": "asset_tower",     "to": "guild_millers",     "label": "נבנה_על_ידי" },
+        { "from": "asset_tower",     "to": "wheel_mechanism",   "label": "מכיל" },
+        { "from": "asset_tower",     "to": "place_york",        "label": "ממוקם_ליד" },
+        { "from": "guild_millers",   "to": "milling_tradition", "label": "קיימו" },
+        { "from": "milling_tradition","to": "value_tech",       "label": "מבטא_ערך" },
+        { "from": "guild_millers",   "to": "value_social",      "label": "מגלם" },
+        { "from": "river_ouse",      "to": "event_flood",       "label": "גרם" },
+        { "from": "event_flood",     "to": "wheel_mechanism",   "label": "פגע" },
+        { "from": "asset_tower",     "to": "story_ghost",       "label": "קשור_ל" },
+        { "from": "person_abbot",    "to": "guild_millers",     "label": "העניק_זכיון_ל" },
+        { "from": "period_medieval", "to": "milling_tradition", "label": "ממסגר" },
+        { "from": "value_tech",      "to": "wheel_mechanism",   "label": "מתבטא_דרך" }
+      ]
+    };
+  </script>
+  <script src="../runtime/kg-runtime.js"></script>
+</body>
+</html>

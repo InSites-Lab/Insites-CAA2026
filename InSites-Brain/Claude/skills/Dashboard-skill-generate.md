@@ -121,7 +121,7 @@ Brackets = conditional: Map only if `asset.coordinates.lat` is non-null; Themes 
 | **Significance** | Statement of cultural significance | Styled as a featured block. |
 | **Vulnerability** | Heat matrix: values × Nara aspects | Rows = value categories, columns = Nara aspects. Column headers show current integrity rating. Cells colored by impact (red/amber/neutral). 2–3 sentence interpretive callout. |
 | **Process** | KPIs, next steps, quick boosts, sources | Three-column KPI (strengths/gaps/boosts). Two-column layout: next steps + quick boosts. Sources list. |
-| **KG** | Embedded MiniKG with floating popover | D3 force-directed graph. Banner noting standalone KG has richer features. See §9 for interaction. |
+| **KG** | Embedded MiniKG with floating popover | If a KG was generated earlier in the session, reuse its graph data JSON (nodes + edges) — do not re-extract. Otherwise extract from stage outputs. D3 force-directed graph. See §9 for interaction. |
 | **AI Query** | In-artifact heritage analysis chat | Implements `[CA-AIQ]` contract. Claude: Anthropic endpoint. Gemini: swap endpoint per `[CA-AIQ]`. GPT: placeholder mode (starter prompts only). See §9a. |
 
 ### 4a. Map Tab Spec (conditional)

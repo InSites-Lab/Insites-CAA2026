@@ -20,6 +20,8 @@ export { SessionReportModal } from './SessionReportModal';
 export type { SessionReportModalProps } from './SessionReportModal';
 export { DashboardPreviewModal } from './DashboardPreviewModal';
 export type { DashboardPreviewModalProps } from './DashboardPreviewModal';
+export { CollectionDashboardModal } from './CollectionDashboardModal';
+export type { CollectionDashboardModalProps } from './CollectionDashboardModal';
 export { ReadAssessmentModal } from './ReadAssessmentModal';
 export type { ReadAssessmentModalProps } from './ReadAssessmentModal';
 export { GlossaryModal } from './GlossaryModal';

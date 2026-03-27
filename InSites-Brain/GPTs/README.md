@@ -14,7 +14,17 @@ Based on InSites-CAA-mono v3.md (Claude source of truth, March 2026).
 ├── dashboard-spec.md           ← Knowledge file: Dashboard + reference data shape
 ├── ma-workflows.md             ← Knowledge file: MA-RA + MA-RC workflows
 ├── collection-dashboard-spec.md ← Knowledge file: Collection Dashboard [CA-DB-C]
-└── Original/                   ← Archived v1 files (reference only)
+├── agent-for-agents.md         ← Knowledge file: "The Architect" meta-agent
+├── runtime/                    ← KG frontend engine (deploy to alephplace.com CDN)
+│   ├── kg-runtime.js           ← vis-network engine (15 entity types, 3-tab sidebar)
+│   └── kg-runtime.css          ← Full UI styling (responsive, RTL/LTR)
+├── tests/                      ← KG test HTML files (do NOT upload)
+│   ├── test-kg-en.html         ← English LTR test (loads local runtime)
+│   ├── test-kg-he.html         ← Hebrew RTL test (loads local runtime)
+│   └── test-kg-gpt.html        ← CDN test (loads from alephplace.com)
+├── CAA-GTPs (Claude.ai-Spilts)/ ← Upload package mirror + frozen backups
+│   └── Original/               ← Archived v1 files (reference only)
+└── OLD/                        ← Archived (gitignored)
 ```
 
 ## What's New in v3

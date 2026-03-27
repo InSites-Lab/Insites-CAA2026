@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Knowledge Graph — Millwright's Tower (EN test)</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Hebrew:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../runtime/kg-runtime.css" />
+  <style>
+    #kg-app { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="kg-app">
+    <div id="kg-toolbar"></div>
+    <div id="kg-network"></div>
+    <aside id="kg-sidebar"></aside>
+  </div>
+
+  <script>
+    window.__DATA_JSON__ = {
+      "title": "Millwright's Tower — Heritage Knowledge Graph",
+      "nodes": [
+        {
+          "id": "asset_tower",
+          "name": "Millwright's Tower",
+          "type": "Asset",
+          "meaning": "14th-century fortified mill tower on the River Ouse"
+        },
+        {
+          "id": "river_ouse",
+          "name": "River Ouse",
+          "type": "Natural Phenomenon",
+          "meaning": "Water source powering the mill and shaping the landscape"
+        },
+        {
+          "id": "period_medieval",
+          "name": "Medieval Period (1300–1500)",
+          "type": "Historical Period",
+          "meaning": "Era of guild-controlled milling and fortified infrastructure"
+        },
+        {
+          "id": "guild_millers",
+          "name": "Guild of Millers",
+          "type": "Social Group",
+          "meaning": "Trade guild that built and operated the tower mill"
+        },
+        {
+          "id": "wheel_mechanism",
+          "name": "Waterwheel Mechanism",
+          "type": "Architectural Element",
+          "meaning": "Original undershot wheel, partially surviving in the lower chamber"
+        },
+        {
+          "id": "milling_tradition",
+          "name": "Grain Milling Tradition",
+          "type": "Tradition / Custom",
+          "meaning": "Continuous milling practice from 14th to 19th century"
+        },
+        {
+          "id": "value_tech",
+          "name": "Technological Heritage",
+          "type": "Cultural Value",
+          "value_type": "Historical",
+          "meaning": "Evidence of medieval hydraulic engineering knowledge"
+        },
+        {
+          "id": "value_social",
+          "name": "Community Livelihood",
+          "type": "Cultural Value",
+          "value_type": "Social",
+          "meaning": "The mill sustained the local economy for five centuries"
+        },
+        {
+          "id": "place_york",
+          "name": "York",
+          "type": "Place",
+          "meaning": "Regional market town that the mill served"
+        },
+        {
+          "id": "event_flood",
+          "name": "Great Flood of 1421",
+          "type": "Event",
+          "meaning": "Flood that damaged the original wheel and prompted reconstruction"
+        },
+        {
+          "id": "story_ghost",
+          "name": "Legend of the Night Miller",
+          "type": "Story / Narrative",
+          "meaning": "Local folk tale about a ghostly miller heard grinding at midnight"
+        },
+        {
+          "id": "person_abbot",
+          "name": "Abbot William de Selby",
+          "type": "Person",
+          "meaning": "Granted the milling charter to the Guild in 1312"
+        }
+      ],
+      "edges": [
+        { "from": "asset_tower",     "to": "river_ouse",       "label": "powered_by" },
+        { "from": "asset_tower",     "to": "period_medieval",   "label": "dates_to" },
+        { "from": "asset_tower",     "to": "guild_millers",     "label": "built_by" },
+        { "from": "asset_tower",     "to": "wheel_mechanism",   "label": "contains" },
+        { "from": "asset_tower",     "to": "place_york",        "label": "located_near" },
+        { "from": "guild_millers",   "to": "milling_tradition", "label": "practiced" },
+        { "from": "milling_tradition","to": "value_tech",       "label": "expresses_value" },
+        { "from": "guild_millers",   "to": "value_social",      "label": "embodies" },
+        { "from": "river_ouse",      "to": "event_flood",       "label": "caused" },
+        { "from": "event_flood",     "to": "wheel_mechanism",   "label": "damaged" },
+        { "from": "asset_tower",     "to": "story_ghost",       "label": "associated_with" },
+        { "from": "person_abbot",    "to": "guild_millers",     "label": "granted_charter_to" },
+        { "from": "period_medieval", "to": "milling_tradition", "label": "frames" },
+        { "from": "value_tech",      "to": "wheel_mechanism",   "label": "expressed_through" }
+      ]
+    };
+  </script>
+  <script src="../runtime/kg-runtime.js"></script>
+</body>
+</html>

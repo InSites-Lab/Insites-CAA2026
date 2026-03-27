@@ -18,7 +18,7 @@ description: Creates interactive CBSA Knowledge Graphs for cultural heritage ass
 
 Scan all CBSA outputs in the conversation (contexts, timeline, values, comparisons, significance statement) and identify:
 
-**Nodes (10-15, maximum 18)** in priority order:
+**Nodes (10-15, maximum 20)** in priority order:
 1. The central heritage asset (asset) — always exactly one
 2. Key value-bearing entities (structures, places)
 3. Major events and periods
@@ -733,8 +733,8 @@ Answer concisely (up to 150 words). Focus on insights from the graph structure a
 
 Before creating the Artifact, verify:
 
-- [ ] 10-15 nodes (no more than 18)
-- [ ] Up to 24 edges
+- [ ] 10-15 nodes (no more than 20)
+- [ ] Up to 25 edges
 - [ ] Up to 3 cultural_value nodes
 - [ ] Every node connected (no orphans)
 - [ ] `name` and `meaning` in English

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Old Mill Heritage — Knowledge Graph</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Hebrew:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://alephplace.com/atar.bot/canvas/kg-runtime.css"/>
+  <style>
+    #kg-app { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="kg-app">
+    <div id="kg-toolbar"></div>
+    <div id="kg-network"></div>
+    <aside id="kg-sidebar"></aside>
+  </div>
+
+  <script>
+    window.__DATA_JSON__ = {
+      title: "Old Mill Heritage — Knowledge Graph",
+      nodes: [
+        { id: "asset_mill", name: "Old Mill", type: "Asset", meaning: "19th-century flour mill, central heritage asset of the industrial landscape" },
+        { id: "place_valley", name: "River Valley", type: "Place", meaning: "Alluvial valley providing water power and transport routes" },
+        { id: "val_industrial", name: "Industrial Heritage", type: "Cultural Value", meaning: "Testimony to early mechanized flour production in the region", value_type: "Historical" },
+        { id: "period_modern", name: "Modern Period", type: "Historical Period", meaning: "Late Ottoman and British Mandate era, 1870–1948" },
+        { id: "person_founder", name: "Johann Weber", type: "Person", meaning: "German Templer who established the mill in 1882" },
+        { id: "event_fire", name: "1936 Fire", type: "Event", meaning: "Arson during the Arab Revolt; mill partially rebuilt with reinforced concrete" },
+        { id: "group_templers", name: "Templer Community", type: "Social Group", meaning: "German Protestant settlers who built industrial infrastructure" },
+        { id: "val_landscape", name: "Cultural Landscape", type: "Cultural Value", meaning: "Mill-and-valley ensemble as integrated productive landscape", value_type: "Landscape" }
+      ],
+      edges: [
+        { from: "place_valley", to: "asset_mill", label: "situates" },
+        { from: "asset_mill", to: "val_industrial", label: "embodies" },
+        { from: "period_modern", to: "asset_mill", label: "frames" },
+        { from: "person_founder", to: "asset_mill", label: "established" },
+        { from: "event_fire", to: "asset_mill", label: "damaged" },
+        { from: "group_templers", to: "person_founder", label: "includes" },
+        { from: "group_templers", to: "val_industrial", label: "generated" },
+        { from: "place_valley", to: "val_landscape", label: "constitutes" },
+        { from: "asset_mill", to: "val_landscape", label: "anchors" },
+        { from: "asset_mill", to: "period_modern", label: "reframes" }
+      ]
+    };
+  </script>
+  <script src="https://alephplace.com/atar.bot/canvas/kg-runtime.js"></script>
+</body>
+</html>

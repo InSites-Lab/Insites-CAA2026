@@ -291,3 +291,4 @@ Before returning any artifact, verify:
 | Date | Change |
 |------|--------|
 | 2026-03-27 | v1 — Initial contract. Consolidates KG, Dashboard, Collection visual language across Claude, Gemini, GPT. |
+| 2026-03-27 | v1.1 — Full propagation: [CA-UX]/[CA-AIQ]/[CA-EC] refs added to mono v5, Gemini, GPT, split core. AI Query tab added to [CA-DB] + [CA-DB-C] across all platforms. MA-RC updated to v2 everywhere. GPT kg-spec renamed, collection-dashboard-spec created. Test artifacts for Gemini. |

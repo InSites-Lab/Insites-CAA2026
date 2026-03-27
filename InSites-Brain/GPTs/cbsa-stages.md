@@ -411,7 +411,7 @@ If Stage 1 or Stage 3 identified experiential or Spirit & Feeling content, weave
 
 ### 5.2 What's Next?
 
-- **Knowledge Graph** — interactive map of entities and relationships (execute [CA-KG] exactly as specified in `kg-specs.md`; do not substitute another implementation) 
+- **Knowledge Graph** — interactive map of entities and relationships (see kg-spec.md)
 - **Assessment Dashboard** — visual summary of the full CBSA process (see dashboard-spec.md)
 - Also available: semiotic reading, alternative narrative framings, educational/community ideas — ask for any of these.
 ---

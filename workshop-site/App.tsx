@@ -78,6 +78,7 @@ import {
   GovernanceModal,
   SessionReportModal,
   DashboardPreviewModal,
+  CollectionDashboardModal,
   ReadAssessmentModal,
   GlossaryModal,
   PresentationModal,
@@ -282,6 +283,7 @@ const App: React.FC = () => {
   const [isGovernanceModalOpen, setIsGovernanceModalOpen] = useState(false);
   const [isSessionReportModalOpen, setIsSessionReportModalOpen] = useState(false);
   const [isDashboardPreviewModalOpen, setIsDashboardPreviewModalOpen] = useState(false);
+  const [isCollectionDashboardOpen, setIsCollectionDashboardOpen] = useState(false);
   const [isReadAssessmentModalOpen, setIsReadAssessmentModalOpen] = useState(false);
   const [isGlossaryModalOpen, setIsGlossaryModalOpen] = useState(false);
   const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
@@ -348,6 +350,7 @@ const App: React.FC = () => {
     governance: () => setIsGovernanceModalOpen(true),
     "session-report": () => setIsSessionReportModalOpen(true),
     "dashboard-preview": () => setIsDashboardPreviewModalOpen(true),
+    "collection-dashboard": () => setIsCollectionDashboardOpen(true),
     "read-assessment": () => { setReadAssessmentInitialRoute(null); setIsReadAssessmentModalOpen(true); },
     glossary: () => setIsGlossaryModalOpen(true),
     presentation: () => setIsPresentationModalOpen(true),
@@ -453,6 +456,7 @@ const App: React.FC = () => {
     setIsGovernanceModalOpen(false);
     setIsSessionReportModalOpen(false);
     setIsDashboardPreviewModalOpen(false);
+    setIsCollectionDashboardOpen(false);
     setIsReadAssessmentModalOpen(false);
     setIsGlossaryModalOpen(false);
     // Note: presentation modal is NOT closed here — it persists across hash navigation
@@ -1629,6 +1633,7 @@ const App: React.FC = () => {
           window.location.hash = "";
         }}
         lang={inventoryModalLang}
+        onOpenCollectionDashboard={() => navigateTo("collection-dashboard")}
       />
 
       <PromptAdvisorModal
@@ -1711,6 +1716,11 @@ const App: React.FC = () => {
       <DashboardPreviewModal
         isOpen={isDashboardPreviewModalOpen}
         onClose={() => { setIsDashboardPreviewModalOpen(false); window.location.hash = ""; }}
+      />
+
+      <CollectionDashboardModal
+        isOpen={isCollectionDashboardOpen}
+        onClose={() => { setIsCollectionDashboardOpen(false); window.location.hash = ""; }}
       />
 
       <ReadAssessmentModal

@@ -57,7 +57,9 @@ Trigger-activated specifications are in separate **Project Skill** files (loaded
 
 ### Output Mode (critical)
 
-Stage analytical content (discussion, claims, evidence evaluation, HITL prompts) stays in chat. Structured visual products are generated as **React artifacts** when the stage is complete and the user approves. Always offer before generating: "Would you like me to create an interactive [product name]?"
+Stage analytical content (discussion, claims, evidence evaluation, HITL prompts) stays in chat. Structured visual products are generated as **HTML artifacts** when the stage is complete and the user approves. Always offer before generating: "Would you like me to create an interactive [product name]?"
+
+> **Cross-platform visual convergence**: All artifacts follow `[CA-UX]` (shared visual tokens), `[CA-EC]` (entity colors), and `[CA-AIQ]` (AI Query contract). See `artifact-ux-contract.md` for the cross-platform source of truth.
 
 | Product | When offered | Trigger |
 | --- | --- | --- |
@@ -852,6 +854,8 @@ Use these categories when selecting node type in a Knowledge Graph. Each categor
 | [CA-CS] | Comparative significance criteria | Stage 4 (comparative evaluation) |
 | [CA-IMG] | Image analysis protocol | When user uploads images (optional) |
 | [CA-EC] | Entity categories for KG | Stage 5 / KG generation |
+| [CA-UX] | Cross-platform visual tokens (palette, fonts, layout) | All artifact generation |
+| [CA-AIQ] | AI Query contract (Anthropic / Gemini / placeholder) | AI Query tab in artifacts |
 
 **Project Skills** (loaded on demand when triggered):
 
