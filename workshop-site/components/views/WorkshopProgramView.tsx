@@ -37,7 +37,8 @@ const TYPE_LABELS: Record<string, string> = {
 // ─── Tab Definitions ──────────────────────────────────────────────
 
 const PROGRAM_TABS = [
-  { id: 'story', label: 'Our Story', icon: <Users size={14} /> },
+  { id: 'challenges', label: 'Our Story', icon: <Users size={14} /> },
+  { id: 'story', label: 'Story (old)', icon: <Users size={14} /> },
   { id: 'principles', label: 'Principles', icon: <Eye size={14} /> },
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
   { id: 'schedule', label: 'Schedule', icon: <Clock size={14} /> },
@@ -52,7 +53,7 @@ export interface WorkshopProgramViewProps {
 }
 
 export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<TabId>('story');
+  const [activeTab, setActiveTab] = useState<TabId>('challenges');
 
   const totalMinutes = WORKSHOP_PROGRAM.reduce((sum, b) => sum + (parseInt(b.duration) || 0), 0);
 
@@ -89,6 +90,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'challenges' && <ChallengesTab />}
         {activeTab === 'story' && <OurStoryTab />}
         {activeTab === 'principles' && <PrinciplesTab onNavigate={onNavigate} />}
         {activeTab === 'cbsa' && <CbsaTab onNavigate={onNavigate} />}
@@ -98,7 +100,72 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
   );
 };
 
-// ─── Our Story Tab ────────────────────────────────────────────────
+// ─── Challenges Tab (Our Story v2 — poster + challenge cards) ─────
+
+const CHALLENGES = [
+  {
+    quote: "It's important but too complex",
+    response: "With AI trained in our assessment principles, we can simplify the process and link outputs directly to surveys and systems.",
+    color: 'amber',
+  },
+  {
+    quote: "It's too heavy, no one reads it",
+    response: "With natural language queries and visual tools like knowledge graphs, we can make cultural insights clearer, usable, and even discover new ones.",
+    color: 'indigo',
+  },
+  {
+    quote: "So will AI replace the professionals?",
+    response: "No. Experts remain essential. AI is a smart partner for detecting connections and contexts — but it needs our guidance.",
+    color: 'emerald',
+  },
+];
+
+const challengeColors: Record<string, { border: string; bg: string; text: string; quote: string }> = {
+  amber: { border: 'border-l-amber-400', bg: 'bg-amber-50', text: 'text-amber-900/70', quote: 'text-amber-900' },
+  indigo: { border: 'border-l-indigo-400', bg: 'bg-indigo-50', text: 'text-indigo-900/70', quote: 'text-indigo-900' },
+  emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-900/70', quote: 'text-emerald-900' },
+};
+
+const ChallengesTab: React.FC = () => (
+  <div className="space-y-5">
+    {/* Poster */}
+    <div>
+      <img
+        src="/poster.png"
+        alt="Atar.Bot — CBSA Workshop"
+        className="w-full rounded-2xl border border-slate-200 shadow-sm"
+      />
+      <p className="text-center text-sm text-slate-500 italic mt-2">
+        "The LLM is a looking glass — more than a wonderland"
+      </p>
+    </div>
+
+    {/* Intro line */}
+    <p className="text-sm text-slate-600 leading-relaxed">
+      AI already speaks our language and is becoming an active partner in culture. In this workshop, we examine how it can help with the assessment challenges:
+    </p>
+
+    {/* 3 Challenge cards */}
+    <div className="space-y-3">
+      {CHALLENGES.map((ch, idx) => {
+        const c = challengeColors[ch.color] || challengeColors.amber;
+        return (
+          <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
+            <summary className="p-4 cursor-pointer flex items-center justify-between select-none">
+              <span className={`font-bold text-sm ${c.quote}`}>"{ch.quote}"</span>
+              <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0 ml-2" />
+            </summary>
+            <div className="px-4 pb-4 pt-1">
+              <p className={`text-sm ${c.text} leading-relaxed`}>{ch.response}</p>
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// ─── Our Story Tab (original — kept for comparison) ───────────────
 
 const OurStoryTab: React.FC = () => (
   <div className="space-y-5">
