@@ -83,31 +83,58 @@ Re-read all stage outputs from the conversation and extract:
 - `contexts[].relatedValues` links each context to the value categories it generates — this enables cross-referencing.
 - `vulnerability` is derived by cross-reading Stage 2 implications against Stage 3 ratings. Impact levels: 3 = loss of this integrity aspect severely damages this value; 2 = moderate damage; 1 = minor or indirect.
 
-## 4. Tab Structure (mandatory)
+## 4. Tab Structure (mandatory — consolidated)
 
-Each CBSA stage must have its own tab. Do not merge stages.
+Tabs are consolidated for cognitive load management (~8 tabs, not 11+). Stages that are tightly coupled share a tab. Map is always present.
 
 ```
-Overview → Timeline → Contexts → Values → Integrity → Comparative → Significance → [Vulnerability] → Process → [Report] → [Debrief] → [Session Analysis] → [KG]
+Overview → Map → Timeline → Contexts & Values → [Themes] → Integrity → Comparative → Significance → [Report] → [Debrief] → [Session Analysis] → [KG]
 ```
 
-Brackets = conditional. Vulnerability: only if data exists. Report: always generate (see `report-tab-spec.md` [CA-RPT]); becomes required once DOCX exists. Debrief + Session Analysis: only if user opts in after [CA-IP] — process documentation, not heritage evidence. KG: only if generated during session.
+Brackets = conditional: Themes only if ≥2 themes total across all categories; Report — always generate (see `report-tab-spec.md` [CA-RPT]); becomes required once DOCX exists. Debrief + Session Analysis: only if user opts in after [CA-IP] — process documentation, not heritage evidence. KG: only if generated during session.
+
+**First-time orientation (mandatory)**: Before generating the dashboard, offer: "I can generate an interactive Assessment Dashboard. Quick path: **Overview → Significance** (key findings). Or explore all tabs for the full picture. Which do you prefer?"
 
 | Tab | Content | Key features |
 | --- | --- | --- |
-| **Overview** | KPIs, asset description, integrity range, data gaps | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. |
+| **Overview** | KPIs, asset description, integrity range, data gaps, process summary, sources | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. Process section: strengths/gaps/quick boosts/next steps (folded from former Process tab). Sources list. |
+| **Map** | Site location + mentioned locations from Stages 1/4/5 | **MANDATORY** — even for single-assessment dashboards. Shows site as primary marker. If Stages 1, 4, or 5 mention comparison sites, connected sites, or regional context locations, add as secondary markers with labels. Leaflet map with cross-referencing to Comparative tab. See §4a. |
 | **Timeline** | Chronological events | **Proportional spacing** based on year gaps. **Color-coded** by change type (use/structure/setting/infrastructure). Distribution summary. |
-| **Contexts** | Context cards with related values | Each card shows: type label, description, timespan, **clickable value pills**. Clicking a context highlights related values in Values tab. |
-| **Values** | Value cards + Attribute-Value-Implication table | Cards: name, category pill, evidence indicator (●/◐/○), summary. Below: full attribute table with implication warnings. |
-| **Integrity** | Nara Grid cards + summary | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. |
+| **Contexts & Values** | Context cards + value cards + attribute table (merged) | **Contexts section**: Each card shows type label, description, timespan, **clickable value pills**. **Values section**: Cards with name, category pill, evidence indicator (●/◐/○), summary. **Attribute table** below with 🔑 Implication column. Cross-referencing works within this tab: clicking a context highlights its related values inline. |
+| **Themes** | Value\context\threat thematic clusters (conditional) | Sub-tab pills: "Value Themes" / "Context Themes" / "Threat Themes" with count badges. Theme cards with colored dot, label, member pills (clickable → navigate to item in home tab). Only if ≥2 themes total. See §4b. |
+| **Integrity** | Nara Grid cards + vulnerability heat matrix + summary | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. **Vulnerability sub-section**: heat matrix (values × Nara aspects) with legend ABOVE matrix: 🔴 Severe (3) / 🟠 Moderate (2) / ⬜ Minor (1). 2–3 sentence interpretive callout ABOVE the matrix explaining the pattern. |
 | **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. |
 | **Significance** | Statement of cultural significance | Styled as a featured block. |
-| **Vulnerability** | Heat matrix: values × Nara aspects | Rows = value categories, columns = Nara aspects. Column headers show current integrity rating. Cells colored by impact (red/amber/neutral). 2–3 sentence interpretive callout. |
-| **Process** | KPIs, next steps, quick boosts, sources | Three-column KPI (strengths/gaps/boosts). Two-column layout: next steps + quick boosts. Sources list. |
 | **Report** | One-page printable assessment summary | Always generate. Export controls. Full spec in `report-tab-spec.md` [CA-RPT]. |
 | **Debrief** | Session debrief Q&A | Three reflection questions + user responses. Conversation-card layout. Muted process styling. Only if user opts in post-[CA-IP]. |
 | **Session Analysis** | Session Report [CA-IP] | Interaction Map table, Self-Reflection quotes, Session Signature. Same muted process styling. Only if user opts in post-[CA-IP]. |
 | **KG** | Embedded MiniKG with floating popover | If a KG was generated earlier in the session, reuse its graph data JSON (nodes + edges) — do not re-extract. Otherwise extract from stage outputs. D3 force-directed graph. See §7 for interaction. |
+
+### 4a. Map Tab Spec (mandatory)
+
+**Condition**: Always render — even for single-assessment dashboards.
+
+- **Library**: Leaflet 1.9.4 from `cdnjs.cloudflare.com`. Guard: `if (typeof L !== 'undefined')`.
+- **Tiles**: OpenStreetMap.
+- **Asset marker**: `L.circleMarker`, radius 10, fill `#2563eb`, white stroke width 2. Tooltip: asset name.
+- **Secondary markers**: If Stages 1, 4, or 5 mention comparison sites, connected sites, or regional context locations — add as `L.circleMarker`, radius 7, fill `#94a3b8`, with labels. Only render if coordinates are available or can be inferred.
+- **Asset popup**: name (bold), type, period, description, integrity range summary.
+- **Bounds**: Auto-fit all markers with padding `[40, 40]`. If only asset marker → zoom 12.
+- **Coordinate source**: Below the map container, show: "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
+- **Container**: `height: 440px; border-radius: 10px; border: 1px solid #e2e8f0`.
+- **Cross-referencing**: Click comparator marker → set `highlight = { type: 'comparator', id }` → Comparative tab highlights that card.
+
+### 4b. Themes Tab Spec (conditional)
+
+**Condition**: Render only if ≥2 themes total across `valueThemes`, `contextThemes`, and `threatThemes`.
+
+**Layout**: Sub-tab switcher (pill buttons): "Value Themes" / "Context Themes" / "Threat Themes" with count badges. Hide a sub-tab if 0 themes in that category.
+
+**Theme card**: Colored dot matching `theme.color`, label, count, one-sentence description, member pills (clickable → navigate to item in home tab with highlight). Cards are always expanded.
+
+**Threat Themes** additionally: mini heatmap row showing vulnerability cells that define the threat pattern.
+
+**Theme derivation rules**: Group values sharing overlapping contexts or co-occurring in attribute table. Group contexts by temporal overlap or causal relationship. Group vulnerability cells by shared high-impact patterns. ≥2 members per theme. Label with short noun phrase. Include 1-sentence rationale.
 
 ## 5. Cross-Referencing (mandatory)
 
@@ -235,9 +262,9 @@ The AI Query tab implements the generic AI Query contract from `artifact-ux-cont
 1. Only include data from the conversation — never fabricate.
 2. If a stage was not completed, show as incomplete in progress bar and mark "Not completed" in its tab.
 3. Evidence indicators (●/◐/○) must match Stage 2 markers and appear consistently in all tabs that reference values.
-4. KG tab appears only if KG was generated during the session; Vulnerability tab only if data exists.
+4. KG tab appears only if KG was generated during the session; Themes tab only if ≥2 themes exist. Vulnerability is a sub-section of Integrity (always present if data exists).
 5. Replace `__DATA__` and `__ASSET_NAME__` placeholders with extracted content.
-6. **All CBSA stages (1–6) have dedicated tabs** — no merged stages.
+6. **Consolidated tabs** — Contexts & Values share one tab; Vulnerability folds into Integrity; Process folds into Overview. See §4.
 7. **Attribute-Value-Implication table** present in Values tab.
 8. **Cross-referencing** implemented: at least Context↔Value linking functional.
 9. **Readability**: no text below 0.62rem; no contrast ratio below 3:1.
@@ -280,7 +307,7 @@ Use **Code Interpreter** for DOCX export. Do not stop at file delivery if a logi
 
 ## 12. Reference Data Shape — Ayelet HaShachar
 
-The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
+The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements an earlier version of this spec. Use it as a working example for visual language and interaction patterns — not as a locked template. The current spec consolidates tabs (~8 vs 10+), adds mandatory Map, merges Contexts & Values, and folds Vulnerability into Integrity.
 
 This section describes the data shape and rendering approach used in that reference. Your generated data must follow this shape exactly.
 
@@ -386,7 +413,7 @@ The Ayelet assessment compared 3 water towers.
 
 Impact levels: 3 = loss severely damages this value, 2 = moderate damage, 1 = minor.
 
-**Rendering**: Heat matrix table. Column headers show the Nara aspect name AND its current integrity rating from the authenticity grid. Cells colored: 3=red, 2=amber, 1=neutral/grey. Below: 2–3 sentence interpretive callout identifying the most critical vulnerability intersection.
+**Rendering**: Heat matrix table. Column headers show the Nara aspect name AND its current integrity rating from the authenticity grid. Cells colored: 3=red, 2=amber, 1=neutral/grey. **Legend ABOVE matrix**: 🔴 Severe (3) / 🟠 Moderate (2) / ⬜ Minor (1). **Interpretive callout ABOVE the matrix** (not below): 2–3 sentences identifying the most critical vulnerability intersection and the pattern it reveals.
 
 ### Process Quality
 
