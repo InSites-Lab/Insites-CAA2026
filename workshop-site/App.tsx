@@ -1315,25 +1315,23 @@ const App: React.FC = () => {
                 </div>
               </div>
             ) : (
-              /* DEFAULT HOME VIEW — two-column on desktop */
+              /* DEFAULT HOME VIEW */
               <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-4xl mx-auto w-full px-6 py-2 md:py-3">
-                  <div className="grid md:grid-cols-2 gap-5 items-start">
+                <div className="max-w-3xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
 
-                    {/* Left column — Poster */}
-                    <div className="pt-2 md:pt-3">
-                      <img
-                        src="/poster.png"
-                        alt="Atar.Bot — CBSA Workshop Poster"
-                        className="w-full rounded-2xl border border-slate-200 shadow-sm"
-                      />
-                      <p className="text-center text-sm text-slate-500 italic mt-2">
-                        "The LLM is a looking glass — more than a wonderland"
-                      </p>
-                    </div>
+                  {/* Poster — slightly constrained width */}
+                  <div className="pt-2 md:pt-3 max-w-2xl mx-auto">
+                    <img
+                      src="/poster.png"
+                      alt="Atar.Bot — CBSA Workshop Poster"
+                      className="w-full rounded-2xl border border-slate-200 shadow-sm"
+                    />
+                    <p className="text-center text-sm text-slate-500 italic mt-2">
+                      "The LLM is a looking glass — more than a wonderland"
+                    </p>
+                  </div>
 
-                    {/* Right column — Program + Bot links + Resources */}
-                    <div className="space-y-4 pt-2 md:pt-3">
+                  <div className="space-y-4">
                       {/* Workshop Program Card */}
                       <button
                         onClick={() => navigateTo("program")}
