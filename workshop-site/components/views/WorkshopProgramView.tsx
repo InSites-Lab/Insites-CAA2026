@@ -165,35 +165,20 @@ const CbsaTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigat
       </p>
     </div>
 
-    {/* Two differentiators */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <button
-        onClick={() => onNavigate?.('governance')}
-        className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-left hover:bg-emerald-100 hover:border-emerald-300 transition-all cursor-pointer group"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <ShieldCheck size={16} className="text-emerald-600" />
-          <h4 className="font-bold text-sm text-emerald-900">Human-in-the-Loop</h4>
-          <ArrowRight size={12} className="text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
-        </div>
-        <p className="text-xs text-emerald-800/70 leading-relaxed">
-          You approve every stage transition. The bot proposes analysis; you decide what stays, what changes, what's missing.
-        </p>
-      </button>
-      <button
-        onClick={() => onNavigate?.('step-1')}
-        className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-left hover:bg-indigo-100 hover:border-indigo-300 transition-all cursor-pointer group"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <ArrowRight size={16} className="text-indigo-600 rotate-45" />
-          <h4 className="font-bold text-sm text-indigo-900">Context Effect</h4>
-          <ArrowRight size={12} className="text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
-        </div>
-        <p className="text-xs text-indigo-800/70 leading-relaxed">
-          Bidirectional framing: contexts shape how we read significance, and recognized significance reframes the context itself.
-        </p>
-      </button>
-    </div>
+    {/* Key concept */}
+    <button
+      onClick={() => onNavigate?.('step-1')}
+      className="w-full bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-left hover:bg-indigo-100 hover:border-indigo-300 transition-all cursor-pointer group"
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <ArrowRight size={16} className="text-indigo-600 rotate-45" />
+        <h4 className="font-bold text-sm text-indigo-900">Context Effect</h4>
+        <ArrowRight size={12} className="text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
+      </div>
+      <p className="text-xs text-indigo-800/70 leading-relaxed">
+        The core CBSA principle: contexts shape how we read significance, and recognized significance reframes the context itself. Bidirectional, evaluative — never causal.
+      </p>
+    </button>
   </div>
 );
 

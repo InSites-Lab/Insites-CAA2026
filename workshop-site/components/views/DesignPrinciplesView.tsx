@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, ChevronDown, ShieldCheck, Activity } from 'lucide-react';
+import { Eye, ChevronDown, ShieldCheck, Activity, ArrowRight } from 'lucide-react';
 import { LOOKING_GLASS_CARDS } from '../../constants';
 
 export interface DesignPrinciplesViewProps {
@@ -56,10 +56,16 @@ export const DesignPrinciplesView: React.FC<DesignPrinciplesViewProps> = ({ onNa
       })}
     </div>
 
-    {/* Divider */}
+    {/* Divider — clickable title */}
     <div className="flex items-center gap-3 pt-2">
       <div className="flex-1 h-px bg-slate-200" />
-      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">How the Bot Works</span>
+      <button
+        onClick={() => onNavigate?.("governance")}
+        className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-emerald-600 transition-colors cursor-pointer flex items-center gap-1"
+      >
+        How the Bot Works
+        <ArrowRight size={10} className="opacity-0 group-hover:opacity-100" />
+      </button>
       <div className="flex-1 h-px bg-slate-200" />
     </div>
 
