@@ -215,20 +215,61 @@ const CbsaTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigat
       </p>
     </div>
 
-    {/* Key concept */}
-    <button
-      onClick={() => onNavigate?.('step-1')}
-      className="w-full bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-left hover:bg-indigo-100 hover:border-indigo-300 transition-all cursor-pointer group"
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <ArrowRight size={16} className="text-indigo-600 rotate-45" />
-        <h4 className="font-bold text-sm text-indigo-900">Context Effect</h4>
-        <ArrowRight size={12} className="text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
+    {/* Context Effect — visual explanation */}
+    <details className="bg-indigo-50 border border-indigo-200 border-l-4 border-l-indigo-400 rounded-xl overflow-hidden group">
+      <summary className="p-4 cursor-pointer flex items-center justify-between select-none">
+        <div className="flex items-center gap-2">
+          <ArrowRight size={16} className="text-indigo-600 rotate-45" />
+          <div>
+            <h4 className="font-bold text-sm text-indigo-900">Context Effect</h4>
+            <p className="text-[11px] text-indigo-600/70">The core CBSA principle — bidirectional, evaluative</p>
+          </div>
+        </div>
+        <ChevronDown size={16} className="text-indigo-400 group-open:rotate-180 transition-transform shrink-0" />
+      </summary>
+      <div className="px-4 pb-4 pt-2 border-t border-indigo-200 space-y-4">
+        {/* Visual diagram */}
+        <div className="flex items-center justify-center gap-3 py-3">
+          <div className="bg-white border-2 border-indigo-300 rounded-xl px-4 py-3 text-center shadow-sm">
+            <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide">Context</p>
+            <p className="text-[10px] text-indigo-400">(lens)</p>
+          </div>
+          <div className="flex flex-col items-center gap-0.5 text-indigo-500">
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-bold">frames</span>
+              <span>→</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>←</span>
+              <span className="text-[10px] font-bold">reframes</span>
+            </div>
+          </div>
+          <div className="bg-white border-2 border-amber-300 rounded-xl px-4 py-3 text-center shadow-sm">
+            <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">Asset</p>
+            <p className="text-[10px] text-amber-400">(significance)</p>
+          </div>
+        </div>
+
+        {/* Example */}
+        <div className="bg-white/60 rounded-lg p-3 space-y-1.5">
+          <p className="text-[11px] font-bold text-indigo-800">Example:</p>
+          <p className="text-xs text-indigo-800/70">
+            🏛 <strong>"Mamluk trade route"</strong> (context)
+          </p>
+          <p className="text-xs text-indigo-800/60 ml-4">
+            → frames the caravanserai as having economic + social value
+          </p>
+          <p className="text-xs text-indigo-800/60 ml-4">
+            ← the caravanserai's survival reframes the trade route as heritage-significant
+          </p>
+        </div>
+
+        {/* Rule */}
+        <p className="text-[11px] text-indigo-700/60 italic">
+          Evaluative, not causal. Never "caused" or "led to" — always "frames" and "reframes."
+        </p>
       </div>
-      <p className="text-xs text-indigo-800/70 leading-relaxed">
-        The core CBSA principle: contexts shape how we read significance, and recognized significance reframes the context itself. Bidirectional, evaluative — never causal.
-      </p>
-    </button>
+    </details>
   </div>
 );
 
