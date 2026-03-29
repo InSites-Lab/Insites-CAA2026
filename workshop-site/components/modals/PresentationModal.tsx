@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../common/Modal';
-import { WorkshopOpeningViewV3 } from '../views/WorkshopOpeningViewV3';
+import { WorkshopProgramView } from '../views/WorkshopProgramView';
 
 export interface PresentationModalProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ export interface PresentationModalProps {
 }
 
 export const PresentationModal: React.FC<PresentationModalProps> = ({ isOpen, onClose, onNavigate }) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Workshop Opening" fullscreen>
-    <WorkshopOpeningViewV3 onNavigate={onNavigate} />
+  <Modal isOpen={isOpen} onClose={onClose} title="Workshop Presentation" fullscreen>
+    <WorkshopProgramView onNavigate={onNavigate} />
   </Modal>
 );
