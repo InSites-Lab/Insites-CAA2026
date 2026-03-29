@@ -1326,7 +1326,7 @@ const App: React.FC = () => {
                       alt="Atar.Bot — CBSA Workshop Poster"
                       className="w-full rounded-2xl border border-slate-200 shadow-sm"
                     />
-                    <p className="text-center text-sm text-slate-500 italic mt-2">
+                    <p className="text-center text-lg text-slate-900 italic mt-2">
                       "The LLM is a looking glass — more than a wonderland"
                     </p>
                   </div>
@@ -1341,8 +1341,8 @@ const App: React.FC = () => {
                           <Layout size={20} />
                         </div>
                         <div>
-                          <h4 className="font-bold text-base text-indigo-900 mb-0.5">Workshop Program</h4>
-                          <p className="text-sm text-indigo-600/70">Presentation, hands-on assessment, ethics discussion</p>
+                          <h4 className="font-bold text-base text-indigo-900 mb-0.5">Workshop Introduction</h4>
+                          <p className="text-sm text-indigo-600/70">What is the story of "InSites"?, Design Principles, Workshop Program  </p>
                         </div>
                       </button>
 
@@ -1364,6 +1364,7 @@ const App: React.FC = () => {
                               <Sparkles size={20} className="text-blue-600" />
                             </div>
                             <span className="text-xs font-bold text-slate-700">Gemini</span>
+                            <span className="text-[9px] font-bold text-red-500">Thinking mode!</span>
                           </a>
                           <div className="flex flex-col items-center gap-1.5 p-3 bg-white border border-slate-200 rounded-xl opacity-60 cursor-default">
                             <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
