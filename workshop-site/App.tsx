@@ -787,7 +787,17 @@ const App: React.FC = () => {
                 <AboutView onNavigate={navigateTo} />
               </div>
             ) : mobileView === "PROGRAM" ? (
-              <WorkshopProgramView onNavigate={navigateTo} />
+              <div className="relative h-full">
+                <button
+                  onClick={() => navigateTo("presentation")}
+                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-700 shadow-sm border border-slate-200 transition-all"
+                  aria-label="Fullscreen presentation"
+                  title="Fullscreen presentation"
+                >
+                  <Maximize2 size={16} />
+                </button>
+                <WorkshopProgramView onNavigate={navigateTo} />
+              </div>
             ) : mobileView === "STEP_DETAIL" ||
               (selectedAgentId !== null && currentAgent) ? (
               // Unified Step Detail View logic
@@ -1681,7 +1691,7 @@ const App: React.FC = () => {
 
       <PresentationModal
         isOpen={isPresentationModalOpen}
-        onClose={() => { setIsPresentationModalOpen(false); window.location.hash = ""; }}
+        onClose={() => { setIsPresentationModalOpen(false); navigateTo("program"); }}
         onNavigate={navigateTo}
       />
 
