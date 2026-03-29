@@ -1317,7 +1317,7 @@ const App: React.FC = () => {
             ) : (
               /* DEFAULT HOME VIEW */
               <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
+                <div className="max-w-4xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
 
                   {/* Poster Hero */}
                   <div className="pt-2 md:pt-3">
@@ -1330,6 +1330,20 @@ const App: React.FC = () => {
                       "The LLM is a looking glass — more than a wonderland"
                     </p>
                   </div>
+
+                  {/* Workshop Program Card — first after poster */}
+                  <button
+                    onClick={() => navigateTo("program")}
+                    className="w-full flex items-center gap-4 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-2xl border border-indigo-200 hover:border-indigo-300 transition-all group cursor-pointer text-left shadow-sm"
+                  >
+                    <div className="p-2.5 bg-indigo-600 text-white rounded-xl shrink-0 group-hover:scale-110 transition-transform">
+                      <Layout size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base text-indigo-900 mb-0.5">Workshop Program</h4>
+                      <p className="text-sm text-indigo-600/70">Presentation, hands-on assessment, ethics discussion</p>
+                    </div>
+                  </button>
 
                   {/* Bot Platform Cards — compact row with brand logos */}
                   <div>
@@ -1359,20 +1373,6 @@ const App: React.FC = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Workshop Program Card */}
-                  <button
-                    onClick={() => navigateTo("program")}
-                    className="w-full flex items-center gap-4 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-2xl border border-indigo-200 hover:border-indigo-300 transition-all group cursor-pointer text-left shadow-sm"
-                  >
-                    <div className="p-2.5 bg-indigo-600 text-white rounded-xl shrink-0 group-hover:scale-110 transition-transform">
-                      <Layout size={20} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-base text-indigo-900 mb-0.5">Workshop Program</h4>
-                      <p className="text-sm text-indigo-600/70">Presentation, hands-on assessment, ethics discussion</p>
-                    </div>
-                  </button>
 
                   {/* Links */}
                   <div className="space-y-2">
