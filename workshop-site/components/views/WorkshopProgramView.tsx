@@ -37,7 +37,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const PROGRAM_TABS = [
   { id: 'story', label: 'Our Story', icon: <Users size={14} /> },
-  { id: 'principles', label: 'Principles', icon: <Eye size={14} /> },
+  { id: 'principles', label: 'Principles', icon: <Lightbulb size={14} /> },
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
   { id: 'schedule', label: 'Schedule', icon: <Clock size={14} /> },
 ] as const;
