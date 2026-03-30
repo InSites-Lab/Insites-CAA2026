@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, ChevronRight, Eye, Share2, ExternalLink } from 'lucide-react';
+import { Zap, ChevronRight, Eye } from 'lucide-react';
 import { AgentConfig } from '../../types';
 
 export interface SidebarProps {
@@ -87,52 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* Session Sharing Link */}
-          <div className="pt-0 px-3 mt-0 pb-1">
-            <a
-              href="https://forms.gle/zqsZA7DXNJVe4zJc7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-between p-3 rounded-xl border-2 bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-600 hover:shadow-md transition-all duration-300 group cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-1.5 rounded-lg transition-all bg-slate-50 text-amber-500 group-hover:bg-amber-50">
-                  <Share2 size={14} />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-[13px] uppercase tracking-wider">Share Session</h3>
-                </div>
-              </div>
-              <ExternalLink
-                size={14}
-                className="text-slate-300 group-hover:text-amber-300 transition-transform duration-300"
-              />
-            </a>
-          </div>
-
-          {/* Design Principles Button */}
-          <div className="pt-0 px-3 mt-0 pb-1">
-            <button
-              onClick={onDesignClick}
-              className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showDesignView ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-200' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600 hover:shadow-md'}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-1.5 rounded-lg transition-all ${showDesignView ? 'bg-white/20 text-white' : 'bg-slate-50 text-rose-500 group-hover:bg-rose-50'}`}>
-                  <Eye size={14} />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-[13px] uppercase tracking-wider">Design Principles</h3>
-                </div>
-              </div>
-              <ChevronRight
-                size={14}
-                className={`transition-transform duration-300 ${showDesignView ? 'text-rose-200 translate-x-1' : 'text-slate-300 group-hover:text-rose-300'}`}
-              />
-            </button>
-          </div>
-
           {/* Extensions & Tools Button */}
-          <div className="pt-0 px-3 mt-0 pb-2">
+          <div className="pt-0 px-3 mt-0 pb-1">
             <button
               onClick={onResearchAidsClick}
               className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md'}`}
@@ -148,6 +104,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ChevronRight
                 size={14}
                 className={`transition-transform duration-300 ${showResearchAids ? 'text-indigo-200 translate-x-1' : 'text-slate-300 group-hover:text-indigo-300'}`}
+              />
+            </button>
+          </div>
+
+          {/* Design Principles Button */}
+          <div className="pt-0 px-3 mt-0 pb-2">
+            <button
+              onClick={onDesignClick}
+              className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showDesignView ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-200' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600 hover:shadow-md'}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-1.5 rounded-lg transition-all ${showDesignView ? 'bg-white/20 text-white' : 'bg-slate-50 text-rose-500 group-hover:bg-rose-50'}`}>
+                  <Eye size={14} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-[13px] uppercase tracking-wider">Design Principles</h3>
+                </div>
+              </div>
+              <ChevronRight
+                size={14}
+                className={`transition-transform duration-300 ${showDesignView ? 'text-rose-200 translate-x-1' : 'text-slate-300 group-hover:text-rose-300'}`}
               />
             </button>
           </div>

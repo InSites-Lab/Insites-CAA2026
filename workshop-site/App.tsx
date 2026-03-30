@@ -11,7 +11,6 @@ import {
   MessageSquare,
   ExternalLink,
   Github,
-  ClipboardCheck,
   Bot,
   Globe,
   Trash2,
@@ -1512,10 +1511,10 @@ const App: React.FC = () => {
                         colorScheme="indigo"
                       />
                       <ResourceLink
-                        href="https://forms.gle/F9ZykAefJQ94n2Vc7"
-                        icon={<ClipboardCheck size={16} />}
-                        label="Feedback Form"
-                        secondaryLabel="Research feedback to improve the tool"
+                        href="https://forms.gle/zqsZA7DXNJVe4zJc7"
+                        icon={<Share2 size={16} />}
+                        label="Share Your Session"
+                        secondaryLabel="Share your assessment session link with the group"
                         highlight={true}
                         colorScheme="amber"
                       />
