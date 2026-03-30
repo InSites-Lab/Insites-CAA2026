@@ -44,7 +44,7 @@ export const DashboardPreviewModal: React.FC<DashboardPreviewModalProps> = ({ is
         {/* Desktop: iframe */}
         <div className="hidden sm:block rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white">
           <iframe
-            src="/dashboard-demo.html"
+            src="./dashboard-demo.html"
             className="w-full border-0"
             style={{ height: '70vh', minHeight: '500px' }}
             title="Assessment Dashboard Demo — Ayelet HaShachar Water Tower"

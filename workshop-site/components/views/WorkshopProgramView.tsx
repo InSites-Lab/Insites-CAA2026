@@ -105,19 +105,19 @@ const CHALLENGES = [
     quote: "It's important but too complex",
     response: "With AI trained in our assessment principles, we can simplify the process and link outputs directly to surveys and systems.",
     color: 'amber',
-    avatar: '/rabbit.png',
+    avatar: './rabbit.png',
   },
   {
     quote: "It's too heavy, no one reads it",
     response: "With natural language queries and visual tools like knowledge graphs, we can make cultural insights clearer, usable, and even discover new ones.",
     color: 'indigo',
-    avatar: '/hatter.jpg',
+    avatar: './hatter.jpg',
   },
   {
     quote: "So will AI replace the professionals?",
     response: "No. Experts remain essential. AI is a smart partner for detecting connections and contexts — but it needs our guidance.",
     color: 'emerald',
-    avatar: '/robot.png',
+    avatar: './robot.png',
   },
 ];
 
@@ -132,7 +132,7 @@ const ChallengesTab: React.FC = () => (
     {/* Poster */}
     <div>
       <img
-        src="/poster.png"
+        src="./poster.png"
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />

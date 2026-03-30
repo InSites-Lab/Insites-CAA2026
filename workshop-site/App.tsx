@@ -1324,7 +1324,7 @@ const App: React.FC = () => {
                   {/* Poster — slightly constrained width */}
                   <div className="pt-2 md:pt-3 max-w-2xl mx-auto">
                     <img
-                      src="/poster.png"
+                      src="./poster.png"
                       alt="InSites-CAA — CBSA Workshop Poster"
                       className="w-full rounded-2xl border border-slate-200 shadow-sm"
                     />
@@ -1621,7 +1621,7 @@ const App: React.FC = () => {
             onClick={() => { setIsOpeningSlideOpen(false); window.location.hash = ""; }}
             className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-2xl cursor-pointer"
           >✕</button>
-          <img src="/poster.png" alt="InSites Workshop" className="max-h-[45vh] rounded-2xl border border-slate-200 shadow-lg mb-6" />
+          <img src="./poster.png" alt="InSites Workshop" className="max-h-[45vh] rounded-2xl border border-slate-200 shadow-lg mb-6" />
           <h1 className="text-3xl md:text-4xl font-black text-slate-800 text-center leading-tight mb-2">
             InSites: Significance Assessment through<br />the Looking Glass of Gen-AI
           </h1>

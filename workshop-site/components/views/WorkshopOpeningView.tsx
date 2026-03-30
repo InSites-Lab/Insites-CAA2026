@@ -36,7 +36,7 @@ export const WorkshopOpeningView: React.FC<WorkshopOpeningViewProps> = ({ onNavi
       {/* Poster Hero */}
       <section className="max-w-2xl mx-auto w-full px-6 pt-6 pb-2">
         <img
-          src="/poster.png"
+          src="./poster.png"
           alt="InSites-CAA — CBSA Workshop Poster"
           className="w-full rounded-2xl border border-slate-200 shadow-sm"
         />

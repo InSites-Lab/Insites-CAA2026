@@ -41,7 +41,7 @@ export const WorkshopOpeningViewV2: React.FC<WorkshopOpeningViewV2Props> = ({ on
       {/* Poster Hero */}
       <section className="max-w-2xl mx-auto w-full px-6 pt-6 pb-4">
         <img
-          src="/poster.png"
+          src="./poster.png"
           alt="InSites-CAA — CBSA Workshop Poster"
           className="w-full rounded-2xl border border-slate-200 shadow-sm"
         />

@@ -80,14 +80,14 @@ export const Header: React.FC<HeaderProps> = ({
         >
           {/* Mobile Technion logo (public/technion-small.png) */}
           <img
-            src="technion-small.png"
+            src="./technion-small.png"
             alt="Technion"
             className="h-6 object-contain inline-block md:hidden"
           />
 
           {/* Desktop Technion logo (public/Technion_Logo.png) */}
           <img
-            src="Technion_Logo.png"
+            src="./Technion_Logo.png"
             alt="Technion"
             className="h-6 md:h-7 lg:h-8 object-contain hidden md:inline-block mr-1"
           />
