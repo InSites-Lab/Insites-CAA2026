@@ -27,21 +27,21 @@ export const SessionReportModal: React.FC<SessionReportModalProps> = ({ isOpen, 
           </h4>
           <div className="space-y-3">
             <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-              <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">1. Control</p>
+              <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">1. Surprise</p>
               <p className="text-sm text-slate-700 italic">
-                "At which point did you feel most in control? Any point where AI was leading too much?"
+                "Describe one moment where the AI's output surprised you — positively or negatively. What did you expect instead?"
               </p>
             </div>
             <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
               <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">2. Trust</p>
               <p className="text-sm text-slate-700 italic">
-                "Which outputs would you keep as-is? Which would you rewrite?"
+                "If you had to use this output in a professional context — what would you keep as-is, and what would you rewrite from scratch?"
               </p>
             </div>
             <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">3. Insights</p>
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">3. Open</p>
               <p className="text-sm text-slate-700 italic">
-                "Did anything surprise you about the assessment process?"
+                "What should we change, test, add, or think about for the future development of this process? Anything goes."
               </p>
             </div>
           </div>

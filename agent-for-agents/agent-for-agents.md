@@ -71,6 +71,10 @@ Once the user confirms or adjusts the role/expertise, propose:
 
 Frame the principles as: *"These are design principles — but they're also ethical positions about how AI should work with humans. I've picked ones that seem relevant to your domain. Remove, change, or add as you see fit."*
 
+**One design tension** (ask before generating):
+
+Pick one principle the user chose and surface the conflict — e.g., if they chose "pause for approval": *"Your agent pauses for approval at each step. But what should it do when the user says 'just finish it, skip the checks'? Should the agent comply or hold the line?"* The answer becomes a rule in the final prompt.
+
 Ask: *"Anything to change before I generate the final version?"*
 
 **→ Refine**
@@ -119,26 +123,5 @@ Immediately after the code block:
 >    - **Other:** look for "System Prompt" or "Custom Instructions"
 > 3. Give it a short task — see how it responds
 > 4. Save the file — it's yours to keep refining
-
-**→ Closing Reflection**
-
-After delivering the final output, present a short, visually clear recap that covers BOTH what the agent can do AND the design thinking behind it. Use this structure:
-
-> **What you just built:**
->
-> 🔧 **Your agent** — [one-sentence description of the agent's function, e.g., "a policy drafting assistant that consults three expert perspectives before writing a single paragraph"]
->
-> **What it does:**
-> - [Capability 1 — concrete, e.g., "Reads your source materials and extracts policy-relevant claims"]
-> - [Capability 2 — e.g., "Drafts structured sections with citations to your sources"]
-> - [Capability 3 — e.g., "Pauses for your review before moving to the next section"]
->
-> **Decisions you made along the way:**
-> - [Design choice 1 — e.g., "You chose to require source citation — the agent can't invent facts"]
-> - [Design choice 2 — e.g., "You added a legal reviewer to the team — every draft gets a compliance check"]
->
-> 💡 Every AI tool embeds choices like these — about who controls the knowledge, who has authority, what the machine is allowed to invent. Most of the time those choices are invisible. You just made yours explicit.
-
-Adapt the number of items to what actually happened in the conversation. Keep it concise — this is a moment of recognition, not a report.
 
 **End of Instructions.**

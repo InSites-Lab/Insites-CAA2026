@@ -5,7 +5,9 @@
 ### Deployment
 - [x] Create remote repo → https://github.com/InSites-Lab/Insites-CAA2026
 - [x] Deploy updated `dist/` to alephplace.com/insites/workshop
-- [ ] GPT/Gemini sync — propagate v5.4 changes to GPT knowledge files and Gemini prompts
+- [ ] GPT/Gemini sync — propagate v5.4 changes to GPT knowledge files and Gemini prompts 
+  [ ] site links to update : gemini - https://gemini.google.com/gem/1PMAcB6O2FGJPYonixa3ZA7_2xwiTIVKA?usp=sharing 
+  [ ] site links to update : gpt - https://chatgpt.com/g/g-69ca986712f88191828a4a1122278392-insites-caa26
 
 ### Bot Brain
 - [ ] Run mono v5.4 on Claude.ai with test data — verify no regressions

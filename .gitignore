@@ -6,6 +6,7 @@ management/
 content-dev/
 promptsEngineering/
 sakem-li/
+/docs/
 InSites Budget.md
 .vscode/
 *.code-workspace
@@ -14,6 +15,8 @@ InSites Budget.md
 .claude/
 CLAUDE.md
 InSites-Brain/CLAUDE.md
+InSites-Brain/Claude/InSites-CAA-mono*.md
+InSites-Brain/Gemini/InSites-CAA-mono*.md
 
 # Temp files
 ~$*

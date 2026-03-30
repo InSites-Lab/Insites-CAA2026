@@ -19,7 +19,7 @@ const WORKSHOP_PROGRAM: ProgramBlock[] = [
   { number: 2, title: "Write with InSites", duration: "50 min", type: "hands-on", description: "Participants write a significance assessment using InSites", icon: <PenTool size={18} /> },
   { number: null, title: "Break", duration: "10 min", type: "break", description: "", icon: <Coffee size={18} /> },
   { number: 3, title: "Read with InSites", duration: "30 min", type: "hands-on", description: "Analyze existing assessments (EAC11 case studies)", icon: <BookOpen size={18} /> },
-  { number: 4, title: "Ethics in Practice", duration: "40 min", type: "discussion", description: "Critical discussion: transparency, bias, responsibility", icon: <MessageSquare size={18} /> },
+  { number: 4, title: "Build Your Own AI Assistant", duration: "40 min", type: "hands-on", description: "Design your own AI agent — choose its expertise, principles, and workflow. Then deploy it.", icon: <MessageSquare size={18} /> },
   { number: 5, title: "Wrap-up & Discussion", duration: "10 min", type: "lecture", description: "Takeaways, open questions, feedback", icon: <Presentation size={18} /> },
 ];
 
@@ -40,7 +40,7 @@ const PROGRAM_TABS = [
   { id: 'challenges', label: 'Our Story', icon: <Users size={14} /> },
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
   { id: 'principles', label: 'Principles', icon: <Eye size={14} /> },
-  { id: 'schedule', label: 'Schedule', icon: <Clock size={14} /> },
+  { id: 'schedule', label: 'Program', icon: <Clock size={14} /> },
 ] as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'];
@@ -318,6 +318,29 @@ const ScheduleTab: React.FC<{ onNavigate?: (route: string) => void; totalMinutes
                 </div>
                 {block.description && (
                   <p className="text-xs text-slate-600 leading-relaxed">{block.description}</p>
+                )}
+                {block.number === 4 && (
+                  <details className="mt-2 group/deploy">
+                    <summary className="text-[11px] font-bold text-amber-600 cursor-pointer flex items-center gap-1 hover:text-amber-700 transition-colors select-none">
+                      <span>How to deploy what you built</span>
+                      <ChevronDown size={12} className="group-open/deploy:rotate-180 transition-transform" />
+                    </summary>
+                    <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                      <p className="text-[11px] text-slate-700 font-medium">After the bot generates your system instructions:</p>
+                      <ol className="text-[11px] text-slate-600 space-y-1.5 list-decimal ml-3">
+                        <li><strong>Copy</strong> the generated text</li>
+                        <li><strong>Deploy</strong> on your platform:
+                          <ul className="mt-1 ml-3 space-y-0.5 list-disc text-[10px]">
+                            <li><strong>Claude</strong> → Projects → New Project → paste as Custom Instructions</li>
+                            <li><strong>ChatGPT</strong> → Explore GPTs → Create → paste in Instructions</li>
+                            <li><strong>Gemini</strong> → Gem Manager → New Gem → paste in System Instructions</li>
+                          </ul>
+                        </li>
+                        <li><strong>Test</strong> — give it a short task and see how it responds</li>
+                        <li><strong>Save</strong> — the file is yours to keep refining</li>
+                      </ol>
+                    </div>
+                  </details>
                 )}
                 {block.number !== null && SESSION_RESOURCES[block.number] && (
                   <details className="mt-2 group/res">
