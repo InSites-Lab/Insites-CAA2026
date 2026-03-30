@@ -5,7 +5,7 @@
 1. Go to [claude.ai](https://claude.ai) → **Projects** → **Create Project**
 2. Name it: `InSites-CAA`
 3. Open project settings → **Custom Instructions**
-4. Copy the **entire contents** of [`InSites-CAA-mono v5.4.md`](InSites-CAA-mono%20v5.4.md) and paste
+4. Copy the **entire contents** of [`InSites-CAA-mono v5.5.md`](InSites-CAA-mono%20v5.5.md) and paste
 5. Save
 
 > **Tip:** Use a paid account with the latest Claude model for best results.
