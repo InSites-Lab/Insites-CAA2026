@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { FileText, BookOpen, Zap, Sparkles } from 'lucide-react';
+import { FileText, BookOpen, Zap } from 'lucide-react';
 import { Modal } from '../common';
-import { ZAIRA_TEXT } from '../../constants';
 
 export interface GraphInputModalProps {
   isOpen: boolean;
@@ -42,12 +41,14 @@ export const GraphInputModal: React.FC<GraphInputModalProps> = ({
         <div className="space-y-3">
           <label className="text-sm font-bold text-slate-700">Text for analysis:</label>
           <div className="flex flex-wrap gap-2 mb-2">
-            <button
-              onClick={() => selectSample(ZAIRA_TEXT, "zaira")}
+            <a
+              href="https://gemini.google.com/share/03421deb044b"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 min-w-[120px] py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-900 border border-indigo-200 hover:border-indigo-300 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
             >
-              <BookOpen size={14} /> Zaira — Invisible Cities
-            </button>
+              <BookOpen size={14} /> Zaira KG (Gemini demo)
+            </a>
             <a
               href="./chaco-kg.html"
               target="_blank"
@@ -65,23 +66,11 @@ export const GraphInputModal: React.FC<GraphInputModalProps> = ({
           />
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <div
-              onClick={() => setUseApi(!useApi)}
-              className={`relative w-10 h-5 rounded-full transition-colors ${useApi ? 'bg-amber-500' : 'bg-slate-300'}`}
-            >
-              <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${useApi ? 'translate-x-5' : ''}`} />
-            </div>
-            <span className="text-xs font-medium text-slate-600 flex items-center gap-1">
-              <Sparkles size={12} className={useApi ? 'text-amber-500' : 'text-slate-400'} />
-              {useApi ? 'AI Live (Gemini Flash)' : 'Demo Mode'}
-            </span>
-          </label>
+        <div className="flex items-center justify-end pt-4 border-t border-slate-100">
           <button
             onClick={() => {
               onClose();
-              onGenerate(useApi);
+              onGenerate(false);
             }}
             disabled={!inputText.trim()}
             className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg hover:shadow-emerald-200 transition-all active:scale-95"
