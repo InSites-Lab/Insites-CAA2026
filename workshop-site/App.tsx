@@ -1474,7 +1474,7 @@ const App: React.FC = () => {
                               <li>
                                 Paste{" "}
                                 <a
-                                  href="https://github.com/InSites-Lab/Insites-CAA2026/blob/main/InSites-Brain/Claude/InSites-CAA-mono%20v5.5.md"
+                                  href="https://github.com/InSites-Lab/Insites-CAA2026/blob/main/InSites-Brain/Claude/InSites-CAA-claude.md"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-purple-600 underline"
