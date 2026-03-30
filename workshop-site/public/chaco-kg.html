@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaco Culture NHP — Knowledge Graph</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans',system-ui,sans-serif; background:#f8fafc; color:#1e293b; overflow:hidden; height:100vh; }
+  .container { display:flex; height:100vh; }
+  .graph-area { flex:1; position:relative; min-width:0; }
+  .sidebar { width:340px; min-width:300px; background:#f1f5f9; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; overflow:hidden; transition:width 0.2s; }
+  .sidebar.collapsed { width:0; min-width:0; border:none; overflow:hidden; }
+  .sidebar-toggle { position:absolute; right:340px; top:12px; z-index:20; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:14px; transition:right 0.2s; }
+  .sidebar-toggle.collapsed-btn { right:0; }
+  .tab-bar { display:flex; border-bottom:1px solid #e2e8f0; background:#fff; flex-shrink:0; }
+  .tab-btn { flex:1; padding:10px 8px; border:none; background:transparent; cursor:pointer; font-size:12px; font-weight:500; color:#64748b; border-bottom:2px solid transparent; transition:all 0.15s; font-family:inherit; }
+  .tab-btn.active { color:#3b82f6; border-bottom-color:#3b82f6; font-weight:600; }
+  .tab-btn:hover { color:#1e293b; }
+  .tab-content { flex:1; overflow-y:auto; padding:16px; }
+  .node-title { font-size:1.1rem; font-weight:700; margin-bottom:8px; }
+  .type-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600; color:#fff; margin-bottom:12px; }
+  .meaning-text { font-size:0.88rem; color:#475569; line-height:1.6; margin-bottom:16px; }
+  .conn-section { border-top:1px solid #e2e8f0; padding-top:12px; }
+  .conn-label { font-size:0.78rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; font-weight:600; }
+  .conn-item { padding:8px 10px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:5px; font-size:0.82rem; cursor:pointer; transition:background 0.12s; display:flex; align-items:center; gap:6px; }
+  .conn-item:hover { background:#eff6ff; }
+  .conn-verb { color:#3b82f6; font-weight:500; font-size:0.75rem; }
+  .conn-arrow { color:#94a3b8; font-size:0.7rem; }
+  .placeholder { text-align:center; color:#94a3b8; padding:40px 20px; font-size:0.9rem; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+  .stat-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center; }
+  .stat-val { font-size:1.6rem; font-weight:700; color:#1e293b; font-family:'JetBrains Mono',monospace; }
+  .stat-lbl { font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; }
+  .search-input { width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem; margin-bottom:12px; font-family:inherit; background:#fff; }
+  .filter-btn { padding:4px 10px; border-radius:14px; font-size:0.72rem; cursor:pointer; border:2px solid transparent; color:#fff; font-weight:500; margin:2px; transition:all 0.12s; font-family:inherit; }
+  .filter-btn.inactive { opacity:0.35; }
+  .top-connected { margin-top:16px; }
+  .top-item { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:0.82rem; border-bottom:1px solid #f1f5f9; cursor:pointer; }
+  .top-item:hover { color:#3b82f6; }
+  .legend { position:absolute; bottom:12px; left:12px; display:flex; flex-wrap:wrap; gap:8px; background:rgba(30,41,59,0.85); backdrop-filter:blur(8px); padding:8px 14px; border-radius:8px; max-width:60%; }
+  .legend-item { display:flex; align-items:center; gap:4px; font-size:0.66rem; color:#e2e8f0; white-space:nowrap; }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .copy-btn { position:absolute; top:12px; left:12px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:12px; font-family:inherit; z-index:10; }
+  .copy-btn:hover { background:#eff6ff; }
+  .ai-prompt-card { padding:10px 14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-size:0.82rem; margin-bottom:6px; transition:all 0.12s; color:#475569; }
+  .ai-prompt-card:hover { border-color:#3b82f6; background:#eff6ff; }
+  .ai-response { padding:12px; background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; font-size:0.82rem; line-height:1.5; margin-top:8px; }
+  .copy-q-btn { display:inline-block; margin-top:6px; padding:4px 10px; background:#3b82f6; color:#fff; border:none; border-radius:4px; font-size:0.72rem; cursor:pointer; font-family:inherit; }
+  svg text { user-select:none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="graph-area" id="graphArea">
+    <button class="copy-btn" id="copyJsonBtn" title="Copy graph JSON">📋 Copy JSON</button>
+    <svg id="graphSvg"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle">◀</button>
+  <div class="sidebar" id="sidebar">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="info">Info</button>
+      <button class="tab-btn" data-tab="analytics">Analytics</button>
+      <button class="tab-btn" data-tab="ai">AI Query</button>
+    </div>
+    <div class="tab-content" id="tabContent"></div>
+  </div>
+</div>
+
+<script>
+const d3 = window.d3;
+
+const DATA = {
+  "nodes": [
+    {"id":"ccnhp","name":"Chaco Culture NHP","type":"asset","meaning":"UNESCO World Heritage archaeological landscape, ancestral Puebloan regional center"},
+    {"id":"pueblo_bonito","name":"Pueblo Bonito","type":"structure","meaning":"Largest great house — 600+ rooms, monumental masonry construction"},
+    {"id":"casa_rinconada","name":"Casa Rinconada","type":"structure","meaning":"Great kiva closed in 1996 at tribal request to prevent desecration"},
+    {"id":"fajada_butte","name":"Fajada Butte","type":"structure","meaning":"Sacred site with astronomical markers, closed to public since 1982"},
+    {"id":"chaco_canyon","name":"San Juan Basin","type":"place","meaning":"Semiarid basin containing the canyon and 39 outlier protection sites"},
+    {"id":"mesa_verde","name":"Mesa Verde","type":"place","meaning":"Migration destination and comparative site with cliff dwellings"},
+    {"id":"puebloans","name":"Ancestral Puebloans","type":"group","meaning":"Builders of the great houses, A.D. 400–1300"},
+    {"id":"hopi_pueblo","name":"Hopi & Pueblo Peoples","type":"group","meaning":"Living descendants maintaining pilgrimage practices since 13th century"},
+    {"id":"navajo","name":"Navajo Nation","type":"group","meaning":"Inhabited canyon for 400 years; displaced by NPS in 1930s–1940s"},
+    {"id":"nps","name":"National Park Service","type":"group","meaning":"Federal agency managing CCNHP since 1916"},
+    {"id":"antiquities_act","name":"Antiquities Act 1906","type":"event","meaning":"First U.S. heritage law, catalyzed by excavation controversies at Chaco"},
+    {"id":"wh_inscription","name":"WH Inscription 1987","type":"event","meaning":"UNESCO recognition under criterion C(iii) — testimony to disappeared civilization"},
+    {"id":"chaco_phenom","name":"Chaco Phenomenon","type":"period","meaning":"A.D. 700–1300 regional system of roads, outliers, and ceremonial networks"},
+    {"id":"val_scientific","name":"Scientific Value","type":"cultural_value","meaning":"Century-deep archaeological archive with ongoing research potential"},
+    {"id":"val_historical","name":"Historical Value","type":"cultural_value","meaning":"Site that catalyzed American heritage protection law"}
+  ],
+  "edges": [
+    {"from":"ccnhp","to":"chaco_canyon","label":"located_in"},
+    {"from":"pueblo_bonito","to":"ccnhp","label":"part_of"},
+    {"from":"casa_rinconada","to":"ccnhp","label":"part_of"},
+    {"from":"fajada_butte","to":"ccnhp","label":"part_of"},
+    {"from":"ccnhp","to":"puebloans","label":"built_by"},
+    {"from":"hopi_pueblo","to":"ccnhp","label":"pilgrimage_to"},
+    {"from":"navajo","to":"chaco_canyon","label":"inhabited"},
+    {"from":"nps","to":"ccnhp","label":"manages"},
+    {"from":"ccnhp","to":"antiquities_act","label":"catalyzed"},
+    {"from":"wh_inscription","to":"ccnhp","label":"recognizes"},
+    {"from":"chaco_phenom","to":"ccnhp","label":"defines"},
+    {"from":"ccnhp","to":"val_scientific","label":"expresses_value"},
+    {"from":"ccnhp","to":"val_historical","label":"expresses_value"},
+    {"from":"hopi_pueblo","to":"casa_rinconada","label":"sacred_to"},
+    {"from":"hopi_pueblo","to":"fajada_butte","label":"sacred_to"},
+    {"from":"puebloans","to":"hopi_pueblo","label":"ancestors_of"},
+    {"from":"puebloans","to":"chaco_phenom","label":"created"},
+    {"from":"mesa_verde","to":"chaco_canyon","label":"connected_to"},
+    {"from":"nps","to":"navajo","label":"displaced"},
+    {"from":"antiquities_act","to":"nps","label":"established_framework"}
+  ]
+};
+
+const TYPE_COLORS = {
+  asset:'#E53935', cultural_value:'#FFD700', structure:'#D81B60', place:'#9C27B0',
+  event:'#FB8C00', period:'#6D4C41', person:'#00ACC1', group:'#7CB342'
+};
+const TYPE_LABELS = {
+  asset:'Heritage Asset', cultural_value:'Cultural Value', structure:'Structure',
+  place:'Place', event:'Event', period:'Period', person:'Person', group:'Social Group'
+};
+
+const NODE_RADIUS = (d) => {
+  if (d.type === 'asset') return 16;
+  if (d.type === 'cultural_value') return 11;
+  return 9;
+};
+
+let selectedNode = null;
+let activeTab = 'info';
+let searchQuery = '';
+let activeFilters = new Set(Object.keys(TYPE_COLORS));
+let sidebarOpen = true;
+
+// Build legend
+function buildLegend() {
+  const types = [...new Set(DATA.nodes.map(n => n.type))];
+  const legend = document.getElementById('legend');
+  legend.innerHTML = types.map(t =>
+    `<span class="legend-item"><span class="legend-dot" style="background:${TYPE_COLORS[t]}"></span>${TYPE_LABELS[t] || t}</span>`
+  ).join('');
+}
+
+// Sidebar toggle
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+  const btn = document.getElementById('sidebarToggle');
+  btn.textContent = sidebarOpen ? '◀' : '▶';
+  btn.classList.toggle('collapsed-btn', !sidebarOpen);
+  btn.style.right = sidebarOpen ? '340px' : '0';
+  setTimeout(() => renderGraph(), 250);
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTab = btn.dataset.tab;
+    renderTab();
+  });
+});
+
+// Copy JSON
+document.getElementById('copyJsonBtn').addEventListener('click', () => {
+  try {
+    navigator.clipboard.writeText(JSON.stringify(DATA, null, 2));
+    const btn = document.getElementById('copyJsonBtn');
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = '📋 Copy JSON', 1500);
+  } catch(e) {
+    alert('Copy not available in this environment. Download the file to use this feature.');
+  }
+});
+
+function getConnections(nodeId) {
+  return DATA.edges.filter(e => e.from === nodeId || e.to === nodeId).map(e => {
+    const isSource = e.from === nodeId;
+    const otherId = isSource ? e.to : e.from;
+    const otherNode = DATA.nodes.find(n => n.id === otherId);
+    return { label: e.label, node: otherNode, direction: isSource ? 'outgoing' : 'incoming', arrow: isSource ? '→' : '←' };
+  });
+}
+
+function selectNode(node) {
+  selectedNode = node;
+  activeTab = 'info';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-tab="info"]').classList.add('active');
+  renderTab();
+  highlightEdges(node ? node.id : null);
+}
+
+function highlightEdges(nodeId) {
+  d3.selectAll('.edge-path').attr('stroke-opacity', d => {
+    if (!nodeId) return 0.35;
+    return (d.source.id === nodeId || d.target.id === nodeId) ? 0.9 : 0.08;
+  });
+  d3.selectAll('.edge-label').attr('opacity', d => {
+    if (!nodeId) return 0.7;
+    return (d.source.id === nodeId || d.target.id === nodeId) ? 1 : 0.05;
+  });
+}
+
+function renderTab() {
+  const tc = document.getElementById('tabContent');
+  if (activeTab === 'info') {
+    if (!selectedNode) {
+      tc.innerHTML = '<div class="placeholder">Click a node to inspect it</div>';
+    } else {
+      const conns = getConnections(selectedNode.id);
+      const outgoing = conns.filter(c => c.direction === 'outgoing');
+      const incoming = conns.filter(c => c.direction === 'incoming');
+      tc.innerHTML = `
+        <div class="node-title">${selectedNode.name}</div>
+        <span class="type-badge" style="background:${TYPE_COLORS[selectedNode.type]}">${TYPE_LABELS[selectedNode.type]}</span>
+        <p class="meaning-text">${selectedNode.meaning}</p>
+        <div class="conn-section">
+          ${outgoing.length ? `<div class="conn-label">Outgoing (${outgoing.length})</div>` + outgoing.map(c =>
+            `<div class="conn-item" onclick="selectNodeById('${c.node?.id}')">
+              <span class="conn-arrow">→</span>
+              <span class="conn-verb">${c.label}</span>
+              <span>${c.node?.name || '?'}</span>
+            </div>`
+          ).join('') : ''}
+          ${incoming.length ? `<div class="conn-label" style="margin-top:12px">Incoming (${incoming.length})</div>` + incoming.map(c =>
+            `<div class="conn-item" onclick="selectNodeById('${c.node?.id}')">
+              <span class="conn-arrow">←</span>
+              <span class="conn-verb">${c.label}</span>
+              <span>${c.node?.name || '?'}</span>
+            </div>`
+          ).join('') : ''}
+        </div>`;
+    }
+  } else if (activeTab === 'analytics') {
+    const nodeCount = DATA.nodes.length;
+    const edgeCount = DATA.edges.length;
+    const typeCount = new Set(DATA.nodes.map(n => n.type)).size;
+    const density = (2 * edgeCount / (nodeCount * (nodeCount - 1))).toFixed(2);
+    const degreeCounts = {};
+    DATA.nodes.forEach(n => degreeCounts[n.id] = 0);
+    DATA.edges.forEach(e => { degreeCounts[e.from]++; degreeCounts[e.to]++; });
+    const topNodes = Object.entries(degreeCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+    const typeCounts = {};
+    DATA.nodes.forEach(n => typeCounts[n.type] = (typeCounts[n.type]||0)+1);
+
+    tc.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-val">${nodeCount}</div><div class="stat-lbl">Nodes</div></div>
+        <div class="stat-card"><div class="stat-val">${edgeCount}</div><div class="stat-lbl">Edges</div></div>
+        <div class="stat-card"><div class="stat-val">${typeCount}</div><div class="stat-lbl">Types</div></div>
+        <div class="stat-card"><div class="stat-val">${density}</div><div class="stat-lbl">Density</div></div>
+      </div>
+      <input class="search-input" type="text" placeholder="Search nodes..." value="${searchQuery}" oninput="updateSearch(this.value)"/>
+      <div class="conn-label">Filter by Type</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">
+        ${Object.entries(typeCounts).map(([t,c]) =>
+          `<button class="filter-btn ${activeFilters.has(t)?'':'inactive'}" style="background:${TYPE_COLORS[t]}" onclick="toggleFilter('${t}')">${TYPE_LABELS[t]} (${c})</button>`
+        ).join('')}
+        ${activeFilters.size < Object.keys(typeCounts).length ? `<button class="filter-btn" style="background:#64748b" onclick="clearFilters()">Clear</button>` : ''}
+      </div>
+      <div class="conn-label">Most Connected</div>
+      <div class="top-connected">
+        ${topNodes.map(([id,deg]) => {
+          const n = DATA.nodes.find(x => x.id === id);
+          return `<div class="top-item" onclick="selectNodeById('${id}')"><span>${n?.name}</span><span style="color:#94a3b8">${deg}</span></div>`;
+        }).join('')}
+      </div>`;
+  } else if (activeTab === 'ai') {
+    const prompts = [
+      "What are the key relationships in this knowledge graph?",
+      "Which entities are most connected?",
+      "How do contexts relate to values?",
+      "Explain the context-effect relationships",
+      "What patterns emerge from the graph structure?"
+    ];
+    tc.innerHTML = `
+      <div class="conn-label" style="margin-bottom:10px">Ask about this graph</div>
+      ${prompts.map(p => `
+        <div class="ai-prompt-card" onclick="showAIResponse(this, '${p.replace(/'/g,"\\'")}')">${p}</div>
+      `).join('')}
+      <div id="aiResponseArea"></div>`;
+  }
+}
+
+function showAIResponse(el, question) {
+  const area = document.getElementById('aiResponseArea');
+  area.innerHTML = `
+    <div class="ai-response">
+      💬 Copy this question to the chat conversation for an answer based on the full assessment context.
+      <br><br><em>"${question}"</em>
+      <br><button class="copy-q-btn" onclick="copyQuestion('${question.replace(/'/g,"\\'")}')">📋 Copy to clipboard</button>
+    </div>`;
+}
+
+function copyQuestion(q) {
+  try { navigator.clipboard.writeText(q); } catch(e) { /* sandbox */ }
+}
+
+window.selectNodeById = function(id) {
+  const node = DATA.nodes.find(n => n.id === id);
+  if (node) selectNode(node);
+};
+window.updateSearch = function(val) { searchQuery = val; };
+window.toggleFilter = function(type) {
+  if (activeFilters.has(type)) activeFilters.delete(type); else activeFilters.add(type);
+  renderTab();
+  renderGraph();
+};
+window.clearFilters = function() {
+  activeFilters = new Set(Object.keys(TYPE_COLORS));
+  renderTab();
+  renderGraph();
+};
+window.showAIResponse = showAIResponse;
+window.copyQuestion = copyQuestion;
+
+// D3 Graph
+let simulation;
+function renderGraph() {
+  const container = document.getElementById('graphArea');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  const svg = d3.select('#graphSvg').attr('width', width).attr('height', height);
+  svg.selectAll('*').remove();
+
+  const visibleNodes = DATA.nodes.filter(n => activeFilters.has(n.type));
+  const visibleIds = new Set(visibleNodes.map(n => n.id));
+  const links = DATA.edges
+    .filter(e => visibleIds.has(e.from) && visibleIds.has(e.to))
+    .map(e => ({source: e.from, target: e.to, label: e.label}));
+  const nodes = visibleNodes.map(d => ({...d}));
+
+  const defs = svg.append('defs');
+  defs.append('marker')
+    .attr('id','arrowhead').attr('viewBox','0 -5 10 10')
+    .attr('refX',22).attr('refY',0)
+    .attr('markerWidth',6).attr('markerHeight',6)
+    .attr('orient','auto')
+    .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#94a3b8');
+
+  const g = svg.append('g');
+  const zoom = d3.zoom().scaleExtent([0.3,3]).on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoom);
+  svg.on('click', (e) => { if (e.target === svg.node()) { selectNode(null); } });
+
+  simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(140))
+    .force('charge', d3.forceManyBody().strength(-380))
+    .force('center', d3.forceCenter(width/2, height/2))
+    .force('collision', d3.forceCollide().radius(d => NODE_RADIUS(d) + 8));
+
+  function arcPath(d) {
+    const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+    const dr = Math.sqrt(dx*dx + dy*dy) * 1.2;
+    return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+  }
+
+  const edgePaths = g.selectAll('.edge-path')
+    .data(links).enter().append('path')
+    .attr('class','edge-path')
+    .attr('fill','none').attr('stroke','#cbd5e1').attr('stroke-width',1.2)
+    .attr('stroke-opacity',0.35).attr('marker-end','url(#arrowhead)');
+
+  const edgeLabels = g.selectAll('.edge-label')
+    .data(links).enter().append('text')
+    .attr('class','edge-label')
+    .attr('text-anchor','middle').attr('font-size','9px').attr('fill','#94a3b8')
+    .attr('opacity',0.7).text(d => d.label);
+
+  const nodeGroups = g.selectAll('.node-group')
+    .data(nodes).enter().append('g')
+    .attr('class','node-group').attr('cursor','pointer')
+    .call(d3.drag()
+      .on('start', (e,d) => { if(!e.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag', (e,d) => { d.fx=e.x; d.fy=e.y; })
+      .on('end', (e,d) => { if(!e.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; })
+    );
+
+  nodeGroups.append('circle')
+    .attr('r', d => NODE_RADIUS(d))
+    .attr('fill', d => TYPE_COLORS[d.type] || '#78909C')
+    .attr('stroke','#fff').attr('stroke-width',2)
+    .on('mouseover', function(e,d) {
+      d3.select(this).transition().duration(120).attr('r', NODE_RADIUS(d)+4).attr('stroke-width',3);
+    })
+    .on('mouseout', function(e,d) {
+      d3.select(this).transition().duration(120).attr('r', NODE_RADIUS(d)).attr('stroke-width',2);
+    })
+    .on('click', (e,d) => { e.stopPropagation(); selectNode(d); });
+
+  nodeGroups.append('text')
+    .attr('dy', d => NODE_RADIUS(d) + 14)
+    .attr('text-anchor','middle').attr('font-size','10px').attr('fill','#475569')
+    .attr('font-weight','500')
+    .text(d => d.name.length > 20 ? d.name.slice(0,18)+'…' : d.name)
+    .style('text-shadow','0 0 4px #f8fafc, 0 0 4px #f8fafc');
+
+  simulation.on('tick', () => {
+    edgePaths.attr('d', arcPath);
+    edgeLabels
+      .attr('x', d => (d.source.x + d.target.x)/2)
+      .attr('y', d => {
+        const mx = (d.source.x+d.target.x)/2, my = (d.source.y+d.target.y)/2;
+        const dx = d.target.x-d.source.x, dy = d.target.y-d.source.y;
+        const len = Math.sqrt(dx*dx+dy*dy) || 1;
+        return my - (dx/len)*15;
+      });
+    nodeGroups.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+}
+
+buildLegend();
+renderTab();
+renderGraph();
+window.addEventListener('resize', () => renderGraph());
+</script>
+</body>
+</html>

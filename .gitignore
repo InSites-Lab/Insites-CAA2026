@@ -7,6 +7,20 @@ content-dev/
 promptsEngineering/
 sakem-li/
 /docs/
+
+# === Sites data — keep only caa26-workshop-sitesData tracked ===
+InSites-Brain/sites-data/misc-sites-data/
+InSites-Brain/sites-data/*.pdf
+InSites-Brain/sites-data/*.txt
+InSites-Brain/sites-data/*.js
+InSites-Brain/sites-data/*.json
+InSites-Brain/sites-data/EAC/
+InSites-Brain/sites-data/Samples*/
+InSites-Brain/sites-data/TabghaSample/
+InSites-Brain/sites-data/dolmens-tuba/
+InSites-Brain/sites-data/wokshop-shared-assessments/
+InSites-Brain/sites-data/mills-*
+InSites-Brain/sites-data/chaco-*
 InSites Budget.md
 .vscode/
 *.code-workspace

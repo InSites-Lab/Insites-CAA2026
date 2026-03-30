@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaco Culture NHP — CBSA Assessment Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#f8fafc;color:#1e293b;font-size:14px;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.header{background:#1e293b;color:#f8fafc;padding:24px 28px;border-radius:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.header h1{font-size:20px;font-weight:700;margin-bottom:4px}
+.header-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#94a3b8}
+.header-meta .badge{background:#2563eb;color:#fff;padding:2px 8px;border-radius:10px;font-weight:600}
+.tab-bar{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:0;background:#e2e8f0;border-radius:10px 10px 0 0;padding:4px 4px 0}
+.tab-btn{padding:8px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#64748b;border-radius:8px 8px 0 0;transition:all .15s;font-family:inherit;white-space:nowrap}
+.tab-btn.active{color:#1e293b;background:#fff;font-weight:600;box-shadow:0 -2px 6px rgba(0,0,0,.04)}
+.tab-btn:hover{color:#1e293b}
+.tab-panel{display:none;background:#fff;border-radius:0 0 12px 12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tab-panel.active{display:block}
+.guide{background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:20px;cursor:pointer;font-size:12px}
+.guide-title{font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.guide-body{margin-top:8px;color:#92400e;display:block}
+.guide.collapsed .guide-body{display:none}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px}
+.card-title{font-weight:600;font-size:14px;margin-bottom:8px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center}
+.kpi-val{font-size:24px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace}
+.kpi-lbl{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:500;margin:2px;cursor:pointer}
+.pill-blue{background:#dbeafe;color:#2563eb}
+.pill-green{background:#dcfce7;color:#16a34a}
+.pill-amber{background:#fef3c7;color:#b45309}
+.pill-red{background:#fee2e2;color:#dc2626}
+.pill-slate{background:#f1f5f9;color:#475569}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+th{background:#f8fafc;text-align:left;padding:10px 12px;border-bottom:2px solid #e2e8f0;font-weight:600;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.3px}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.rating-high{color:#16a34a;font-weight:600}
+.rating-med{color:#d97706;font-weight:600}
+.rating-low{color:#dc2626;font-weight:600}
+.sig-block{background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:12px;padding:24px;font-size:14px;line-height:1.8}
+.sig-block p{margin-bottom:12px}
+.highlight-banner{background:#eff6ff;border:1px solid #93c5fd;padding:8px 14px;border-radius:8px;margin-bottom:16px;display:none;font-size:12px;justify-content:space-between;align-items:center}
+.highlight-banner.visible{display:flex}
+.back-pill{display:none;background:#2563eb;color:#fff;padding:4px 12px;border-radius:12px;font-size:11px;cursor:pointer;margin-bottom:12px;border:none;font-family:inherit}
+.back-pill.visible{display:inline-block}
+#mapContainer{height:440px;border-radius:10px;border:1px solid #e2e8f0;z-index:1}
+.timeline-event{display:flex;align-items:flex-start;margin-bottom:16px;gap:12px}
+.timeline-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.timeline-year{font-family:'JetBrains Mono',monospace;font-size:12px;color:#64748b;min-width:100px;flex-shrink:0}
+.timeline-label{font-size:13px;flex:1}
+.change-use{background:#3b82f6}.change-structure{background:#8b5cf6}.change-setting{background:#f59e0b}.change-infrastructure{background:#10b981}
+.vuln-cell{width:28px;height:28px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.vuln-3{background:#ef4444}.vuln-2{background:#f59e0b}.vuln-1{background:#e2e8f0;color:#94a3b8}
+.nara-card{border-left:4px solid;padding:14px 16px;margin-bottom:10px;border-radius:0 10px 10px 0;background:#fff;border-color:#e2e8f0}
+.nara-card.high{border-color:#16a34a}.nara-card.medium{border-color:#d97706}.nara-card.low{border-color:#dc2626}
+.ai-prompt{padding:10px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:6px;transition:all .12s}
+.ai-prompt:hover{border-color:#2563eb;background:#eff6ff}
+.ai-resp{padding:12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;font-size:13px;margin-top:8px}
+.copy-btn-small{background:#2563eb;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;margin-top:6px;font-family:inherit}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media print{.tab-bar,.header{display:none!important}.tab-panel{display:block!important;box-shadow:none;border:none}body{font-size:11pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="header">
+  <div>
+    <h1>Chaco Culture National Historical Park</h1>
+    <div class="header-meta">
+      <span>📍 San Juan Basin, NW New Mexico</span>
+      <span>🏛 Archaeological Landscape</span>
+      <span>📅 A.D. 400–1300</span>
+      <span>🌐 UNESCO WHS 1987</span>
+      <span>📊 Stages: <span class="badge">0–6 Complete</span></span>
+    </div>
+  </div>
+  <div style="font-size:11px;color:#94a3b8;text-align:right">
+    Source: Getty Conservation Institute (2005)<br>
+    CBSA Assessment · March 30, 2026
+  </div>
+</div>
+
+<div class="highlight-banner" id="highlightBanner">
+  <span id="highlightText"></span>
+  <button onclick="clearHighlight()" style="background:none;border:none;cursor:pointer;color:#2563eb;font-size:12px">✕ Clear</button>
+</div>
+<button class="back-pill" id="backPill" onclick="goBack()"></button>
+
+<div class="tab-bar" id="tabBar"></div>
+<div id="tabPanels"></div>
+</div>
+
+<script>
+const isSandbox = window.location.href === 'about:srcdoc';
+let activeTabId = 'overview';
+let previousTab = null;
+let highlight = null;
+
+const ASSET = {
+  name:"Chaco Culture National Historical Park",
+  location:"San Juan Basin, NW New Mexico, USA",
+  type:"Archaeological Landscape",
+  period:"A.D. 400–1300 (ancestral Puebloan)",
+  description:"Monumental great house complex and regional network center of the Chaco Phenomenon.",
+  coordinates:{lat:36.06,lng:-107.96},
+  coordinateSource:"inferred"
+};
+
+const TABS = [
+  {id:'overview',label:'Overview'},
+  {id:'map',label:'Map'},
+  {id:'timeline',label:'Timeline'},
+  {id:'contexts_values',label:'Contexts & Values'},
+  {id:'integrity',label:'Integrity'},
+  {id:'comparative',label:'Comparative'},
+  {id:'significance',label:'Significance'},
+  {id:'report',label:'Report'},
+  {id:'ai',label:'AI Query'}
+];
+
+const TIMELINE = [
+  {year:"8000 BP",yearStart:-6000,label:"Paleo-Indian habitation of San Juan Basin",changeType:"use"},
+  {year:"A.D. 400–500",yearStart:400,label:"First permanent settlement; agriculture; pit houses",changeType:"structure"},
+  {year:"A.D. 700",yearStart:700,label:"Chaco Phenomenon begins — great house construction",changeType:"structure"},
+  {year:"A.D. 1130",yearStart:1130,label:"New construction ceases",changeType:"use"},
+  {year:"A.D. 1300",yearStart:1300,label:"Population emigrates; canyon abandoned (archaeologically)",changeType:"use"},
+  {year:"1250–present",yearStart:1250,label:"Hopi/Pueblo pilgrimage to ancestral homeland",changeType:"use"},
+  {year:"1896–1901",yearStart:1896,label:"Hyde Expedition excavates Pueblo Bonito",changeType:"structure"},
+  {year:"1906",yearStart:1906,label:"Antiquities Act enacted — catalyzed by Chaco controversies",changeType:"setting"},
+  {year:"1907",yearStart:1907,label:"National Monument designation (Proclamation 740)",changeType:"setting"},
+  {year:"1937",yearStart:1937,label:"CCC Navajo stonemasons begin stabilization work",changeType:"structure"},
+  {year:"1941",yearStart:1941,label:"Threatening Rock collapses onto Pueblo Bonito (~30 rooms)",changeType:"structure"},
+  {year:"1947",yearStart:1947,label:"Last Navajo resident displaced; boundary fences erected",changeType:"use"},
+  {year:"1980",yearStart:1980,label:"Redesignated as National Historical Park; 33 outliers protected",changeType:"setting"},
+  {year:"1987",yearStart:1987,label:"UNESCO World Heritage Site inscription [C(iii)]",changeType:"setting"},
+  {year:"1996",yearStart:1996,label:"Casa Rinconada closed at tribal request",changeType:"use"}
+];
+
+const CONTEXTS = [
+  {id:'ctx_hist',type:'Historical',icon:'🏛',label:'From Regional Center to Antiquities Catalyst',desc:'Chaco\'s excavation controversies directly catalyzed the 1906 Antiquities Act. The site is both subject and origin of American heritage protection.',relatedValues:['Historical','Scientific'],timespan:'A.D. 700–present'},
+  {id:'ctx_env',type:'Environmental',icon:'🌿',label:'Arid Landscape as Agent',desc:'Semiarid climate (21.6 cm rain) both preserved and actively degrades masonry through freeze-thaw. Chacoan water systems are evidence of this same constraint.',relatedValues:['Technological','Scientific'],timespan:'Continuous'},
+  {id:'ctx_pol',type:'Political',icon:'⚔️',label:'Contested Sovereignty',desc:'Federal, tribal (Navajo, Hopi, Pueblo), state, and private interests overlap. Surface/subsurface rights divisions complicate governance across 39 outlier sites.',relatedValues:['Social','Historical'],timespan:'1907–present'},
+  {id:'ctx_soc',type:'Social',icon:'👥',label:'Living Heritage and Contested Narratives',desc:'Multiple tribal groups maintain active cultural connections. Interpretive conflict between archaeological "abandonment" and Indigenous "continuous use."',relatedValues:['Social','Symbolic'],timespan:'1250–present'},
+  {id:'ctx_sci',type:'Scientific',icon:'🔬',label:'Excavation as Knowledge and Loss',desc:'A century of excavation built understanding while removing irreplaceable material. The Chaco Center Project (1971–86) transformed interpretation at landscape scale.',relatedValues:['Scientific','Historical'],timespan:'1896–present'}
+];
+
+const VALUES = [
+  {id:'v_hist',name:'Heritage Law Catalyst',category:'Historical',evidence:'sourced',summary:'The site\'s excavation controversies directly triggered the 1906 Antiquities Act — first U.S. heritage law.'},
+  {id:'v_sci',name:'Century-Deep Archaeological Archive',category:'Scientific',evidence:'sourced',summary:'Six major campaigns, 1000+ sites identified, regional road system discovered through remote sensing.'},
+  {id:'v_soc',name:'Contested Belonging Across Living Cultures',category:'Social',evidence:'inferred',summary:'Hopi/Pueblo pilgrimage since 13th c.; Navajo habitation for 400 years; ongoing narrative conflict.'},
+  {id:'v_tech',name:'Monumental Engineering in Extreme Environment',category:'Technological',evidence:'sourced',summary:'Great houses, road systems (64+ km), water control, astronomical alignments — unique in the Americas.'},
+  {id:'v_sym',name:'Ancestral Homeland as Spiritual Geography',category:'Symbolic',evidence:'uncertain',summary:'Fajada Butte and Casa Rinconada closures are management expressions of recognized spiritual significance.'}
+];
+
+const ATTR_TABLE = [
+  {attribute:'Great house masonry fabric',values:['Historical','Technological','Scientific'],significance:'Physical record of unique Puebloan construction',implication:'Loss → irreplaceable material record destroyed'},
+  {attribute:'Road alignments and outlier network',values:['Technological','Scientific','Historical'],significance:'Landscape-scale evidence of regional system',implication:'Fragmentation → only evidence for Chaco regional system lost'},
+  {attribute:'Water control systems',values:['Technological','Scientific'],significance:'Engineered response to extreme aridity',implication:'Erosion → loss of environmental adaptation evidence'},
+  {attribute:'Astronomical markers',values:['Technological','Symbolic'],significance:'Solar/lunar knowledge in petroglyphs and architecture',implication:'Visitor damage → calendric knowledge system lost'},
+  {attribute:'Unexcavated deposits',values:['Scientific'],significance:'Archive-in-waiting for future methods',implication:'Excavation/looting → irreversible loss of research potential'},
+  {attribute:'Pilgrimage continuity',values:['Social','Symbolic'],significance:'Living ancestral connection since 13th c.',implication:'Unrestricted access → rupture of living heritage practice'},
+  {attribute:'Canyon landscape setting',values:['All'],significance:'Visual/spatial frame for all features',implication:'Energy extraction → erosion of setting integrity'},
+  {attribute:'Excavation archive',values:['Scientific','Historical'],significance:'Century-deep methodological record',implication:'Archive dispersal → inability to reinterpret past findings'}
+];
+
+const NARA_GRID = [
+  {aspect:'Form & Design',description:'Great house plans legible; room counts, kiva layouts, roads mapped',valueExpression:'Historical, Technological',rating:'high'},
+  {aspect:'Materials & Substance',description:'Masonry exposed to freeze-thaw since excavation; CCC/Vivian repair materials introduced; Threatening Rock destroyed ~30 rooms',valueExpression:'Technological, Scientific',rating:'medium'},
+  {aspect:'Use & Function',description:'Original Puebloan use ceased A.D. 1300; Navajo displaced 1930s–1947; current: NPS park + restricted tribal pilgrimage',valueExpression:'Social, Symbolic',rating:'medium'},
+  {aspect:'Location & Setting',description:'Canyon landscape largely intact; energy extraction threatens surrounding basin; in-holdings persist',valueExpression:'All values',rating:'high'},
+  {aspect:'Spirit & Feeling',description:'Remote desert isolation preserved; night sky intact; sacred sites closed (Fajada Butte, Casa Rinconada)',valueExpression:'Symbolic, Social',rating:'high'},
+  {aspect:'Documentary / Archival',description:'Six campaigns with varying rigor; collections dispersed (AMNH, Smithsonian, UNM); 1987 survey unavailable',valueExpression:'Scientific, Historical',rating:'medium'}
+];
+
+const COMPARATORS = [
+  {name:'Mesa Verde National Park',period:'A.D. 600–1300',distinction:'Cliff dwellings represent different settlement strategy (alcoves vs. open ground). No equivalent regional road-and-outlier network.',criteria:{rarity:'high',documentation:'high',condition:'high'},coordinates:{lat:37.18,lng:-108.49}},
+  {name:'Aztec Ruins National Monument',period:'A.D. 1100–1300',distinction:'Chacoan outlier great house included in WH inscription. Satellite — significance partly derivative of Chaco center.',criteria:{rarity:'moderate',documentation:'high',condition:'high'},coordinates:{lat:36.84,lng:-107.99}},
+  {name:'Chacoan Outlier Sites',period:'A.D. 700–1300',distinction:'39 protected sites demonstrate geographic reach but individually smaller. The canyon is the nexus they reference.',criteria:{rarity:'moderate',documentation:'moderate',condition:'variable'},coordinates:null}
+];
+
+const VULNERABILITY = [
+  {value:'Historical',form:3,material:2,use:1,setting:2,spirit:1,documentary:2},
+  {value:'Scientific',form:3,material:3,use:1,setting:1,spirit:1,documentary:3},
+  {value:'Social',form:1,material:1,use:3,setting:2,spirit:3,documentary:1},
+  {value:'Technological',form:3,material:3,use:1,setting:1,spirit:1,documentary:2},
+  {value:'Symbolic',form:1,material:1,use:2,setting:2,spirit:3,documentary:1}
+];
+
+const SIGNIFICANCE_TEXT = `Chaco's defining condition is a paradox of knowledge through loss. A century of excavation — from treasure hunting (1896) through systematic interdisciplinary fieldwork (1971–86) — simultaneously built our understanding of the ancestral Puebloan world and irreversibly diminished the physical archive that carries it. The 1941 collapse of Threatening Rock destroyed thirty rooms at Pueblo Bonito that had been painstakingly excavated two decades earlier, compounding the loss. Yet this same excavation history is constitutive of Chaco's scientific and historical value: the Chaco Center Project's use of remote sensing to identify the regional road system fundamentally transformed interpretation, demonstrating that research potential grows with methodological innovation even as material deposits shrink.
+
+What this archive records is a monumental engineering achievement without parallel in the pre-Columbian Americas. The canyon's great houses — masonry structures with hundreds of rooms and dozens of kivas, built on open ground — form the nexus of a regional system linking over 150 outlying sites through engineered roads spanning more than 64 kilometers, water management infrastructure adapted to extreme aridity, astronomical knowledge embedded in petroglyphs and architectural alignments, and trade networks reaching Mesoamerica and the Pacific Coast.
+
+Beyond archaeology, Chaco sustains living heritage connections that resist any framing of the site as "abandoned." Hopi and Pueblo communities maintain pilgrimage practices since the 13th-century emigration; the NPS closure of Fajada Butte (1982) and Casa Rinconada (1996) at tribal request are governance expressions of recognized spiritual value. Most distinctively, Chaco holds a reflexive relationship to American heritage protection itself: the excavation controversies at this site directly catalyzed the 1906 Antiquities Act.`;
+
+// Build tabs
+const tabBar = document.getElementById('tabBar');
+const tabPanels = document.getElementById('tabPanels');
+TABS.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (t.id===activeTabId?' active':'');
+  btn.textContent = t.label;
+  btn.onclick = () => switchTab(t.id);
+  tabBar.appendChild(btn);
+  const panel = document.createElement('div');
+  panel.className = 'tab-panel' + (t.id===activeTabId?' active':'');
+  panel.id = 'panel-'+t.id;
+  tabPanels.appendChild(panel);
+});
+
+function switchTab(id, fromCrossRef) {
+  if (fromCrossRef) previousTab = activeTabId;
+  activeTabId = id;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', TABS[i].id===id));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='panel-'+id));
+  const bp = document.getElementById('backPill');
+  if (fromCrossRef && previousTab) {
+    bp.textContent = '← Back to ' + TABS.find(t=>t.id===previousTab)?.label;
+    bp.classList.add('visible');
+  } else { bp.classList.remove('visible'); previousTab=null; }
+  try { history.pushState(null,null,'#'+id); } catch(e){}
+  renderPanel(id);
+}
+function goBack() { if(previousTab){switchTab(previousTab);previousTab=null;document.getElementById('backPill').classList.remove('visible');} }
+function clearHighlight() { highlight=null; document.getElementById('highlightBanner').classList.remove('visible'); renderPanel(activeTabId); }
+
+function renderPanel(id) {
+  const panel = document.getElementById('panel-'+id);
+  if (id==='overview') renderOverview(panel);
+  else if (id==='map') renderMap(panel);
+  else if (id==='timeline') renderTimeline(panel);
+  else if (id==='contexts_values') renderContextsValues(panel);
+  else if (id==='integrity') renderIntegrity(panel);
+  else if (id==='comparative') renderComparative(panel);
+  else if (id==='significance') renderSignificance(panel);
+  else if (id==='report') renderReport(panel);
+  else if (id==='ai') renderAI(panel);
+}
+
+function guide(title,body) {
+  return `<div class="guide" onclick="this.classList.toggle('collapsed')"><div class="guide-title"><span>ℹ️ ${title}</span><span>▾</span></div><div class="guide-body">${body}</div></div>`;
+}
+
+const ratingBadge = r => r==='high'?'<span class="pill pill-green">🟢 High</span>':r==='medium'?'<span class="pill pill-amber">🟡 Medium</span>':'<span class="pill pill-red">🔴 Low</span>';
+const critBadge = r => r==='high'?'<span class="pill pill-green">High</span>':r==='moderate'?'<span class="pill pill-amber">Moderate</span>':'<span class="pill pill-slate">'+r+'</span>';
+
+function renderOverview(el) {
+  el.innerHTML = guide('Overview','KPIs summarize scope. Integrity range shows condition at a glance. Gaps flag what\'s missing.') + `
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-lbl">Values</div></div>
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-lbl">Contexts</div></div>
+    <div class="kpi"><div class="kpi-val">3/5</div><div class="kpi-lbl">Sourced Evidence</div></div>
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-lbl">Data Gaps</div></div>
+  </div>
+  <div class="card"><div class="card-title">Asset Description</div><p>${ASSET.description} Located in ${ASSET.location}. Period: ${ASSET.period}.</p></div>
+  <div class="card"><div class="card-title">Integrity Range</div>
+    ${NARA_GRID.map(n => `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9"><span style="font-size:13px">${n.aspect}</span>${ratingBadge(n.rating)}</div>`).join('')}
+  </div>
+  <div class="card"><div class="card-title">Data Gaps</div>
+    <ul style="padding-left:18px;font-size:13px;color:#64748b">
+      <li>Missing pp. 69–97 (values analysis core)</li><li>No condition survey data</li><li>No photographs/plans uploaded</li>
+      <li>1987 unpublished survey unavailable</li><li>No Native American consultation records</li>
+    </ul>
+  </div>
+  <div class="card"><div class="card-title">Process Summary</div>
+    <p style="font-size:13px"><strong>Strengths:</strong> Reflexive significance relationship identified; integrity paradox provides precise conservation frame.</p>
+    <p style="font-size:13px;margin-top:8px"><strong>Reliability:</strong> Tier 3 source; core values section missing. Revisit with primary records.</p>
+    <p style="font-size:13px;margin-top:8px"><strong>Source:</strong> Getty Conservation Institute case study (de la Torre et al. 2005)</p>
+  </div>`;
+}
+
+let mapInit = false;
+function renderMap(el) {
+  if (mapInit) return;
+  el.innerHTML = guide('Map','Asset and comparator locations. Click markers for details.') +
+    '<div id="mapContainer"></div><p style="font-size:11px;color:#94a3b8;margin-top:8px">📍 Coordinates: inferred from place names</p>';
+  setTimeout(() => {
+    if (typeof L === 'undefined') { el.innerHTML += '<p>Leaflet not loaded.</p>'; return; }
+    const map = L.map('mapContainer').setView([ASSET.coordinates.lat, ASSET.coordinates.lng], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+    L.circleMarker([ASSET.coordinates.lat,ASSET.coordinates.lng],{radius:10,fillColor:'#2563eb',color:'#fff',weight:2,fillOpacity:0.9})
+      .bindPopup(`<strong>${ASSET.name}</strong><br>${ASSET.type}<br>${ASSET.period}<br>UNESCO WHS 1987`)
+      .addTo(map);
+    COMPARATORS.forEach(c => {
+      if (c.coordinates) {
+        L.circleMarker([c.coordinates.lat,c.coordinates.lng],{radius:7,fillColor:'#94a3b8',color:'#fff',weight:1,fillOpacity:0.8})
+          .bindPopup(`<strong>${c.name}</strong><br>${c.period}<br>${c.distinction.slice(0,80)}...`)
+          .addTo(map);
+      }
+    });
+    document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();map.closePopup();}});
+    const bounds = [[ASSET.coordinates.lat,ASSET.coordinates.lng]];
+    COMPARATORS.forEach(c => { if(c.coordinates) bounds.push([c.coordinates.lat,c.coordinates.lng]); });
+    if (bounds.length > 1) map.fitBounds(bounds, {padding:[40,40]});
+    mapInit = true;
+  }, 100);
+}
+
+function renderTimeline(el) {
+  const changeColors = {use:'change-use',structure:'change-structure',setting:'change-setting',infrastructure:'change-infrastructure'};
+  el.innerHTML = guide('Timeline','Events spaced chronologically. Color = type of change. Look for clusters of rapid change.') +
+    '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;font-size:11px">' +
+    ['use','structure','setting','infrastructure'].map(t => `<span style="display:flex;align-items:center;gap:4px"><span class="timeline-dot ${changeColors[t]}" style="width:10px;height:10px"></span>${t}</span>`).join('') + '</div>' +
+    TIMELINE.map(t => `<div class="timeline-event"><span class="timeline-dot ${changeColors[t.changeType]||'change-use'}"></span><span class="timeline-year">${t.year}</span><span class="timeline-label">${t.label}</span></div>`).join('');
+}
+
+function renderContextsValues(el) {
+  el.innerHTML = guide('Contexts & Values','Click a context to see related values. Evidence markers (〰️/💭) show traceability. Attribute table below.') +
+    '<h3 style="font-size:14px;margin-bottom:12px">Contexts</h3>' +
+    CONTEXTS.map(c => `<div class="card" style="cursor:pointer" onclick="highlightValues('${c.id}','${c.relatedValues.join(',')}')">
+      <div class="card-title">${c.icon} ${c.type} — ${c.label}</div>
+      <p style="font-size:13px;color:#475569">${c.desc}</p>
+      <div style="margin-top:8px">${c.relatedValues.map(v => `<span class="pill pill-blue">${v}</span>`).join('')}</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:4px">Timespan: ${c.timespan}</div>
+    </div>`).join('') +
+    '<h3 style="font-size:14px;margin:20px 0 12px">Values</h3>' +
+    VALUES.map(v => {
+      const evMark = v.evidence==='sourced'?'':'('+v.evidence==='inferred'?'〰️':'💭'+')';
+      const hl = highlight && highlight.type==='value' && highlight.id===v.id ? 'border:2px solid #2563eb;' : '';
+      return `<div class="card" id="val-${v.id}" style="${hl}">
+        <div class="card-title">${v.category} — "${v.name}" ${v.evidence==='inferred'?'〰️':v.evidence==='uncertain'?'💭':''}</div>
+        <p style="font-size:13px;color:#475569">${v.summary}</p>
+        <span class="pill pill-slate">${v.evidence}</span>
+      </div>`;
+    }).join('') +
+    '<h3 style="font-size:14px;margin:20px 0 12px">Attribute-Value-Implication Table</h3>' +
+    '<table><tr><th>Attribute</th><th>Values</th><th>Significance</th><th>🔑 Implication</th></tr>' +
+    ATTR_TABLE.map(a => `<tr><td>${a.attribute}</td><td>${a.values.map(v=>`<span class="pill pill-blue">${v}</span>`).join('')}</td><td>${a.significance}</td><td style="color:#dc2626;font-size:12px">${a.implication}</td></tr>`).join('') +
+    '</table>';
+}
+window.highlightValues = function(ctxId, vals) {
+  const valArr = vals.split(',');
+  VALUES.forEach(v => {
+    const el = document.getElementById('val-'+v.id);
+    if (el) el.style.border = valArr.includes(v.category) ? '2px solid #2563eb' : '';
+  });
+};
+
+function renderIntegrity(el) {
+  const naraAspects = ['Form & Design','Materials & Substance','Use & Function','Location & Setting','Spirit & Feeling','Documentary / Archival'];
+  el.innerHTML = guide('Integrity','Left border color = integrity rating. Green = high, amber = medium. Vulnerability matrix below.') +
+    '<p style="font-size:13px;color:#475569;margin-bottom:16px"><strong>Core pattern:</strong> Excavation simultaneously built Chaco\'s scientific value and reduced its material integrity — a temporal paradox where the knowledge source is also the primary agent of loss.</p>' +
+    NARA_GRID.map(n => `<div class="nara-card ${n.rating}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><strong>${n.aspect}</strong>${ratingBadge(n.rating)}</div>
+      <div style="font-size:12px;color:#475569;margin-bottom:4px">${n.description}</div>
+      <div>${n.valueExpression.split(', ').map(v=>`<span class="pill pill-blue">${v}</span>`).join('')}</div>
+    </div>`).join('') +
+    '<h3 style="font-size:14px;margin:20px 0 12px">🔴 Vulnerability Analysis</h3>' +
+    '<p style="font-size:12px;color:#475569;margin-bottom:12px">Red = loss of this integrity aspect severely damages this value. Amber = moderate. Grey = minor.</p>' +
+    '<table><tr><th>Value</th>' + naraAspects.map(a=>`<th style="font-size:10px;writing-mode:vertical-lr;transform:rotate(180deg);height:80px">${a}</th>`).join('') + '</tr>' +
+    VULNERABILITY.map(v => `<tr><td style="font-weight:600">${v.value}</td>
+      <td><span class="vuln-cell vuln-${v.form}">${v.form}</span></td>
+      <td><span class="vuln-cell vuln-${v.material}">${v.material}</span></td>
+      <td><span class="vuln-cell vuln-${v.use}">${v.use}</span></td>
+      <td><span class="vuln-cell vuln-${v.setting}">${v.setting}</span></td>
+      <td><span class="vuln-cell vuln-${v.spirit}">${v.spirit}</span></td>
+      <td><span class="vuln-cell vuln-${v.documentary}">${v.documentary}</span></td>
+    </tr>`).join('') + '</table>';
+}
+
+function renderComparative(el) {
+  el.innerHTML = guide('Comparative','Each site rated on rarity, documentation, condition. Colors match rating.') +
+    COMPARATORS.map(c => `<div class="card">
+      <div class="card-title">${c.name} <span style="font-weight:400;color:#64748b">(${c.period})</span></div>
+      <p style="font-size:13px;color:#475569;margin-bottom:8px">${c.distinction}</p>
+      <div>${Object.entries(c.criteria).map(([k,v])=>`<span>${k}: ${critBadge(v)}</span> `).join('')}</div>
+    </div>`).join('') +
+    '<div class="card"><div class="card-title">Comparison Summary</div><p style="font-size:13px;color:#475569">Chaco\'s distinctiveness: (1) monumental open-ground great house construction unique in the Americas; (2) landscape-scale infrastructure defining a regional system, not a settlement; (3) reflexive role in generating American heritage law. No comparator shares this combination.</p></div>';
+}
+
+function renderSignificance(el) {
+  el.innerHTML = guide('Significance','The synthesized statement from Stage 5.') +
+    '<div class="sig-block">' + SIGNIFICANCE_TEXT.split('\n\n').map(p => `<p>${p}</p>`).join('') + '</div>';
+}
+
+function renderReport(el) {
+  const sandboxNote = isSandbox ? '<p style="background:#fef3c7;padding:10px;border-radius:8px;font-size:12px;margin-bottom:16px">📥 Download this dashboard file to use Export HTML and Print/PDF features.</p>' : '<button onclick="try{window.print()}catch(e){}" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-bottom:16px;font-family:inherit">🖨️ Print / PDF</button>';
+  el.innerHTML = guide('Report','One-page assessment summary.') + sandboxNote + `
+  <div style="max-width:720px;margin:0 auto">
+    <div class="card"><div class="card-title">📋 Assessment Overview</div><p style="font-size:13px">Chaco Culture NHP is a UNESCO World Heritage archaeological landscape that served as the nexus of the ancestral Puebloan regional system (A.D. 700–1300). Its significance rests on a paradox: a century of excavation built understanding while diminishing the physical archive, and the site itself catalyzed the legal framework (1906 Antiquities Act) that now protects it.</p></div>
+    <div class="card"><div class="card-title">💎 Key Values</div>
+      ${VALUES.map(v => `<p style="font-size:13px;margin-bottom:4px"><strong>${v.category}</strong> — ${v.name} ${v.evidence==='inferred'?'〰️':v.evidence==='uncertain'?'💭':''}</p>`).join('')}
+    </div>
+    <div class="card"><div class="card-title">🏛️ Integrity Snapshot</div>
+      ${NARA_GRID.map(n => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span>${n.aspect}</span>${ratingBadge(n.rating)}</div>`).join('')}
+    </div>
+    <div class="card"><div class="card-title">✨ Significance Statement</div><p style="font-size:13px">${SIGNIFICANCE_TEXT.split('\n\n')[0]}</p></div>
+    <div class="card"><div class="card-title">📐 Process & Methodology</div><p style="font-size:13px">Stages 0–6 completed. Source: Tier 3 (Getty Conservation Institute case study). 5 values identified, 5 contexts analyzed, 3 comparators evaluated. Evidence notation: sourced (3), inferred 〰️ (1), uncertain 💭 (1).</p></div>
+    <div class="card"><div class="card-title">💬 Session Analytics</div><ul style="font-size:13px;padding-left:16px;color:#475569">
+      <li>6 user interventions across 7 stages</li><li>Dominant style: Editor</li><li>Key revision: significance statement restructured to lead with integrity paradox</li>
+      <li>Comparative section: user replaced comparator (Casa Grande → Chacoan outliers)</li><li>Trust profile: Selective — keep significance, rewrite comparative</li>
+    </ul></div>
+  </div>`;
+}
+
+function renderAI(el) {
+  const prompts = ["Summarize the significance of this asset","What are the main gaps in this assessment?","How do values connect to contexts?","What does the integrity assessment reveal?","How does this asset compare to its comparators?"];
+  el.innerHTML = guide('AI Query','Click a prompt or type your own question. Copy it to the chat for a full-context answer.') +
+    prompts.map(p => `<div class="ai-prompt" onclick="showAIResp(this,'${p}')">${p}</div>`).join('') +
+    '<div id="aiRespArea"></div>';
+}
+window.showAIResp = function(el, q) {
+  document.getElementById('aiRespArea').innerHTML = `<div class="ai-resp">💬 Copy this question to the chat conversation for an answer based on the full assessment context.<br><br><em>"${q}"</em><br><button class="copy-btn-small" onclick="try{navigator.clipboard.writeText('${q}')}catch(e){}">📋 Copy</button></div>`;
+};
+
+// Init
+renderPanel('overview');
+try {
+  const hash = window.location.hash.replace('#','');
+  if (hash && TABS.find(t=>t.id===hash)) switchTab(hash);
+} catch(e){}
+try { window.addEventListener('popstate', () => { const h=location.hash.replace('#',''); if(TABS.find(t=>t.id===h)) switchTab(h); }); } catch(e){}
+</script>
+</body>
+</html>

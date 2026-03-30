@@ -1295,6 +1295,16 @@ const App: React.FC = () => {
                           </p>
                         </div>
                       </button>
+
+                      {/* Examples */}
+                      <div className="pt-1">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">Examples</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          <a href="./chaco-kg.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-full transition-colors">KG: Chaco</a>
+                          <a href="./chaco-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-2.5 py-1 rounded-full transition-colors">Dashboard: Chaco</a>
+                          <a href="./mills-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2.5 py-1 rounded-full transition-colors">Collection: Mills</a>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
