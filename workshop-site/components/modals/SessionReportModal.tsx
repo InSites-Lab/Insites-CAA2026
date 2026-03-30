@@ -16,7 +16,7 @@ export const SessionReportModal: React.FC<SessionReportModalProps> = ({ isOpen, 
     >
       <div className="text-left space-y-6" dir="ltr">
         <p className="text-sm text-slate-600 leading-relaxed">
-          After completing the assessment (Stage 6), Atar.Bot collects structured reflections and generates
+          After completing the assessment (Stage 6), InSites-CAA collects structured reflections and generates
           a research-grade record of how you collaborated with AI. Trust measured, not asserted.
         </p>
 

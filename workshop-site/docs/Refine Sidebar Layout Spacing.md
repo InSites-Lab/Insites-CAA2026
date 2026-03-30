@@ -828,7 +828,7 @@ but we have 6 stages and the extras button - how could it be orizontal on mobile
 I've completed the mobile layout redesign.
 
 1.  **Horizontal Navigation**: I replaced the sidebar/drawer approach with a sticky horizontal scroll bar at the top of the screen (on mobile). This contains all 6 stages and the "Tools" button in a compact, swipeable row.
-2.  **Full Content Visibility**: By moving the navigation to a thin top bar, the main content area (including the "Atar.Bot" links) is now immediately visible without being pushed down.
+2.  **Full Content Visibility**: By moving the navigation to a thin top bar, the main content area (including the "InSites-CAA" links) is now immediately visible without being pushed down.
 3.  **Clean Up**: I removed the unused "Menu" button code and optimized the layout spacing.
 4.  **Styling**: Added a `hide-scrollbar` utility to keep the navigation bar looking clean while remaining scrollable.
 

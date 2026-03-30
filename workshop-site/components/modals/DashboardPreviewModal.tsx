@@ -19,7 +19,7 @@ export const DashboardPreviewModal: React.FC<DashboardPreviewModalProps> = ({ is
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
-              After completing Stage 6, Atar.Bot generates a 10-tab interactive dashboard that visualizes the entire
+              After completing Stage 6, InSites-CAA generates a 10-tab interactive dashboard that visualizes the entire
               assessment. Tabs cross-reference each other — clicking a context highlights related values, and vice versa.
             </p>
             <div className="flex flex-wrap gap-2 mt-2">

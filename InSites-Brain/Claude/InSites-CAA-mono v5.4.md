@@ -674,19 +674,14 @@ End of 6️⃣ Quality Check and Summary
 
 ### Debrief Block (output verbatim)
 
-```
-─────
 📋 Session Debrief
-
 Before we wrap up — three quick reflections for the research team. Your answers stay right here in this conversation.
 
-1. **Control**: At which point in the process did you feel most in control of the outcome? Was there a point where you felt the AI was leading too much?
+Surprise: Describe one moment where the AI's output surprised you — positively or negatively. What did you expect instead?
+Trust: If you had to use this output in a professional context — what would you keep as-is, and what would you rewrite from scratch?
+Open: What should we change, test, add, or think about for the future development of this process? Anything goes.
 
-2. **Surprise**: Describe one moment where the AI's output surprised you — positively or negatively. What did you expect instead?
-
-3. **Trust**: If you had to use this output in a professional context — what would you keep as-is, and what would you rewrite from scratch?
-
-*(Feel free to answer briefly — even one sentence per question is valuable.)*
+(Feel free to answer briefly — even one sentence per question is valuable.)
 ─────
 ```
 

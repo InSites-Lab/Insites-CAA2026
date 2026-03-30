@@ -50,7 +50,7 @@ export const WorkshopOpeningViewV3: React.FC<WorkshopOpeningViewV3Props> = ({ on
       <section className="max-w-2xl mx-auto w-full px-6 pt-6 pb-4">
         <img
           src="/poster.png"
-          alt="Atar.Bot — CBSA Workshop Poster"
+          alt="InSites-CAA — CBSA Workshop Poster"
           className="w-full rounded-2xl border border-slate-200 shadow-sm"
         />
         <p className="text-center text-base text-slate-500 italic mt-3">

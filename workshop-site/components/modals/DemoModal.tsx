@@ -15,7 +15,7 @@ export const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
       title={
         <div className="flex items-center gap-2">
           <Eye size={20} className="text-indigo-600" />
-          <span className="mr-1">Visual Analysis in Atar.Bot: The Writing Invention & AI Image</span>
+          <span className="mr-1">Visual Analysis in InSites-CAA: The Writing Invention & AI Image</span>
         </div>
       }
       maxWidth="max-w-7xl"
@@ -46,7 +46,7 @@ export const DemoModal: React.FC<DemoModalProps> = ({ isOpen, onClose }) => {
         <div className="lg:col-span-7 space-y-6 order-2 lg:order-1 flex flex-col h-full text-left">
           <div className="space-y-4">
             <p className="text-sm text-slate-600 leading-relaxed font-medium border-l-4 border-indigo-500 pl-4">
-              Below are the results of the structural analysis performed by Atar.Bot on the visual image, using CBSA methodology for identifying values and contexts.
+              Below are the results of the structural analysis performed by InSites-CAA on the visual image, using CBSA methodology for identifying values and contexts.
             </p>
           </div>
           <div className="flex flex-col gap-3">

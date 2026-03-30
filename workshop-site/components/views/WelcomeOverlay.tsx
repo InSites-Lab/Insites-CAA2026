@@ -29,7 +29,7 @@ export const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ isOpen, onClose,
           </div>
           <div>
             <h2 className="font-black text-base text-slate-600 leading-tight">
-              Resource Center — Atar.Bot Workshop — Cultural Significance Assessment with AI            </h2>
+              Resource Center — InSites-CAA Workshop — Cultural Significance Assessment with AI            </h2>
             <p className="text-sm text-slate-500 font-medium">
               InSites Lab • Faculty of Architecture, Technion
             </p>

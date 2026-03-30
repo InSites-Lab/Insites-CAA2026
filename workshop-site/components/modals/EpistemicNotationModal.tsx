@@ -16,7 +16,7 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
     >
       <div className="text-left space-y-6" dir="ltr">
         <p className="text-sm text-slate-600 leading-relaxed">
-          Atar.Bot uses a three-tier notation system to mark the epistemic status of every claim.
+          InSites-CAA uses a three-tier notation system to mark the epistemic status of every claim.
           This teaches critical thinking about evidence — distinguishing what a source says explicitly
           from what the bot infers or interprets.
         </p>

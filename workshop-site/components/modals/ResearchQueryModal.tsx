@@ -120,7 +120,7 @@ export const ResearchQueryModal: React.FC<ResearchQueryModalProps> = ({
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex items-center gap-3">
             <Info size={14} className="text-slate-400" />
             <p className="text-[10px] text-slate-500 font-medium leading-tight">
-              Tip: Copy the prompt and paste it into your Atar.Bot chat at the relevant stage. Recommended especially for Stage 2 — Value Analysis, and Stage 5 — Significance Statement.
+              Tip: Copy the prompt and paste it into your InSites-CAA chat at the relevant stage. Recommended especially for Stage 2 — Value Analysis, and Stage 5 — Significance Statement.
             </p>
           </div>
         </div>

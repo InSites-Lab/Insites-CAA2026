@@ -1106,7 +1106,7 @@ const App: React.FC = () => {
 
                   <div>
                     <h3 className="text-2xl font-black text-slate-500 mb-2">Design Principles</h3>
-                    <p className="text-slate-500">How transparency, control, and evidence governance work in Atar.Bot</p>
+                    <p className="text-slate-500">How transparency, control, and evidence governance work in InSites-CAA</p>
                   </div>
 
                   <DesignPrinciplesView onNavigate={navigateTo} />
@@ -1143,7 +1143,7 @@ const App: React.FC = () => {
                   {/* Tools Section */}
                   <div className="space-y-2">
                     <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                      Tools integrated in Atar.Bot
+                      Tools integrated in InSites-CAA
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {/* Assessment Dashboard */}
@@ -1323,7 +1323,7 @@ const App: React.FC = () => {
                   <div className="pt-2 md:pt-3 max-w-2xl mx-auto">
                     <img
                       src="/poster.png"
-                      alt="Atar.Bot — CBSA Workshop Poster"
+                      alt="InSites-CAA — CBSA Workshop Poster"
                       className="w-full rounded-2xl border border-slate-200 shadow-sm"
                     />
                     <p className="text-center text-lg text-slate-900 italic mt-2">
@@ -1348,7 +1348,7 @@ const App: React.FC = () => {
 
                       {/* Bot Platform Cards */}
                       <div>
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Try Atar.Bot</h4>
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Try InSites-CAA</h4>
                         <p className="text-[11px] text-slate-500 mb-2">Recommended: paid account with reasoning mode</p>
                         <div className="grid grid-cols-3 gap-2">
                           <a href="https://chatgpt.com/g/g-695d3567400c8191a402087b38c7b6b7-tr-bvt-h-rkt-mshm-vt-lshymvr" target="_blank" rel="noopener noreferrer"
@@ -1470,7 +1470,7 @@ const App: React.FC = () => {
           >
             <div className=" mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
               <a
-                href="mailto:yuval.shafriri@gmail.com?subject=Contact%20from%20Atar.Bot%20-%20CAA%20Workshop&body=Hello,%0D%0A%0D%0A"
+                href="mailto:yuval.shafriri@gmail.com?subject=Contact%20from%20InSites-CAA%20-%20CAA%20Workshop&body=Hello,%0D%0A%0D%0A"
                 className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-300 text-black px-2 py-2 sm:px-1.5 sm:py-1 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 text-xs sm:text-sm font-bold shrink-0"
                 dir="ltr"
                 aria-label="Send email to site creators"
@@ -1480,7 +1480,7 @@ const App: React.FC = () => {
               </a>
 
               <div className=" text-xs sm:text-[13px] text-slate-400 opacity-100 truncate flex-1 text-center sm:text-left">
-                 Companion site for Atar.Bot significance assessment workshops © Developed by Dr. Yael Alef and Yuval Shafriri
+                 Companion site for InSites-CAA significance assessment workshops © Developed by Dr. Yael Alef and Yuval Shafriri
               </div>
             </div>
           </footer>

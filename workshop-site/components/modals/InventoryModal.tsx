@@ -68,7 +68,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onClose,
               <div className="p-2 bg-white rounded-lg shadow-sm text-emerald-600 group-hover:scale-110 transition-transform"><Sparkles size={18} /></div>
               <div>
                 <h4 className="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors">Collection Analysis Example</h4>
-                <p className="text-[10px] text-slate-500 font-medium">Demo of Atar.Bot Gemini execution connected to workshop asset assessments collection in NotebookLM</p>
+                <p className="text-[10px] text-slate-500 font-medium">Demo of InSites-CAA Gemini execution connected to workshop asset assessments collection in NotebookLM</p>
               </div>
             </div>
             <div className="bg-white px-3 py-1.5 rounded-lg text-[10px] font-bold text-emerald-600 border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-all flex items-center gap-2">

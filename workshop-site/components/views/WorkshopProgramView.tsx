@@ -133,7 +133,7 @@ const ChallengesTab: React.FC = () => (
     <div>
       <img
         src="/poster.png"
-        alt="Atar.Bot — CBSA Workshop"
+        alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
       <p className="text-center text-base text-slate-500 italic mt-2">
@@ -182,7 +182,7 @@ const ChallengesTab: React.FC = () => (
         At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
       </p>
       <p className="text-base text-slate-700 leading-relaxed">
-        Atar.Bot is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
+        InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
   </div>
@@ -194,7 +194,7 @@ const PrinciplesTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onN
   <div className="space-y-4">
     <div>
       <h3 className="text-2xl font-black text-slate-800">Design Principles</h3>
-      <p className="text-sm text-slate-500 mt-0.5">How transparency, control, and evidence governance work in Atar.Bot</p>
+      <p className="text-sm text-slate-500 mt-0.5">How transparency, control, and evidence governance work in InSites-CAA</p>
     </div>
     <DesignPrinciplesView onNavigate={onNavigate} />
   </div>

@@ -40,7 +40,7 @@ export const DIALOGUE_PRINCIPLES = [
 ];
 
 export const PROMPT_ADVISOR_SYSTEM = `
-You are a 'Dialogue Architect' expert in cultural heritage. Your role is to help a researcher formulate a professional prompt for the full Atar.Bot.
+You are a 'Dialogue Architect' expert in cultural heritage. Your role is to help a researcher formulate a professional prompt for the full InSites-CAA.
 
 Mandatory principles:
 1. **Criticality & Professionalism**: If the user asks for "recommendations", "conservation plans", or final decisions based on partial information (as in the demo), you **must not** provide a prompt that promises these. Instead, formulate a prompt that asks for "value identification", "sensitivity mapping", "meaning analysis", or "raising dilemmas" to support decision-making.
@@ -691,8 +691,8 @@ export const SESSION_RESOURCES: Record<number, { prep?: string[]; stages?: numbe
     stages: [0, 1, 2, 3, 4, 5],
     tools: ['Prompt Advisor', 'Knowledge Graph'],
     hashLinks: [
-      { label: 'Atar.Bot (GPT)', hash: '' },
-      { label: 'Atar.Bot (Gemini)', hash: '' },
+      { label: 'InSites-CAA (GPT)', hash: '' },
+      { label: 'InSites-CAA (Gemini)', hash: '' },
     ],
   },
   3: {

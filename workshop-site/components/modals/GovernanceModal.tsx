@@ -16,7 +16,7 @@ export const GovernanceModal: React.FC<GovernanceModalProps> = ({ isOpen, onClos
     >
       <div className="text-left space-y-6" dir="ltr">
         <p className="text-sm text-slate-600 leading-relaxed">
-          Atar.Bot embeds a governance framework that keeps the human in control at every point.
+          InSites-CAA embeds a governance framework that keeps the human in control at every point.
           These aren't safety guardrails — they're design features that make the collaboration transparent and productive.
         </p>
 

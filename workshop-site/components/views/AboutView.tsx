@@ -28,7 +28,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate, hideHeader = f
                                 Resource Center
                             </h2>
                             <p className="text-sm text-slate-500 font-medium">
-                                Atar.Bot Workshops — Significance Assessment
+                                InSites-CAA Workshops — Significance Assessment
                             </p>
                         </div>
                     </div>
@@ -37,7 +37,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate, hideHeader = f
                 <div className="text-left">
                     <div className="text-sm text-slate-600 leading-relaxed mb-6 space-y-4">
                         <p>
-                            Atar.Bot is an experimental AI tool supporting cultural significance assessment of heritage assets using the
+                            InSites-CAA is an experimental AI tool supporting cultural significance assessment of heritage assets using the
                             <span className="font-bold text-indigo-700">
                           &nbsp; CBSA
                          </span> <br/> <span className="font-bold text-indigo-700">
@@ -104,7 +104,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate, hideHeader = f
                             <div>
                                 <h4 className="font-bold text-base text-slate-800 mb-1">Assessment Stages Framework</h4>
                                 <p className="text-sm text-slate-500 leading-snug">
-                                    The structured assessment process in Atar.Bot. Click on each stage to see its rationale and prompt summary.
+                                    The structured assessment process in InSites-CAA. Click on each stage to see its rationale and prompt summary.
                                 </p>
                             </div>
                         </button>
@@ -132,7 +132,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate, hideHeader = f
                             <div>
                                 <h4 className="font-bold text-base text-slate-800 mb-1">Design Principles</h4>
                                 <p className="text-sm text-slate-500 leading-snug">
-                                    Epistemic notation, governance framework, and session debrief — how transparency and control work in Atar.Bot.
+                                    Epistemic notation, governance framework, and session debrief — how transparency and control work in InSites-CAA.
                                 </p>
                             </div>
                         </button>

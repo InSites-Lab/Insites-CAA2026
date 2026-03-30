@@ -165,7 +165,7 @@ export const PromptAdvisorModal: React.FC<PromptAdvisorModalProps> = ({
             <div className="bg-white p-4 rounded-xl border border-slate-100 flex items-center gap-4">
               <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><Info size={16} /></div>
               <p className="text-[10px] font-bold text-slate-500 leading-tight">
-                Remember: Copy the generated prompt and paste it into the full Atar.Bot interface (ChatGPT/Gemini) to start the process.
+                Remember: Copy the generated prompt and paste it into the full InSites-CAA interface (ChatGPT/Gemini) to start the process.
               </p>
             </div>
           </div>
