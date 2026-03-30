@@ -44,22 +44,24 @@ InSites-Brain/MANIFEST.md
 # === Paper content (gitignore for now) ===
 InSites-Brain/Heritage4.0/
 
-# === Claude: keep only current version + user-facing files ===
-InSites-Brain/Claude/InSites-CAA-mono-v2.2.md
-InSites-Brain/Claude/InSites-CAA-mono v5.3*
-InSites-Brain/Claude/InSites-CAA-main.md
-InSites-Brain/Claude/tests/
+# === Claude: keep only mono prompt + setup guide ===
+InSites-Brain/Claude/not-used/
 InSites-Brain/Claude/plans/
+InSites-Brain/Claude/tests/
 InSites-Brain/Claude/KG-Skill-en/
 InSites-Brain/Claude/KG-artifacts/
 InSites-Brain/Claude/global-claude-ai-skills/
 InSites-Brain/Claude/claude skills/
-# Dev-only skills (keep the 4 bot skills public)
-InSites-Brain/Claude/skills/Dashboard-review-skill.md
-InSites-Brain/Claude/skills/LIM-skill.md
-InSites-Brain/Claude/skills/agent-builder-skill.md
-InSites-Brain/Claude/skills/prompt-qa-skill.md
-InSites-Brain/Claude/skills/.vscode/
+InSites-Brain/Claude/InSites-CAA-mono-v2.2.md
+InSites-Brain/Claude/InSites-CAA-mono v5.3*
+InSites-Brain/Claude/InSites-CAA-main.md
+InSites-Brain/Claude/InSites-CAA.md
+InSites-Brain/Claude/WORKSHOP-README.md
+InSites-Brain/Claude/agent-for-agents.md
+InSites-Brain/Claude/claude-ai-project*/
+InSites-Brain/Claude/skills/
+InSites-Brain/Claude/*.png
+InSites-Brain/Claude/*.jpg
 
 # === GPTs: keep only root files + runtime + tests ===
 InSites-Brain/GPTs/CAA/
