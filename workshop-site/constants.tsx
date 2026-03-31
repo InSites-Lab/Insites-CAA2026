@@ -647,20 +647,6 @@ export const LOOKING_GLASS_CARDS = [
     color: 'rose',
     content: `It reflects your material back, structured through CBSA.\nEvery claim sourced. Every step approved by you.\nAlice decides where and when to step.`,
   },
-  {
-    id: 'low-floor',
-    title: 'Low Floor, High Ceiling',
-    tagline: 'After Mitchel Resnick\'s design principles for Scratch',
-    color: 'indigo',
-    content: `**Chat-native platforms** — Claude Projects · Gemini · GPTs\n- Every step is a conversation — maximum human-in-the-loop\n- Full prompt transparency — readable, editable, challengeable\n- You control the LLM directly in natural language\n\n**Not a standalone app** — No React + Node + API production stack.\nWe gave up polished agentic UX — which has real advantages — because CBSA should be driven by human judgment, not automated by agent workflows.`,
-  },
-  {
-    id: 'stay-current',
-    title: 'Stay Current, Stay in Control',
-    tagline: 'LLMs evolve fast. Our platform choice keeps us on the edge.',
-    color: 'emerald',
-    content: `- Test the latest models the moment they ship — no migration, no refactoring\n- No API costs that make us conservative with the deep, multi-stage analysis CBSA demands\n- No architectural lock-in — what works today doesn't constrain tomorrow\n\n*The tool serves the assessor. The assessor doesn't serve the tool.*`,
-  },
 ];
 
 // ─── Glossary ─────────────────────────────────────────────────────

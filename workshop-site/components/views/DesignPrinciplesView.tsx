@@ -69,7 +69,7 @@ export const DesignPrinciplesView: React.FC<DesignPrinciplesViewProps> = ({ onNa
       <div className="flex-1 h-px bg-slate-200" />
     </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 gap-3">
       <button
         onClick={() => onNavigate?.("notation")}
         className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-rose-50/30 transition-all group cursor-pointer"
