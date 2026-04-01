@@ -130,7 +130,7 @@ const ChallengesTab: React.FC = () => (
     {/* Poster */}
     <div className="max-w-2xl mx-auto">
       <img
-        src="./poster.png"
+        src="./poster-light.jpg"
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
