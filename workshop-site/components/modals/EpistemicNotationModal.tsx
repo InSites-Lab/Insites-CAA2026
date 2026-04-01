@@ -15,11 +15,16 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
       maxWidth="max-w-4xl"
     >
       <div className="text-left space-y-6" dir="ltr">
-        <p className="text-sm text-slate-600 leading-relaxed">
-          InSites-CAA uses a three-tier notation system to mark the epistemic status of every claim.
-          This teaches critical thinking about evidence — distinguishing what a source says explicitly
-          from what the bot infers or interprets.
-        </p>
+        <div className="py-4 space-y-4">
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">The tension</p>
+          <p className="text-lg text-slate-800 leading-relaxed">
+            Govern the AI — ground every claim, prevent hallucination.
+            Without losing the interpretive power at the core of heritage assessment.
+          </p>
+          <p className="text-2xl font-black text-slate-900 pt-2 border-t border-slate-100">
+            How can we see what is inferred — and what is interpreted?
+          </p>
+        </div>
 
         {/* Three-tier table */}
         <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
@@ -43,7 +48,7 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
                 </td>
               </tr>
               <tr className="bg-amber-50/50 hover:bg-amber-50 transition-colors">
-                <td className="p-4 border-b border-slate-100 font-mono text-lg text-center text-amber-700">°</td>
+                <td className="p-4 border-b border-slate-100 font-mono text-lg text-center text-amber-700">〰️</td>
                 <td className="p-4 border-b border-slate-100">
                   <span className="font-bold text-amber-800">Inferred</span>
                   <p className="text-slate-500 text-xs mt-1">Synthesized from 2+ pieces of evidence — must cite both</p>
@@ -79,9 +84,9 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
               </p>
             </div>
             <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Inferred °</p>
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Inferred 〰️</p>
               <p className="text-sm text-slate-700">
-                "The tower <em>may have served</em>° as a regional landmark, given its elevated position and the absence of competing structures" <span className="text-slate-400 font-mono text-xs">[A:3, B:1]</span>
+                "The tower <em>may have served</em>〰️ as a regional landmark, given its elevated position and the absence of competing structures" <span className="text-slate-400 font-mono text-xs">[A:3, B:1]</span>
               </p>
             </div>
             <div className="p-4 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
@@ -97,8 +102,8 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
         <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
           <h4 className="font-bold text-slate-800 text-sm mb-2">Prose-Notation Coherence</h4>
           <p className="text-sm text-slate-600 leading-relaxed">
-            When a claim carries ° or 💭, the surrounding prose <strong>must match</strong> the notation's epistemic status.
-            A ° mark with certainty in the sentence is a contradiction. This rule forces alignment between
+            When a claim carries 〰️ or 💭, the surrounding prose <strong>must match</strong> the notation's epistemic status.
+            A 〰️ mark with certainty in the sentence is a contradiction. This rule forces alignment between
             what the evidence actually supports and how the finding is communicated — a micro-lesson in critical reading
             that distinguishes AI inference from hallucination.
           </p>
@@ -108,11 +113,11 @@ export const EpistemicNotationModal: React.FC<EpistemicNotationModalProps> = ({ 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
             <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">Stage 1 — Contexts</p>
-            <p className="text-xs text-slate-600">Contexts emerging uniquely from the description (°), reading between the lines (💭)</p>
+            <p className="text-xs text-slate-600">Contexts emerging uniquely from the description (〰️), reading between the lines (💭)</p>
           </div>
           <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
             <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Stage 2 — Values</p>
-            <p className="text-xs text-slate-600">Values inferred from cross-context analysis (°), values from subtext (💭)</p>
+            <p className="text-xs text-slate-600">Values inferred from cross-context analysis (〰️), values from subtext (💭)</p>
           </div>
           <div className="p-3 bg-slate-100 rounded-lg border border-slate-200">
             <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Throughout</p>

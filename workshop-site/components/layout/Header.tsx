@@ -57,22 +57,14 @@ export const Header: React.FC<HeaderProps> = ({
   className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-0 py-1.5 flex items-center"
 >
   <h1 className="font-black tracking-tight leading-none text-indigo-100 group-hover:text-white text-base md:text-lg truncate relative inline-block transition-colors duration-300">
-    InSites-CAA Workshop
+    <span className="md:hidden">InSites-CAA Workshop</span>
+    <span className="hidden md:inline">CAA26 — Significance Assessment through the Looking Glass of Gen-AI</span>
     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
   </h1>
 </button>
  
-          {/* About button - Desktop only (>=768px), subtle transparent style */}
-          <button
-            onClick={onAboutClick}
-            title="About this site"
-            aria-label="About this site"
-            className="cursor-pointer hidden md:flex items-center justify-center w-12 h-8 
-            rounded-lg border border-white/20 text-white/100 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all
-            active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            <Info className="w-[24px] h-[21px]" strokeWidth={2.5} />
-          </button>
+          <span className="hidden md:inline text-slate-500 mx-3">|</span>
+          <span className="hidden md:inline text-indigo-100 font-bold text-xl">Alef &amp; Shafriri</span>
         </div>
         <div
           className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"

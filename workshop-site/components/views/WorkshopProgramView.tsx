@@ -40,7 +40,7 @@ const PROGRAM_TABS = [
   { id: 'challenges', label: 'Our Story', icon: <Users size={14} /> },
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
   { id: 'principles', label: 'Principles', icon: <Eye size={14} /> },
-  { id: 'schedule', label: 'Program', icon: <Clock size={14} /> },
+  { id: 'example', label: 'Example', icon: <Presentation size={14} /> },
 ] as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'];
@@ -57,20 +57,11 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
   const totalMinutes = WORKSHOP_PROGRAM.reduce((sum, b) => sum + (parseInt(b.duration) || 0), 0);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-white overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16" dir="ltr">
-      <div className="max-w-4xl mx-auto w-full px-6 py-4 space-y-4">
+    <div className={`flex-1 flex flex-col h-full bg-white ${activeTab !== 'example' ? 'overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16' : 'overflow-hidden'}`} dir="ltr">
+      <div className="max-w-4xl mx-auto w-full px-6 py-4 space-y-4 shrink-0">
 
         {/* Tab Bar */}
         <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
-          <button
-            onClick={() => onNavigate?.('home')}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer"
-            title="Back to Home"
-          >
-            <Home size={14} />
-            <span className="hidden sm:inline">Home</span>
-          </button>
-          <div className="w-px bg-slate-300 my-1" />
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -92,8 +83,15 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
         {activeTab === 'challenges' && <ChallengesTab />}
         {activeTab === 'principles' && <PrinciplesTab onNavigate={onNavigate} />}
         {activeTab === 'cbsa' && <CbsaTab onNavigate={onNavigate} />}
-        {activeTab === 'schedule' && <ScheduleTab onNavigate={onNavigate} totalMinutes={totalMinutes} />}
       </div>
+      {activeTab === 'example' && (
+        <iframe
+          src="./notation.html"
+          className="w-full border-0"
+          style={{ height: 'calc(100vh - 110px)' }}
+          title="Notation Example"
+        />
+      )}
     </div>
   );
 };
@@ -130,7 +128,7 @@ const challengeColors: Record<string, { border: string; bg: string; text: string
 const ChallengesTab: React.FC = () => (
   <div className="space-y-5">
     {/* Poster */}
-    <div>
+    <div className="max-w-2xl mx-auto">
       <img
         src="./poster.png"
         alt="InSites-CAA — CBSA Workshop"
