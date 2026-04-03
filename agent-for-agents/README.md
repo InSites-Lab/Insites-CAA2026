@@ -1,6 +1,15 @@
 # Build Your Own AI Assistant
 
-An AI that helps you design your own AI agent or assistant — choose its expertise, principles, and workflow, then deploy it.
+A meta-agent: an AI that helps you build other AIs. You describe a professional task, it designs a custom AI assistant — with the expertise, principles, and workflow you choose. The output is a system instruction file you can deploy on any platform.
+
+*You're not just using AI — you're designing how AI should work for your specific needs.*
+
+## What happens when you open it
+
+1. **Describe your task** — what should the AI help with? (reviewing reports, drafting policy, analyzing data, writing assessments...)
+2. **Choose principles** — the bot proposes design rules like "cite every source" or "pause for approval" — you pick what matters for your work
+3. **Review the draft** — it generates a complete system instruction you can read and refine
+4. **Deploy** — copy the result into Claude, ChatGPT, or Gemini and start using it
 
 ## Quick Start
 
