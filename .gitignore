@@ -86,6 +86,7 @@ InSites-Brain/Claude/*.png
 InSites-Brain/Claude/*.jpg
 
 # === GPTs: keep only root files + runtime + tests ===
+InSites-Brain/GPTs -original dash en/
 InSites-Brain/GPTs/CAA/
 InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/
 InSites-Brain/GPTs/CAA-GTPs-InSites v4_current_files_package/
