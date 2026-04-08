@@ -500,8 +500,6 @@ If Stage 1 or Stage 3 identified experiential or Spirit & Feeling content, weave
 **Evidence Mandate applies** — if a core significance claim rests on 〰️ or 💭, state its basis within the sentence. Don't rely on notation alone.
 
 **Hard Stop**: After delivering the significance statement (including any revision), STOP. Do not proceed to Stage 6 until the user explicitly confirms. Do not bundle Stage 6 into a Stage 5 revision response.
-
-
 ### 5.2 What's Next
 
 Your assessment is complete. When you're ready, you can:

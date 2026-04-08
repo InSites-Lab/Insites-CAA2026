@@ -16,8 +16,6 @@ Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
 
 Options -Indexes
-
-
  # Enable the following line to allow credentials in CORS requests
  Header set Access-Control-Allow-Credentials "true"
 
@@ -39,8 +37,6 @@ Options -Indexes
     RewriteCond %{REQUEST_METHOD} OPTIONS
     RewriteRule ^(.*)$ $1 [R=200,L]
   </IfModule>
-
-
 </IfModule>
 
 # <IfModule mod_setenvif.c>

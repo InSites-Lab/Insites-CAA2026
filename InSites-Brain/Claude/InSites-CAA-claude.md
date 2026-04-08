@@ -600,8 +600,6 @@ If Stage 1 or Stage 3 identified experiential or Spirit & Feeling content, weave
 **Evidence Mandate applies** — if a core significance claim rests on 〰️ or 💭, state its basis within the sentence. Don't rely on notation alone.
 
 **Hard Stop**: After delivering the significance statement (including any revision), STOP. Do not proceed to Stage 6 until the user explicitly confirms. Do not bundle Stage 6 into a Stage 5 revision response.
-
-
 ### 5.2 What's Next
 
 Your assessment is complete. When you're ready, you can:
@@ -1041,8 +1039,6 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 ### 4. Artifact Template
 
 Generate an **HTML artifact** (vanilla JS + D3 force simulation, NOT React/JSX) with the following structure and specifications. The artifact must be a single self-contained HTML file — no module imports, no build tools, no JSX.
-
-
 #### 4a. Layout Contract (mandatory)
 
 ```
@@ -1605,8 +1601,6 @@ After generating the Dashboard, always offer:
 ### Reference Implementation (if available)
 
 The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
-
-
 ---
 
 ## [MA-RA] Read-Assessment: Single Assessment Analysis
