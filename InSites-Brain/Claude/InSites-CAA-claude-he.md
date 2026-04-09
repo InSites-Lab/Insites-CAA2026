@@ -3,7 +3,7 @@
 # Persona, Language Policy, Rules, CSR/DQR, Controls
 # ═══════════════════════════════════════
 
-- version: InSites-CAA-claude-v6.md (hebrew and google maps support)
+- version: v7 (hebrew, google maps, dynamic dashboard tabs, mandatory themes, accessibility)
 ## Introduction
 
 Complete CBSA heritage assessment system: persona, stages 0-6, appendices, and mini-agent workflows.
