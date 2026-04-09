@@ -1795,6 +1795,10 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 
 - On page load: read hash and restore the corresponding tab.
 
+### Accessibility (mandatory)
+
+- Sidebar navigation: `role="tablist"` on container, `role="tab"` with `aria-selected="true"/"false"` on each tab button, `role="tabpanel"` on content area.
+
 ### Cross-Tab Entity Linking
 
 - All entity names (sites, values, comparators, themes) must be clickable across all tabs.
@@ -1941,7 +1945,11 @@ Re-read all stage outputs from the conversation and extract:
 
     "threatThemes": [{ "id": "", "label": "", "description": "", "vulnerabilities": [], "color": "" }]
 
-  }
+  },
+
+  "tabs": [
+    { "id": "evidence", "label": "Evidence Weight", "icon": "⚖️", "type": "cards", "data": { "cards": [] } }
+  ]
 
 }
 
@@ -1964,6 +1972,10 @@ Re-read all stage outputs from the conversation and extract:
 - `comparative.comparators[].coordinates`: Same logic per comparator site.
 
 - `themes`: Group related values/contexts/vulnerabilities by narrative thread. Rules: ≥2 members per theme; only populate if ≥3 values OR ≥3 contexts exist. Label each theme with a short noun phrase (e.g., "Industrial Heritage Identity", "Environmental Vulnerability"). Include 1-sentence rationale in `description`.
+
+- `tabs`: Optional array of dynamic tabs for MA-RA reading results or session-specific content. If MA-RA readings (Evidence Weight, Stakeholder Lens, Context-Effect Audit, etc.) were performed during the session, include each as a tab entry. Supported types: `table` (columns + rows), `cards` (array with title/body/level/badges), `matrix` (rowLabels + colLabels + cells 0-3), `prose` (sections with title + body), `custom` (raw HTML). Dynamic tabs render after Significance in the tab bar.
+
+- In all text fields and `tabs[]` data, use exact entity names (asset name, comparator names) to enable cross-tab navigation.
 
 ### 4. Tab Structure (mandatory — consolidated)
 
@@ -1989,7 +2001,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 | --- | --- | --- |
 
-| **Overview** | KPIs, asset description, integrity range, data gaps, process summary, sources | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. Process section: strengths/gaps/quick boosts/next steps (folded from former Process tab). Sources list. |
+| **Overview** | KPIs, asset description, integrity range, data gaps, process summary, sources | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). KPI numeric values use monospace font (`JetBrains Mono, ui-monospace, monospace`). Integrity range shows color-coded ratings per aspect. Process section: strengths/gaps/quick boosts/next steps (folded from former Process tab). Sources list. |
 
 | **Map** | Asset + mentioned locations (mandatory) | Leaflet map. **Always present** — even for single-site assessments, show the site as a point. If Stage 1, 4, or 5 mention other locations (comparison sites, connected sites, regional context), add as secondary points with labels. Asset: blue circle r=10. Comparators/mentioned: slate circle r=7. Click → popup with details. Coordinate source indicator below map. If coordinates unknown, show a placeholder with "Location not specified in source material." See §4a. |
 
@@ -1999,7 +2011,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 | **Themes** | Value/context/threat thematic clusters (conditional) | Sub-tab pills: "Value Themes" / "Context Themes" / "Threat Themes" with count badges. Theme cards with colored dot, label, member pills (clickable → navigate to item in home tab). Only if ≥2 themes total. See §4b. |
 
-| **Integrity** | Nara Grid cards + summary + vulnerability matrix | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. **🔴 Vulnerability Analysis** (visible sub-heading): interpretive callout ABOVE the heat matrix (not below). Legend inline: "🔴 = loss severely damages this value, 🟡 = moderate, ⚪ = minor." Heat matrix: rows = value categories, columns = Nara aspects with integrity rating in header. Only if vulnerability data exists. |
+| **Integrity** | Nara Grid cards + summary + vulnerability matrix | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. **🔴 Vulnerability Analysis** (visible sub-heading): interpretive callout ABOVE the heat matrix (not below). Legend inline: "🔴 = loss severely damages this value, 🟡 = moderate, ⚪ = minor." Each cell shows symbol + number: `● 3` (severe), `◐ 2` (moderate), `○ 1` (minor), `· 0` (negligible) — symbols provide non-color distinction for accessibility. Heat matrix: rows = value categories, columns = Nara aspects with integrity rating in header. Only if vulnerability data exists. |
 
 | **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. |
 
@@ -2033,7 +2045,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 - **Coordinate source**: Below the map container, show: "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
 
-- **Container**: `height: 440px; border-radius: 10px; border: 1px solid #e2e8f0`.
+- **Container**: `height: min(440px, 60vh); border-radius: 10px; border: 1px solid #e2e8f0`.
 
 - **Cross-referencing**: Click comparator marker → set `highlight = { type: 'comparator', id }` → Comparative tab highlights that card.
 
@@ -3028,7 +3040,7 @@ Re-read MA-RC Step 2 extraction output and build a per-site JSON record:
 
 | Site description | `description` | 1–2 sentences |
 
-| Significance summary | `significanceSummary`, `highlight` | `highlight` = one-sentence collection-level insight |
+| Significance summary | `significanceSummary`, `highlight` | `highlight` = one-sentence collection-level insight **(MANDATORY — must be non-empty for every site)** |
 
 | Values identified | `values: { [type]: "e"/"i"/"a" }` | Map to 8 categories: Historical, Scientific, Landscape, Community, Intangible, Architectural, Nature, Educational. `e` = explicit, `i` = implied, `a` = absent |
 
@@ -3044,29 +3056,32 @@ Also derive from Collection Reading and analyses (if available):
 
 - `managementClusters[]` — grouping labels from Classify step, if run
 
-### 3. Tab Structure (6 tabs, fixed order)
+- `themes[]` — **MANDATORY**. Array of theme objects: `{ id, label, description, sites: [siteId], evidence: { siteId: "text" } }`. Always generate from MA-RC analysis.
+
+- `tabs[]` — dynamic tabs from MA-RC Step 3 analysis results. Same schema as [CA-DB]: `{ id, label, icon, type, data }`
+
+### 3. Tab Structure (4 fixed + dynamic)
+
+**Fixed tabs** (always present):
 
 | # | Tab | Content | Key features |
-
 |---|-----|---------|-------------|
-
-| 1 | **Overview** | KPI cards (N sites, N countries, time span, N methods) + 4 distribution charts (by country, type, period, protection) | Always first tab. Orients the user. |
-
+| 1 | **Overview** | KPI cards (N sites, N countries, time span, N methods) + 4 distribution charts (by country, type, period, protection). KPI numeric values use monospace font. | Always first tab. Orients the user. |
 | 2 | **Map** | Leaflet map with circle markers sized by explicit-value count | Filter buttons per value type. Click filter → dim or hide markers where that value is absent. Click marker → popup with significance summary + highlight. |
-
 | 3 | **Values** | Matrix: sites × value types, evidence markers (〰️/💭). Below: value specification panel. | Sortable columns. Sticky first column. Footer counts. Click site name → expand panel showing what each value means at that site. |
+| 4 | **Themes** | Thematic clusters across the collection **(MANDATORY)** | Always generate themes from MA-RC analysis. Minimum: group sites by overlapping value patterns. Include evidence per site. Theme cards with colored dot, label, description, clickable site member pills, per-site evidence text. |
 
-| 4 | **Arguments** | Significance premises bar chart + claim scope pie chart + argument assessment table | Table: Site, Argument Type, Strength (color-coded), Evidence Basis, Claim Scope, Assessment note. |
+**Dynamic tabs** (from `data.tabs[]` — include MA-RC Step 3 analysis results):
 
-| 5 | **Gaps** | Traffic-light matrix: sites × data dimensions (values, significance, integrity, threats, method, comparisons). Green/yellow/red. | Per-site completeness score. Identifies documentation gaps. |
+Add analysis results the user requested during the session. Supported types: `table` (columns + rows), `cards` (title/body/level/badges), `matrix` (rowLabels/colLabels/cells 0-3), `prose` (sections with title + body), `custom` (raw HTML). Common dynamic tabs include:
 
-| 6 | **AI Query** | In-artifact heritage analysis chat | Implements [CA-AIQ] contract. Gemini: Gemini API. See §9 below. |
+- **Arguments** — significance premises table (type: `table`)
+- **Gaps** — traffic-light completeness matrix (type: `matrix`)
+- **Cross-Tabs** — distribution charts (type: `custom`)
+- **Clusters** — management grouping cards (type: `cards`)
+- **AI Query** — implements [CA-AIQ] contract (Gemini API live)
 
-**Conditional tabs** (add only if data supports them):
-
-- **Cross-Tabs** — stacked bar charts (values by country/type/period). Only if ≥5 sites. Otherwise fold distributions into Overview.
-
-- **Clusters** — management grouping cards. Only if Classify step was run in MA-RC.
+In `tabs[]` data, use exact `site.name` values when referencing sites — enables cross-tab navigation.
 
 ### 4. Mandatory Rules
 
