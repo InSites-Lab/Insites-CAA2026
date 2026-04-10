@@ -9,4 +9,4 @@ Workflow specs that drive the bot's features. Each spec is the source of truth f
 | `MA-RC-guide.md` | Practitioner guide for running Read-Collection |
 | `collection-report-spec.md` | Collection report output format |
 | `report-tab-spec.md` | Report tab UI structure |
-| `Bot-Research-Skiil/` | Session report specs (CA-IP) — research instrumentation |
+| `Bot-Research-Skill/` | Session report specs (CA-IP) — research instrumentation |

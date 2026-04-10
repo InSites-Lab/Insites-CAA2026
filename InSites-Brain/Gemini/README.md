@@ -13,12 +13,11 @@ Use the ready-made Gem: [Open InSites-CAA Gem](https://gemini.google.com/gem/1PM
 ## Files
 
 ```
-InSites-CAA-GEM.md       ← English version (paste into Gem)
-InSites-CAA-Gem-he.md    ← Hebrew version (Hebrew overlay + Google Maps + D3 fixes)
+InSites-CAA-GEM.md       ← System instructions (paste into Gem)
 README.md                ← This file
 ```
 
-## Prompt Structure (Hebrew version — v6)
+## Prompt Structure
 
 | Part | Content | Appendix Codes |
 |------|---------|----------------|
