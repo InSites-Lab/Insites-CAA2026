@@ -63,8 +63,16 @@ InSites-Brain/MANIFEST.md
 # Verification screenshots (temporary, root-level)
 /*.png
 
-# === Paper content (gitignore for now) ===
-InSites-Brain/Heritage4.0/
+# === Paper content ===
+# Heritage4.0/ stays mostly internal (drafts, source PDFs, paper docm).
+# Only research-tools/ is exposed as paper supplementary materials.
+InSites-Brain/Heritage4.0/source-materials/
+InSites-Brain/Heritage4.0/writing/
+InSites-Brain/Heritage4.0/evidence/
+InSites-Brain/Heritage4.0/*.docm
+InSites-Brain/Heritage4.0/*.docx
+InSites-Brain/Heritage4.0/*.pdf
+InSites-Brain/Heritage4.0/~$*
 
 # === Claude: keep only mono prompt + setup guide ===
 InSites-Brain/Claude/not-used/
@@ -77,11 +85,9 @@ InSites-Brain/Claude/claude skills/
 InSites-Brain/Claude/InSites-CAA-mono-v2.2.md
 InSites-Brain/Claude/InSites-CAA-mono v5.3*
 InSites-Brain/Claude/InSites-CAA-main.md
-InSites-Brain/Claude/InSites-CAA.md
 InSites-Brain/Claude/WORKSHOP-README.md
 InSites-Brain/Claude/agent-for-agents.md
 InSites-Brain/Claude/claude-ai-project*/
-InSites-Brain/Claude/skills/
 InSites-Brain/Claude/*.png
 InSites-Brain/Claude/*.jpg
 
