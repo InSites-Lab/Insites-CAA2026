@@ -33,7 +33,11 @@ The full stage-by-stage extraction rules and boundary cases are in [core/SKILL.m
 
 The paper reports that ~80% of the bot's substantive claims involve synthesis or inference across multiple sources, with only ~20% being direct extractions from a single passage. An earlier version of this analysis reported a 94% "epistemic classification accuracy" figure (manually counted, single coder). Both numbers come from the same body of evidence. We chose to foreground 80% in the paper for three reasons.
 
-**1. Stability across runs.** When three independent extraction agents applied the same codebook to the same transcript, the synthesis-plus-inference share held within ±2 percentage points (91–93% in the raw cross-run data; the rounded 80% in the paper is the share excluding "expert-added" claims). The accuracy figure varied between 67% and 91% across the same three runs, because it depends on how strictly each analyst applies the "should-have-been-marked-uncertain" rule — a methodological threshold the codebook deliberately leaves to the analyst.
+**1. Stability across runs.** When the codebook was applied three times by independent runs of a Claude-based extraction agent (no shared state between runs), the synthesis-plus-inference share held within ±2 percentage points (91–93%). The accuracy figure varied between 67% and 91% across the same three runs, because it depends on how strictly each analyst applies the "should-have-been-marked-uncertain" rule — a methodological threshold the codebook deliberately leaves to the analyst.
+
+**Derivation of the 80%/20% figure.** The cross-run data shows synthesis+inference at 91–93%, direct extraction at 5–7%, and overreach at ~2% (see [core/claim-extraction-cross-run-comparison.md](core/claim-extraction-cross-run-comparison.md) §2). The paper rounds toward conservatism: any single-source claim with even minimal analytical framing was reclassified as extraction rather than synthesis, which raises the extraction share from ~5% to ~20% and lowers the synthesis+inference share from ~92% to ~80%. The conservative split is what appears in the paper's prose; the cross-run table shows the unrounded distribution. Both are defensible; the 80%/20% framing is harder to challenge.
+
+**Caveat on "independent runs."** The three runs are independent in the sense of no shared state and no access to each other's results, but they all used the same model family (Claude). They do not constitute inter-coder reliability in the human-coder sense. They demonstrate that the codebook is applied consistently by a single agent type, not that multiple coder backgrounds converge on the same extraction. See Limitations.
 
 **2. Closer to the paper's argument.** The paper claims that uncertainty notation licenses cross-source reasoning. The 80% directly demonstrates that — most of what the bot produces *is* cross-source reasoning, not extraction. The 94% answered a different and weaker question: was the bot accurate at self-classifying its own outputs.
 
@@ -43,9 +47,26 @@ The 80% does not change the paper's argument from what the 94% supported — it 
 
 ## The case study
 
-The paper analyzes a single AI-assisted heritage assessment session. A heritage expert (Yael Alef) used the InSites-CAA bot in Claude Opus to produce a Cultural Built-heritage Significance Assessment (CBSA) of the Tuba-Zangariyye Dolmen Field on the Korazim Plateau, northern Israel. Three source documents were provided to the bot: an archaeological survey (Berger 2025), a heritage-management case study (Alef et al.), and a regional research synthesis (Stepansky 2005). Source PDFs are not included in this supplementary; full citations and page numbers appear in the narrative reports under [further-reading/](further-reading/).
+The paper analyzes a single AI-assisted heritage assessment session. A heritage expert (Yael Alef) used the InSites-CAA bot in Claude Opus to produce a Cultural Built-heritage Significance Assessment (CBSA) of the Tuba-Zangariyye Dolmen Field on the Korazim Plateau, northern Israel. Three source documents were provided to the bot: an archaeological survey (Berger 2025), a heritage-management case study (Alef et al.), and a regional research synthesis (Stepansky 2005). Full citations and page numbers appear in the narrative reports under [further-reading/](further-reading/).
 
 The session ran on 2026-03-21/22. The bot produced the full 6-stage assessment plus a Knowledge Graph and a Dashboard. The expert intervened approximately 13 times during the run. Total session time was about 4 hours, including 1 hour of source-data preparation.
+
+**Source documents.** The three publications provided to the bot are not included in this supplementary due to copyright. They are available on request from the authors. Citations:
+
+- Berger et al. (2025). Tuba-Zangariyye (Southeast), Survey. *Hadashot Arkheologiyot — Excavations and Surveys in Israel* 137.
+- Alef, Mordohovich & Berger. The Tuba-Zangariyye Dolmen Field. (Heritage management case study; full citation in further-reading/Heritage4_0-Case-Evidence-2303.md.)
+- Stepansky, Y. (2005). The Megalithic Culture of the Corazim Plateau. *Material Culture and Archaeology* 5/1, pp. 39–56.
+
+## Limitations
+
+The supplementary materials should be read in light of the following methodological constraints. None of these undermine the paper's case-study claims, but they bound the scope of generalization.
+
+- **N=1.** One assessment session, one expert, one site, one bot configuration. The headline numbers (45 claims, 80%/20% split, 13 expert interventions, 5 expert-validated new insights) describe this run; they do not generalize to a population. The paper makes case-study claims, not population claims.
+- **Single human coder for the manual baseline.** The 45-claim manual count (`core/Claim-Level-Count-2303.md`) was produced by one analyst. No second-coder pass and no Cohen's κ. The cross-run AI extraction validates that the codebook is consistently applied by an LLM agent, not that two human coders would converge.
+- **Expert is also the analyst.** The expert who ran the bot session also informed the analysis. Self-evaluation bias is possible. No blind independent reviewer.
+- **Three runs share the same model family.** The "three independent runs" all used Claude. Independence is in the run-state sense (no shared context, no access to each other's results), not in the model-or-coder sense. Inter-coder reliability across human coders or across LLM families is not yet established.
+- **Codebook calibration is post-hoc.** The v1.1 codebook (`core/SKILL.md`) was tightened after observing v1.0 produced 106 claims (vs. the analyst's expected paragraph-level count of 45). This iterative refinement is standard practice in qualitative content analysis but is not pre-registered methodology.
+- **Source documents are external.** Reviewers cannot independently verify source-tracing claims (e.g., "this insight combines Source A p.1 with Source C p.40") without access to the three publications. Citations are provided; PDFs available on request.
 
 ## Folder layout
 
