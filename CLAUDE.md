@@ -58,26 +58,44 @@ InSites-Brain/
 .claude/skills/cbsa-ux-review/SKILL.md         # /cbsa-ux-review
 ```
 
-### 📝 ACTIVE WRITING — Heritage 4.0 Paper (Florence)
+### 📝 Heritage 4.0 Paper — Submitted (Florence, anonymous review)
+
+Paper: extended abstract submitted to Springer CCIS / Heritage 4.0 Florence conference. Latest draft: `Heritage4.0_V6-2.docm` (gitignored). Status as of 2026-04-26: in anonymous review; URL placeholder in reference [8] will be filled at camera-ready.
+
+**Most of Heritage4.0/ is gitignored (internal). Only `research-tools/` is exposed as paper supplementary, on branch `heritage-4.0.1` (pushed to origin).**
 
 ```
-InSites-Brain/Heritage4.0/
-  PROJECT-INSTRUCTIONS.md                      # Claude.ai Project instructions (paste-ready)
-  writing/                                     # Direct writing task
-    Heritage4_0-Draft-v1.md                    # Paper draft (extended abstract, 6p Springer CCIS)
-    Heritage4_0-Draft-v1.docx                  # Same in Springer CCIS template
-    Heritage4_0-Adapted-Structure-2303.md      # Section-by-section writing scaffold
-    Writing-Plan.md                            # Full plan, methodology, page budget, checklist
-    splnproc2510.docm                          # Springer CCIS Word template
-    instructions for Authors heritage 4.0.pdf  # Venue submission guidelines
-  evidence/                                    # Session-generated analysis (Claude Code output)
-    Heritage4_0-Case-Evidence-2303.md          # Source-traced demonstrations + performance profile
-    Manual-vs-Bot-Comparison-2303.md           # Manual SA vs AI-assisted SA comparison
-    Claim-Level-Count-2303.md                  # 45-claim epistemic analysis (quantitative backbone)
-    Tuba-Run-Analysis-2303.md                  # Bot session analysis
-    InSites_Observation_Guide.docx             # Expert observation rubric
-  source-materials/                            # Case study source PDFs (A, B, C)
+InSites-Brain/Heritage4.0/                       (gitignored at root, except research-tools/)
+  Heritage4.0_V6-2.docm                          # Submitted draft (gitignored)
+  writing/                                        # Drafts + scaffolds (gitignored)
+  source-materials/                               # Source PDFs A, B, C (gitignored)
+  research-tools/                                 # PUBLIC supplementary (tracked on heritage-4.0.1)
+    README.md                                     # Reader-oriented guide: claim definition,
+                                                  #   80%-vs-94% rationale, case study, limitations
+    core/                                         # 5 paper-cited files + README
+      SKILL.md                                    # Claim-extractor codebook v1.1
+      Claim-Level-Count-2303.md                   # 45-claim manual count cited in §4
+      claim-extraction-cross-run-comparison.md    # ★ Basis for the 80% finding
+      tz-textonly.md                              # Raw session transcript
+      tuba-session-transcript.md                  # Cleaned transcript (Stages 0–6 + HITL)
+    reproducibility/                              # 5 three-run validation files + README
+      claim-extraction-run-{A,B,C}.md             # Three independent extractions
+      claim-extraction-{20260325,comparison-20260325}.md  # v1.0 vs v1.1 codebook
+    further-reading/                              # 4 narrative analyses + README
+      Heritage4_0-Case-Evidence-2303.md           # Demos A/B/C with source tracing
+      Manual-vs-Bot-Comparison-2303.md            # Manual SA vs AI-assisted SA
+      Tuba-Run-Analysis-2303.md                   # Bot session analysis
+      InSites_Observation_Guide.docx              # Expert observation rubric
+
+paper-supplementary/                             (PUBLIC entry point on heritage-4.0.1)
+  README.md                                       # Short, points into research-tools/
 ```
+
+**Active branch for paper supplementary**: `heritage-4.0.1` (3 commits, pushed to `origin/heritage-4.0.1`). Do NOT merge to main pre-acceptance.
+
+**Scope rule (intentional minimum)**: The supplementary is sized for an extended-abstract delivery, with camera-ready iteration to follow. See memory `project_paper_supplementary_state.md` for the deferred-to-camera-ready list (numbers-traceability table, optional inter-rater spot-check, source DOIs, polished prose). Do NOT add these now.
+
+**Claim-extractor skill location**: active copy at `.claude/skills/claim-extractor/SKILL.md` (gitignored, local-only) so Claude Code can trigger it. Reference copy in `Heritage4.0/research-tools/core/SKILL.md` (the public version cited by the paper).
 
 ### 📐 REFERENCE — Read-only specs, don't modify unless asked
 
