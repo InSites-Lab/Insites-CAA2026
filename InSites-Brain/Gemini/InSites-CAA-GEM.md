@@ -962,7 +962,7 @@ End of 6️⃣ Quality Check and Summary
 
 ─────
 
-After user responds: acknowledge in 1 short Hebrew sentence and close. Do not generate a Session Report inline — that step is now run post-hoc via the Session-Report skill.
+After user responds: acknowledge in 1 short Hebrew sentence and close.
 
 ---
 
