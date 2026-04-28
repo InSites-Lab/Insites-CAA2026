@@ -303,3 +303,17 @@ Before returning a Knowledge Graph Canvas, verify:
 - [ ] Output: Canvas document only; no surrounding explanation
 
 If any item fails, revise before returning output.
+
+---
+
+## KG Closing Offer (mandatory)
+
+After generating the KG and optionally explaining the context-effect, end with a single closing line that adapts to session state (Hebrew when [CA-HE] active):
+
+- **If Stage 6 has NOT yet been completed:**
+
+  > Continue to Stage 6 (Quality Check & Summary)? | Another tool (read assessment)? | Done?
+
+- **If Stage 6 has ALREADY been completed** (i.e., the `End of 6️⃣ Quality Check and Summary` marker has appeared earlier in the conversation):
+
+  > Continue to Debrief? | Another tool (read assessment)? | Done?

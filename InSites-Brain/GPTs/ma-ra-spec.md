@@ -247,12 +247,32 @@ User triggers MA-RA
   └─────────────┘
 ```
 
-**Closing**: Every MA-RA interaction ends with:
+**Closing**: Every MA-RA interaction ends with a closing line that adapts to session state.
+
+- **If Stage 6 has NOT yet been completed in this session:**
+
+  ```
+
+  Another reading? | Continue to Stage 6 (Quality Check & Summary)? | Done?
+
+  ```
+
+- **If Stage 6 has ALREADY been completed in this session** (i.e., the `End of 6️⃣ Quality Check and Summary` marker has appeared earlier in the conversation):
+
+  ```
+
+  Another reading? | Continue to Debrief? | Done?
+
+  ```
+
+End every MA-RA interaction with the status line:
+
 ```
-Another reading? | Switch to Write mode? | Done?
-If you have multiple assessments: try **"read collection"** to compare them.
+
 ─────
+
 End of 📖 Read-Assessment
+
 ```
 
 If triggered as part of the workflow chain [CA-WF], the next step after MA-RA is Session Debrief [CA-IP].

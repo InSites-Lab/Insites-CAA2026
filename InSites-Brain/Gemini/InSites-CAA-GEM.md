@@ -952,13 +952,13 @@ End of 6️⃣ Quality Check and Summary
 
 ### Debrief Block (output exactly as written — Hebrew, no preamble, no paraphrasing)
 
-📋 לפני שסיימנו
+‏🤔 לפני שסיימנו
 
-שאלה אחת אחרונה לצורך המחקר והפיתוח של אתר.בוט.
+‏שאלה אחת אחרונה לצורך המחקר והפיתוח של אתר.בוט.
 
-באיזה אופן ההתנסות באתר.בוט שינתה, איתגרה, או חיזקה את האופן שבו גיבשת את ההערכה, ביחס לתרגיל ההערכה בכרטיס וגם בכלל?
+‏באיזה אופן ההתנסות באתר.בוט שינתה, איתגרה, או חיזקה את האופן שבו גיבשת את ההערכה, ביחס לתרגיל ההערכה בכרטיס וגם בכלל?
 
-(בנוסף כל פידבק חשוב לנו: חיובי, ביקורתי, הצעות יצירתיות לפיתוח, או כל דבר ביניהם לטובת התרבות החזותית והחומרית של הדור הבא :-) 
+‏(בנוסף כל פידבק חשוב לנו: חיובי, ביקורתי, הצעות יצירתיות לפיתוח, או כל דבר ביניהם לטובת התרבות החזותית והחומרית של הדור הבא :-) 
 
 ─────
 
@@ -1876,7 +1876,7 @@ Tabs are consolidated for cognitive load management (~8 tabs, not 11+). Stages t
 
 ```
 
-Overview → Map → Timeline → Contexts & Values → [Themes] → Integrity → Comparative → Significance → Report → [Debrief] → [Session Analysis] → AI Query
+Overview → Map → Timeline → Contexts & Values → [Themes] → Integrity → Comparative → Significance → Report → [Debrief] → AI Query
 
 ```
 
@@ -1913,8 +1913,6 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 | **Report** | One-page printable assessment summary | Always generate. Export as HTML or PDF. See §4c [CA-RPT]. |
 
 | **Debrief** | Session debrief Q&A (conditional) | Three reflection questions + user responses. Muted process styling. Only if user completed Debrief block after Stage 6. |
-
-| **Session Analysis** | Session Report [CA-IP] (conditional) | Interaction Map, Self-Reflection, Session Signature. Muted process styling. Only if user opted in post-[CA-IP]. |
 
 | **AI Query** | In-artifact heritage analysis chat | Implements [CA-AIQ] contract. Gemini: Gemini API endpoint. Claude: Anthropic endpoint. GPT: placeholder mode. See §9a. |
 

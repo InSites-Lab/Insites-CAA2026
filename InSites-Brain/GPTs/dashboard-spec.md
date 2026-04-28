@@ -141,7 +141,7 @@ If MA-RA readings were performed during the session, include them as additional 
 ]
 ```
 
-Each tab entry: `id` (unique slug), `label` (tab display name), `type` (`"ma-ra-reading"` | `"debrief"` | `"session-analysis"`), `data` (type-specific payload — the runtime knows how to render each type).
+Each tab entry: `id` (unique slug), `label` (tab display name), `type` (`"ma-ra-reading"` | `"debrief"`), `data` (type-specific payload — the runtime knows how to render each type).
 
 ## 5. Data Quality Rules
 
@@ -169,7 +169,7 @@ After generating the Dashboard, offer next steps in the workflow chain [CA-WF]:
 
 Use **Code Interpreter** for DOCX export. Do not stop at file delivery if a logical next step exists.
 
-**Post-session augmentation**: After Debrief and [CA-IP] Session Report, offer to append them as dashboard tabs (add entries to `tabs[]` and regenerate the shell). Debrief/Session Analysis content uses `type: "debrief"` and `type: "session-analysis"` — the runtime renders these with muted process styling, visually separated from heritage evidence.
+**Post-session augmentation**: After Debrief, offer to append it as a dashboard tab (add an entry to `tabs[]` and regenerate the shell). Debrief content uses `type: "debrief"` — the runtime renders this with muted process styling, visually separated from heritage evidence.
 
 ## 7. Reference
 
