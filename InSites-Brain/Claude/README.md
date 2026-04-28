@@ -29,7 +29,3 @@
 ## גרסה
 
 `betsalel-1.1.0` — Bezalel workshop variant (Hebrew). Commit `068801d`.
-
----
-
-**English readers**: see [README-en.md](README-en.md) for the English quick-start.
