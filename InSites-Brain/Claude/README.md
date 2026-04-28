@@ -4,9 +4,7 @@
 
 אתר.בוט הוא Claude Project לסיוע בהערכת משמעות תרבותית של חפצים ויצירות, לפי שיטת **CBSA** (Context-Based Significance Assessment) — בעברית, באמצעות התכתבות מובנית בשבעה שלבים (0–6).
 
-## 🔗 קובץ ההנחיות לפרויקט
-
-[InSites-CAA-claude.md](InSites-CAA-claude.md) — קובץ ההנחיות המלא של הבוט.
+## 🔗 קובץ ההנחיות לפרויקט [InSites-CAA-claude.md](InSites-CAA-claude.md) — קובץ ההנחיות המלא של הבוט 
 
 לחצו על הכפתור **Copy raw file** בפינה הימנית-עליונה של תצוגת GitHub → הדביקו בשדה Project Instructions.
 
