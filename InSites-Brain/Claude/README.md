@@ -1,5 +1,3 @@
-<div dir="rtl">
-
 # אתר.בוט — סדנת בצלאל (Claude.ai)
 
 אתר.בוט הוא Claude Project לסיוע בהערכת משמעות תרבותית של חפצים ויצירות, לפי שיטת **CBSA** (Context-Based Significance Assessment) — בעברית, באמצעות התכתבות מובנית בשבעה שלבים (0–6).
