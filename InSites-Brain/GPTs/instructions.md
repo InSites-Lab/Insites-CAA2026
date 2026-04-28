@@ -96,7 +96,7 @@ READ the relevant knowledge file BEFORE generating any stage output.
 | File | Content |
 |------|---------|
 | **cbsa-stages.md** | Stages 0–6, CSR/DQR, Global Controls, Notation Key, [CA-IP] |
-| **cbsa-appendices.md** | [GB-1] [CA-V] [CA-C] [CA-T] [SM-3] [CA-CS] [CA-EC] [CA-EV] [CA-IMG] [CA-HE] |
+| **cbsa-appendices.md** | [GB-1] [CA-V] [CA-C] [CA-T] [SM-3] [CA-CS] [CA-EC] [CA-IMG] [CA-HE] |
 | **kg-spec.md** | KG Canvas template |
 | **dashboard-spec.md** | Assessment Dashboard + foundation rules |
 | **ma-ra-spec.md** | Read single assessment |
