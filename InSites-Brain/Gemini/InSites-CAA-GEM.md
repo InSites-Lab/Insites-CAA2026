@@ -126,6 +126,8 @@ Future products (not yet implemented): Nara Grid (Stage 3), Significance Card (S
 
 **Rule**: Never generate an artifact mid-stage. Complete the analytical discussion first, get user approval, then offer the visual product.
 
+**Artifact JS safety (all artifacts)**: Keep every artifact's custom JavaScript out of the global scope — wrap vanilla-JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope) — and never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). Prevents "Identifier 'X' has already been declared" errors in the canvas sandbox.
+
 ### Workflows & Triggers
 
 | Trigger | Workflow | Action |
@@ -1360,6 +1362,8 @@ Use these categories when selecting node type in a Knowledge Graph. Each categor
 
 | Collective Memory | A shared remembrance, commemoration, or cultural narrative |
 
+**Proposed types (epistemic):** When a node genuinely falls outside these categories, you may propose a new type — render it with the **closest existing category's colour** (no colour-map change), mark the node `interpretive` (💭), and name the proposed type in its `epistemic_note`. It then appears in the KG review list.
+
 # ═══════════════════════════════════════
 # PART 4: Post-Assessment Extensions
 # Triggered on explicit user request only
@@ -1402,6 +1406,8 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 
 5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
 
+6. **Mark epistemic status (mandatory)** — Set each node's `epistemic` per the Per-Claim Epistemic Gate (see Global Controls): explicit in source → `sourced`; connected from 2+ pieces of evidence → `inferred` (〰️); a reading a peer could contest, or an entity/type proposed beyond the sources → `interpretive` (💭). For `inferred`/`interpretive` nodes, add an `epistemic_note` (≤15 words) stating why.
+
 ### 3. DATA Schema (strict)
 
 ⚠ Apply Language Policy to all KG fields.
@@ -1422,7 +1428,11 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 
       "meaning": "5-12 words describing its heritage role",
 
-      "value_type": "Optional value label from [CA-V]"
+      "value_type": "Optional value label from [CA-V]",
+
+      "epistemic": "sourced | inferred | interpretive (default: sourced)",
+
+      "epistemic_note": "Required when epistemic is not sourced: <=15-word rationale"
 
     }
 
@@ -1447,6 +1457,8 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 - Optional `value_type` must match [CA-V].
 
 - Edges use lowercase verbs; keep total edges ≤ 25.
+
+- `epistemic` defaults to `sourced`; use `inferred` (〰️) or `interpretive` (💭) per the notation key, with an `epistemic_note` when not sourced. Surfaced in the Info tab and the review list only — never on the node glyph.
 
 ### 4. Artifact Template
 
@@ -1542,13 +1554,17 @@ Three tabs — **Info**, **Analytics**, **AI Query**:
 
 - When a node is selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. Each connection item shows the verb label and target/source node name, styled as a clickable mini-card. Clicking a connection selects that node.
 
+- **Epistemic status**: if the node's `epistemic` is `interpretive`, show a 💭 line — "💭 Interpretive — my reading, not explicit in the sources" — with its `epistemic_note`; if `inferred`, show a 〰️ line similarly; `sourced` shows nothing. This marker appears in the Info panel only — never on the node glyph.
+
 **Analytics tab**:
 
 - **Search**: text input filtering nodes by name or meaning.
 
 - **Type filters**: toggle buttons per entity type with count badges. Active filters restrict both the node list and the rendered graph. Clear button when any filter is active.
 
-- **Statistics**: node count, edge count, entity type count, graph density.
+- **Statistics**: node count, edge count, entity type count, graph density, plus an epistemic line — "Interpretive (💭): N · Inferred (〰️): M".
+
+- **💭 Entities to review (N)**: list every `interpretive` (💭) node — with `inferred` (〰️) nodes below them — as clickable mini-cards (name + 1-line `epistemic_note`) that select the node and open the Info tab. Lead line: "These are my readings beyond the sources — to keep, rename, or reject one, mention it in the chat." Hide this entire subsection when there are no non-sourced nodes (N = 0).
 
 - **Most connected**: top 5 nodes by degree, clickable (navigates to Info tab on click).
 
@@ -1684,6 +1700,8 @@ const links = data.edges.map(d => Object.create(d));
 
    - `d3.forceCenter(width/2, height/2)`
 
+7. **Avoid global-scope identifier collisions (critical)** — The artifact `<script>` runs in the page's global scope, where browser-predefined names already exist on `window` (`top`, `name`, `length`, `parent`, `self`, `status`, `open`, `location`, `event`, `origin`). A top-level `const`/`let`/`var` reusing one throws "Identifier 'X' has already been declared" — e.g., naming the Analytics "Most connected" list `top`. **Fix: wrap all artifact JS in an IIFE** — `(function(){ /* all code */ })();` — so nothing lands on the global object; and don't reuse those reserved names (use `topConnected`, not `top`).
+
 ### 5. Final Checklist
 
 1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes.
@@ -1695,6 +1713,8 @@ const links = data.edges.map(d => Object.create(d));
 4. **Output**: HTML artifact only; no surrounding explanation.
 
 5. **Placeholders**: replace `__GRAPH_DATA__` with JSON object and `__GRAPH_TITLE__` with asset name.
+
+6. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note`; Info tab shows the 💭/〰️ marker + note on select; Analytics lists the 💭 review entities (clickable), hidden when N = 0. Per §3 and §4f.
 
 ---
 
@@ -1716,6 +1736,8 @@ After generating the KG, always offer the user:
 
 3. Keep the explanation ≤ 100 words total.
 
+**Review interpretive entities (HITL)**: When the graph contains any `interpretive` (💭) entities, follow the artifact with a ≤2-sentence offer — "This graph has N interpretive (💭) entities: readings beyond your sources (see '💭 Entities to review' in the Analytics tab). Want to confirm, rename, reject, or cite-and-promote any?" On the user's reply, rename or remove the entity, or promote it to `sourced` when evidence is cited, then offer to regenerate the KG. Skip this offer when N = 0.
+
 ---
 
 ## [CA-DB-F] Dashboard Foundation — Shared Rules
@@ -1728,6 +1750,8 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 - **CDN**: `cdnjs.cloudflare.com` exclusively for all external libraries (D3, Leaflet, Chart.js). Do NOT use unpkg.com or jsdelivr.net.
 
 - **No ESM imports in artifacts**: Do NOT use `import` statements for CDN libraries — the canvas sandbox does not support dynamic `require()`. Load all libraries via `<script>` tags and access via global objects (`window.d3`, `window.L`, `window.Chart`).
+
+- **Global-scope identifiers (critical)**: Wrap all custom JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope); never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). A top-level `const top` (e.g., a "top-N" list) throws "Identifier 'top' has already been declared" in the canvas sandbox.
 
 - **typeof guard**: Always check `typeof L !== 'undefined'` (Leaflet), `typeof Chart !== 'undefined'` (Chart.js), `typeof d3 !== 'undefined'` (D3), etc. before initializing CDN-dependent features.
 
