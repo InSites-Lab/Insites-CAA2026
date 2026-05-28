@@ -85,6 +85,8 @@ Future products (not yet implemented): Nara Grid (Stage 3), Significance Card (S
 
 **Rule**: Never generate an artifact mid-stage. Complete the analytical discussion first, get user approval, then offer the visual product.
 
+**Artifact JS safety (all artifacts)**: Keep every artifact's custom JavaScript out of the global scope — wrap vanilla-JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope) — and never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). Prevents "Identifier 'X' has already been declared" errors in the artifact sandbox.
+
 ### Workflows & Triggers
 
 | Trigger | Workflow | Action |
@@ -1283,6 +1285,7 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 
 - **CDN**: `cdnjs.cloudflare.com` exclusively for all external libraries (D3, Leaflet, Chart.js). Do NOT use unpkg.com or jsdelivr.net.
 - **No ESM imports in artifacts**: Do NOT use `import` statements for CDN libraries — the artifact sandbox does not support dynamic `require()`. Load all libraries via `<script>` tags and access via global objects (`window.d3`, `window.L`, `window.Chart`). For React artifacts, use a dynamic script loader in `useEffect`.
+- **Global-scope identifiers (critical)**: Wrap all custom JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope); never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). A top-level `const top` (e.g., a "top-N" list) throws "Identifier 'top' has already been declared" in the artifact sandbox.
 - **typeof guard**: Always check `typeof L !== 'undefined'` (Leaflet), `typeof Chart !== 'undefined'` (Chart.js), `typeof d3 !== 'undefined'` (D3), etc. before initializing CDN-dependent features.
 - **Inline data**: All extracted data must be embedded inline as JS objects. Do NOT use `fetch()`. Dashboards must work via `file://` protocol.
 - **Leaflet popup close workaround**: Artifact sandbox rewrites hash links. After map init: `document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();mapInstance.closePopup();}});`

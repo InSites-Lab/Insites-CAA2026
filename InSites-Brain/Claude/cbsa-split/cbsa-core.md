@@ -104,6 +104,8 @@ Future products (not yet implemented): Nara Grid (Stage 3), Significance Card (S
 
 **Rule**: Never generate an artifact mid-stage. Complete the analytical discussion first, get user approval, then offer the visual product.
 
+**Artifact JS safety (all artifacts)**: Keep every artifact's custom JavaScript out of the global scope — wrap vanilla-JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope) — and never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). Prevents "Identifier 'X' has already been declared" errors in the artifact sandbox.
+
 ### Workflows & Triggers
 
 | Trigger | Workflow | Action |
