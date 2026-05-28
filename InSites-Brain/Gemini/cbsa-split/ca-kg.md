@@ -262,6 +262,10 @@ Artifacts in this environment execute with the API key provided at runtime. Do N
 
 5. **Robust Markdown Rendering**: Write a `parseMarkdown(text)` function that handles `**bold**`, `*italic*`, `` `code` ``, parses bullet lists (`- ` or `* `) into proper `<ul>` and `<li>` tags, and converts `\n\n` to `<p>`. Add specific CSS rules for `.msg-assistant ul` (e.g., `padding-left: 24px;`) and `.msg-assistant li` to ensure readability.
 
+6. **No AbortController (CRITICAL)**: Do NOT use `AbortController`/`AbortSignal` for the fetch timeout — it cannot be cloned across the artifact `postMessage` boundary (`DataCloneError`). Use `Promise.race` with `setTimeout` instead:
+
+   `const fetchWithTimeout = (url, opts, ms = 20000) => Promise.race([fetch(url, opts), new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout")), ms))]);`
+
 #### 4k. D3 Force Implementation Notes (mandatory)
 
 The data contract natively uses `source` and `target` to align with D3.js. Clone the data directly for the simulation:

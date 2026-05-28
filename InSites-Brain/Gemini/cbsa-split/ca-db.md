@@ -297,7 +297,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 | **Integrity** | Nara Grid cards + summary + vulnerability matrix | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. **🔴 Vulnerability Analysis** (visible sub-heading): interpretive callout ABOVE the heat matrix (not below). Legend inline: "🔴 = loss severely damages this value, 🟡 = moderate, ⚪ = minor." Each cell shows symbol + number: `● 3` (severe), `◐ 2` (moderate), `○ 1` (minor), `· 0` (negligible) — symbols provide non-color distinction for accessibility. Heat matrix: rows = value categories, columns = Nara aspects with integrity rating in header. Only if vulnerability data exists. |
 
-| **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. |
+| **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. Each card includes a **📍 Map** button → `mapInstance.setView([c.lat, c.lng], 16)` to fly to the comparator on the Map tab (comparators are excluded from the map's initial zoom). |
 
 | **Significance** | Statement of cultural significance | Styled as a featured block. |
 
@@ -325,7 +325,17 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 - **Comparator popup**: name (bold), period, architect, distinction (truncated 80 chars), criteria as colored pills.
 
-- **Bounds**: Auto-fit all markers with padding `[40, 40]`. If only asset marker → zoom 12.
+- **Initial view & zoom (CRITICAL — prevents country-wide zoom-out)**: Center close on the asset. Do NOT `fitBounds()` over remote comparators — a distant comparator forces a country-level zoom-out.
+
+  - Build a **local set** = asset point + any secondary points belonging to *this* assessment that sit near the asset (components, connected/regional sites). Comparators (Stage 4) are **never** in this set.
+
+  - Local set = 1 point → `mapInstance.setView([asset.lat, asset.lng], 16)`.
+
+  - Local set = 2+ points → `mapInstance.fitBounds(localBounds, { padding: [40,40], maxZoom: 16 })` (never over-zooms).
+
+  - **Comparator markers** still render but do NOT affect the initial view — reach them via the "📍 Map" button in the Comparative tab.
+
+- **No polygons**: use `L.circleMarker` for all points; never draw polygons/boundary lines unless explicitly requested.
 
 - **Coordinate source**: Below the map container, show: "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
 
@@ -673,6 +683,18 @@ const fetchWithTimeout = (url, opts, ms = 20000) =>
 
 ```
 
+**Gemini API call (live — primary platform):**
+
+1. **API key**: `const apiKey = "";` — leave empty; the Canvas runtime injects the active key. A hardcoded key causes 403.
+
+2. **Endpoint (exact — do not change the model)**: `POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`. The injected key is scoped to this model only — any other name (`flash-lite`, older flash) → **403 Forbidden**.
+
+3. **Payload**: `{ contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: SYSTEM_PROMPT + JSON.stringify(DATA) }] } }`.
+
+4. **Reliability**: wrap `fetchWithTimeout` in exponential-backoff retry (5 retries: 1s, 2s, 4s, 8s, 16s). Extract via `result.candidates?.[0]?.content?.parts?.[0]?.text`.
+
+5. **Markdown**: render with a regex `parseMarkdown()` (bold/italic/code/lists/paragraphs), as in `CA-KG in ca-kg.md` §4j.
+
 **System prompt**: "You are a heritage expert analyzing an Assessment Dashboard. Be concise (max 150 words). Format using markdown lists and bold text. Base your answer ONLY on this data JSON: {dataJSON}"
 
 **Starter prompts** (Single Dashboard):
@@ -858,6 +880,8 @@ The AI Query tab implements the [CA-AIQ] contract.
 - **Claude**: Live analysis via Anthropic API. Swap the API call block per [CA-AIQ] contract.
 
 - **GPT**: Placeholder mode — display starter prompts, route queries to GPT conversation.
+
+**Gemini API implementation**: identical to §9a above (empty `apiKey`, `gemini-2.5-flash-preview-09-2025` endpoint, no `AbortController` → `Promise.race` timeout, exponential backoff, `parseMarkdown`).
 
 **System prompt**: "You are a heritage expert analyzing a Collection Dashboard. Be concise (max 150 words). Format using markdown lists and bold text. Base your answer ONLY on this data JSON: {dataJSON}"
 
