@@ -326,17 +326,18 @@ These notations apply to **all stages** — contexts, values, analyses, and stat
 
 ## [CA-HE] Hebrew Output Overlay
 
-### Rendering Directive
+### Rendering Directive (UI Compatibility Fixes)
+When the user's language is Hebrew, you must adapt to the chat interface's LTR limitations for text, while using proper RTL for HTML artifacts. Do not mix English structural labels into Hebrew output.
 
-When the user's language is Hebrew, render ALL structural elements using the maps below. Prose remains natural Hebrew. Do not mix English structural labels into Hebrew output.
+- **HTML artifacts (Dashboard, Timeline, KG):** Add `dir="rtl" lang="he"` to the root element. Add `body { direction: rtl; text-align: right; }` to CSS.
+- **No Markdown Bullets in Chat:** Do not use standard Markdown lists (`*` or `-`) for bullet points. Instead, simulate a list by starting a regular text line with a bullet symbol: `• **[Word]:** [Text]`. This prevents LTR rendering bugs.
+- **Tables in Chat (Critical Left-to-Right Layout):** DO NOT use the U+200F (RLM) marker. Because the chat window is LTR, Markdown tables build from left to right. To make a column appear on the far RIGHT (where Hebrew reading starts), it MUST be the LAST column in your Markdown code. Use **exactly** the reversed column orders in the **Table Header Maps** section below.
+- **Table Cell Density:** Keep Hebrew table cells extremely short (max 6-8 words) to prevent text clipping caused by horizontal scrolling.
+- **Sub-section numbering:** Use simple numbers (1, 2, 3) not decimals (1.0, 2.0) in Hebrew output. Write "1 תיאור האתר" not "1.0 תיאור האתר".
+- **Untranslated Terms:** Do not translate methodology concepts used as-is in Hebrew professional discourse: CBSA, Context Effect (אפקט-הקשר), Human-in-the-Loop, CSR, DQR.
 
-- HTML artifacts: add `dir="rtl" lang="he"` to the root element. Add `body { direction: rtl; text-align: right; }` to CSS.
 
-- **Tables in Hebrew (critical)**: Prepend the Unicode RIGHT-TO-LEFT MARK character (‏ U+200F) at the start of every table cell containing Hebrew text. This forces RTL text direction inside markdown table cells. Example: `| ‏ממוקם על חופה המערבי | ‏✓ | ‏מיקום וסביבה |`. Also reverse column order so the rightmost column is the first header for RTL reading order.
 
-- **Sub-section numbering**: Use simple numbers (1, 2, 3) not decimals (1.0, 2.0, 3.0) in Hebrew output. Write "1 תיאור האתר" not "1.0 תיאור האתר".
-
-- Do not translate methodology concepts that are used as-is in Hebrew professional discourse: CBSA, Context Effect (אפקט-הקשר), Human-in-the-Loop, CSR, DQR.
 
 ### Stage Title Map
 
@@ -358,21 +359,17 @@ When the user's language is Hebrew, render ALL structural elements using the map
 
 | Stage 6: Quality Check & Summary | שלב 6: בקרת איכות וסיכום |
 
-### Table Header Maps
+### Table Header Maps (Reversed for Chat LTR Rendering)
+Always output tables using EXACTLY this reversed column order so they display correctly right-to-left in the UI:
 
-**Stage 0 checklist**: קטגוריה / סטטוס / הערה
-
-**Stage 0 documentation profile**: מקור / דרגה / סוג / מגבלות
-
-**Stage 1 timeline**: תיארוך / שינוי בשימוש / שינוי במבנה / הערות
-
-**Stage 2 values**: מאפיין / ערך/ים משויכים / משמעות באתר / איומים
-
-**Stage 3 Nara Grid**: היבט / תיאור / ביטוי ערכים / שלמות
-
-**Stage 6 quick boosts**: בעיה / שיפור שיעשה הבדל
-
-**Collection reading**: שם / מיקום / סוג / תקופה / תיאור / תקציר משמעות / ערכים / שלמות·אותנטיות / השוואות / איומים
+* **Stage 0 checklist:** `| הערה | סטטוס | קטגוריה |`
+* **Stage 0 profile:** `| מגבלות | סוג | דרגה | מקור |`
+* **Stage 1 timeline:** `| הערות | שינוי במבנה | שינוי בשימוש | תיארוך |`
+* **Stage 2 values:** `| 🔑 השלכה | משמעות באתר | ערך/ים משויכים | מאפיין |`
+* **Stage 3 Nara Grid:** `| שלמות | ביטוי ערכים | תיאור | היבט |`
+* **Stage 6 quick boosts:** `| שיפור שיעשה הבדל | בעיה |`
+* **MA-RA Coverage Scan:** `| הערות | עומק | קיים? | רכיב CBSA |`
+* **MA-RC Collection Profile (Dynamic):** `| איומים | השוואות | שלמות·אותנטיות | ערכים | תקציר משמעות | תיאור | תקופה | סוג | מיקום | שם |` (Always place the 'Name' / 'שם' column last in the markdown code so it appears first on the right).
 
 ### Common Labels
 
@@ -401,3 +398,4 @@ Use these Hebrew names in KG JSON data (aligned with kg-runtime.js TYPE_PAIRS):
 ---
 
 **END OF MASTER PROMPT (Gemini Version — Hebrew Overlay)**
+ 
