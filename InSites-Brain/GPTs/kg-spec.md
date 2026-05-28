@@ -46,7 +46,8 @@ Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge gr
    - **Up to 3 Cultural Value nodes** (abstract value entities for KG illustration)
 3. Capture relationship verbs that show CBSA logic (`located_in`, `expresses_value`, `part_of`, `commemorates`, `influenced_by`, `supports`, etc.).
 4. Drop weak/duplicate nodes; avoid orphans (every node must connect at least once).
-5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
+5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly (the runtime gives it a fallback colour automatically) and mark the node `interpretive` (💭).
+6. Set each node's `epistemic` status per the Per-Claim Epistemic Gate (cbsa-stages.md): explicit in source → `sourced`; connected from 2+ pieces of evidence → `inferred` (〰️); a reading a peer could contest, or an entity/type proposed beyond the sources → `interpretive` (💭). For non-sourced nodes, add an `epistemic_note` (≤15 words).
 
 ## DATA Schema (strict)
 
@@ -61,7 +62,9 @@ Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge gr
       "name": "Display Name",
       "type": "Entity Type",
       "meaning": "5-12 words describing its heritage role",
-      "value_type": "Optional value label from [CA-V]"
+      "value_type": "Optional value label from [CA-V]",
+      "epistemic": "sourced | inferred | interpretive (default: sourced)",
+      "epistemic_note": "Required when epistemic is not sourced: <=15-word rationale"
     }
   ],
   "edges": [
@@ -135,6 +138,8 @@ Only the graph data belongs in the inline script block. Everything else is handl
 | Field | Type | Description |
 |-------|------|-------------|
 | `value_type` | string | For Cultural Value nodes: Historical, Aesthetic, Social, etc. |
+| `epistemic` | string | `sourced` (default) / `inferred` (〰️) / `interpretive` (💭) — shown in the Info tab + review list, never on the node glyph |
+| `epistemic_note` | string | Short rationale (≤15 words); required when `epistemic` ≠ `sourced` |
 | `meta` | object | Additional key-value pairs displayed in sidebar |
 
 ### Required Edge Fields
@@ -234,8 +239,8 @@ The external runtime (`kg-runtime.js` + `kg-runtime.css`) provides all of the fo
 - Type filter buttons with colored dots
 
 ### Sidebar (3 tabs)
-- **Info**: node details (name, type badge, meaning, value_type, meta) + outgoing/incoming connections as clickable cards. When no node is selected: placeholder prompt ("Click a node to inspect it"). When selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming.
-- **Analytics**: Search input filtering nodes by name or meaning. Type filter toggle buttons with count badges. Statistics: node count, edge count, entity type count, graph density. Top 5 most connected nodes by degree, clickable (navigates to Info tab on click).
+- **Info**: node details (name, type badge, meaning, value_type, meta) + outgoing/incoming connections as clickable cards. When no node is selected: placeholder prompt ("Click a node to inspect it"). When selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. If the node's `epistemic` is `inferred`/`interpretive`, a 〰️/💭 status line + `epistemic_note` is shown here (Info panel only — never on the node glyph).
+- **Analytics**: Search input filtering nodes by name or meaning. Type filter toggle buttons with count badges. Statistics: node count, edge count, entity type count, graph density. A **💭 Entities to review (N)** list — interpretive (💭) and inferred (〰️) nodes, clickable → Info tab; hidden when none. Top 5 most connected nodes by degree, clickable (navigates to Info tab on click).
 - **AI Query**: placeholder mode — title, description, example prompts for the GPT chat. No live API calls from the Canvas.
 
 ### Legend
@@ -282,6 +287,8 @@ When user clicks a starter prompt or types a question, display: "💬 Copy this 
 
 Offer to highlight one context-effect edge pair. If accepted: 2 sentences max — Context→Asset, Asset→Context. No theory preamble.
 
+**Review interpretive entities (HITL)**: When the graph has any `interpretive` (💭) entities, follow the Canvas with a ≤2-sentence offer — "This graph has N interpretive (💭) entities (see '💭 Entities to review' in the Analytics tab). Want to confirm, rename, reject, or cite-and-promote any?" On the user's reply, rename/remove the entity or promote it to `sourced` when evidence is cited, then offer to regenerate the KG. Skip this offer when N = 0.
+
 ## Compliance Check
 
 Before returning a Knowledge Graph Canvas, verify:
@@ -299,6 +306,7 @@ Before returning a Knowledge Graph Canvas, verify:
 - [ ] `lang` and `dir` match user language
 - [ ] Counts: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes
 - [ ] Every node has `id`, `name`, `type`, `meaning` (English). No orphan nodes.
+- [ ] Every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note` (≤15 words).
 - [ ] Relationship verbs describe actual CBSA links (avoid duplicate "related_to" unless necessary)
 - [ ] Output: Canvas document only; no surrounding explanation
 

@@ -296,6 +296,44 @@ body {
   font-style: italic;
 }
 
+/* ── Epistemic status + entities-to-review ── */
+.kg-epistemic-row {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+.kg-epistemic-row strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #334155;
+  font-weight: 700;
+}
+.kg-epistemic-note {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 4px;
+}
+.kg-epistemic-summary {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+.kg-review-prompt {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.kg-review-item {
+  justify-content: flex-start;
+}
+.kg-review-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
 /* ── Analytics: stat grid ── */
 .kg-stat-grid {
   display: grid;

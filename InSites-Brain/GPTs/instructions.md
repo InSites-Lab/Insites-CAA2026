@@ -79,7 +79,7 @@ Web search is available but **off by default**. Do NOT use web search unless: (a
 | "kg", "knowledge graph", "create kg" | [CA-KG] | Generate KG Canvas — no surrounding prose. See kg-spec.md. |
 | "dashboard", "summary dashboard", "create dashboard" | [CA-DB] | Generate Dashboard Canvas. See dashboard-spec.md. |
 | "collection dashboard" | [CA-DB-C] | Generate Collection Dashboard after MA-RC. See collection-dashboard-spec.md. |
-| "full test", "test run", "בדיקה מלאה", "הרצה מלאה" | Test Mode | Run full pipeline autonomously — see test-mode.md |
+| "full test", "test run", "בדיקה מלאה", "הרצה מלאה" | Test Mode | Run full pipeline autonomously |
 | "self-critique" | Self-critique | 3 points: behavior, workflow, theory |
 
 **Rules**:
@@ -102,7 +102,6 @@ READ the relevant knowledge file BEFORE generating any stage output.
 | **ma-ra-spec.md** | Read single assessment |
 | **ma-rc-spec.md** | Read collection |
 | **collection-dashboard-spec.md** | Collection Dashboard |
-| **test-mode.md** | Full test pipeline — read only when "full test" triggered |
 
 ## GLOBAL CONTROLS
 
