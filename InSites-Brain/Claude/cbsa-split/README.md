@@ -32,6 +32,35 @@ so the bot reads the precise spec for a task instead of relying on memory of the
 
 Cross-references between files are written as "see X in <file>.md" so any code resolves to its file.
 
+## Epistemic transparency (〰️ / 💭)
+
+InSites makes the model's interpretive work **visible** rather than hiding it. Every element carries an
+epistemic status, defined by the **Global Notation Key** + **Per-Claim Epistemic Gate** in `cbsa-core.md`:
+
+- *(no mark)* — **sourced**: explicit in the user's material.
+- `〰️` — **inferred**: connected from 2+ pieces of evidence (cite them).
+- `💭` — **interpretive** ("cloud"): a reading a reasonable peer could contest.
+
+This notation runs inline through **all stages** (`cbsa-stages.md`) — and, as of this version, through the
+**Knowledge Graph** too, so the KG no longer flattens the epistemic layer the stage prose carries.
+
+### In the Knowledge Graph (`ca-kg.md`)
+
+- Each node has an `epistemic` field (`sourced` default / `inferred` / `interpretive`) plus an
+  `epistemic_note` (≤15-word rationale) when not sourced.
+- The marker appears **only in the Info tab when a node is clicked** — never on the node glyph or colour,
+  so the graph and the `[CA-EC]` colour map are unchanged.
+- The **Analytics tab** carries a **"💭 Entities to review (N)"** report: clickable cards for every
+  interpretive (and inferred) node. Hidden when none exist (N = 0).
+- **HITL moment** — after generating the KG, the bot offers to **confirm / rename / reject /
+  cite-and-promote** the 💭 entities (the decision happens in chat, since the artifact can't write back).
+  Skipped when N = 0.
+- A **proposed entity type** (outside the `[CA-EC]` list in `cbsa-reference.md`) renders with the
+  *closest existing category's colour* and is flagged `interpretive` 💭 — no colour-map change.
+
+> Scope: this is live for the **Claude** artifact (bot-written, driven by the spec). Mirroring the KG
+> epistemic layer into the GPT runtime (`kg-runtime.js`) and Gemini is a pending follow-up.
+
 ## Installation (Claude.ai Project)
 
 1. Paste the entire content of **`cbsa-core.md`** into the Project **Instructions** (custom instructions).
@@ -51,5 +80,6 @@ Cross-references between files are written as "see X in <file>.md" so any code r
   Keep core thin: only content the bot needs in *every* interaction belongs here; everything else goes
   in an on-demand file plus a row in the Loading Block.
 - **Adding/moving a code** → update the Loading Block and any "see X in <file>.md" cross-references.
+- **Epistemic notation** (`〰️`/`💭`) → the general rule is in `cbsa-core.md` (Global Notation Key + Per-Claim Epistemic Gate); the KG entity-level layer (the `epistemic` field, Info-tab display, "Entities to review" report, and After-KG HITL offer) is in `ca-kg.md`.
 - The split derives from `../InSites-CAA-claude.md` (v7), which remains the source-of-truth; `VERIFICATION.md`
   records exactly which source lines went where.
