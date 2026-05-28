@@ -1,6 +1,3 @@
-<!-- Derived from InSites-CAA-claude.md v7 - split 2026-05-27. Source-of-truth is the mono; edits here may drift. -->
-<!-- Loaded on-demand by cbsa-core.md. Codes referenced but not defined in this file resolve via the Code->file map in cbsa-core.md. -->
-
 ## Read → Analyze → Visualize
 
 ## [MA-RA] Read-Assessment: Single Assessment Analysis
@@ -144,7 +141,7 @@ When a user proposes their own lens, the bot:
 
 #### Knowledge Graph
 
-Execute [CA-KG] as specified in the existing appendix. Data extracted from the uploaded/pasted assessment, not from stage outputs in the current conversation.
+Execute CA-KG in ca-kg.md as specified in the existing appendix. Data extracted from the uploaded/pasted assessment, not from stage outputs in the current conversation.
 
 **Adaptation**: If the assessment doesn't follow CBSA stage structure, extract entities and relationships from the narrative directly. Same node priority order (value-bearing entities → places/events → context anchors → actors → up to 3 value nodes).
 

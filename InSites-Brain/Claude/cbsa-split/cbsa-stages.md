@@ -1,5 +1,3 @@
-<!-- Derived from InSites-CAA-claude.md v7 - split 2026-05-27. Source-of-truth is the mono; edits here may drift. -->
-
 # ═══════════════════════════════════════
 # PART 2: CBSA Stages 0–6 + Session Report
 # The structured assessment process
@@ -32,7 +30,7 @@
 
   - If information is unknown, mark with "—" in the cell and note in the gaps list.
   - **Images**: Analyze any images present (uploaded or embedded) as evidence — weave into stages, don't separate. If none exist and the text implies visual evidence would matter, say what's missing in one specific sentence in the Gaps List.
-  - **Archaeological sites note**: If the uploaded material is an excavation report or archaeological survey, note the document type and the dating methods used (see [CA-EV] for evidence type classification). This helps calibrate certainty throughout subsequent stages.
+  - **Archaeological sites note**: If the uploaded material is an excavation report or archaeological survey, note the document type and the dating methods used (see CA-EV in cbsa-reference.md for evidence type classification). This helps calibrate certainty throughout subsequent stages.
 
 3. **Documentation Profile**
 
@@ -67,7 +65,7 @@ End of 0️⃣ Preliminary Review
 ---
 ## Stage 1️⃣ Description and Contexts
 
-**💡 Brief** — see [CSR]. Anchor in Stage 0 findings.
+**💡 Brief** — see CSR in cbsa-core.md. Anchor in Stage 0 findings.
 
 **Link to Previous Stage**: Before output, note 1-2 items from Stage 0 on which the analysis builds.
 
@@ -108,7 +106,7 @@ Include every dated or period-associated event from the sources. Do not skip.
 
 ### 🌐 1.3 Contexts
 
-**Source**: See [CA-C] for full list, [GB-1] for context effect.
+**Source**: See CA-C in cbsa-reference.md for full list, GB-1 in cbsa-reference.md for context effect.
 
 **Context ≠ Value**:
 - Context = lens, framework, field of examination (Stage 1)
@@ -187,7 +185,7 @@ End of 1️⃣ Description and Contexts
 
 ## Stage 2️⃣ Values Analysis
 
-**💡 Brief** — see [CSR]. Anchor in Stage 1 contexts and timeline.
+**💡 Brief** — see CSR in cbsa-core.md. Anchor in Stage 1 contexts and timeline.
 
 **Inferred Values Rule (mandatory):** Every inferred value must cite 1-2 evidence passages from source A.
 **Scope and Coverage Check (mandatory):** Use A as primary; use B only if requested or for a cited gap (tag "general reference"). If A may be incomplete, mark "⚠ Coverage uncertainty (A)" and request missing A sections.
@@ -270,9 +268,9 @@ End of 2️⃣ Values Analysis
 ```
 ## Stage 3️⃣ Authenticity and Integrity
 
-**💡 Brief** — see [CSR]. Anchor in Stage 2 value-attribute pairs. Frame as "stress test" — checking whether values are stable or fragile.
+**💡 Brief** — see CSR in cbsa-core.md. Anchor in Stage 2 value-attribute pairs. Frame as "stress test" — checking whether values are stable or fragile.
 
-**Theory**: See [SM-3] for integrity definitions and Nara Grid rationale.
+**Theory**: See SM-3 in cbsa-reference.md for integrity definitions and Nara Grid rationale.
 
 ### 3.1 Nara Grid Table
 
@@ -325,7 +323,7 @@ End of 3️⃣ Authenticity and Integrity
 
 ## Stage 4️⃣ Comparison with Other Assets
 
-**💡 Brief** — see [CSR]. Anchor in Stage 3 integrity findings.
+**💡 Brief** — see CSR in cbsa-core.md. Anchor in Stage 3 integrity findings.
 
 ### 4.1 Comparison Set
 
@@ -334,7 +332,7 @@ End of 3️⃣ Authenticity and Integrity
 - **Priority B (fallback, mandatory)**: If no comparison sites exist in the files, state explicitly: "No comparison sites were found in the uploaded text." Then **propose 2-3 candidates** based on professional typological knowledge, clearly marked as bot-suggested (not source-derived). **Request user confirmation before proceeding.** This is an explicit exception to the Evidence Mandate — the bot draws on professional knowledge to suggest comparators, but user must approve before analysis. Web search may be used to identify or verify candidates.
 
 **Analysis**:
-Present 2+ comparison sites (geographic, typological, or thematic). For each, apply 2-4 criteria from [CA-CS] (period, rarity, documentation, ensemble connection, condition, selectivity/diversity, research potential). Justify choices with citations.
+Present 2+ comparison sites (geographic, typological, or thematic). For each, apply 2-4 criteria from CA-CS in cbsa-reference.md (period, rarity, documentation, ensemble connection, condition, selectivity/diversity, research potential). Justify choices with citations.
 
 ### 4.2 Comparison Summary
 
@@ -358,7 +356,7 @@ End of 4️⃣ Comparison with Other Assets
 
 ## Stage 5️⃣ Cultural Significance Statement
 
-**💡 Brief** — see [CSR]. Weave together key elements from all previous stages (1-4).
+**💡 Brief** — see CSR in cbsa-core.md. Weave together key elements from all previous stages (1-4).
 
 ### 5.1 Significance Statement
 
@@ -410,7 +408,7 @@ End of 5️⃣ Cultural Significance Statement
 
 ## Stage 6️⃣ Quality Check and Summary
 
-**💡 Brief** — see [CSR]. Anchor in Stage 5 significance statement and strengths/gaps from the process.
+**💡 Brief** — see CSR in cbsa-core.md. Anchor in Stage 5 significance statement and strengths/gaps from the process.
 
 **Purpose** — Conclude with reliability, strengths, and next steps.
 

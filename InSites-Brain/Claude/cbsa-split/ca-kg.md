@@ -1,6 +1,3 @@
-<!-- Derived from InSites-CAA-claude.md v7 - split 2026-05-27. Source-of-truth is the mono; edits here may drift. -->
-<!-- Loaded on-demand by cbsa-core.md. Codes referenced but not defined in this file resolve via the Code->file map in cbsa-core.md. -->
-
 # ═══════════════════════════════════════
 # PART 4: Post-Assessment Extensions
 # Triggered on explicit user request only
@@ -12,7 +9,7 @@
 
 Generate an interactive Knowledge Graph artifact when the user explicitly requests a Knowledge Graph ("kg", "knowledge graph", "create kg").
 
-> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `[CA-EC]`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
+> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `CA-EC in cbsa-reference.md`, AI Query follows `CA-AIQ in ca-db.md`. See `artifact-ux-contract.md` for the cross-platform source of truth.
 
 ### 1. Trigger and Artifact Enforcement
 
@@ -31,7 +28,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
    - **Up to 3 Cultural Value nodes** (abstract value entities for KG illustration)
 3. Capture relationship verbs that show CBSA logic (`located_in`, `expresses_value`, `part_of`, `commemorates`, `influenced_by`, `supports`, etc.).
 4. Drop weak/duplicate nodes; avoid orphans (every node must connect at least once).
-5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
+5. Assign each node a `type` from the CA-EC in cbsa-reference.md entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
 
 ### 3. DATA Schema (strict)
 
@@ -45,7 +42,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
       "name": "Display Name",
       "type": "Entity Type",
       "meaning": "5-12 words describing its heritage role",
-      "value_type": "Optional value label from [CA-V]"
+      "value_type": "Optional value label from CA-V in cbsa-reference.md"
     }
   ],
   "edges": [
@@ -55,9 +52,9 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 ```
 
 **Rules**:
-- `type` must use English tokens from [CA-EC] for colour mapping (the renderer automatically translates to display labels when needed).
+- `type` must use English tokens from CA-EC in cbsa-reference.md for colour mapping (the renderer automatically translates to display labels when needed).
 - `meaning` is concise, site-specific, written in English.
-- Optional `value_type` must match [CA-V].
+- Optional `value_type` must match CA-V in cbsa-reference.md.
 - Edges use lowercase verbs; keep total edges ≤ 25.
 
 ### 4. Artifact Template
@@ -75,7 +72,7 @@ When the sidebar is collapsed, the graph canvas expands to full width. The toggl
 
 #### 4b. Light Chrome Palette (mandatory)
 
-Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by [CA-EC]. Match the visual language defined in `[CA-UX]` — Noto Sans, Noto Sans Hebrew, system-ui, sans-serif + JetBrains Mono for code spans. Same card styles, spacing patterns, and interaction conventions as the Assessment Dashboard [CA-DB].
+Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by CA-EC in cbsa-reference.md. Match the visual language defined in `[CA-UX]` — Noto Sans, Noto Sans Hebrew, system-ui, sans-serif + JetBrains Mono for code spans. Same card styles, spacing patterns, and interaction conventions as the Assessment Dashboard CA-DB in ca-db.md.
 
 ```
 Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
@@ -117,7 +114,7 @@ Three tabs — **Info**, **Analytics**, **AI Query**:
 
 **Info tab**:
 - When no node is selected: placeholder prompt ("Click a node to inspect it").
-- When a node is selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. Each connection item shows the verb label and target/source node name, styled as a clickable mini-card. Clicking a connection selects that node.
+- When a node is selected: node name (≥ 1rem, bold), type badge (coloured by CA-EC in cbsa-reference.md), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. Each connection item shows the verb label and target/source node name, styled as a clickable mini-card. Clicking a connection selects that node.
 
 **Analytics tab**:
 - **Search**: text input filtering nodes by name or meaning.
@@ -142,7 +139,7 @@ Position the entity-type legend as a horizontal wrap strip at the bottom-left of
 #### 4i. Additional Template Requirements
 
 - D3 force-directed graph with zoom (scroll) and drag (nodes)
-- Color mapping by entity type using [CA-EC] categories
+- Color mapping by entity type using CA-EC in cbsa-reference.md categories
 - Copy JSON button (copies the full graph data to clipboard via `navigator.clipboard.writeText()`; blob download is blocked by the artifact sandbox)
 
 #### 4j. D3 Force Implementation Notes (mandatory)
@@ -205,7 +202,7 @@ const links = data.edges.map(d => Object.create(d));
 4. **Output**: HTML artifact only; no surrounding explanation.
 5. **Placeholders**: replace `__GRAPH_DATA__` with JSON object and `__GRAPH_TITLE__` with asset name.
 6. **Layout**: graph canvas 65–70%, sidebar 30–35%. Sidebar collapsible, open by default. Per §4a.
-7. **Palette**: UI chrome uses §4b hex values. Entity colours use [CA-EC].
+7. **Palette**: UI chrome uses §4b hex values. Entity colours use CA-EC in cbsa-reference.md.
 8. **Node sizes**: asset 14–16px, cultural value 11px, others 8–10px. Per §4c.
 9. **Edges**: curved arcs (not straight lines), link distance 130–152px. Per §4d.
 10. **Interaction**: hover enlargement, click-to-select with edge dimming, background-click deselect. Per §4e.

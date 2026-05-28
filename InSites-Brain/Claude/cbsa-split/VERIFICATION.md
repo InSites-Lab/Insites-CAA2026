@@ -1,100 +1,113 @@
-<!-- Integrity report for the cbsa-split of InSites-CAA-claude.md v7. Generated 2026-05-27. -->
+# VERIFICATION — cbsa-split
 
-# VERIFICATION — cbsa-split integrity report
+Split of `InSites-CAA-claude.md` (v7, **2,230 lines**, UTF-8 no-BOM, CRLF) into 8 flat content files.
+Organizational split only: content verbatim; the sole additions are the Loading Block (core) and the
+cross-reference updates listed in §3. Source file **not modified** (141,332 bytes before and after).
 
-Split of `InSites-CAA-claude.md` (v7, **2,230 lines**, UTF-8 no-BOM, CRLF) into a Claude Projects
-core + on-demand architecture. This is an **organizational split only** — content is preserved
-verbatim; the sole additions are the loading-instructions block in `cbsa-core.md`, a one-line
-provenance comment per file, and a per-file on-demand header note.
+## 1. Coverage list — every top-level section → file
 
----
+**`cbsa-core.md`**
+- PART 1 banner + Introduction / version line + System Prompt header
+- Persona + Language Policy
+- **Loading Block** (added — placed after Persona, before Governance)
+- Governance (stage flow, activation, upload routing, navigation, rules), Context Recall & Missing Data
+- Output Discipline (LIM), Engagement & Visual Clarity, Output Mode, Workflows & Triggers, Safety & Scope
+- Critical Operating Rules
+- Theoretical Frameworks: CSR + DQR
+- Global Controls (Stage Closing, Global Notation Key, Per-Claim Epistemic Gate, Stage Title Examples)
+- `[CA-HE]` Hebrew Output Overlay — **full** (Rendering Directive + all terminology maps)
 
-## 1. Verbatim fidelity — PASS (18/18)
+**`cbsa-stages.md`**
+- PART 2 banner + Stage Specifications header
+- Stages 0, 1, 2, 3, 4, 5, 6 (full, incl. Internal Instructions, Reflections, status lines)
+- `[CA-IP]` Session Report (Debrief, format, action tags, signature criteria, rules)
 
-Each source block was sliced by line range (not retyped) and asserted byte-exact in its target via
-`.Contains()`. All 18 block checks passed; zero failures. Preserved exactly: UTF-8 no-BOM encoding,
-CRLF line endings, Hebrew text, RIGHT-TO-LEFT MARK (U+200F), the 〰️ / 💭 epistemic markers, emoji
-stage icons, and the box-drawing PART banners.
+**`cbsa-reference.md`**
+- PART 3 banner
+- `[GB-1]` CBSA General Guidelines
+- `[CA-V]` Value Types · `[CA-C]` Context Types · `[CA-T]` Change Types
+- `[SM-3]` Integrity & Nara Grid · `[CA-E]` Examples & Phrasing
+- `[CA-CS]` Comparative Significance Criteria · `[CA-EV]` Evidence Types
+- `[CA-EC]` Entity Categories
 
-**Source unchanged**: `InSites-CAA-claude.md` remains 141,332 bytes (compared before/after).
+**`ca-img.md`** — `[CA-IMG]` Image Analysis Aid
 
-## 2. Nothing dropped — full line-coverage map
+**`ca-kg.md`** — PART 4 banner + `Write → Visualize` divider + `[CA-KG]` Knowledge Graph (full)
 
-Every source line 1–2230 maps to exactly one destination, except lines 1001–1002 (the `[CA-HE]`
-heading), intentionally duplicated so the Hebrew appendix is self-describing.
+**`ca-db.md`** — `[CA-DB-F]` Dashboard Foundation + `[CA-DB]` Assessment Dashboard (incl. `[CA-RPT]` Report Tab, `[CA-AIQ]` AI Query) + `[CA-DB-C]` Collection Dashboard + END marker
 
-| Source lines | Block(s) | Destination |
-|---|---|---|
-| 1–223 | PART 1 banner, Introduction/version, Persona, Governance, LIM, Engagement, Output Mode, Triggers, Safety, Critical Operating Rules, CSR/DQR, Global Controls, Notation Key, Title Examples | `cbsa-core.md` |
-| 778–783 | `[GB-1]` CBSA General Guidelines | `cbsa-core.md` |
-| 1001–1009 | `[CA-HE]` heading + Rendering Directive | `cbsa-core.md` |
-| 224–770 | PART 2 banner, Stage-Specs header, Stages 0–6, `[CA-IP]` Session Report | `cbsa-stages.md` |
-| 1047–1261 | PART 4 banner, `Write → Visualize` divider, `[CA-KG]` | `apps/ca-kg-knowledge-graph.md` |
-| 1262–1695 | `[CA-DB-F]`, `[CA-DB]`, `[CA-RPT]`, `[CA-AIQ]` | `apps/ca-db-dashboard.md` |
-| 1696–1959 | `Read → Analyze → Visualize` divider, `[MA-RA]` | `apps/ma-ra-read-assessment.md` |
-| 1960–2101 | `[MA-RC]` | `apps/ma-rc-read-collection.md` |
-| 2102–2230 | `[CA-DB-C]`, `[CA-AIQ]`, `[CA-UX]`, END marker | `apps/ca-db-c-collection-dashboard.md` |
-| 771–777 | PART 3 banner | `appendices/appendix-values-contexts.md` |
-| 784–857 | `[CA-V]`, `[CA-C]`, `[CA-T]` | `appendices/appendix-values-contexts.md` |
-| 907–962 | `[CA-CS]`, `[CA-EV]` | `appendices/appendix-values-contexts.md` |
-| 858–896 | `[SM-3]` Integrity & Nara Grid | `appendices/appendix-nara-grid.md` |
-| 897–906 | `[CA-E]` Examples & Phrasing | `appendices/appendix-examples.md` |
-| 963–977 | `[CA-IMG]` Image Analysis | `appendices/appendix-image-analysis.md` |
-| 978–1000 | `[CA-EC]` Entity Categories | `appendices/appendix-entity-categories.md` |
-| 1001–1002 + 1010–1046 | `[CA-HE]` heading (repeat) + terminology maps | `appendices/appendix-hebrew-overlay.md` |
+**`ma-ra.md`** — `Read → Analyze → Visualize` divider + `[MA-RA]` Read-Assessment (full)
 
-**Reconciliation**: Σ(block sizes) = **2,232** = 2,230 unique source lines + 2 duplicated `[CA-HE]`
-heading lines. No gaps, no orphaned lines.
+**`ma-rc.md`** — `[MA-RC]` Read-Collection (full)
 
-## 3. No duplication introduced by the split
+**Line reconciliation**: source lines 1–2230 each map to exactly one file (contiguous, no gaps).
+Per-file source spans — core 1–223 + 1001–1046; stages 224–770; reference 771–962 + 978–1000;
+ca-img 963–977; ca-kg 1047–1261; ca-db 1262–1695 + 2102–2230; ma-ra 1696–1959; ma-rc 1960–2101.
+Σ = 2,230. The 8 files total 2,244 lines = 2,230 + 19 (Loading Block in core) − ~5 blank lines
+normalized at the 3 non-contiguous seams (whitespace only).
 
-- **`[CA-AIQ]` AI Query Tab appears twice** — inside `[CA-DB]` (≈src 1672) and `[CA-DB-C]` (≈src 2205).
-  This duplication exists in the **source** and is preserved verbatim; it was **not** introduced here.
-- **`[CA-HE]` heading (lines 1001–1002)** appears in both `cbsa-core.md` and `appendix-hebrew-overlay.md`
-  — the single intentional duplication, so the appendix is self-describing. The directive body
-  (1003–1009) is in core only; the maps (1010–1046) are in the appendix only — no content overlap.
-- No other content appears in more than one file.
+**Verbatim proof**: before the §3 edits, every source span was asserted byte-exact in its target via
+`.Contains()` (11/11 PASS). Preserved: UTF-8 no-BOM, CRLF, Hebrew, U+200F RTL marks, 〰️/💭 markers, emojis.
 
-## 4. References — resolution mechanism
+## 2. No duplicates
 
-Inline cross-references in the source use bracket codes (`[CA-V]`, `[SM-3]`, `[CSR]`, …). Rather than
-rewrite every inline mention (which would violate the verbatim mandate), references are resolved by:
+Each content block appears in exactly one file. Specifically:
+- `[CA-HE]` is in `cbsa-core.md` **only** (full overlay; not duplicated anywhere).
+- `[CA-EC]` is in `cbsa-reference.md` **only**; KG/dashboard specs point to it (§3), not copy it.
+- Stages use **pointers** to taxonomies ("see CA-C in cbsa-reference.md …"), never inline copies — so no
+  taxonomy text is duplicated between `cbsa-stages.md` and `cbsa-reference.md` (instruction rule 6 satisfied).
+- **Pre-existing intra-file note**: `[CA-AIQ]` AI Query appears twice **within `ca-db.md`** — once in the
+  single-assessment spec (§9a) and once in the collection spec (§9). This duplication exists in the source
+  (two distinct placeholder specs for two dashboards) and is preserved verbatim. It is **not** cross-file,
+  so rule 6 (no duplication *across* files) holds.
 
-1. **`Code → file resolution` table in `cbsa-core.md`** (always in context) — maps every code to the
-   file it now lives in. This is the authoritative router.
-2. **Per-file on-demand header** — each loaded file states that codes referenced-but-not-defined
-   resolve via the core map.
-3. **Explicit dependency note** — `ca-db-c-collection-dashboard.md` carries an HTML-comment stating it
-   also requires `ca-db-dashboard.md` for the shared foundation `[CA-DB-F]`.
+## 3. References updated (instruction rule 5)
 
-Result: any `[CA-X]` encountered in any file is resolvable to its current location.
+Every cross-**file** reference was rewritten to name its new home (26 replacement groups). Same-file
+references, section headings/definitions, self-references, and external references were left unchanged.
 
-## 5. Cognitive self-containment
+| File | Original | Rewritten to | Count |
+|---|---|---|---|
+| cbsa-core.md | `[GB-1]` | GB-1 in cbsa-reference.md | 2 |
+| cbsa-core.md | `[CA-IMG]` | CA-IMG in ca-img.md | 1 |
+| cbsa-core.md | `[CA-IP]` | [CA-IP] in cbsa-stages.md | 2 |
+| cbsa-core.md | `[MA-RC]` / `[MA-RA]` / `[CA-KG]` | MA-RC in ma-rc.md / MA-RA in ma-ra.md / CA-KG in ca-kg.md | 1 each |
+| cbsa-core.md | `[CA-DB]` | CA-DB in ca-db.md | 2 |
+| cbsa-stages.md | `[CA-C]` + `[GB-1]` (line-332 combo) | CA-C / GB-1 in cbsa-reference.md | 1 |
+| cbsa-stages.md | `[CA-CS]` | CA-CS in cbsa-reference.md | 1 |
+| cbsa-stages.md | `see [CSR]` | see CSR in cbsa-core.md | 6 |
+| cbsa-stages.md | `[SM-3]` | SM-3 in cbsa-reference.md | 1 |
+| cbsa-stages.md | `[CA-EV]` | CA-EV in cbsa-reference.md | 1 |
+| cbsa-reference.md | `see Critical Operating Rules …` | … in cbsa-core.md | 1 |
+| cbsa-reference.md | `See Stage 3 for Nara Grid` | See Stage 3 in cbsa-stages.md … | 1 |
+| cbsa-reference.md | `[CA-HE]` (PART-3 banner) | CA-HE in cbsa-core.md | 1 |
+| ca-img.md | `[CA-V]` | CA-V in cbsa-reference.md | 1 |
+| ca-kg.md | `[CA-EC]` | CA-EC in cbsa-reference.md | 7 |
+| ca-kg.md | `[CA-V]` | CA-V in cbsa-reference.md | 2 |
+| ca-kg.md | `[CA-AIQ]` / `[CA-DB]` | CA-AIQ in ca-db.md / CA-DB in ca-db.md | 1 each |
+| ca-db.md | `[CA-EC]` | CA-EC in cbsa-reference.md | 2 |
+| ca-db.md | `[CA-V]` / `[CA-KG]` | CA-V in cbsa-reference.md / CA-KG in ca-kg.md | 1 each |
+| ca-db.md | `[CA-IP]` | [CA-IP] in cbsa-stages.md | 2 |
+| ca-db.md | `[CA-HE]` | CA-HE in cbsa-core.md | 1 |
+| ma-ra.md | `[CA-KG]` | CA-KG in ca-kg.md | 1 |
 
-Each on-demand file is usable on its own given the data-extraction context that comes from the stages.
-The **one deliberate cross-file dependency** — collection dashboard → `[CA-DB-F]` (in the assessment
-dashboard file) — is stated explicitly in the file header and in the core loading table.
+**Left unchanged (correct):**
+- *Same-file* refs inside `ca-db.md`: `[CA-DB]`, `[CA-DB-C]`, `[CA-DB-F]`, `[CA-RPT]`, `[CA-AIQ]`.
+- *Same-file* refs inside `cbsa-stages.md`: `[CA-IP]` (Session Report is in this file).
+- *Self-refs*: `[CA-HE]` in core (Persona line); `[CA-V]` inside reference's SM-3 section.
+- *External* (point outside the split, names already given): `[CA-UX]` → `artifact-ux-contract.md`;
+  `test-mode.md`; `design/report-tab-spec.md`; `Single-Dashboard-example.html`.
 
-## 6. Scaffolding & seam notes (full disclosure)
+A post-edit scan confirmed **no substring corruption** (no `*.md` immediately followed by `-`/letters,
+i.e. `[CA-DB]` did not damage `[CA-DB-C]`/`[CA-DB-F]`) and **no missed cross-file references**.
 
-- **PART banners** (PART 1/2/3/4) and the two app-group dividers (`Write → Visualize`,
-  `Read → Analyze → Visualize`) are monolith navigation scaffolding. Each travels verbatim at the top
-  of the first file of its group (PART 1 → core; PART 2 → stages; PART 3 → values-contexts;
-  PART 4 + `Write → Visualize` → ca-kg; `Read → Analyze → Visualize` → ma-ra). The `END OF MASTER
-  PROMPT` marker sits at the tail of `ca-db-c-collection-dashboard.md`.
-- **`appendix-values-contexts.md` ordering**: its members are non-contiguous in the source
-  (`[SM-3]` + `[CA-E]` sit between them); they are regrouped into one file in source order
-  (V → C → T → CS → EV). No text changed.
-- **Pre-existing source quirks preserved (not "fixed")**: `[CA-DB]`'s `§9a [CA-AIQ]` and `Reference
-  Implementation` sit after `§10 Final Checklist`; `[CA-AIQ]` is duplicated across the two dashboards.
-- **Seam whitespace**: at the few assembly seams in the 3 composed files (core, values-contexts,
-  hebrew-overlay), blank separator lines join formerly-adjacent-now-separate blocks. These are
-  whitespace-only and markdown-invisible; no semantic text was added or removed.
+## 4. Flagged items
 
-## 7. Additions (the only non-verbatim content)
-
-- `cbsa-core.md`: the `## File Loading Instructions — Mandatory` block (loading table + artifact
-  self-check + Code→file resolution).
-- Every file: a one-line provenance HTML comment; on-demand files also carry a one-line header note.
-
-These are the only changes to content beyond pure re-organization.
+- **`[GB-1]` placement** — the instruction's core/reference lists did not name `[GB-1]`. Placed in
+  `cbsa-reference.md` as the framework's foundational vocabulary (it heads PART 3 in the source).
+  Core's two `[GB-1]` references were updated to point there. *Review if you'd prefer it in core.*
+- **Test-mode** — the instruction said to include test-mode/simulation in `cbsa-stages.md` "if present."
+  The master contains **no inline test-mode block** — only a `see test-mode.md` reference (external file)
+  in the core trigger table. Nothing was moved to stages; the external reference is preserved in core.
+- **`[CA-AIQ]` intra-file duplication** in `ca-db.md` — see §2; pre-existing in source, preserved.
+- **No default-to-stages placements** were needed (rule 7) — every section had a clear home.

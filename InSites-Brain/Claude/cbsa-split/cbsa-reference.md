@@ -1,10 +1,13 @@
-<!-- Derived from InSites-CAA-claude.md v7 - split 2026-05-27. Source-of-truth is the mono; edits here may drift. -->
-<!-- Loaded on-demand by cbsa-core.md. Codes referenced but not defined in this file resolve via the Code->file map in cbsa-core.md. -->
-
 # ═══════════════════════════════════════
 # PART 3: Reference Appendices
-# Vocabularies, rules, classification aids, [CA-HE]
+# Vocabularies, rules, classification aids, CA-HE in cbsa-core.md
 # ═══════════════════════════════════════
+
+---
+
+## [GB-1] CBSA General Guidelines
+
+CBSA is a holistic, values-based heritage assessment approach that integrates physical and non-physical aspects across multiple contexts. Central to CBSA is the **Context Effect** — see Critical Operating Rules in cbsa-core.md for the operational definition. This is an interpretive/value-attribution mechanism, not a causal description of real-world change. The stages structure the thinking process, not a rigid formula.
 
 ---
 
@@ -82,6 +85,55 @@ Use change type prefixes in the integrity assessment to clarify which aspect of 
 
 ---
 
+## [SM-3] Integrity and Nara Grid: Theory and Application
+
+### Defining Integrity in CBSA
+
+Integrity measures how much of the original form, material, use, setting, or interpretation of a site has survived intact. In CBSA, integrity is not "preserve everything perfectly" — it is about managing selective change while maintaining the values that make the site culturally significant.
+
+A site can have:
+- **High material integrity** (original materials present) but **low use integrity** (no longer in use)
+- **High form integrity** (original design legible) but **low setting integrity** (surrounded by new development)
+
+The heritage assessment question: "Which integrities matter most for this site's identified values?"
+
+### Nara Grid Assessment
+
+See Stage 3 in cbsa-stages.md for Nara Grid table structure, template columns, and assessment rules. Key principle: rate each aspect independently (high / medium / low / lost) — high integrity in one aspect does not require high integrity in others.
+
+### Archaeological Integrity: Three-State Principle
+
+If the site has archaeological layers or excavation history, offer the three-state integrity model:
+
+> "I can also assess integrity across three temporal states: at-exposure, post-excavation, and as-potential. Would you like me to apply this?"
+
+If the user accepts, apply the model below. If no archaeological dimension exists, skip this section entirely.
+
+The three states:
+
+1. **Integrity-at-exposure** — the condition of remains when first uncovered: stratigraphy intact, spatial relationships visible, sealed contexts undisturbed.
+2. **Integrity-post-excavation** — what survives after the excavation: layers removed to reach earlier phases, sections cut, diagnostic finds extracted, some strata sacrificed.
+3. **Integrity-as-potential** — for unexcavated sites: undisturbed deposits hold future-value that diminishes upon excavation, even when well-documented. Rate alongside material condition when the site (or portions) remains unexcavated.
+
+**Why this matters**: Excavation is simultaneously documentation and destruction. A layer that was professionally excavated and meticulously recorded (plans, sections, photographs, finds catalog) retains **documentary integrity** even after its material integrity is lost. This connects directly to Documentary/Archival Value [CA-V].
+
+**Application in the Nara Grid**: For archaeological sites, the "Attribute Description" column should note both states where relevant:
+- "(at-exposure) Intact mosaic floor with geometric pattern, sealed by collapse layer"
+- "(post-excavation) Mosaic conserved in situ; collapse layer removed and documented"
+
+**Assessment question**: When the excavation removed material, was the documentation thorough enough that the knowledge survives the loss of fabric? Rate documentation quality alongside material condition.
+
+---
+## [CA-E] Examples and Phrasing Aids
+
+**Comparative Claims:** "Represents the… / Rare for… / Earliest known example of…"
+
+**Implication Sentence Templates:** "Reduces legibility of… / Diminishes landmark presence of… / Obscures original volume of… / Breaks continuity of… / Alters spatial hierarchy of…"
+
+**Integrity Phrasings:** "Later additions partially obscure… / Original profile remains legible despite…"
+
+---
+
 ## [CA-CS] Comparative Significance Criteria
 
 Use these criteria in Stage 4 (comparison with other assets) and Stage 5 (significance statement) to support professional judgments.
@@ -135,5 +187,28 @@ Evidence types **combine** with certainty notation — they don't replace it:
 **Rule**: Evidence type tagging is **optional but encouraged** for archaeological sites. The bot should use it when the evidence type meaningfully affects interpretation. Do not force-tag every claim — use it where it matters.
 
 **Display rule**: Spell out each evidence type code on its first use in each stage — e.g., `[str (stratigraphic)+mat (material-diagnostic): A:23]`. After first use in that stage, abbreviate: `[str+mat: A:45]`. This keeps the output self-documenting without a separate legend block.
+
+---
+
+## [CA-EC] Entity Categories
+
+Use these categories when selecting node type in a Knowledge Graph. Each category includes a brief description for clarity.
+
+| Category | Description |
+| --- | --- |
+| Place | A geographic location, area, or region relevant to the heritage asset |
+| Structure / Building | A constructed edifice or architectural ensemble |
+| Architectural Element | A specific component of a structure (column, arch, frieze, etc.) |
+| Person | An individual historically or culturally linked to the asset |
+| Event | A discrete historical occurrence tied to the asset's timeline |
+| Story / Narrative | An oral tradition, legend, or documented account |
+| Cultural Value | An abstract value category from the CBSA assessment |
+| Natural Phenomenon | A geological, ecological, or climatic feature |
+| Artwork / Artefact | A movable object, inscription, or decorative element |
+| Tradition / Custom | A recurring cultural practice associated with the asset |
+| Social Group | A community, guild, congregation, or population segment |
+| Historical Period | A defined chronological era relevant to the assessment |
+| Religion / Belief | A faith system, cosmology, or spiritual practice |
+| Collective Memory | A shared remembrance, commemoration, or cultural narrative |
 
 ---

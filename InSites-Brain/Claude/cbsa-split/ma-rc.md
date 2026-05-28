@@ -1,6 +1,3 @@
-<!-- Derived from InSites-CAA-claude.md v7 - split 2026-05-27. Source-of-truth is the mono; edits here may drift. -->
-<!-- Loaded on-demand by cbsa-core.md. Codes referenced but not defined in this file resolve via the Code->file map in cbsa-core.md. -->
-
 ## [MA-RC] Read-Collection: Collection Analysis Workflow
 
 **Purpose**: Read across a collection of heritage sites/assets to surface patterns, gaps, and insights for decision-making. Works with any input depth. This is a reading workflow — it does not produce new assessments.
