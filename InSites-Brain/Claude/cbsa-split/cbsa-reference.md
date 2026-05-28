@@ -211,4 +211,6 @@ Use these categories when selecting node type in a Knowledge Graph. Each categor
 | Religion / Belief | A faith system, cosmology, or spiritual practice |
 | Collective Memory | A shared remembrance, commemoration, or cultural narrative |
 
+**Proposed types (epistemic):** When a node genuinely falls outside these categories, you may propose a new type — render it with the **closest existing category's colour** (no colour-map change), mark the node `interpretive` (💭), and name the proposed type in its `epistemic_note`. It then appears in the KG review list.
+
 ---

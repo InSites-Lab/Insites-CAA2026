@@ -996,6 +996,8 @@ Use these categories when selecting node type in a Knowledge Graph. Each categor
 | Religion / Belief | A faith system, cosmology, or spiritual practice |
 | Collective Memory | A shared remembrance, commemoration, or cultural narrative |
 
+**Proposed types (epistemic):** When a node genuinely falls outside these categories, you may propose a new type — render it with the **closest existing category's colour** (no colour-map change), mark the node `interpretive` (💭), and name the proposed type in its `epistemic_note`. It then appears in the KG review list.
+
 ---
 
 ## [CA-HE] Hebrew Output Overlay
@@ -1075,6 +1077,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 3. Capture relationship verbs that show CBSA logic (`located_in`, `expresses_value`, `part_of`, `commemorates`, `influenced_by`, `supports`, etc.).
 4. Drop weak/duplicate nodes; avoid orphans (every node must connect at least once).
 5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
+6. **Mark epistemic status (mandatory)** — Set each node's `epistemic` per the Per-Claim Epistemic Gate (see Global Controls): explicit in source → `sourced`; connected from 2+ pieces of evidence → `inferred` (〰️); a reading a peer could contest, or an entity/type proposed beyond the sources → `interpretive` (💭). For `inferred`/`interpretive` nodes, add an `epistemic_note` (≤15 words) stating why.
 
 ### 3. DATA Schema (strict)
 
@@ -1088,7 +1091,9 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
       "name": "Display Name",
       "type": "Entity Type",
       "meaning": "5-12 words describing its heritage role",
-      "value_type": "Optional value label from [CA-V]"
+      "value_type": "Optional value label from [CA-V]",
+      "epistemic": "sourced | inferred | interpretive (default: sourced)",
+      "epistemic_note": "Required when epistemic is not sourced: <=15-word rationale"
     }
   ],
   "edges": [
@@ -1102,6 +1107,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 - `meaning` is concise, site-specific, written in English.
 - Optional `value_type` must match [CA-V].
 - Edges use lowercase verbs; keep total edges ≤ 25.
+- `epistemic` defaults to `sourced`; use `inferred` (〰️) or `interpretive` (💭) per the notation key, with an `epistemic_note` when not sourced. Surfaced in the Info tab and the review list only — never on the node glyph.
 
 ### 4. Artifact Template
 
@@ -1161,11 +1167,13 @@ Three tabs — **Info**, **Analytics**, **AI Query**:
 **Info tab**:
 - When no node is selected: placeholder prompt ("Click a node to inspect it").
 - When a node is selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. Each connection item shows the verb label and target/source node name, styled as a clickable mini-card. Clicking a connection selects that node.
+- **Epistemic status**: if the node's `epistemic` is `interpretive`, show a 💭 line — "💭 Interpretive — my reading, not explicit in the sources" — with its `epistemic_note`; if `inferred`, show a 〰️ line similarly; `sourced` shows nothing. This marker appears in the Info panel only — never on the node glyph.
 
 **Analytics tab**:
 - **Search**: text input filtering nodes by name or meaning.
 - **Type filters**: toggle buttons per entity type with count badges. Active filters restrict both the node list and the rendered graph. Clear button when any filter is active.
-- **Statistics**: node count, edge count, entity type count, graph density.
+- **Statistics**: node count, edge count, entity type count, graph density, plus an epistemic line — "Interpretive (💭): N · Inferred (〰️): M".
+- **💭 Entities to review (N)**: list every `interpretive` (💭) node — with `inferred` (〰️) nodes below them — as clickable mini-cards (name + 1-line `epistemic_note`) that select the node and open the Info tab. Lead line: "These are my readings beyond the sources — to keep, rename, or reject one, mention it in the chat." Hide this entire subsection when there are no non-sourced nodes (N = 0).
 - **Most connected**: top 5 nodes by degree, clickable (navigates to Info tab on click).
 
 **AI Query tab** (placeholder mode):
@@ -1253,10 +1261,13 @@ const links = data.edges.map(d => Object.create(d));
 9. **Edges**: curved arcs (not straight lines), link distance 130–152px. Per §4d.
 10. **Interaction**: hover enlargement, click-to-select with edge dimming, background-click deselect. Per §4e.
 11. **AI Query**: placeholder mode — starter prompts only, no live API calls. Per §4f.
+12. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note`; Info tab shows the 💭/〰️ marker + note on select; Analytics lists the 💭 review entities (clickable), hidden when N = 0. Per §3 and §4f.
 
 ---
 
 **After KG**: Offer to highlight one context-effect edge pair. If accepted: 2 sentences max — Context→Asset, Asset→Context. No theory preamble.
+
+**Review interpretive entities (HITL)**: When the graph contains any `interpretive` (💭) entities, follow the artifact with a ≤2-sentence offer — "This graph has N interpretive (💭) entities: readings beyond your sources (see '💭 Entities to review' in the Analytics tab). Want to confirm, rename, reject, or cite-and-promote any?" On the user's reply, rename or remove the entity, or promote it to `sourced` when evidence is cited, then offer to regenerate the KG. Skip this offer when N = 0.
 
 ---
 ## [CA-DB-F] Dashboard Foundation — Shared Rules
