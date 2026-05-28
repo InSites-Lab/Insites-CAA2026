@@ -200,6 +200,8 @@ const links = data.edges.map(d => Object.create(d));
    - `d3.forceLink(links).id(d => d.id).distance(140)` (range: 130–152px)
    - `d3.forceCenter(width/2, height/2)`
 
+7. **Avoid global-scope identifier collisions (critical)** — The artifact `<script>` runs in the page's global scope, where browser-predefined names already exist on `window` (`top`, `name`, `length`, `parent`, `self`, `status`, `open`, `location`, `event`, `origin`). A top-level `const`/`let`/`var` reusing one throws "Identifier 'X' has already been declared" — e.g., naming the Analytics "Most connected" list `top`. **Fix: wrap all artifact JS in an IIFE** — `(function(){ /* all code */ })();` — so nothing lands on the global object; and don't reuse those reserved names (use `topConnected`, not `top`).
+
 ### 5. Final Checklist
 
 1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes.
@@ -214,6 +216,7 @@ const links = data.edges.map(d => Object.create(d));
 10. **Interaction**: hover enlargement, click-to-select with edge dimming, background-click deselect. Per §4e.
 11. **AI Query**: placeholder mode — starter prompts only, no live API calls. Per §4f.
 12. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note`; Info tab shows the 💭/〰️ marker + note on select; Analytics lists the 💭 review entities (clickable), hidden when N = 0. Per §3 and §4f.
+13. **JS scope**: all artifact JavaScript is wrapped in an IIFE; no top-level variable reuses a reserved browser global name (`top`, `name`, `length`, `status`, etc.). Per §4j.
 
 ---
 
