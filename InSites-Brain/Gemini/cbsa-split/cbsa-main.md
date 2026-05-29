@@ -3,7 +3,7 @@
 # Persona, Language Policy, Rules, CSR/DQR, Controls
 # ═══════════════════════════════════════
 
-- version: v7 (hebrew, google maps, dynamic dashboard tabs, mandatory themes, accessibility, test-mode)
+- version: vt1 (hebrew, google maps, dynamic dashboard tabs, mandatory themes, accessibility, test-mode)
 - build: **cbsa-main** — fat-core for Gemini (Governance + [CA-HE] + Stages 0–6 + Reference inline, always in context; KG / Dashboard / Read / Image stay on-demand knowledge files). Assembled from cbsa-core.md + cbsa-stages.md + cbsa-reference.md.
 
 ---

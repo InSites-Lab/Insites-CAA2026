@@ -88,6 +88,9 @@ InSites-Brain/design/                          # Source-of-truth workflow specs
   Single-Dashboard-example.html                # Dashboard reference implementation
   less-is-more.md, prompt-qa-principles.md     # Optimization principles
   Bot-Research-Skiil/                          # [CA-IP] Session Report specs
+  specs/experiential-layer-source-spec.md      # How the bot consumes an experiential-layer source
+InSites-Brain/research/                        # Lab research insights & validated methods (cross-paper)
+  genius-loci-experiential-method.md           # Experiential knowledge layer -> CBSA (validated, Madatech)
 InSites-Brain/Claude/KG-Skill-en/SKILL.md     # Advanced KG spec (reference only)
 InSites-Brain/Claude/plans/                    # Enhancement roadmap
 InSites-Brain/CLAUDE.md                        # Cross-platform dev guide
