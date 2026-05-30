@@ -65,6 +65,7 @@ InSites-Brain/MANIFEST.md
 
 # === Paper content (gitignore for now) ===
 InSites-Brain/Heritage4.0/
+InSites-Brain/CN-Paper/
 
 # === Claude: keep only mono prompt + setup guide ===
 InSites-Brain/Claude/not-used/
