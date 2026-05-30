@@ -1,29 +1,30 @@
-# InSites-CAA on Google Gemini
+<div dir="rtl">
 
-## Quick Start
+# מוחות Gemini — InSites CAA
 
-Use the ready-made Gem: [Open InSites-CAA Gem](https://gemini.google.com/gem/1PMAcB6O2FGJPYonixa3ZA7_2xwiTIVKA?usp=sharing)
+גרסה נוכחית: **v9** — קיימות שתי צורות פריסה זהות בתוכן:
+**`gem-split/`** (מפוצל, מומלץ ל-Gem) ו-**`InSites-CAA-GEM-v9.md`** (מונוליטי).
 
-## Manual Setup
+» version: v9 - split parity + RTL chat tables natural-order
 
-1. Open [gemini.google.com](https://gemini.google.com) → Gems → Create New Gem
-2. Copy the contents of the desired version and paste into System Instructions
-3. Save, upload a heritage document, type **"start"** (or **"התחל"** for Hebrew)
+## קבצים
 
-## Files
+| קובץ | תיאור |
+|------|-------|
+| `gem-split/` | גרסה מפוצלת — `cbsa-main.md` (הדבקה ל-Instructions, fat-core) + 5 קבצי ידע (`ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`) |
+| `InSites-CAA-GEM-v9.md` | מונוליטי — הכול בקובץ אחד, מתאים להעתקה ל-Gem בודד |
+| `README.md` | קובץ זה |
 
-```
-InSites-CAA-GEM.md       ← System instructions (paste into Gem)
-README.md                ← This file
-```
+גרסאות קודמות (v8 ומטה, וריאנט newHE) הועברו ל-`OLD/`.
 
-## Prompt Structure
+## פריסה
 
-| Part | Content | Appendix Codes |
-|------|---------|----------------|
-| **PART 1: System & Governance** | Persona, Language Policy, Rules, CSR/DQR, Controls | — |
-| **PART 2: CBSA Stages 0–6** | The structured assessment process + Session Report [CA-IP] | — |
-| **PART 3: Reference Appendices** | Vocabularies, rules, classification aids | [GB-1] [CA-V] [CA-C] [CA-T] [SM-3] [CA-E] [CA-CS] [CA-EV] [CA-IMG] [CA-EC] [CA-HE] |
-| **PART 4: Post-Assessment Extensions** | Triggered on explicit user request only | — |
-| ↳ Write → Visualize | Knowledge Graph, Dashboard | [CA-KG] [CA-DB-F] [CA-DB] |
-| ↳ Read → Analyze → Visualize | Read workflows, Collection Dashboard | [MA-RA] [MA-RC] [CA-DB-C] |
+עיין ב-`gem-split/README.md` להוראות העלאה מלאות ל-Gemini Gem.
+בקצרה: הדבק את `gem-split/cbsa-main.md` בשדה ה-Instructions, והעלה את 5 קבצי הידע (flat, ללא תיקיות).
+
+## הערות v9
+
+- טבלאות צ'אט בעברית: סדר עמודות **טבעי** (העמודה הראשונה בקוד מופיעה מימין ב-RTL). אין שימוש ב-U+200F (RLM).
+- `cbsa-main.md` עבר QA: גדרות קוד מאוזנות, ה-`[CA-HE]` והשלבים מרונדרים כ-Markdown תקין.
+
+</div>

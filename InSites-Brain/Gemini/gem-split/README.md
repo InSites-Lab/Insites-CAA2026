@@ -59,6 +59,10 @@ prompt's routing (the "dashboard" trigger and the MA-RC collection-dashboard han
    present (in `[CA-EC]` Proposed-types note and `ca-kg.md` extraction step).
 3. **Whitespace cleaned** — inter-row / inter-item blank lines removed across all 6 files.
 4. **Filenames** set to the routing-correct lowercase names (`ca-kg.md`, `ca-db.md`, `cbsa-main.md`).
+5. **RTL chat tables → natural column order.** `[CA-HE]` Table Header Maps now list columns in natural
+   logical order (first column = rightmost in RTL), replacing the earlier reversed/LTR workaround. Still no U+200F.
+6. **`cbsa-main.md` QA.** Code-fence phasing fixed (no headings/tables trapped in code blocks); `[CA-HE]` +
+   stages render as proper Markdown.
 
 ## What was rejected (do not upload)
 
@@ -70,12 +74,12 @@ rewrites — **net regressions**, discarded:
   final checklist; corrupted the D3 `<script>` line.
 - `CA-DB-C.md` — lossy split-out of canonical `ca-db.md` §`[CA-DB-C]`.
 
-## Status — parallel review artifact, NOT the source of truth
+## Status — this IS the maintained Gemini split
 
-- Source of truth = the Gemini mono `InSites-Brain/Gemini/InSites-CAA-GEM.md` → split `cbsa-split/`.
-- This bundle **duplicates** that content for one-click upload and will need **manual sync**: when methodology
-  changes, edit the mono / split, then re-derive these files (re-append the hardening header + re-apply the
-  v9 entity reconciliation, which is not yet propagated to the canonical mono/split).
+- `gem-split/` (this folder) is now the **maintained split** for Gemini. The earlier `cbsa-split/` and the
+  `cbsa-split (Gem 3.1 pro suggestion)/` review folder were retired to `OLD/`.
+- The monolithic `InSites-CAA-GEM-v9.md` (Gemini root) carries the **same content** in one file; keep the two
+  in sync when methodology changes (edit here, then mirror the change into the mono).
 
 ## Remaining note (inherited, by design — not a bug)
 

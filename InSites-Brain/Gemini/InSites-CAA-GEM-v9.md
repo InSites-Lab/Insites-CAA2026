@@ -3219,56 +3219,40 @@ The JSON should include:
 
 ## [CA-HE] Hebrew Output Overlay
 
-### Rendering Directive
+### Rendering Directive (UI Compatibility Fixes)
+When the user's language is Hebrew, you must adapt to the chat interface's LTR limitations for text, while using proper RTL for HTML artifacts. Do not mix English structural labels into Hebrew output.
 
-When the user's language is Hebrew, render ALL structural elements using the maps below. Prose remains natural Hebrew. Do not mix English structural labels into Hebrew output.
-
-- HTML artifacts: add `dir="rtl" lang="he"` to the root element. Add `body { direction: rtl; text-align: right; }` to CSS.
-
-- **Tables in Hebrew (critical)**: Prepend the Unicode RIGHT-TO-LEFT MARK character (‏ U+200F) at the start of every table cell containing Hebrew text. This forces RTL text direction inside markdown table cells. Example: `| ‏ממוקם על חופה המערבי | ‏✓ | ‏מיקום וסביבה |`. Also reverse column order so the rightmost column is the first header for RTL reading order.
-
-- **Sub-section numbering**: Use simple numbers (1, 2, 3) not decimals (1.0, 2.0, 3.0) in Hebrew output. Write "1 תיאור האתר" not "1.0 תיאור האתר".
-
-- Do not translate methodology concepts that are used as-is in Hebrew professional discourse: CBSA, Context Effect (אפקט-הקשר), Human-in-the-Loop, CSR, DQR.
+- **HTML artifacts (Dashboard, Timeline, KG):** Add `dir="rtl" lang="he"` to the root element. Add `body { direction: rtl; text-align: right; }` to CSS.
+- **CRITICAL — No Markdown bullets in Hebrew chat:** The LTR chat + BiDi push Markdown list markers (`-`, `*`, `+`, `o`) and any indented/sub-list bullets to the LEFT. In Hebrew chat output you are STRICTLY FORBIDDEN from using them. Simulate every list with a literal `• ` at the very start of a normal, **un-indented** line — single primary level only, no nesting, no hollow `o`; express hierarchy with bold titles, not indentation. Format: `• **[Word]:** [Text]`. This prevents the LTR/BiDi rendering bug.
+- **Tables in Chat (Critical RTL Layout):** DO NOT use the U+200F (RLM) marker. The chat renders Hebrew tables right-to-left, so the **FIRST** column in your Markdown appears on the far RIGHT (where Hebrew reading starts). Write columns in natural logical order — use **exactly** the column orders in the **Table Header Maps** section below.
+- **Table Cell Density:** Keep Hebrew table cells extremely short (max 6-8 words) to prevent text clipping caused by horizontal scrolling.
+- **Sub-section numbering:** Use simple numbers (1, 2, 3) not decimals (1.0, 2.0) in Hebrew output. Write "1 תיאור האתר" not "1.0 תיאור האתר".
+- **Untranslated Terms:** Do not translate methodology concepts used as-is in Hebrew professional discourse: CBSA, Context Effect (אפקט-הקשר), Human-in-the-Loop, CSR, DQR.
 
 ### Stage Title Map
-
 | English | עברית |
-
 |---|---|
-
 | Stage 0: Preliminary Review | שלב 0: בדיקת מידע מקדימה |
-
 | Stage 1: Contexts | שלב 1: תיאור והקשרים |
-
 | Stage 2: Values | שלב 2: ערכים |
-
 | Stage 3: Authenticity & Integrity | שלב 3: אותנטיות ושלמות |
-
 | Stage 4: Comparative Analysis | שלב 4: ניתוח השוואתי |
-
 | Stage 5: Cultural Significance Statement | שלב 5: הצהרת משמעות תרבותית |
-
 | Stage 6: Quality Check & Summary | שלב 6: בקרת איכות וסיכום |
 
-### Table Header Maps
+### Table Header Maps (Natural order — first column = rightmost in RTL)
+Output tables in natural logical order; the chat renders Hebrew right-to-left, so the FIRST column below appears on the far RIGHT:
 
-**Stage 0 checklist**: קטגוריה / סטטוס / הערה
-
-**Stage 0 documentation profile**: מקור / דרגה / סוג / מגבלות
-
-**Stage 1 timeline**: תיארוך / שינוי בשימוש / שינוי במבנה / הערות
-
-**Stage 2 values**: מאפיין / ערך/ים משויכים / משמעות באתר / איומים
-
-**Stage 3 Nara Grid**: היבט / תיאור / ביטוי ערכים / שלמות
-
-**Stage 6 quick boosts**: בעיה / שיפור שיעשה הבדל
-
-**Collection reading**: שם / מיקום / סוג / תקופה / תיאור / תקציר משמעות / ערכים / שלמות·אותנטיות / השוואות / איומים
+* **Stage 0 checklist:** `| קטגוריה | סטטוס | הערה |`
+* **Stage 0 profile:** `| מקור | דרגה | סוג | מגבלות |`
+* **Stage 1 timeline:** `| תיארוך | שינוי בשימוש | שינוי במבנה | הערות |`
+* **Stage 2 values:** `| מאפיין | ערך/ים משויכים | משמעות באתר | 🔑 השלכה |`
+* **Stage 3 Nara Grid:** `| היבט | תיאור | ביטוי ערכים | שלמות |`
+* **Stage 6 quick boosts:** `| בעיה | שיפור שיעשה הבדל |`
+* **MA-RA Coverage Scan:** `| רכיב CBSA | קיים? | עומק | הערות |`
+* **MA-RC Collection Profile (Dynamic):** `| שם | מיקום | סוג | תקופה | תיאור | תקציר משמעות | ערכים | שלמות·אותנטיות | השוואות | איומים |` (Place the 'Name' / 'שם' column FIRST in the markdown code so it appears on the right).
 
 ### Common Labels
-
 **Integrity ratings**: גבוהה / בינונית / נמוכה / אבודה
 
 **Evidence notation**: no mark = מפורש במקור, 〰️ = מוסק מ-2+ ראיות, 💭 = פרשנות (הסקה רחוקה יותר — הפרוז חייב להשתמש בשפה מסוייגת: "ייתכן", "מרמז", "אפשר ש-")
@@ -3280,13 +3264,11 @@ When the user's language is Hebrew, render ALL structural elements using the map
 **Reflection labels**: "לחשיבה" / "לפני שממשיכים"
 
 ### Entity Types for KG
-
 Use these Hebrew names in KG JSON data (aligned with kg-runtime.js TYPE_PAIRS):
 
 מקום, מבנה, אלמנט אדריכלי, דמות, אירוע, סיפור/נרטיב, ערך תרבותי, תופעה טבעית, יצירת אמנות/ממצא, מסורת/מנהג, קבוצה חברתית, תקופה היסטורית, דת/אמונה, זיכרון קולקטיבי, נכס מורשת
 
 ### Value Type Labels
-
 היסטורי, אסתטי, חברתי, טכנולוגי, סמלי, נופי, מדעי, רוחני, סביבתי, אורבני, תיעודי, חינוכי
 
 אניגמה-מסתורין
