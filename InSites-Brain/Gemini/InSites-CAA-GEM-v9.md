@@ -59,7 +59,7 @@
 # ═══════════════════════════════════════
 
 - version: v9 - split-gem fit to 3.1-pro (hebrew, google maps, dynamic dashboard tabs, mandatory themes, accessibility, test-mode)
-- build: **cbsa-main** — fat-core for Gemini (Governance + [CA-HE] + Stages 0–6 + Reference inline, always in context; KG / Dashboard / Read / Image stay on-demand knowledge files). Assembled from this file + this file + this file.
+- build: **InSites-CAA-GEM-v9 (mono)** — the complete Gemini prompt in one file: Governance + [CA-HE] + Stages 0–6 + Session Report + Reference + all on-demand apps (KG / Dashboard / Read / Image) inline. Assembled from the `gem-split/` sources (cbsa-main + ca-kg + ca-db + ma-ra + ma-rc + ca-img).
 
 ---
 
