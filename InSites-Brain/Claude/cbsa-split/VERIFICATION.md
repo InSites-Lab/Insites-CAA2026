@@ -8,8 +8,8 @@ spine inline: **PART 1** (governance/controls/`[CA-HE]`) + **PART 2** (Stages 0�
 `ca-ip.md`. The former `cbsa-stages.md` and `cbsa-reference.md` were **retired** (their content moved
 into `cbsa-core.md` PART 2/PART 3; recoverable via git).
 
-**Current file set (7 content files):** `cbsa-core.md` (fat spine, Project Instructions) · on-demand:
-`ca-ip.md`, `ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`.
+**Current file set (8 content files):** `cbsa-core.md` (fat spine, Project Instructions) · on-demand:
+`ca-ip.md`, `ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`, `test-mode.md` (`/test` self-run).
 
 **Cross-reference convention after restructure:** inside `cbsa-core.md`, former cross-file pointers to
 `cbsa-stages.md`/`cbsa-reference.md`/`cbsa-core.md` were rewritten to **"in this document"** (all three

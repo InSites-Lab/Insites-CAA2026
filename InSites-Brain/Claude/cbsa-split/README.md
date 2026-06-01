@@ -1,6 +1,6 @@
 # cbsa-split — CBSA master prompt, split for Claude Projects
 
-A split of `../InSites-CAA-claude.md` (v7) into **7 flat content files** plus this README and
+A split of `../InSites-CAA-claude.md` (v7) into **8 flat content files** plus this README and
 `VERIFICATION.md`. As of the fat-spine restructure, the split keeps a **fat always-in-context spine**
 (governance + the full CBSA Stages 0–6 + the Reference appendices) and loads only the genuine
 one-shot utilities (Session Report, KG, Dashboard, Read workflows, Image) on demand.
@@ -28,6 +28,7 @@ KG, Dashboard, Reads, Image) stays on-demand and XML-triggered.
   | "read assessment" | `ma-ra.md` |
   | "read collection" | `ma-rc.md` |
   | image analysis | `ca-img.md` |
+  | `/test` (full-pipeline self-run) | `test-mode.md` |
 
   Stages 0–6 and the Reference appendices are **not** loaded — they are always in context inside
   `cbsa-core.md`.
@@ -40,6 +41,7 @@ KG, Dashboard, Reads, Image) stays on-demand and XML-triggered.
   + `[CA-DB-C]` collection dashboard.
 - **`ma-ra.md`** / **`ma-rc.md`** — Read-Assessment / Read-Collection workflows.
 - **`ca-img.md`** — `[CA-IMG]` image analysis aid.
+- **`test-mode.md`** — `/test` full-pipeline self-run on a built-in *Zaira* sample (Stages 0–6 + KG + Dashboard), no upload needed.
 
 Cross-references **inside `cbsa-core.md`** are written as "see X in this document"; references from an
 on-demand file back to the always-on spine are written as "see X in cbsa-core.md".
@@ -77,8 +79,8 @@ through the **Knowledge Graph** too, so the KG no longer flattens the epistemic 
 
 1. Paste the entire content of **`cbsa-core.md`** (the fat spine — governance + Stages 0–6 + Reference)
    into the Project **Instructions** (custom instructions).
-2. Upload the other **6 content files** as Project **Files**:
-   `ca-ip.md`, `ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`.
+2. Upload the other **7 content files** as Project **Files**:
+   `ca-ip.md`, `ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`, `test-mode.md`.
 3. Optionally upload `README.md` and `VERIFICATION.md` as Project Files for reference.
 4. All files are flat (no folders), matching how Claude Projects stores uploaded files.
 
