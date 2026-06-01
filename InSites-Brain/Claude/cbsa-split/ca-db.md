@@ -1,61 +1,38 @@
 ## [CA-DB-F] Dashboard Foundation — Shared Rules
 
-> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `CA-EC in cbsa-reference.md`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
+> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `CA-EC in cbsa-core.md`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
 
 These rules apply to **both** the single-assessment dashboard [CA-DB] and the collection dashboard [CA-DB-C]. Each spec references this foundation rather than repeating these patterns.
 
-### Technical Constraints
+### Technical Constraints (native React artifact)
 
-- **CDN**: `cdnjs.cloudflare.com` exclusively for all external libraries (D3, Leaflet, Chart.js). Do NOT use unpkg.com or jsdelivr.net.
-- **No ESM imports in artifacts**: Do NOT use `import` statements for CDN libraries — the artifact sandbox does not support dynamic `require()`. Load all libraries via `<script>` tags and access via global objects (`window.d3`, `window.L`, `window.Chart`). For React artifacts, use a dynamic script loader in `useEffect`.
-- **Global-scope identifiers (critical)**: Wrap all custom JS in an IIFE `(function(){ /* all code */ })();` (React code stays in component scope); never declare top-level variables with reserved browser-global names (`top`, `name`, `length`, `parent`, `status`, `event`, `location`). A top-level `const top` (e.g., a "top-N" list) throws "Identifier 'top' has already been declared" in the artifact sandbox.
-- **typeof guard**: Always check `typeof L !== 'undefined'` (Leaflet), `typeof Chart !== 'undefined'` (Chart.js), `typeof d3 !== 'undefined'` (D3), etc. before initializing CDN-dependent features.
-- **Inline data**: All extracted data must be embedded inline as JS objects. Do NOT use `fetch()`. Dashboards must work via `file://` protocol.
-- **Leaflet popup close workaround**: Artifact sandbox rewrites hash links. After map init: `document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();mapInstance.closePopup();}});`
-- **Chart.js stability**: Do NOT set `maintainAspectRatio:false` on doughnut/pie charts. Add `canvas{max-height:280px}` CSS.
-- **Leaflet Map Tiles (Critical)**: Use OpenStreetMap as default layer (works in artifact sandbox). Add Google Maps layers only outside sandbox — no dead switcher buttons in preview.
-  ```javascript
-  const osmBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
-  osmBase.addTo(mapInstance);
-  const isSandbox = window.location.href === 'about:srcdoc';
-  if (!isSandbox) {
-    const mapLang = (document.documentElement.lang === 'he') ? 'iw' : 'en';
-    const googleTerrain = L.tileLayer(`https://mt1.google.com/vt/lyrs=p&hl=${mapLang}&x={x}&y={y}&z={z}`, { maxZoom: 20 });
-    const googleSatellite = L.tileLayer(`https://mt1.google.com/vt/lyrs=y&hl=${mapLang}&x={x}&y={y}&z={z}`, { maxZoom: 20 });
-    L.control.layers({ "OpenStreetMap": osmBase, "Terrain": googleTerrain, "Satellite": googleSatellite }, null, { position: 'topleft' }).addTo(mapInstance);
-  }
-  ```
-  Language auto-detected from `document.documentElement.lang` (set by CA-HE in cbsa-core.md). Position `topleft` avoids RTL scrollbar overlap. Also add to `<style>`: `[dir="rtl"] .leaflet-popup-content-wrapper { direction: rtl; text-align: right; }`
-- **CRITICAL — Artifact sandbox constraint**: Do NOT use `AbortController` or `AbortSignal` for fetch timeout. The artifact iframe uses `postMessage`, and `AbortSignal` cannot be cloned across this boundary (`DataCloneError`). Use `Promise.race` with `setTimeout` instead.
-- **Sandbox compatibility (critical)**: The Claude.ai artifact preview runs inside `about:srcdoc` where these browser APIs are blocked:
-  · `history.pushState()` / `location.hash` writes
-  · `localStorage` / `sessionStorage`
-  · `window.print()`
-  · Blob downloads (`URL.createObjectURL` + `<a>.click()`)
+This dashboard is a **native React artifact** on Claude. Do NOT emit a self-contained HTML file, vanilla JS, CDN `<script>` tags, an IIFE, or a dynamic script loader — those are the GPT/Gemini constraints and are wrong here.
 
-  Mandatory rules:
-  · Wrap ALL calls to these APIs in try-catch. Never let a blocked API crash the dashboard.
-  · Tab switching must be driven by an in-memory variable (`activeTab`), not URL state. URL hash is a progressive enhancement.
-  · Detect sandbox context with: `const isSandbox = window.location.href === 'about:srcdoc';`
-  · Report tab: when in sandbox, replace export buttons with: "📥 Download this dashboard file to use Export HTML and Print/PDF features."
-  · localStorage for guide box state: fall back to in-memory object when localStorage throws.
-  · All these features must work when the HTML is downloaded and opened as a standalone file. The sandbox constraint must never remove functionality — only defer it to standalone mode.
+- **Imports (direct)**: Import the libraries you need — they are provided in the Claude React-artifact set: `recharts` (bar/line/area/pie charts), `Plotly`/`react-plotly.js` (the Map tab — geographic scatter), `d3` (KG force-graph + custom viz), `lucide-react` (icons), and `papaparse` / `xlsx` (SheetJS) when CSV/Excel handling is needed. Tailwind classes and inline styles both work. **No `react-leaflet`/Leaflet** — not available in React artifacts; the Map tab uses Plotly scattergeo (see §4a).
+- **No external network**: the artifact sandbox blocks cross-origin `fetch`/XHR. All extracted data is embedded inline as a `const` object literal in the component. The only sanctioned outbound call is `window.claude.complete` (AI Query — see [CA-AIQ]).
+- **No browser storage**: `localStorage`/`sessionStorage` are blocked. ALL UI state (active tab, guide-box collapsed, filters, highlight) lives in React state (`useState`/`useReducer`) — per-session, not persisted. Don't try/catch around storage; just don't use it.
+- **Reserved names**: React component scope holds all locals (no IIFE). Still, don't name a state/ref with a reserved DOM global (`top`, `name`, `length`, `status`, `event`, `location`) — use `topSites`, `assetName`, etc.
+- **Charts**: prefer `recharts` (React-native, responsive) for bar/line/area/pie. If a doughnut/pie needs Chart.js (also available), wrap the canvas in a fixed-height container and avoid `maintainAspectRatio:false`.
+- **Map (no tiles)**: there is NO Leaflet and NO external map tiles (cross-origin fetch is blocked). The Map tab uses **Plotly `scattergeo`** — built-in Natural Earth outlines (offline) with site points by lat/lon. Full spec in §4a.
+- **Sizing**: measure chart/map/SVG containers with a `ResizeObserver` (or parent `clientWidth/clientHeight`) so first paint inside the animated artifact frame is correct; re-measure on resize.
+- **RTL**: when the assessment language is Hebrew, set `dir="rtl" lang="he"` on the root and mirror layout per CA-HE in cbsa-core.md.
+- **`window.claude.complete` timeouts**: do NOT use `AbortController`/`AbortSignal` (cannot cross the artifact `postMessage` boundary → `DataCloneError`). If you need a timeout, use `Promise.race` with `setTimeout`.
+- **No in-artifact download / print**: blob downloads (`URL.createObjectURL`) and `window.print()` are blocked. Export (Word/PDF/Excel) is delivered through the chat — the bot generates the document — not via an in-artifact button. (`papaparse`/`xlsx` may build a workbook in memory for on-screen display; offer the actual file via chat.) The Report tab shows its content on-screen and notes: "📥 Ask in chat to export this as a formatted document."
+- **State-only navigation**: there is no URL/history in the artifact — `activeTab` and all cross-references run purely from React state. No `pushState` / `location.hash` / `popstate`.
 
 ### Guide Boxes (every tab)
 
-- Collapsible with chevron toggle.
-- State persisted in localStorage (`guide_[tabId]`). First visit = expanded; returning = collapsed.
+- Collapsible with chevron toggle, driven by **React state** (`useState`, e.g. a `{[tabId]: bool}` map or one flag per tab).
+- Default expanded; collapse is per-session only (no localStorage — browser storage is blocked in artifacts).
 - 3-zone structure: "What you see" (encoding), "How to interact" (actions), "What to look for" (insight callout with amber left-border accent).
 - Styling: `background: var(--amber-100); border-left: 3px solid var(--amber-500);` — compact header with icon + title + chevron.
 - Collapsed state: single line, minimal footprint.
 
 ### Navigation & History
 
-- Encode active tab in URL hash (`#overview`, `#map`, `#timeline`, etc.).
-- `history.pushState()` on every tab switch.
-- `popstate` listener for browser back/forward tab restoration.
-- After cross-tab jumps (e.g., entity click → different tab), show "← Back to [previous tab]" pill.
-- On page load: read hash and restore the corresponding tab.
+- Active tab is held in **React state** (`const [activeTab, setActiveTab] = useState('overview')`) — the single source of truth. URL hash / `history.pushState` / `popstate` are blocked in the artifact sandbox; do not use them.
+- After cross-tab jumps (e.g., entity click → different tab), show "← Back to [previous tab]" pill, tracked in React state.
+- All tab switching and cross-references work entirely from React state — no URL involvement.
 
 ### Accessibility (mandatory)
 
@@ -82,7 +59,7 @@ Generate an interactive Assessment Dashboard after Stage 6, when the user explic
 - **Mandatory offer**: At the end of Stage 6, always present: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
 - **Execute only on acceptance** — do not auto-generate.
 - Respond **only** with the artifact (no surrounding prose).
-- **Format**: Generate as a single self-contained **HTML file** (vanilla JS + D3 from CDN). No build toolchain required.
+- **Format**: Generate as a **native React artifact** (Claude's default), importing `recharts`/`Plotly`/`d3`/`lucide-react` as needed per [CA-DB-F]. No self-contained HTML, no CDN, no vanilla-JS.
 
 ### 2. Data Extraction
 
@@ -94,7 +71,7 @@ Re-read all stage outputs from the conversation and extract:
 | Data Quality | Stage 0 | Sources uploaded, identified gaps (list) |
 | Timeline | Stage 1 | 5–10 key dated events with **year, label, and change type** (use / structure / setting / infrastructure) |
 | Contexts | Stage 1 | Each context: type label, description, **related value categories**, **timespan** |
-| Values | Stage 2 | Each value: name, category (CA-V in cbsa-reference.md), evidence strength (sourced/inferred/uncertain), 1-line summary |
+| Values | Stage 2 | Each value: name, category (CA-V in cbsa-core.md), evidence strength (sourced/inferred/uncertain), 1-line summary |
 | Attribute Table | Stage 2.2 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
 | Authenticity | Stage 3 | Nara Grid as **structured objects**: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary sentence. |
 | Comparative | Stage 4 | Each comparator: name, period, architect (if known), distinction narrative, criteria ratings (rarity, documentation, condition). Plus overall summary. |
@@ -184,7 +161,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 | Tab | Content | Key features |
 | --- | --- | --- |
 | **Overview** | KPIs, asset description, integrity range, data gaps, process summary, sources | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. Process section: strengths/gaps/quick boosts/next steps (folded from former Process tab). Sources list. |
-| **Map** | Asset + mentioned locations (mandatory) | Leaflet map. **Always present** — even for single-site assessments, show the site as a point. If Stage 1, 4, or 5 mention other locations (comparison sites, connected sites, regional context), add as secondary points with labels. Asset: blue circle r=10. Comparators/mentioned: slate circle r=7. Click → popup with details. Coordinate source indicator below map. If coordinates unknown, show a placeholder with "Location not specified in source material." See §4a. |
+| **Map** | Asset + mentioned locations (mandatory) | Plotly `scattergeo` map (built-in outlines, no tiles). **Always present** — even for single-site assessments, show the site as a point. If Stage 1, 4, or 5 mention other locations (comparison sites, connected sites, regional context), add as secondary points with labels. Asset: blue marker ~14. Comparators/mentioned: slate marker ~9. Hover → tooltip; click → details panel. Coordinate source indicator below map. If coordinates unknown, show a placeholder with "Location not specified in source material." See §4a. |
 | **Timeline** | Chronological events | **Proportional spacing** based on year gaps. **Color-coded** by change type (use/structure/setting/infrastructure). Distribution summary. |
 | **Contexts & Values** | Context cards + value cards + attribute table (merged) | **Contexts section**: Each card shows type label, description, timespan, **clickable value pills**. **Values section**: Cards with name, category pill, evidence indicator (〰️/💭 per notation key), summary. **Attribute table** below with 🔑 Implication column. Cross-referencing works within this tab: clicking a context highlights its related values inline. |
 | **Themes** | Value/context/threat thematic clusters (conditional) | Sub-tab pills: "Value Themes" / "Context Themes" / "Threat Themes" with count badges. Theme cards with colored dot, label, member pills (clickable → navigate to item in home tab). Only if ≥2 themes total. See §4b. |
@@ -193,24 +170,20 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 | **Significance** | Statement of cultural significance | Styled as a featured block. |
 | **Report** | One-page printable assessment summary | Always generate. Export as HTML or PDF. See §4c [CA-RPT]. |
 | **Debrief** | Session debrief Q&A (conditional) | Three reflection questions + user responses. Muted process styling. Only if user completed Debrief block after Stage 6. |
-| **Session Analysis** | Session Report [CA-IP] in cbsa-stages.md (conditional) | Interaction Map, Self-Reflection, Session Signature. Muted process styling. Only if user opted in post-[CA-IP] in cbsa-stages.md. |
-| **AI Query** | Placeholder mode — starter prompts route to chat | Displays starter prompts; user copies question to chat for full-context answer. No live API calls. See §9a. |
+| **Session Analysis** | Session Report [CA-IP] in ca-ip.md (conditional) | Interaction Map, Self-Reflection, Session Signature. Muted process styling. Only if user opted in post-[CA-IP] in ca-ip.md. |
+| **AI Query** | Live via `window.claude.complete` | Starter prompts + free-text box; runs a **live** completion grounded in the embedded dashboard data, with loading state and a copy-to-chat fallback when the runtime is unavailable. See §9a. |
 
 ### 4a. Map Tab Spec (mandatory)
 
-**Condition**: Always render. If `asset.coordinates.lat` is non-null, show Leaflet map with markers. If coordinates unknown, show placeholder: "📍 Location not specified in source material — add coordinates to enable map."
+**Condition**: Always render. If `asset.coordinates.lat` is non-null, show the **Plotly `scattergeo`** map with site points. If coordinates unknown, show placeholder: "📍 Location not specified in source material — add coordinates to enable map."
 
-- **Library**: Leaflet 1.9.4 from `cdnjs.cloudflare.com`. Guard: `if (typeof L !== 'undefined')`.
-- **Tiles**: See [CA-DB-F] Leaflet Map Tiles rule (OSM default + Google layers outside sandbox).
-- **Asset marker**: `L.circleMarker`, radius 10, fill `#2563eb`, white stroke width 2. Tooltip: asset name.
-- **Comparator markers**: `L.circleMarker`, radius 7, fill `#94a3b8`, stroke color = highest criteria rating color. Only render if that comparator's coordinates are non-null.
-- **Asset popup**: name (bold), type, period, description, integrity range summary.
-- **Comparator popup**: name (bold), period, architect, distinction (truncated 80 chars), criteria as colored pills.
-- **Bounds**: Auto-fit all markers with padding `[40, 40]`. If only asset marker → zoom 12.
-- **Coordinate source**: Below the map container, show: "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
-- **Container**: `height: min(440px, 60vh); border-radius: 10px; border: 1px solid #e2e8f0`.
-- **Cross-referencing**: Click comparator marker → set `highlight = { type: 'comparator', id }` → Comparative tab highlights that card.
-- **Leaflet popup close workaround**: Apply checklist item 13.
+- **Library**: Plotly `scattergeo` (imported; **no Leaflet, no external tiles** — cross-origin fetch is blocked). One geo trace, `mode: 'markers'` (+ optional `text` labels). The base map uses Plotly's built-in Natural Earth outlines (coastlines, country/subunit borders), rendered offline. Set `geo.showcountries: true`, `geo.showsubunits: true`, and light land/water fills matching the palette.
+- **Fit**: set `geo.fitbounds: 'locations'` (or compute `lonaxis.range`/`lataxis.range` from the points) so the map frames the asset + comparators. With a single asset point, set a modest `geo.projection.scale` so it isn't a whole-world view.
+- **Asset marker**: marker `size` ~14, color `#2563eb`, white outline. **Comparator/mentioned markers**: `size` ~9, color `#94a3b8`, outline = highest criteria rating color. Only plot points whose coordinates are non-null.
+- **Details on interaction** (Plotly has no rich popups): use `hovertemplate` for a concise hover card (name, type, period), and a `plotly_click` handler that sets `highlight` state and renders a **details panel beside/below the map** — asset: name (bold), type, period, description, integrity range; comparator: name (bold), period, architect, distinction (≤80 chars), criteria as colored pills.
+- **Coordinate source**: below the map, show "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
+- **Container**: `height: min(440px, 60vh); border-radius: 10px; border: 1px solid #e2e8f0`. Use Plotly `useResizeHandler` (or a `ResizeObserver`) so it sizes correctly inside the artifact frame.
+- **Cross-referencing**: clicking a comparator point sets `highlight = { type: 'comparator', id }` → Comparative tab highlights that card.
 
 ### 4b. Themes Tab Spec (conditional)
 
@@ -341,8 +314,8 @@ Every tab must include a collapsible guide box at the top, explaining what the t
 3. **"What to look for"** — insight callout with amber left-border accent. The actionable takeaway.
 
 **Behavior**:
-- Collapsible with chevron toggle.
-- State persisted in localStorage (`guide_[tabId]`). First visit = expanded; returning = collapsed.
+- Collapsible with chevron toggle, driven by **React state** (`useState`).
+- Default expanded; collapse is per-session only (no localStorage — browser storage is blocked in artifacts).
 - Collapsed state: single line (amber "ℹ" icon + title + chevron), minimal footprint.
 
 **Styling**:
@@ -353,7 +326,7 @@ Every tab must include a collapsible guide box at the top, explaining what the t
 
 **Content must be tab-specific** — no generic descriptions. Guide content per tab:
 - **Overview**: "KPIs summarize scope; integrity range shows condition at a glance; gaps flag what's missing."
-- **Map**: "Asset and comparator locations. Click markers for details. Dotted outline = inferred coordinates."
+- **Map**: "Asset and comparator locations on a region map. Click a point for details. Coordinate-source note appears below the map."
 - **Timeline**: "Events spaced proportionally by year. Color = type of change. Look for clusters of rapid change."
 - **Contexts**: "Click a context to highlight related values. Pill links jump to Values tab."
 - **Values**: "Evidence markers (〰️/💭) show traceability. Attribute table below shows what sustains each value."
@@ -365,14 +338,11 @@ Every tab must include a collapsible guide box at the top, explaining what the t
 - **Process**: "Strengths, gaps, and quick wins. Action items for next steps."
 - **KG**: "Force-directed graph. Drag nodes, scroll to zoom, click for connections."
 
-### 8. Navigation & History (mandatory)
+### 8. Navigation (mandatory)
 
-- **URL hash**: Encode active tab in URL hash: `#overview`, `#map`, `#timeline`, etc. Wrap in try-catch — blocked in artifact sandbox.
-- **pushState**: Use `history.pushState()` on every tab switch, **wrapped in try-catch**. Tab switching must work even when pushState fails — the in-memory `activeTab` variable is the source of truth, not the URL.
-- **popstate**: Listen for `popstate` event to restore tab on browser back/forward. Wrap listener registration in try-catch.
-- **Back pill**: After cross-tab jumps (e.g., click comparator on Map → Comparative tab), show "← Back to Map" pill. Hide when user navigates manually via the tab bar.
-- **Page load**: On load, attempt to read hash and restore the corresponding tab. Default to Overview if no hash or if hash reading fails. Wrap in try-catch.
-- **Sandbox fallback**: All navigation features above are progressive enhancements. The dashboard must be fully functional (all tabs switchable, all cross-references working) even when all URL-based APIs are blocked.
+- **Active tab in React state**: `const [activeTab, setActiveTab] = useState('overview')` is the single source of truth. There is no URL/history in the artifact — do not use `location.hash`, `history.pushState`, or `popstate` (blocked in the sandbox).
+- **Back pill**: After cross-tab jumps (e.g., click comparator on Map → Comparative tab), track the previous tab in state and show a "← Back to Map" pill. Hide when the user navigates manually via the tab bar.
+- **All tabs switchable and all cross-references working** entirely from React state.
 
 ### 9. KG Node Interaction
 
@@ -397,21 +367,21 @@ When a user clicks a KG node, display a **floating popover** adjacent to the cli
 8. **Cross-referencing** implemented: at least Context↔Value linking functional.
 9. **Readability**: no text below 0.62rem; no contrast ratio below 3:1.
 10. **Nara Grid** stored as structured objects, not parsed strings.
-11. **CDN source**: Use `cdnjs.cloudflare.com` exclusively for all external libraries (D3, Leaflet, Chart.js). Do NOT use unpkg.com or jsdelivr.net. Add a `typeof` guard before initializing CDN-dependent features.
-12. **Inline data**: All extracted data must be embedded inline as JS objects. Do NOT use `fetch()` — the dashboard must work when opened via `file://` protocol without a server.
-13. **Leaflet popup close button**: Leaflet's popup close is `<a href="#close">` — in Claude.ai's artifact sandbox, hash links get rewritten. After map init, add: `document.addEventListener('click',function(e){if(e.target.closest('.leaflet-popup-close-button')){e.preventDefault();mapInstance.closePopup();}});`
-14. **Chart.js stability**: For doughnut/pie charts, do NOT set `maintainAspectRatio:false` — it causes infinite expansion. Add `canvas{max-height:280px}` CSS to chart containers. Only use `maintainAspectRatio:false` for bar charts in constrained-height containers.
-15. **Map tab** conditional on non-null `asset.coordinates.lat`; coordinate source indicator below map; Leaflet `typeof L` guard.
+11. **Native React**: import `recharts`/`Plotly`/`d3`/`lucide-react` directly — no CDN `<script>`, no vanilla-JS, no IIFE, no dynamic script loader.
+12. **Inline data**: all extracted data embedded inline as a `const` object in the component. No `fetch()` (cross-origin blocked).
+13. **Charts**: recharts for bar/line/area/pie (responsive); Chart.js optional for a doughnut/pie in a fixed-height container (no `maintainAspectRatio:false`).
+14. **Map tab**: Plotly `scattergeo` (built-in Natural Earth outlines, no tiles); always render; coordinate-source indicator below; placeholder when coordinates unknown. Per §4a.
+15. **Sizing**: `ResizeObserver` / Plotly `useResizeHandler` so charts/map/SVG paint correctly inside the animated artifact frame.
 16. **Themes tab** conditional on ≥2 clusters total; member pills linked via cross-referencing; threat themes show mini heatmap.
-17. **Guide boxes** on every tab; collapsible with chevron; localStorage state persistence (`guide_[tabId]`); 3-zone structure.
-18. **URL hash** encodes active tab; `pushState` on switch; `popstate` listener; back pill after cross-tab jumps.
+17. **Guide boxes** on every tab; collapsible with chevron via **React state** (no localStorage); 3-zone structure.
+18. **Navigation** via **React state** (`activeTab`); back pill after cross-tab jumps. No URL hash / `pushState` / `popstate`.
 19. **Cross-referencing** extended to `value|context|comparator|theme` types; back pill shown after highlight jumps.
-20. **AI Query tab** uses placeholder mode — starter prompts only, no live API calls.
-21. **Sandbox compatibility**: All `history.pushState()`, `localStorage`, `location.hash`, `window.print()`, and blob download calls wrapped in try-catch. Tab switching works via in-memory state. Report export buttons replaced with download prompt when in sandbox. Dashboard fully functional in both artifact preview and standalone mode.
+20. **AI Query** is **live** via `window.claude.complete` (dashboard data embedded in the prompt); loading state; copy-to-chat fallback when the runtime is unavailable. Per §9a.
+21. **No storage / no in-artifact download**: `localStorage`/`sessionStorage`, blob downloads and `window.print()` are blocked; all state in React; export (Word/PDF/Excel) is delivered via chat (the bot generates the file), not an in-artifact button.
 
-### 9a. AI Query Tab `[CA-AIQ]` (Placeholder Mode)
+### 9a. AI Query Tab `[CA-AIQ]` (Live via `window.claude.complete`)
 
-The AI Query tab uses **placeholder mode** on Claude. No live API calls from the artifact. Starter prompts guide the user to ask questions in the chat conversation, where the bot has full context.
+The AI Query tab runs **live** on Claude: it calls `window.claude.complete` (no API key, billed to the viewer) with the dashboard data embedded in the prompt, so the user gets a grounded answer without leaving the artifact. This is the one AI-Query capability GPT/Gemini cannot offer.
 
 **Starter prompts** (Single Dashboard):
 1. "Summarize the significance of this asset"
@@ -420,7 +390,22 @@ The AI Query tab uses **placeholder mode** on Claude. No live API calls from the
 4. "What does the integrity assessment reveal?"
 5. "How does this asset compare to its comparators?"
 
-**UI elements**: Chat-style message area with starter prompt cards. When user clicks a prompt or types a question, display: "💬 Copy this question to the chat conversation for an answer based on the full assessment context." Include a copy-to-clipboard button for the question text. No live API calls are executed from the artifact.
+**UI elements**: chat-style message area with the 5 starter-prompt cards and a free-text box. On submit (card click or typed question), run a live completion:
+
+```jsx
+async function ask(question) {
+  setLoading(true); setAnswer('');
+  const prompt =
+    `You are analysing a CBSA heritage Assessment Dashboard. Answer ONLY from the data below, concisely (≤150 words). ` +
+    `If the data does not support an answer, say so.\n\nDASHBOARD DATA (JSON):\n${JSON.stringify(DASHBOARD_DATA)}\n\nQUESTION: ${question}`;
+  try { setAnswer(await window.claude.complete(prompt)); }
+  catch (e) { setFallback(question); }      // graceful fallback, below
+  finally { setLoading(false); }
+}
+```
+
+- **Loading state**: spinner / "Thinking…" while pending; render the answer in a card with the question echoed above it.
+- **Graceful fallback (mandatory)**: guard with `typeof window !== 'undefined' && window.claude && typeof window.claude.complete === 'function'`. If unavailable or the call throws, show the copy-to-chat affordance instead: "💬 Copy this question to the chat for an answer based on the full assessment context." + a copy-to-clipboard button.
 
 ---
 
@@ -430,14 +415,14 @@ After generating the Dashboard, always offer:
 
 ### Reference Implementation (if available)
 
-The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) implements this spec fully: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a working example — not as a locked template.
+The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) shows the intended **visual design and structure**: light theme throughout, all 10 tabs, cross-referencing with shared highlight state, structured Nara Grid, per-comparator cards, vulnerability matrix, proportional timeline with change types, and floating KG popover. Use it as a **visual/structural reference for the look and tab set** — it is HTML, so reproduce its design in the React artifact; do not copy its vanilla-JS code or treat it as a locked template.
 ---
 
 ## [CA-DB-C] Collection Dashboard — MA-RC Integration
 
 > **Scope**: Collection-level visualization (multiple sites from MA-RC analysis). For single-assessment dashboards (one site, one CBSA process), see [CA-DB] above. Both share the UX foundation ([CA-DB-F]) but have different data shapes, tab structures, and visual palettes. Collection: Inter + stone/amber palette.
 >
-> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `CA-EC in cbsa-reference.md`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
+> **Cross-platform reference**: Visual tokens follow `[CA-UX]`, entity colors follow `CA-EC in cbsa-core.md`, AI Query follows `[CA-AIQ]`. See `artifact-ux-contract.md` for the cross-platform source of truth.
 
 ### 1. Trigger and Offer
 
@@ -445,7 +430,7 @@ The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example
 - Also generate on direct request ("dashboard", "collection dashboard", "visualize").
 - Execute only on acceptance — do not auto-generate.
 - Respond **only** with the artifact (no surrounding prose).
-- **Format**: Single self-contained **HTML file** (vanilla JS, Chart.js + Leaflet from CDN). No build toolchain.
+- **Format**: a **native React artifact** (recharts for charts, Plotly `scattergeo` for the map, `lucide-react` icons — imported per [CA-DB-F]). No self-contained HTML, no CDN, no vanilla-JS.
 
 ### 2. Data Extraction
 
@@ -478,7 +463,7 @@ Also derive from Collection Reading and analyses (if available):
 | # | Tab | Content | Key features |
 |---|-----|---------|-------------|
 | 1 | **Overview** | KPI cards (N sites, N countries, time span, N methods) + 4 distribution charts. KPI numeric values use monospace font. | Always first tab. Orients the user. |
-| 2 | **Map** | Leaflet map with circle markers sized by explicit-value count | Filter buttons per value type. Click marker → popup with significance summary + highlight. |
+| 2 | **Map** | Plotly `scattergeo` map; marker size by explicit-value count | Filter buttons per value type (dim non-matching points). Click a point → details panel with significance summary + highlight. |
 | 3 | **Values** | Matrix: sites × value types, evidence markers (〰️/💭). Below: value specification panel. | Sortable columns. Sticky first column. Footer counts. Click site name → expand panel. |
 | 4 | **Themes** | Thematic clusters across the collection **(MANDATORY)** | Always generate. Theme cards with colored dot, label, description, clickable site member pills, per-site evidence text. |
 
@@ -489,7 +474,7 @@ Add analysis results the user requested. Supported types: table, cards, matrix, 
 - **Gaps** — traffic-light completeness matrix (type: `matrix`)
 - **Cross-Tabs** — distribution charts (type: `custom`)
 - **Clusters** — management grouping cards (type: `cards`)
-- **AI Query** — implements [CA-AIQ] contract (Anthropic API on Claude)
+- **AI Query** — implements the [CA-AIQ] contract **live** via `window.claude.complete` (no API key; see §9)
 
 In `tabs[]` data, use exact `site.name` values when referencing sites — enables cross-tab navigation.
 
@@ -503,14 +488,14 @@ In `tabs[]` data, use exact `site.name` values when referencing sites — enable
 - **Cross-tab site navigation.** Shared `navigateToSite(siteId)` function. Site name clicked in Values → show value panel; in other tabs → switch to Map + open popup.
 - **Map filters must filter.** Value filter buttons must dim or hide non-matching markers — not just toggle visual state.
 - **Gap data derived from extraction.** Use `⚠ not stated` / `—` markers to determine green/yellow/red. Never hardcode per-site overrides.
-- All [CA-DB-F] foundation rules apply (Chart.js stability, inline data, Leaflet workaround, sandbox compatibility).
+- All [CA-DB-F] foundation rules apply (native React imports, inline data, React-state navigation/guide-boxes, no storage).
 
 ### 5. Visual Language — Design Tokens
 
-**Libraries** (load in `<head>`):
-- Leaflet 1.9.4 via `cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/`
-- Chart.js 4.4.1 via `cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/`
-- Do NOT use unpkg.com or jsdelivr.net. Add `typeof` guard before map init.
+**Libraries** (imported directly — provided in the React-artifact set):
+- `Plotly` / `react-plotly.js` for the Map tab (`scattergeo`, built-in outlines, no tiles)
+- `recharts` for the distribution charts (Chart.js optional)
+- `lucide-react` for icons. No CDN, no `<script>` tags.
 
 #### 5a. Design Intent
 
@@ -526,7 +511,7 @@ See [CA-UX] for cross-platform visual tokens.
 
 - **Cross-tab navigation**: All site tags clickable → navigate to Map popup or Values row. Implement `selectSiteOnMap()`, `goBack()`.
 - **Header**: Collection name, N sites, region, depth badge, source, date.
-- All [CA-DB-F] foundation rules apply (inline data, Leaflet workaround, sandbox compatibility).
+- All [CA-DB-F] foundation rules apply (inline data, React state, no storage, native React).
 
 ### 6. Checklist
 
@@ -534,11 +519,11 @@ See [CA-UX] for cross-platform visual tokens.
 2. ☐ Evidence markers (〰️/💭) consistent across all tabs
 3. ☐ Charts show all data categories — no `.slice()` truncation
 4. ☐ Collection metadata in header (source, depth, N items)
-5. ☐ AI Query uses placeholder mode
+5. ☐ AI Query is live via `window.claude.complete` (with copy-to-chat fallback)
 
-### 9. AI Query Tab `[CA-AIQ]` (Placeholder Mode)
+### 9. AI Query Tab `[CA-AIQ]` (Live via `window.claude.complete`)
 
-The AI Query tab uses **placeholder mode** on Claude. No live API calls from the artifact. Starter prompts guide the user to ask questions in the chat conversation.
+The AI Query tab runs **live** on Claude: it calls `window.claude.complete` (no API key, billed to the viewer) with the collection data embedded in the prompt — same pattern as [CA-DB] §9a.
 
 **Starter prompts** (Collection Dashboard):
 1. "What value patterns are shared across sites?"
@@ -547,7 +532,7 @@ The AI Query tab uses **placeholder mode** on Claude. No live API calls from the
 4. "Where are the biggest data gaps?"
 5. "What management clusters emerge?"
 
-**UI elements**: Chat-style message area with starter prompt cards. When user clicks a prompt or types a question, display: "💬 Copy this question to the chat conversation for an answer based on the full assessment context." Include a copy-to-clipboard button. No live API calls are executed from the artifact.
+**UI elements**: chat-style message area with the starter-prompt cards and a free-text box. On submit, build a prompt embedding the collection JSON (`COLLECTION_DATA`) and `await window.claude.complete(prompt)`; show a loading state, then the answer. **Graceful fallback (mandatory)**: guard `typeof window !== 'undefined' && window.claude && typeof window.claude.complete === 'function'`; if unavailable or the call throws, show "💬 Copy this question to the chat for an answer based on the full collection context." + a copy-to-clipboard button.
 
 ### 7. Dataset Export
 

@@ -997,6 +997,7 @@ Use these categories when selecting node type in a Knowledge Graph. Each categor
 | Historical Period | A defined chronological era relevant to the assessment |
 | Religion / Belief | A faith system, cosmology, or spiritual practice |
 | Collective Memory | A shared remembrance, commemoration, or cultural narrative |
+| Heritage Asset | The assessed heritage asset/site itself as an entity (the primary subject of the assessment) |
 
 **Proposed types (epistemic):** When a node genuinely falls outside these categories, you may propose a new type — render it with the **closest existing category's colour** (no colour-map change), mark the node `interpretive` (💭), and name the proposed type in its `epistemic_note`. It then appears in the KG review list.
 
@@ -1029,6 +1030,7 @@ When the user's language is Hebrew, render ALL structural elements using the map
 **Stage 2 values**: מאפיין / ערך/ים משויכים / משמעות באתר / איומים
 **Stage 3 Nara Grid**: היבט / תיאור / ביטוי ערכים / שלמות
 **Stage 6 quick boosts**: בעיה / שיפור שיעשה הבדל
+**MA-RA coverage scan**: רכיב CBSA / קיים? / עומק / הערות
 **Collection reading**: שם / מיקום / סוג / תקופה / תיאור / תקציר משמעות / ערכים / שלמות·אותנטיות / השוואות / איומים
 
 ### Common Labels
@@ -1078,7 +1080,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
    - **Up to 3 Cultural Value nodes** (abstract value entities for KG illustration)
 3. Capture relationship verbs that show CBSA logic (`located_in`, `expresses_value`, `part_of`, `commemorates`, `influenced_by`, `supports`, etc.).
 4. Drop weak/duplicate nodes; avoid orphans (every node must connect at least once).
-5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
+5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 15 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly and add it to the colour map.
 6. **Mark epistemic status (mandatory)** — Set each node's `epistemic` per the Per-Claim Epistemic Gate (see Global Controls): explicit in source → `sourced`; connected from 2+ pieces of evidence → `inferred` (〰️); a reading a peer could contest, or an entity/type proposed beyond the sources → `interpretive` (💭). For `inferred`/`interpretive` nodes, add an `epistemic_note` (≤15 words) stating why.
 
 ### 3. DATA Schema (strict)

@@ -82,6 +82,7 @@ Common analysis types (offer when relevant to the data):
 - **Management clustering** — group by governance needs (shared corridors, multi-owner compounds, isolated sites).
 - **Documentation gap analysis** — what's present vs. missing for a nomination/dossier; priority actions.
 - **Enrichment needs** — what analytics dimensions are derivable now vs. need additional data.
+- **Computed analytics (code execution)** — for tabular input (CSV/Excel), compute *exact* distributions, cross-tabs, and clusters (and an optional downloadable Excel) instead of estimating by eye. See **Step 3+** below.
 
 Rules:
 - Cite item names. Do not invent data.
@@ -98,6 +99,31 @@ Another angle? | Focus on one site? | Dataset? | Dashboard? | Done?
 
 ---
 
+### Step 3+ — Computed Analytics (code execution, optional)
+
+**When available**: the collection is (or can be saved as) **tabular data** — CSV, Excel (`.xlsx`), or a clean Markdown/JSON table. For tabular collections, prefer **real computation over estimation**.
+
+**What it is**: use Claude's **code-execution (Analysis) tool** to parse the file (`papaparse`), compute exact figures (`lodash`), and — on request — build a downloadable workbook (`xlsx`/SheetJS). This replaces by-eye reading of distributions with verified counts. (This is a Claude.ai capability; GPT/Gemini cannot do it in-session.)
+
+**Offer it** when the user asks for distributions, counts, cross-tabs, rankings, or "the numbers":
+> "This collection is tabular — I can compute the exact distributions (and export an Excel summary) rather than estimate. Run the computation?"
+
+**Typical computations** (only what the data supports):
+- Value-type distribution (explicit/implied/absent counts per category), per site and overall.
+- Period / type / country frequency tables and cross-tabs.
+- Integrity and threat frequencies; sites-per-threat.
+- Management or thematic clusters by grouping on shared attributes.
+- Completeness/gap matrix: % of sites missing each field.
+
+**Output**:
+- Report computed figures inline with **exact counts** (not "most"/"several"), and state the row/site count they are based on.
+- On request, generate a **downloadable `.xlsx`** (one sheet per table) via SheetJS, or a structured **JSON** dataset.
+- Feed the computed figures into the Collection Dashboard ([CA-DB-C]) so its charts show verified numbers, not estimates.
+
+**Discipline**: compute only from the uploaded data (Evidence Mandate). A `⚠ not stated` field counts as missing — never impute. Never present a computed occurrence-count as a quality score or ranking.
+
+---
+
 ### Step 4 — Iteration
 
 User may:
@@ -105,7 +131,7 @@ User may:
 - **Focus on one item** → full extracted record + how it sits in the collection. Offer MA-RA handoff if available.
 - **Classify** → propose 3–5 grouping schemes from visible data. Apply after confirmation.
 - **CBSA normalization** → map values to CA-V categories, contexts to CA-C. Show alongside original terms.
-- **Dataset export** → Generate structured JSON with all extracted and derived data per site.
+- **Dataset export** → Generate structured JSON with all extracted and derived data per site; for tabular input, optionally a computed `.xlsx` via code execution (Step 3+).
 - **Collection dashboard** → "Would you like a visual dashboard for this collection?" Generate per [CA-DB-C] spec. Offer after at least one analysis.
 - **Done** → 3–4 sentences: what the collection revealed, what remains unclear, possible next step.
 

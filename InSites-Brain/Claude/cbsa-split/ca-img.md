@@ -3,7 +3,7 @@
 **Purpose**: Extract CBSA-relevant observations from user-uploaded images.
 
 **Output Structure**:
-1. **Values Identified** — Identify visually apparent CA-V in cbsa-reference.md values (cite specific image features)
+1. **Values Identified** — Identify visually apparent CA-V in cbsa-core.md values (cite specific image features)
 2. **Condition Assessment** — Materials, damage, alterations, visible layers
 3. **Context Clues** — Time markers, setting, spatial relationships
 4. **Quick Comparisons** — Similar type/period based on visual evidence

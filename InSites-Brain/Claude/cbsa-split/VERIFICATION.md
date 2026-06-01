@@ -1,5 +1,32 @@
 # VERIFICATION — cbsa-split
 
+## 0. Current architecture — fat-spine restructure (Alt 1′)
+
+The split was subsequently **restructured to a fat spine**. `cbsa-core.md` now carries the always-on
+spine inline: **PART 1** (governance/controls/`[CA-HE]`) + **PART 2** (Stages 0–6) + **PART 3**
+(Reference appendices). The one-shot Session Report `[CA-IP]` was pulled out to its own on-demand file
+`ca-ip.md`. The former `cbsa-stages.md` and `cbsa-reference.md` were **retired** (their content moved
+into `cbsa-core.md` PART 2/PART 3; recoverable via git).
+
+**Current file set (7 content files):** `cbsa-core.md` (fat spine, Project Instructions) · on-demand:
+`ca-ip.md`, `ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`.
+
+**Cross-reference convention after restructure:** inside `cbsa-core.md`, former cross-file pointers to
+`cbsa-stages.md`/`cbsa-reference.md`/`cbsa-core.md` were rewritten to **"in this document"** (all three
+parts are co-located). On-demand files (`ca-kg.md`, `ca-db.md`, `ca-img.md`) point back to the spine as
+**"in cbsa-core.md"**, and Session-Report pointers were rewritten to **"in ca-ip.md"**. A post-restructure
+scan confirmed **zero** residual references to the retired `cbsa-stages.md`/`cbsa-reference.md` filenames.
+
+**Loading Block:** the old "Files to load" table became the XML-tagged `<FILE_LOADING_ROUTER>` — Stages
+and Reference are declared always-on (not loaded); only the six one-shot utilities are on-demand.
+
+> §1–§4 below document the **original 8-file organizational split** (historical record) and remain
+> accurate for that event; read them together with §0 for the current state.
+
+---
+
+## Original 8-file split (historical record)
+
 Split of `InSites-CAA-claude.md` (v7, **2,230 lines**, UTF-8 no-BOM, CRLF) into 8 flat content files.
 Organizational split only: content verbatim; the sole additions are the Loading Block (core) and the
 cross-reference updates listed in §3. Source file **not modified** (141,332 bytes before and after).
