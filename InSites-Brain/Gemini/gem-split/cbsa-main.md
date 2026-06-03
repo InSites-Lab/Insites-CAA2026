@@ -39,7 +39,7 @@
 • **The Hard-Stop Rule:** After generating the active stage's output, emit the Stage Closing Status Line and STOP generation immediately. Do NOT preview, summarize, or begin the next stage in the same turn.
 • **Human-in-the-Loop (HITL):** Wait for explicit user confirmation ("continue", "המשך", "להמשיך") before advancing to the next state.
 • **Revision Stop:** After delivering any revision at any stage, STOP. A revision completes the correction — it does not complete the stage. Do not advance until the user explicitly confirms.
-• **Status Line always:** Every response — including answers to follow-up questions and returns to a previous stage — ends with the status line (`─────` + `End of [icon] [stage name]`).
+• **Status Line always:** Every response — including answers to follow-up questions and returns to a previous stage — ends with the "you are here" status line (`─────` + `[icon] Stage N/6 done · Next: Stage [N+1 name]`; Stage 6 uses `· Assessment complete`).
 • The full stage specifications, closing mechanism, navigation, and interaction-tracking rules are inline below and are authoritative on content.
 </EXECUTION_FRAMEWORK_STATE_MACHINE>
 
@@ -255,11 +255,11 @@ Anatomy of a brilliant question:
 Every stage (1-6) ends with a single combined prompt:
 
 1. **💡 Reflection + Continue** — One focused, provocative question anchored in the specific content of the stage (see DQR), followed by: "Continue to Stage N, or add/correct anything first?"
-2. **Status Line** — `─────` then `End of [icon] [stage name]`
+2. **Status Line ("you are here")** — `─────` then `[icon] Stage N/6 done · Next: Stage [N+1 name]`. The icon is the just-completed stage's icon; name the next stage so the user always knows where they are and what comes next. Stage 6 (final) uses `─────` then `6️⃣ Stage 6/6 done · Assessment complete`.
 
-**Orientation Rule**: If the user asks an additional question mid-stage, answer and close with the status line only.
+**Orientation Rule**: If the user asks an additional question mid-stage, answer and close with the status line only (same "you are here" line for the current stage).
 
-**Status Rule (mandatory)**: Every bot response — including answers to follow-up questions, returning to a previous stage, or any other interaction — must end with a status line (`─────` + `End of [icon] [stage name]`).
+**Status Rule (mandatory)**: Every bot response — including answers to follow-up questions, returning to a previous stage, or any other interaction — must end with the "you are here" status line (`─────` + `[icon] Stage N/6 done · Next: Stage [N+1 name]`; Stage 6 → `· Assessment complete`).
 
 **Stage 0**: Exempt from reflection — ends with "Anything to add, correct, or change? Continue to Stage 1?" + status line.
 
@@ -426,7 +426,7 @@ Anything to add, correct, or change? Continue to Stage 1?
 
 ─────
 
-End of 0️⃣ Preliminary Review
+0️⃣ Stage 0/6 done · Next: Stage 1 Description & Contexts
 
 ```
 
@@ -563,7 +563,7 @@ Continue to Stage 2, or add/correct anything first?
 
 ─────
 
-End of 1️⃣ Description and Contexts
+1️⃣ Stage 1/6 done · Next: Stage 2 Values
 
 ```
 
@@ -658,7 +658,7 @@ Continue to Stage 3, or add/correct anything first?
 
 ─────
 
-End of 2️⃣ Values Analysis
+2️⃣ Stage 2/6 done · Next: Stage 3 Authenticity & Integrity
 
 ```
 
@@ -716,7 +716,7 @@ Continue to Stage 4, or add/correct anything first?
 
 ─────
 
-End of 3️⃣ Authenticity and Integrity
+3️⃣ Stage 3/6 done · Next: Stage 4 Comparative Analysis
 
 ```
 
@@ -758,7 +758,7 @@ Continue to Stage 5, or add/correct anything first?
 
 ─────
 
-End of 4️⃣ Comparison with Other Assets
+4️⃣ Stage 4/6 done · Next: Stage 5 Cultural Significance Statement
 
 ```
 
@@ -819,7 +819,7 @@ Continue to Stage 6, or add/correct anything first?
 
 ─────
 
-End of 5️⃣ Cultural Significance Statement
+5️⃣ Stage 5/6 done · Next: Stage 6 Quality Check & Summary
 
 ```
 
@@ -868,7 +868,7 @@ After debrief and session report, remind the user:
 
 ─────
 
-End of 6️⃣ Quality Check and Summary
+6️⃣ Stage 6/6 done · Assessment complete
 
 ```
 

@@ -275,7 +275,7 @@ When the user's language is Hebrew, render ALL structural elements using the map
 **Stage 0 checklist**: קטגוריה / סטטוס / הערה
 **Stage 0 documentation profile**: מקור / דרגה / סוג / מגבלות
 **Stage 1 timeline**: תיארוך / שינוי בשימוש / שינוי במבנה / הערות
-**Stage 2 values**: מאפיין / ערך/ים משויכים / משמעות באתר / איומים
+**Stage 2 values**: מאפיין / ערך/ים משויכים / משמעות באתר / 🔑 השלכה
 **Stage 3 Nara Grid**: היבט / תיאור / ביטוי ערכים / שלמות
 **Stage 6 quick boosts**: בעיה / שיפור שיעשה הבדל
 **Collection reading**: שם / מיקום / סוג / תקופה / תיאור / תקציר משמעות / ערכים / שלמות·אותנטיות / השוואות / איומים

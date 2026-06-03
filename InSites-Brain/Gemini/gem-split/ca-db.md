@@ -72,8 +72,6 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 
   · `localStorage` / `sessionStorage`
 
-  · `window.print()`
-
   · Blob downloads (`URL.createObjectURL` + `<a>.click()`)
 
   Mandatory rules:
@@ -84,7 +82,7 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 
   · Detect sandbox context with: `const isSandbox = window.location.href === 'about:srcdoc';`
 
-  · Report tab: when in sandbox, replace export buttons with: "📥 Download this dashboard file to use Export HTML and Print/PDF features."
+  · Report tab: render the report on-screen only. There is no in-artifact file export — show the chat-export note: "📥 Ask in chat to export this report as a formatted Word document." (Deferred in-artifact print/export — see the design future-features note.)
 
   · localStorage for guide box state: fall back to in-memory object when localStorage throws.
 
@@ -144,7 +142,7 @@ Re-read all stage outputs from the conversation and extract:
 | Timeline | Stage 1 | 5–10 key dated events with **year, label, and change type** (use / structure / setting / infrastructure) |
 | Contexts | Stage 1 | Each context: type label, description, **related value categories**, **timespan** |
 | Values | Stage 2 | Each value: name, category (CA-V in cbsa-reference.md), evidence strength (sourced/inferred/uncertain), 1-line summary |
-| Attribute Table | Stage 2.2 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
+| Attribute Table | Stage 2.1 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
 | Authenticity | Stage 3 | Nara Grid as **structured objects**: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary sentence. |
 | Comparative | Stage 4 | Each comparator: name, period, architect (if known), distinction narrative, criteria ratings (rarity, documentation, condition). Plus overall summary. |
 | Significance | Stage 5 | Full statement text |
@@ -289,7 +287,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 | **Integrity** | Nara Grid cards + summary + vulnerability matrix | Each card: aspect name, description, value expression pills, **color-coded rating badge** (high=green → low=red). Left border color matches rating. **🔴 Vulnerability Analysis** (visible sub-heading): interpretive callout ABOVE the heat matrix (not below). Legend inline: "🔴 = loss severely damages this value, 🟡 = moderate, ⚪ = minor." Each cell shows symbol + number: `● 3` (severe), `◐ 2` (moderate), `○ 1` (minor), `· 0` (negligible) — symbols provide non-color distinction for accessibility. Heat matrix: rows = value categories, columns = Nara aspects with integrity rating in header. Only if vulnerability data exists. |
 | **Comparative** | Per-comparator cards + summary | Each card: name, period, architect, criteria ratings (color-coded), distinction narrative. Source note. Each card includes a **📍 Map** button → `mapInstance.setView([c.lat, c.lng], 16)` to fly to the comparator on the Map tab (comparators are excluded from the map's initial zoom). |
 | **Significance** | Statement of cultural significance | Styled as a featured block. |
-| **Report** | One-page printable assessment summary | Always generate. Export as HTML or PDF. See §4c [CA-RPT]. |
+| **Report** | One-page assessment summary | Always generate. Renders on-screen; file export is chat-delivered (Word) — no in-artifact print/export. See §4c [CA-RPT]. |
 | **Debrief** | Session debrief Q&A (conditional) | Three reflection questions + user responses. Muted process styling. Only if user completed Debrief block after Stage 6. |
 | **Session Analysis** | Session Report [CA-IP] in cbsa-stages.md (conditional) | Interaction Map, Self-Reflection, Session Signature. Muted process styling. Only if user opted in post-[CA-IP] in cbsa-stages.md. |
 | **AI Query** | In-artifact heritage analysis chat | Implements [CA-AIQ] contract. Gemini: Gemini API endpoint. Claude: Anthropic endpoint. GPT: placeholder mode. See §9a. |
@@ -391,31 +389,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 **Layout**: Single column, max-width 720px, centered. Same card system as other tabs.
 
-**Export controls** (in Report tab header):
-
-- **📄 Export HTML** — downloads report as self-contained HTML file (`{asset-name}-report.html`). Clone DOM, inline styles, wrap in HTML5 doc with Google Fonts link.
-- **🖨️ Print / PDF** — triggers `window.print()`.
-- **Sandbox fallback (mandatory)**: Detect sandbox (`window.location.href === 'about:srcdoc'`). When in sandbox, replace both buttons with a single message: "📥 Download this dashboard file to use Export HTML and Print/PDF features." Do not show broken buttons.
-
-**Print CSS**:
-
-```css
-
-@media print {
-
-  .tab-bar, .sidebar, nav, .export-controls, footer { display: none !important; }
-
-  .report-tab { display: block !important; max-width: 100%; padding: 20mm; }
-
-  .report-section { break-inside: avoid; }
-
-  body { font-size: 11pt; line-height: 1.5; }
-
-  * { background: white !important; color: black !important; }
-
-}
-
-```
+**Export (chat-delivered)**: The Report tab renders the full report on-screen for reading — that is its only in-artifact form. Do NOT add in-artifact export or print buttons: print does not work in the Gemini canvas, and blob/HTML downloads are unreliable in the sandbox. For a file, show one short note in the Report header: "📥 Ask in chat to export this report as a formatted Word document." When the user asks, the bot generates the Word document in the conversation. (Deferred in-artifact print/export — see the design future-features note.)
 
 **Target length**: 800-1200 words, fitting 1-2 A4 pages.
 
@@ -542,7 +516,7 @@ When a user clicks a KG node, display a **floating popover** adjacent to the cli
 20. **AI Query tab** implements [CA-AIQ] contract with correct platform mode (Gemini API live).
 21. **Tab CSS constraint**: `.tab-content:not(.active) { display: none !important; }` present in `<style>` block.
 22. **No ESM imports**: No `import` statements for CDN libraries. All loaded via `<script>` tags, accessed via `window.*` globals.
-23. **Sandbox compatibility**: All `history.pushState()`, `localStorage`, `location.hash`, `window.print()`, and blob download calls wrapped in try-catch. Tab switching works via in-memory state. Report export buttons replaced with download prompt when in sandbox. Dashboard fully functional in both artifact preview and standalone mode.
+23. **Sandbox compatibility**: All `history.pushState()`, `localStorage`, `location.hash`, and blob download calls wrapped in try-catch. Tab switching works via in-memory state. Report tab is on-screen only with a chat-export note (no in-artifact print/export buttons). Dashboard fully functional in both artifact preview and standalone mode.
 
 ### 9a. AI Query Tab `[CA-AIQ]`
 

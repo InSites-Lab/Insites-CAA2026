@@ -36,6 +36,8 @@ Two parts. Do both before stopping.
 
 **2a. Extraction.** For every item, extract into a normalized record. Work from text only — do not invent.
 
+**Core (mandatory) vs Optional enrichment**: The **Core** fields — Name, Location, Type, Period, Site description, Significance summary — must be attempted for every item. The remaining fields (Values identified, Integrity/Authenticity, Comparative references, Threats, Value specifications) are **optional enrichment** — populate when the text supports them, otherwise use the "If absent" marker.
+
 | Field | If absent |
 |-------|-----------|
 | Name | Use file/row ID |

@@ -9,6 +9,7 @@
 - **Mandatory offer** at end of Stage 6: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
 - Execute only on acceptance — do not auto-generate.
 - Output as a **Canvas document** (HTML shell loading external runtime).
+- **Canvas tool (critical)**: emit the shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#dashboard-root` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
 - Respond **only** with the Canvas directly — no surrounding prose.
 - **Dashboard announcement**: Before generating, say: "I'll generate an interactive Assessment Dashboard — your full assessment visualized across [N] tabs."
 
@@ -60,7 +61,7 @@ Re-read all stage outputs from the conversation and extract:
 | Timeline | Stage 1 | 5–10 key dated events with year, label, and change type (use/structure/setting/infrastructure) |
 | Contexts | Stage 1 | Each context: type label, description, related value categories, timespan |
 | Values | Stage 2 | Each value: name, category ([CA-V]), evidence strength (sourced/inferred/uncertain), 1-line summary |
-| Attribute Table | Stage 2.2 | Each row: attribute name, associated value categories, site-specific significance, implication |
+| Attribute Table | Stage 2.1 | Each row: attribute name, associated value categories, site-specific significance, implication |
 | Authenticity | Stage 3 | Nara Grid as structured objects: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary. |
 | Comparative | Stage 4 | Each comparator: name, period, architect, distinction, criteria ratings (rarity, documentation, condition). Plus summary. |
 | Significance | Stage 5 | Full statement text |

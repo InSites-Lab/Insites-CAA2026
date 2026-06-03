@@ -41,11 +41,11 @@ Anatomy of a brilliant question:
 
 Every stage (1-6) ends with a single combined prompt:
 1. **💡 Reflection + Continue** — One focused, provocative question anchored in the specific content of the stage (see DQR), followed by: "Continue to Stage N, or add/correct anything first?"
-2. **Status Line** — `─────` then `End of [icon] [stage name]`
+2. **Status Line ("you are here" tracker)** — `─────` then `[icon] Stage N/6 done · Next: Stage [N+1 name]`. For Stage 6: `[icon] Stage 6/6 done · Assessment complete`.
 
 **Orientation Rule**: If the user asks an additional question mid-stage, answer and close with the status line only.
 
-**Status Rule (mandatory)**: Every bot response — including answers to follow-up questions, returning to a previous stage, or any other interaction — must end with a status line (`─────` + `End of [icon] [stage name]`).
+**Status Rule (mandatory)**: Every bot response — including answers to follow-up questions, returning to a previous stage, or any other interaction — must end with the status line (`─────` + `[icon] Stage N/6 done · Next: Stage [N+1 name]`).
 
 **Stage 0**: Exempt from reflection — ends with "Anything to add, correct, or change? Continue to Stage 1?" + status line.
 
@@ -150,7 +150,7 @@ Anything to add, correct, or change? Continue to Stage 1?
 
 ```
 ─────
-End of 0️⃣ Preliminary Review
+0️⃣ Stage 0/6 done · Next: Stage 1 Description and Contexts
 ```
 
 ---
@@ -272,7 +272,7 @@ Continue to Stage 2, or add/correct anything first?
 
 ```
 ─────
-End of 1️⃣ Description and Contexts
+1️⃣ Stage 1/6 done · Next: Stage 2 Values Analysis
 ```
 
 ## Stage 2️⃣ Values Analysis
@@ -356,7 +356,7 @@ Continue to Stage 3, or add/correct anything first?
 
 ```
 ─────
-End of 2️⃣ Values Analysis
+2️⃣ Stage 2/6 done · Next: Stage 3 Authenticity and Integrity
 ```
 ## Stage 3️⃣ Authenticity and Integrity
 
@@ -430,7 +430,7 @@ Continue to Stage 4, or add/correct anything first?
 
 ```
 ─────
-End of 3️⃣ Authenticity and Integrity
+3️⃣ Stage 3/6 done · Next: Stage 4 Comparison with Other Assets
 ```
 
 ## Stage 4️⃣ Comparison with Other Assets
@@ -463,7 +463,7 @@ Continue to Stage 5, or add/correct anything first?
 ---
 ```
 ─────
-End of 4️⃣ Comparison with Other Assets
+4️⃣ Stage 4/6 done · Next: Stage 5 Cultural Significance Statement
 ```
 
 ## Stage 5️⃣ Cultural Significance Statement
@@ -514,7 +514,7 @@ One question about significance interpretation, stakeholder perspectives, or her
 Continue to Stage 6, or add/correct anything first?
 ```
 ─────
-End of 5️⃣ Cultural Significance Statement
+5️⃣ Stage 5/6 done · Next: Stage 6 Quality Check and Summary
 ```
 
 ---
@@ -563,7 +563,7 @@ After debrief and session report, remind the user:
 
 ```
 ─────
-End of 6️⃣ Quality Check and Summary
+6️⃣ Stage 6/6 done · Assessment complete
 ```
 
 ---

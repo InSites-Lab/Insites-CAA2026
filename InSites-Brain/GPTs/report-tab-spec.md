@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A dashboard tab that renders a formatted one-page assessment report, designed for HTML export or PDF print. Pulls data from all other dashboard tabs into a concise, professional summary.
+A dashboard tab that renders a formatted one-page assessment report on-screen. Pulls data from all other dashboard tabs into a concise, professional summary. For a downloadable Word/PDF file, the user asks in chat and the bot generates it in the conversation (see Export below).
 
 Entity colors follow `[CA-EC]` in cbsa-appendices.md.
 
@@ -71,49 +71,17 @@ Same as Values tab:
 - ◐ = implied (inferred from context)
 - ○ = uncertain (limited evidence)
 
-## Export Controls
+## Export
 
-Two buttons in the Report tab header area:
+In-artifact print/export does not work in the GPT canvas, so the Report tab has **no print or export buttons**. It renders its content on-screen only.
 
-| Button | Label | Action |
-|--------|-------|--------|
-| Export | 📄 Export HTML | Downloads the report section as a standalone HTML file with inline CSS (no external dependencies). File name: `{asset-name}-report.html` |
-| Print | 🖨️ Print / PDF | Triggers `window.print()` — user can save as PDF from browser print dialog |
+For a downloadable file, show a header note at the top of the Report tab:
 
-## Print Styling
+> 📥 Ask in chat to export this report as a formatted Word/PDF document.
 
-```css
-@media print {
-  /* Hide dashboard chrome */
-  .tab-bar, .sidebar, nav, .export-controls, footer { display: none !important; }
+When the user asks, the bot generates the file in the conversation (using GPT's file / Code-Interpreter path) and delivers it as a chat download — not from inside the artifact.
 
-  /* Show only report content */
-  .report-tab { display: block !important; }
-
-  /* Optimize for A4 */
-  body { font-size: 11pt; line-height: 1.5; }
-  .report-tab { max-width: 100%; margin: 0; padding: 20mm; }
-
-  /* Avoid page breaks inside cards */
-  .report-section { break-inside: avoid; }
-
-  /* Reset backgrounds for printing */
-  * { background: white !important; color: black !important; }
-  .value-pill, .type-badge { background: #f0f0f0 !important; }
-}
-```
-
-## Export HTML Generation
-
-When "Export HTML" is clicked, generate a self-contained HTML document:
-
-1. Clone the report tab DOM content
-2. Inline all computed styles
-3. Wrap in a minimal HTML5 document with:
-   - Same Google Fonts link
-   - Print-optimized CSS
-   - Title: `{Asset Name} — Assessment Report`
-4. Trigger download via `Blob` + `URL.createObjectURL`
+(Deferred in-artifact print/export component — see `../design/specs/future-features.md`.)
 
 ## Platform Notes
 
@@ -141,9 +109,8 @@ Before rendering a Report tab, verify:
 - [ ] All core sections present with data from corresponding tabs
 - [ ] Bot-decided sections only included when data warrants
 - [ ] Evidence indicators match Values tab (●/◐/○)
-- [ ] Export HTML button generates self-contained file
-- [ ] Print button triggers window.print()
-- [ ] @media print hides dashboard chrome
+- [ ] No print/export buttons in the Report tab (GPT canvas)
+- [ ] "Ask in chat to export" header note present
 - [ ] Total content fits 1-2 A4 pages
 - [ ] Visual tokens match [CA-UX]
 - [ ] Session Analytics present (even if brief)

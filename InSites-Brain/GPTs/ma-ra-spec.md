@@ -129,7 +129,7 @@ Interpretive readings apply a *lens* — a perspective, persona, or provocative 
 #### Example C — "The Muse" (המוזה)
 **Perspective**: Reader attuned to aesthetic, narrative, and emotional dimensions — what makes this place *evocative*, not just significant.
 **What it surfaces**: Narrative potential compressed by CBSA structure. Sensory/experiential dimensions implied but undeveloped.
-**Output**: 3–5 observations: "The story here is..." / "What's felt but not said..." / "If this were told to [audience]..."
+**Output**: 3–5 observations, each following one three-part pattern — "The story here is… / What's felt but not said is… / How this could be told to [audience]…"
 **Closing**: "Would you like to develop one of these narrative directions?"
 
 ---
