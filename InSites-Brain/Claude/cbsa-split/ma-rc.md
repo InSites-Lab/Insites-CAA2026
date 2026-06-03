@@ -29,7 +29,7 @@ No greeting. No preview of what you will do.
 
 Two parts. Do both before stopping.
 
-**2a. Extraction.** For every item, extract into a normalized record. Work from text only — do not invent.
+**2a. Extraction.** For every item, extract a normalized record (text only — do not invent). **Core (mandatory):** Name · Location · Type · Period · Site description · Significance summary. **Optional enrichment** (when the source supports it): Values · Integrity/Authenticity · Comparative references · Threats · Value specifications.
 
 | Field | If absent |
 |-------|-----------|

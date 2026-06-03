@@ -8,12 +8,12 @@ These rules apply to **both** the single-assessment dashboard [CA-DB] and the co
 
 This dashboard is a **native React artifact** on Claude. Do NOT emit a self-contained HTML file, vanilla JS, CDN `<script>` tags, an IIFE, or a dynamic script loader — those are the GPT/Gemini constraints and are wrong here.
 
-- **Imports (direct)**: Import the libraries you need — they are provided in the Claude React-artifact set: `recharts` (bar/line/area/pie charts), `Plotly`/`react-plotly.js` (the Map tab — geographic scatter), `d3` (KG force-graph + custom viz), `lucide-react` (icons), and `papaparse` / `xlsx` (SheetJS) when CSV/Excel handling is needed. Tailwind classes and inline styles both work. **No `react-leaflet`/Leaflet** — not available in React artifacts; the Map tab uses Plotly scattergeo (see §4a).
-- **No external network**: the artifact sandbox blocks cross-origin `fetch`/XHR. All extracted data is embedded inline as a `const` object literal in the component. The only sanctioned outbound call is `window.claude.complete` (AI Query — see [CA-AIQ]).
+- **Imports (direct)**: Import the libraries you need — they are provided in the Claude React-artifact set: `recharts` (bar/line/area/pie charts), `d3` (KG force-graph + custom viz), `lucide-react` (icons), and `papaparse` / `xlsx` (SheetJS) when CSV/Excel handling is needed. Tailwind classes and inline styles both work. **Leaflet is used INSIDE the Map tab's `<iframe srcDoc>` (cdnjs 1.9.4 + OSM tiles), not `import`ed into React; a lightweight d3/SVG vector map is the mandatory fallback. See §4a.** **Do NOT use Plotly** — it is not in the React-artifact set (errors: "uses libraries we don't support: plotly.js-dist-min").
+- **No external network**: the artifact sandbox blocks cross-origin `fetch`/XHR. All extracted data is embedded inline as a `const` object literal in the component. The only sanctioned outbound call is `window.claude.complete` (AI Query — see [CA-AIQ]). **Exception:** the Map tab's `<iframe srcDoc>` runs its own cdnjs `<script>` + OSM tile `<img>` loads (image/script loads are not the blocked fetch/XHR); if tiles fail, it falls back to the d3/SVG vector map.
 - **No browser storage**: `localStorage`/`sessionStorage` are blocked. ALL UI state (active tab, guide-box collapsed, filters, highlight) lives in React state (`useState`/`useReducer`) — per-session, not persisted. Don't try/catch around storage; just don't use it.
 - **Reserved names**: React component scope holds all locals (no IIFE). Still, don't name a state/ref with a reserved DOM global (`top`, `name`, `length`, `status`, `event`, `location`) — use `topSites`, `assetName`, etc.
 - **Charts**: prefer `recharts` (React-native, responsive) for bar/line/area/pie. If a doughnut/pie needs Chart.js (also available), wrap the canvas in a fixed-height container and avoid `maintainAspectRatio:false`.
-- **Map (no tiles)**: there is NO Leaflet and NO external map tiles (cross-origin fetch is blocked). The Map tab uses **Plotly `scattergeo`** — built-in Natural Earth outlines (offline) with site points by lat/lon. Full spec in §4a.
+- **Map**: Leaflet (OSM tiles) inside an `<iframe srcDoc>` + a **mandatory** lightweight d3/SVG vector fallback on tile failure. Full spec + reference component in §4a.
 - **Sizing**: measure chart/map/SVG containers with a `ResizeObserver` (or parent `clientWidth/clientHeight`) so first paint inside the animated artifact frame is correct; re-measure on resize.
 - **RTL**: when the assessment language is Hebrew, set `dir="rtl" lang="he"` on the root and mirror layout per CA-HE in cbsa-core.md.
 - **`window.claude.complete` timeouts**: do NOT use `AbortController`/`AbortSignal` (cannot cross the artifact `postMessage` boundary → `DataCloneError`). If you need a timeout, use `Promise.race` with `setTimeout`.
@@ -59,7 +59,7 @@ Generate an interactive Assessment Dashboard after Stage 6, when the user explic
 - **Mandatory offer**: At the end of Stage 6, always present: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
 - **Execute only on acceptance** — do not auto-generate.
 - Respond **only** with the artifact (no surrounding prose).
-- **Format**: Generate as a **native React artifact** (Claude's default), importing `recharts`/`Plotly`/`d3`/`lucide-react` as needed per [CA-DB-F]. No self-contained HTML, no CDN, no vanilla-JS.
+- **Format**: Generate as a **native React artifact** (Claude's default), importing `recharts`/`d3`/`lucide-react` as needed per [CA-DB-F]; the Map tab embeds an iframe-Leaflet map (see §4a). No self-contained HTML, no CDN, no vanilla-JS.
 
 ### 2. Data Extraction
 
@@ -72,7 +72,7 @@ Re-read all stage outputs from the conversation and extract:
 | Timeline | Stage 1 | 5–10 key dated events with **year, label, and change type** (use / structure / setting / infrastructure) |
 | Contexts | Stage 1 | Each context: type label, description, **related value categories**, **timespan** |
 | Values | Stage 2 | Each value: name, category (CA-V in cbsa-core.md), evidence strength (sourced/inferred/uncertain), 1-line summary |
-| Attribute Table | Stage 2.2 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
+| Attribute Table | Stage 2.1 | Each row: attribute name, associated value categories, site-specific significance, **implication for significance** |
 | Authenticity | Stage 3 | Nara Grid as **structured objects**: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary sentence. |
 | Comparative | Stage 4 | Each comparator: name, period, architect (if known), distinction narrative, criteria ratings (rarity, documentation, condition). Plus overall summary. |
 | Significance | Stage 5 | Full statement text |
@@ -161,7 +161,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 | Tab | Content | Key features |
 | --- | --- | --- |
 | **Overview** | KPIs, asset description, integrity range, data gaps, process summary, sources | KPIs: Values count, Evidence rate, Contexts count, Data Gaps count (not "Completion: 100%"). Integrity range shows color-coded ratings per aspect. Process section: strengths/gaps/quick boosts/next steps (folded from former Process tab). Sources list. |
-| **Map** | Asset + mentioned locations (mandatory) | Plotly `scattergeo` map (built-in outlines, no tiles). **Always present** — even for single-site assessments, show the site as a point. If Stage 1, 4, or 5 mention other locations (comparison sites, connected sites, regional context), add as secondary points with labels. Asset: blue marker ~14. Comparators/mentioned: slate marker ~9. Hover → tooltip; click → details panel. Coordinate source indicator below map. If coordinates unknown, show a placeholder with "Location not specified in source material." See §4a. |
+| **Map** | Asset + mentioned locations (mandatory) | Leaflet/OSM tiles in an `<iframe>`; d3/SVG vector fallback on tile failure. **Always present** — even for single-site assessments, show the site as a point. If Stage 1, 4, or 5 mention other locations (comparison sites, connected sites, regional context), add as secondary points with labels. Asset: blue marker (`primary`). Comparators/mentioned: slate marker. Click → details panel + cross-link. Coordinate-source indicator below map. If coordinates unknown, placeholder "Location not specified in source material." See §4a. |
 | **Timeline** | Chronological events | **Proportional spacing** based on year gaps. **Color-coded** by change type (use/structure/setting/infrastructure). Distribution summary. |
 | **Contexts & Values** | Context cards + value cards + attribute table (merged) | **Contexts section**: Each card shows type label, description, timespan, **clickable value pills**. **Values section**: Cards with name, category pill, evidence indicator (〰️/💭 per notation key), summary. **Attribute table** below with 🔑 Implication column. Cross-referencing works within this tab: clicking a context highlights its related values inline. |
 | **Themes** | Value/context/threat thematic clusters (conditional) | Sub-tab pills: "Value Themes" / "Context Themes" / "Threat Themes" with count badges. Theme cards with colored dot, label, member pills (clickable → navigate to item in home tab). Only if ≥2 themes total. See §4b. |
@@ -175,15 +175,103 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 ### 4a. Map Tab Spec (mandatory)
 
-**Condition**: Always render. If `asset.coordinates.lat` is non-null, show the **Plotly `scattergeo`** map with site points. If coordinates unknown, show placeholder: "📍 Location not specified in source material — add coordinates to enable map."
+**Architecture: React host, HTML map island.** The dashboard stays a native React artifact. The Map tab is the one component that renders an `<iframe sandbox="allow-scripts" srcDoc={…}>` whose document is a **self-contained Leaflet page** (Leaflet 1.9.4 from cdnjs + OSM tiles). The iframe is a separate browsing context, so its cdnjs `<script>` and tile `<img>` loads behave as in a standalone HTML artifact — script/image loads are **not** the blocked cross-origin `fetch`/XHR. **Do NOT** `import` Leaflet/`react-leaflet` into the React artifact, and **do NOT** use Plotly (it errors: "uses libraries we don't support: plotly.js-dist-min").
 
-- **Library**: Plotly `scattergeo` (imported; **no Leaflet, no external tiles** — cross-origin fetch is blocked). One geo trace, `mode: 'markers'` (+ optional `text` labels). The base map uses Plotly's built-in Natural Earth outlines (coastlines, country/subunit borders), rendered offline. Set `geo.showcountries: true`, `geo.showsubunits: true`, and light land/water fills matching the palette.
-- **Fit**: set `geo.fitbounds: 'locations'` (or compute `lonaxis.range`/`lataxis.range` from the points) so the map frames the asset + comparators. With a single asset point, set a modest `geo.projection.scale` so it isn't a whole-world view.
-- **Asset marker**: marker `size` ~14, color `#2563eb`, white outline. **Comparator/mentioned markers**: `size` ~9, color `#94a3b8`, outline = highest criteria rating color. Only plot points whose coordinates are non-null.
-- **Details on interaction** (Plotly has no rich popups): use `hovertemplate` for a concise hover card (name, type, period), and a `plotly_click` handler that sets `highlight` state and renders a **details panel beside/below the map** — asset: name (bold), type, period, description, integrity range; comparator: name (bold), period, architect, distinction (≤80 chars), criteria as colored pills.
-- **Coordinate source**: below the map, show "📍 Coordinates: explicit/inferred" matching `asset.coordinateSource`.
-- **Container**: `height: min(440px, 60vh); border-radius: 10px; border: 1px solid #e2e8f0`. Use Plotly `useResizeHandler` (or a `ResizeObserver`) so it sizes correctly inside the artifact frame.
-- **Cross-referencing**: clicking a comparator point sets `highlight = { type: 'comparator', id }` → Comparative tab highlights that card.
+**Two render modes, automatic degradation:**
+1. `tiles` (default) — `<iframe srcDoc={LEAFLET_HTML(points)}>`: OSM raster basemap, Leaflet zoom/pan/markers/popups.
+2. `vector` (fallback, **mandatory**) — a lightweight, self-contained equirectangular SVG (graticule + continent labels + points), zero network. Tile loading is observed but **not guaranteed** across sandbox/CSP versions, so the fallback is never optional.
+
+**Fallback trigger (mandatory):** the iframe posts `tilesOk` on first tile; switch `tiles → vector` when it posts `tilesFailed` / `leafletMissing` / `tilesTimeout` (Leaflet `tileerror`, missing `L`, or no `tileload` within ~4.5 s). Never leave a blank/grey map.
+
+**Data-driven points:** `points: [{ id, name, lat, lng, primary?, size?, kind?, meaning? }]`. Asset → `primary:true` (blue ~9px); comparators → slate (~7px); `size` may encode a count (collection). `lat/lng` may be null → skip that point. Adding sites = editing the array, not the code.
+
+**Auto-fit (critical pitfall):** fit with Leaflet `fitBounds(latlngs, {maxZoom:12})` (tiles) or, in the vector fallback, **linear lon/lat math with a minimum-span floor (~3.5°×2.2°)**. **Never** fit through a hand-built `Polygon` bbox / `d3.geoBounds` — a ring's winding direction can read a small box as "the whole globe minus the box", collapsing all points to one pixel. A single point must not infinite-zoom.
+
+**Coordinate-source indicator (mandatory):** below the map show `📍 Coordinates: explicit | inferred | demo | unknown` from `asset.coordinateSource`. All-null coordinates → placeholder card "📍 Location not specified in source material"; render neither mode.
+
+**Cross-referencing via `postMessage`:** map→host on marker click `{source:'cbsa-map', type:'markerClick', id}` → host sets `highlight` and the Comparative tab highlights that card. host→map on highlight `{source:'cbsa-host', type:'highlight', id}` → opens/centres that marker; on `{type:'filter', ids}` → dims non-matching markers (collection). The vector fallback does the same selection/dimming via React state.
+
+**Container:** `height: min(440px,60vh); border-radius:10px; border:1px solid #e2e8f0`. Host owns the card / guide-box / coord line; the iframe fills the map area only. RTL: host card per [CA-HE]; the Leaflet island stays LTR internally (correct for maps).
+
+**Reference component — copy this VERBATIM into the artifact; change ONLY the `points` data (do NOT regenerate it — the template-literal escaping, `postMessage` bridge, and fit logic are easy to break).** Emit `MapTab` + `LEAFLET_HTML` + the `VectorMap` fallback:
+
+```jsx
+import { useState, useEffect, useRef, useMemo } from 'react';
+
+// PRIMARY: self-contained Leaflet doc for the iframe srcDoc.
+const LEAFLET_HTML = (P) => `<!doctype html><html><head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>html,body,#m{margin:0;height:100%}</style></head><body><div id="m"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>(function(){
+  var P=${JSON.stringify(P)};
+  var post=function(o){parent.postMessage(Object.assign({source:'cbsa-map'},o),'*')};
+  if(typeof L==='undefined'){post({type:'leafletMissing'});return;}
+  var map=L.map('m'),got=0,marks={};
+  var t=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
+  t.on('tileload',function(){got++;if(got===1)post({type:'tilesOk'})});
+  t.on('tileerror',function(){post({type:'tilesFailed'})}); t.addTo(map);
+  P.forEach(function(p){ if(p.lat==null||p.lng==null)return;
+    marks[p.id]=L.circleMarker([p.lat,p.lng],{radius:p.primary?9:(p.size||7),color:'#fff',weight:2,
+      fillColor:p.primary?'#2563eb':'#94a3b8',fillOpacity:1}).addTo(map)
+      .bindPopup('<b>'+p.name+'</b>'+(p.meaning?'<br>'+p.meaning:''))
+      .on('click',function(){post({type:'markerClick',id:p.id})}); });
+  var ll=P.filter(function(p){return p.lat!=null&&p.lng!=null}).map(function(p){return [p.lat,p.lng]});
+  if(ll.length){map.fitBounds(ll,{padding:[40,40],maxZoom:12})}else{map.setView([20,0],2)}
+  window.addEventListener('message',function(e){var d=e.data||{};if(d.source!=='cbsa-host')return;
+    if(d.type==='highlight'&&marks[d.id]){marks[d.id].openPopup();map.panTo(marks[d.id].getLatLng())}
+    if(d.type==='filter'){Object.keys(marks).forEach(function(id){var on=!d.ids||d.ids.indexOf(id)>=0;marks[id].setStyle({fillOpacity:on?1:0.2});});}});
+  setTimeout(function(){if(got===0)post({type:'tilesTimeout'})},4500);
+})();<\/script></body></html>`;
+
+function MapTab({ points, highlight, onSelect, filterIds }) {
+  const [mode, setMode] = useState('tiles');
+  const frameRef = useRef(null);
+  const srcDoc = useMemo(() => LEAFLET_HTML(points), [points]);
+  useEffect(() => {                                  // map -> host
+    function onMsg(e){ const d=e.data||{}; if(d.source!=='cbsa-map')return;
+      if(d.type==='markerClick') onSelect?.(d.id);
+      if(['tilesFailed','leafletMissing','tilesTimeout'].includes(d.type)) setMode('vector'); }
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [onSelect]);
+  useEffect(() => { if(mode!=='tiles')return;        // host -> map
+    frameRef.current?.contentWindow?.postMessage({source:'cbsa-host',type:'highlight',id:highlight??null},'*'); }, [highlight, mode]);
+  useEffect(() => { if(mode!=='tiles')return;
+    frameRef.current?.contentWindow?.postMessage({source:'cbsa-host',type:'filter',ids:filterIds??null},'*'); }, [filterIds, mode]);
+  if(mode==='vector') return <VectorMap points={points} highlight={highlight} onSelect={onSelect} filterIds={filterIds} />;
+  return <iframe ref={frameRef} title="map" sandbox="allow-scripts" srcDoc={srcDoc}
+    style={{width:'100%',height:'min(440px,60vh)',border:'1px solid #e2e8f0',borderRadius:10,background:'#eef2f7'}} />;
+}
+
+// FALLBACK: lightweight equirectangular SVG — no network, no GeoJSON. (Tiles work in current
+// clients, so this is a safety net.) To upgrade later, swap for d3.geoMercator + inlined GeoJSON.
+const CONTINENTS=[{n:'N. America',lat:45,lng:-100},{n:'S. America',lat:-12,lng:-58},{n:'Europe',lat:50,lng:14},{n:'Africa',lat:3,lng:21},{n:'Asia',lat:46,lng:90},{n:'Oceania',lat:-25,lng:134}];
+function VectorMap({ points, highlight, onSelect, filterIds }) {
+  const W=720,H=360, pts=(points||[]).filter(p=>p.lat!=null&&p.lng!=null);
+  const fit=useMemo(()=>{ if(!pts.length)return{aLng:-180,bLng:180,aLat:-90,bLat:90};
+    const lngs=pts.map(p=>p.lng),lats=pts.map(p=>p.lat);
+    const cX=(Math.min(...lngs)+Math.max(...lngs))/2, cY=(Math.min(...lats)+Math.max(...lats))/2;
+    const sX=Math.max(Math.max(...lngs)-Math.min(...lngs),3.5)*1.35, sY=Math.max(Math.max(...lats)-Math.min(...lats),2.2)*1.35;
+    return{aLng:cX-sX/2,bLng:cX+sX/2,aLat:cY-sY/2,bLat:cY+sY/2}; },[pts]);
+  const X=lng=>((lng-fit.aLng)/(fit.bLng-fit.aLng))*W, Y=lat=>((fit.bLat-lat)/(fit.bLat-fit.aLat))*H;
+  const inView=(lat,lng)=>lng>=fit.aLng&&lng<=fit.bLng&&lat>=fit.aLat&&lat<=fit.bLat;
+  const gx=[],gy=[]; for(let g=Math.ceil(fit.aLng/10)*10;g<=fit.bLng;g+=10)gx.push(g); for(let g=Math.ceil(fit.aLat/10)*10;g<=fit.bLat;g+=10)gy.push(g);
+  return (<div>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'min(440px,60vh)',borderRadius:10,border:'1px solid #e2e8f0',background:'#eef2f7',display:'block'}}>
+      {gx.map(g=><line key={'x'+g} x1={X(g)} y1={0} x2={X(g)} y2={H} stroke="#dbe3ee"/>)}
+      {gy.map(g=><line key={'y'+g} x1={0} y1={Y(g)} x2={W} y2={Y(g)} stroke="#dbe3ee"/>)}
+      {CONTINENTS.filter(c=>inView(c.lat,c.lng)).map(c=><text key={c.n} x={X(c.lng)} y={Y(c.lat)} fontSize={13} fill="#aab6c6" textAnchor="middle">{c.n}</text>)}
+      {pts.map(p=>{ const on=!filterIds||filterIds.includes(p.id), sel=highlight===p.id, r=p.primary?8:(p.size||6);
+        return (<g key={p.id} style={{cursor:'pointer',opacity:on?1:0.25}} onClick={()=>onSelect?.(p.id)}>
+          {sel&&<circle cx={X(p.lng)} cy={Y(p.lat)} r={r+5} fill="none" stroke="#2563eb" strokeWidth={2}/>}
+          <circle cx={X(p.lng)} cy={Y(p.lat)} r={r} fill={p.primary?'#2563eb':'#94a3b8'} stroke="#fff" strokeWidth={2}><title>{p.name}</title></circle>
+        </g>); })}
+    </svg>
+    <div style={{fontSize:12,color:'#94a3b8',marginTop:6}}>🗺️ Offline fallback map (tiles unavailable here) — points by coordinate.</div>
+  </div>);
+}
+```
 
 ### 4b. Themes Tab Spec (conditional)
 
@@ -251,21 +339,7 @@ Brackets = conditional: Themes only if ≥2 themes total across all categories; 
 
 **Layout**: Single column, max-width 720px, centered. Same card system as other tabs.
 
-**Export controls** (in Report tab header):
-- **📄 Export HTML** — downloads report as self-contained HTML file (`{asset-name}-report.html`). Clone DOM, inline styles, wrap in HTML5 doc with Google Fonts link.
-- **🖨️ Print / PDF** — triggers `window.print()`.
-- **Sandbox fallback (mandatory)**: Detect sandbox (`window.location.href === 'about:srcdoc'`). When in sandbox, replace both buttons with a single message: "📥 Download this dashboard file to use Export HTML and Print/PDF features." Do not show broken buttons.
-
-**Print CSS**:
-```css
-@media print {
-  .tab-bar, .sidebar, nav, .export-controls, footer { display: none !important; }
-  .report-tab { display: block !important; max-width: 100%; padding: 20mm; }
-  .report-section { break-inside: avoid; }
-  body { font-size: 11pt; line-height: 1.5; }
-  * { background: white !important; color: black !important; }
-}
-```
+**Export (chat-delivered)**: in-artifact file download and `window.print()` are blocked in the React-artifact sandbox. The Report tab renders its content on-screen; for a file, show a single note in the tab header — "📥 Ask in chat to export this report as a formatted Word/PDF document." The bot generates the document in the conversation, not from inside the artifact. *(A future in-artifact print/export component is tracked in `../design/specs/future-features.md`.)*
 
 **Target length**: 800-1200 words, fitting 1-2 A4 pages.
 
@@ -306,23 +380,7 @@ Accent: #2563eb — or site-appropriate
 
 ### 7. Guide Boxes (mandatory — every tab)
 
-Every tab must include a collapsible guide box at the top, explaining what the tab shows and how to interact with it.
-
-**Structure** (3 zones):
-1. **"What you see"** — what the visualization encodes.
-2. **"How to interact"** — available actions (click, filter, sort).
-3. **"What to look for"** — insight callout with amber left-border accent. The actionable takeaway.
-
-**Behavior**:
-- Collapsible with chevron toggle, driven by **React state** (`useState`).
-- Default expanded; collapse is per-session only (no localStorage — browser storage is blocked in artifacts).
-- Collapsed state: single line (amber "ℹ" icon + title + chevron), minimal footprint.
-
-**Styling**:
-- Compact header: amber icon + tab-specific title + chevron.
-- Section labels: small uppercase text.
-- Insight callout: `background: #fef3c7; border-left: 3px solid #f59e0b; padding: 8px 12px;`
-- Body indented from header for clear nesting.
+Every tab includes a collapsible guide box at the top. **Structure / behavior / styling: see [CA-DB-F] → Guide Boxes** (3 zones — "What you see" / "How to interact" / "What to look for"; React-state collapse, default expanded; amber `#fef3c7` callout with `border-left: 3px solid #f59e0b`).
 
 **Content must be tab-specific** — no generic descriptions. Guide content per tab:
 - **Overview**: "KPIs summarize scope; integrity range shows condition at a glance; gaps flag what's missing."
@@ -358,26 +416,16 @@ When a user clicks a KG node, display a **floating popover** adjacent to the cli
 ### 10. Final Checklist
 
 1. Only include data from the conversation — never fabricate.
-2. If a stage was not completed, show as incomplete in progress bar and mark "Not completed" in its tab.
-3. Evidence markers (〰️/💭) must match Stage 2 notation and appear consistently in all tabs that reference values.
+2. If a stage was not completed, show as incomplete and mark "Not completed" in its tab.
+3. Evidence markers (〰️/💭) match Stage 2 notation, consistent across all value-referencing tabs.
 4. Vulnerability tab only if data exists.
-5. Replace `__DATA__` and `__ASSET_NAME__` placeholders with extracted content.
+5. Replace `__DATA__` / `__ASSET_NAME__` placeholders with extracted content.
 6. **All CBSA stages (1–6) have dedicated tabs** — no merged stages.
 7. **Attribute-Value-Implication table** present in Values tab.
-8. **Cross-referencing** implemented: at least Context↔Value linking functional.
+8. **Cross-referencing** functional: at least Context↔Value linking; back pill after highlight jumps.
 9. **Readability**: no text below 0.62rem; no contrast ratio below 3:1.
 10. **Nara Grid** stored as structured objects, not parsed strings.
-11. **Native React**: import `recharts`/`Plotly`/`d3`/`lucide-react` directly — no CDN `<script>`, no vanilla-JS, no IIFE, no dynamic script loader.
-12. **Inline data**: all extracted data embedded inline as a `const` object in the component. No `fetch()` (cross-origin blocked).
-13. **Charts**: recharts for bar/line/area/pie (responsive); Chart.js optional for a doughnut/pie in a fixed-height container (no `maintainAspectRatio:false`).
-14. **Map tab**: Plotly `scattergeo` (built-in Natural Earth outlines, no tiles); always render; coordinate-source indicator below; placeholder when coordinates unknown. Per §4a.
-15. **Sizing**: `ResizeObserver` / Plotly `useResizeHandler` so charts/map/SVG paint correctly inside the animated artifact frame.
-16. **Themes tab** conditional on ≥2 clusters total; member pills linked via cross-referencing; threat themes show mini heatmap.
-17. **Guide boxes** on every tab; collapsible with chevron via **React state** (no localStorage); 3-zone structure.
-18. **Navigation** via **React state** (`activeTab`); back pill after cross-tab jumps. No URL hash / `pushState` / `popstate`.
-19. **Cross-referencing** extended to `value|context|comparator|theme` types; back pill shown after highlight jumps.
-20. **AI Query** is **live** via `window.claude.complete` (dashboard data embedded in the prompt); loading state; copy-to-chat fallback when the runtime is unavailable. Per §9a.
-21. **No storage / no in-artifact download**: `localStorage`/`sessionStorage`, blob downloads and `window.print()` are blocked; all state in React; export (Word/PDF/Excel) is delivered via chat (the bot generates the file), not an in-artifact button.
+11. **Tech recap** (full rules in [CA-DB-F] / §4a / §9a — do not re-derive): native React, no Plotly; Map = iframe-Leaflet + **mandatory** d3/SVG fallback + `fitBounds`/linear auto-fit (never a Polygon bbox); **live** AI Query with copy-to-chat fallback; inline data; no storage / no in-artifact download.
 
 ### 9a. AI Query Tab `[CA-AIQ]` (Live via `window.claude.complete`)
 
@@ -430,7 +478,7 @@ The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example
 - Also generate on direct request ("dashboard", "collection dashboard", "visualize").
 - Execute only on acceptance — do not auto-generate.
 - Respond **only** with the artifact (no surrounding prose).
-- **Format**: a **native React artifact** (recharts for charts, Plotly `scattergeo` for the map, `lucide-react` icons — imported per [CA-DB-F]). No self-contained HTML, no CDN, no vanilla-JS.
+- **Format**: a **native React artifact** (recharts for charts, the shared iframe-Leaflet Map component with d3/SVG fallback for the map — [CA-DB] §4a, `lucide-react` icons — per [CA-DB-F]). No self-contained HTML, no CDN, no vanilla-JS, no Plotly.
 
 ### 2. Data Extraction
 
@@ -463,7 +511,7 @@ Also derive from Collection Reading and analyses (if available):
 | # | Tab | Content | Key features |
 |---|-----|---------|-------------|
 | 1 | **Overview** | KPI cards (N sites, N countries, time span, N methods) + 4 distribution charts. KPI numeric values use monospace font. | Always first tab. Orients the user. |
-| 2 | **Map** | Plotly `scattergeo` map; marker size by explicit-value count | Filter buttons per value type (dim non-matching points). Click a point → details panel with significance summary + highlight. |
+| 2 | **Map** | Shared iframe-Leaflet Map component (§4a); marker size by explicit-value count | Filter buttons per value type **dim non-matching markers in both modes** (host→iframe `filter` message; React state in vector fallback). Click a marker → details panel with significance summary + highlight. |
 | 3 | **Values** | Matrix: sites × value types, evidence markers (〰️/💭). Below: value specification panel. | Sortable columns. Sticky first column. Footer counts. Click site name → expand panel. |
 | 4 | **Themes** | Thematic clusters across the collection **(MANDATORY)** | Always generate. Theme cards with colored dot, label, description, clickable site member pills, per-site evidence text. |
 
@@ -493,9 +541,9 @@ In `tabs[]` data, use exact `site.name` values when referencing sites — enable
 ### 5. Visual Language — Design Tokens
 
 **Libraries** (imported directly — provided in the React-artifact set):
-- `Plotly` / `react-plotly.js` for the Map tab (`scattergeo`, built-in outlines, no tiles)
+- **Map** = the shared iframe-Leaflet `MapTab` component (cdnjs Leaflet + OSM tiles in an `<iframe srcDoc>`) with the d3/SVG vector fallback. See [CA-DB] §4a. Not an imported lib.
 - `recharts` for the distribution charts (Chart.js optional)
-- `lucide-react` for icons. No CDN, no `<script>` tags.
+- `lucide-react` for icons. No CDN `import`s for the React code (the Leaflet cdnjs tags live only inside the iframe `srcDoc`).
 
 #### 5a. Design Intent
 

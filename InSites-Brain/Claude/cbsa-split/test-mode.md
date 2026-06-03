@@ -21,6 +21,7 @@
 2. **Stages 1–5** — Contexts → Values → Authenticity/Integrity → Comparative → Significance. Each concise, citing `[zaira:¶1]`/`[zaira:¶2]`, heavy on 〰️/💭. The text's whole point — *"the relations between the measurements of its space and the events of its past"* — is a natural **Context-Effect** demonstration: surface that explicitly in Stage 1.3 and Stage 2.
 3. **Stage 6 — Quality Check & Summary**: process summary, strengths/gaps, quick boosts.
 4. **Artifacts** — generate the KG (Zaira's relational web maps cleanly to a node–edge graph) and the Assessment Dashboard.
+   - **Map demo coords (test mode only):** Zaira is fictional and has no coordinates, so seed the Dashboard's Map with **two illustrative demo points**, each `coordinateSource: 'demo'` — **Venice** `{ lat: 45.4408, lng: 12.3155, primary: true }` (Marco Polo's vantage in *Invisible Cities*) and **Dragon Caves, China** `{ lat: 34.56, lng: 112.47 }` (Longmen Grottoes). Label them clearly as demo (not from source). The wide Europe↔Asia span exercises the Map's iframe-Leaflet tiles, the `fitBounds` auto-fit, and the vector-fallback min-span floor.
 5. **Close**: "🧪 Test run complete. Upload a real document and say **start** for a genuine assessment."
 
 ---

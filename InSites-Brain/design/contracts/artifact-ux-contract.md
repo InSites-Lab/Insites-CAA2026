@@ -247,13 +247,13 @@ Asset nodes may have a star (★) overlay to distinguish the primary heritage as
 
 ## §5 — Platform Rendering Architecture
 
-| Artifact | Claude & Gemini | GPT |
-|----------|----------------|-----|
-| KG | Inline React/D3 artifact | External `kg-runtime.js` + `kg-runtime.css` (vis-network) |
-| Single Dashboard | Inline HTML/JS + D3 | Same inline code, AI Query in placeholder mode |
-| Collection Dashboard | Inline HTML/JS + Chart.js + Leaflet | Same inline code, AI Query in placeholder mode |
+| Artifact | Claude (native React) | Gemini | GPT |
+|----------|----------------------|--------|-----|
+| KG | Native React + `d3` force-graph; **live** AI Query (`window.claude.complete`) | Inline React/D3 artifact | External `kg-runtime.js` + `kg-runtime.css` (vis-network) |
+| Single Dashboard | Native React (recharts + lucide); Map = iframe-Leaflet + d3/SVG fallback; **live** AI Query | Inline HTML/JS + D3 | Same inline code, AI Query in placeholder mode |
+| Collection Dashboard | Native React (recharts + lucide); Map = iframe-Leaflet (OSM) + d3/SVG fallback; **live** AI Query | Inline HTML/JS + Chart.js + Leaflet | Same inline code, AI Query in placeholder mode |
 
-**Claude and Gemini use the same skill files and produce identical artifact code.** The only difference is the API call block in the AI Query tab — documented in `[CA-AIQ]` §2 above.
+**Claude now diverges from Gemini.** As of the native-React rebuild, Claude artifacts are **native React** — KG = `d3`; dashboards = `recharts` + `lucide-react`, with the **Map tab a Leaflet/OSM map inside an `<iframe srcDoc>` plus a mandatory d3/SVG vector fallback** (see Claude `[CA-DB]` §4a) — and the AI Query tab is **live** via `window.claude.complete` (no Plotly; Plotly is not in the React-artifact set). Gemini keeps the inline-HTML / Chart.js / Leaflet artifacts. GPT uses the external KG runtime + placeholder AI Query. See `[CA-AIQ]` §2 above.
 
 **GPT uses a separate rendering system** (external hosted runtime for KG, same inline code for dashboards) but targets the **same visual result** using the tokens from §1 and colors from §3.
 

@@ -34,7 +34,9 @@ KG, Dashboard, Reads, Image) stays on-demand and XML-triggered.
   `cbsa-core.md`.
 
 - **`cbsa-core.md`** (PART 2) — Stages 0–6. **(PART 3)** — the methodological vocabulary:
-  `[GB-1]`, `[CA-V]`, `[CA-C]`, `[CA-T]`, `[CA-CS]`, `[CA-EV]`, `[CA-E]`, `[SM-3]`, `[CA-EC]`.
+  `[GB-1]`, `[CA-V]`, `[CA-C]`, `[CA-T]`, `[CA-CS]`, `[CA-E]`, `[SM-3]`, `[CA-EC]`. *(The archaeology-only
+  specialist layer — `[CA-EV]` evidence types, three-state integrity, excavation change-type — was extracted
+  to `../extensions/cbsa-archaeology-layer.md`; load it only in archaeology deployments, not in this general build.)*
 - **`ca-ip.md`** — `[CA-IP]` Session Report (one-shot, fires once at the end of a session).
 - **`ca-kg.md`** — `[CA-KG]` Knowledge Graph spec.
 - **`ca-db.md`** — `[CA-DB-F]` foundation + `[CA-DB]` assessment dashboard (incl. `[CA-RPT]`, `[CA-AIQ]`)
