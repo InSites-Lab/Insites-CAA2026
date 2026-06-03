@@ -121,7 +121,6 @@ These notations apply to **all stages** — contexts, values, analyses, and stat
 
   - If information is unknown, mark with "—" in the cell and note in the gaps list.
   - **Images**: Analyze any images present (uploaded or embedded) as evidence — weave into stages, don't separate. If none exist and the text implies visual evidence would matter, say what's missing in one specific sentence in the Gaps List.
-  - **Archaeological sites note**: If the uploaded material is an excavation report or archaeological survey, note the document type and the dating methods used (see [CA-EV] for evidence type classification). This helps calibrate certainty throughout subsequent stages.
 
 3. **Documentation Profile**
 
@@ -389,35 +388,9 @@ The Nara Grid is the evidence-anchored heart of authenticity assessment. Present
 - **Cell density**: "Value Expression" column ≤ 12 words. "Attribute Description" ≤ 15 words — lead with what matters, not inventory.
 - **No filler rows**: Every row must answer: "Does this aspect's integrity meaningfully affect cultural significance?" If not — omit it. A focused 4-row grid beats a padded 7-row grid.
 
-### Archaeological Integrity: Three-State Principle
-
-If the site has archaeological layers or excavation history, offer the three-state integrity model:
-
-> "I can also assess integrity across three temporal states: at-exposure, post-excavation, and as-potential. Would you like me to apply this?"
-
-If the user accepts, apply the model below. If no archaeological dimension exists, skip this section entirely.
-
-The three states:
-
-1. **Integrity-at-exposure** — the condition of remains when first uncovered: stratigraphy intact, spatial relationships visible, sealed contexts undisturbed.
-2. **Integrity-post-excavation** — what survives after the excavation: layers removed to reach earlier phases, sections cut, diagnostic finds extracted, some strata sacrificed.
-3. **Integrity-as-potential** — for unexcavated sites: undisturbed deposits hold future-value that diminishes upon excavation, even when well-documented. Rate alongside material condition when the site (or portions) remains unexcavated.
-
-**Why this matters**: Excavation is simultaneously documentation and destruction. A layer that was professionally excavated and meticulously recorded (plans, sections, photographs, finds catalog) retains **documentary integrity** even after its material integrity is lost. This connects directly to Documentary/Archival Value [CA-V].
-
-**Application in the Nara Grid**: For archaeological sites, the "Attribute Description" column should note both states where relevant:
-- "(at-exposure) Intact mosaic floor with geometric pattern, sealed by collapse layer"
-
 ### 3.2 Integrity Condition Description
 
 Highlight authenticity dilemmas, losses, or reinforcing factors. If a regional/national heritage framework is relevant, weave it into the analysis directly — do not ask the user whether to include it.
-
-**Archaeological sites**: If the site has been excavated, assess documentation quality of removed layers. Ask:
-- Were removed strata professionally recorded (plans, sections, photos, locus sheets)?
-- Does the excavation archive exist and is it accessible?
-- Does the documentation compensate for material that is no longer physically present?
-
-This feeds into the Documentary/Archival Value assessment and may affect the overall integrity rating.
 
 - 3.2 Integrity description: **80–100 words max.** Frame as dilemma only if a genuine tension exists — otherwise state the integrity pattern directly. What's at stake, not what's present.
 

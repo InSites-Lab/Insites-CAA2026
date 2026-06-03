@@ -1,14 +1,16 @@
 # CBSA — Archaeology Specialist Layer (optional, on-demand)
 
-**What this is.** The dedicated archaeological-epistemology layer extracted from the InSites-CAA bot core. The base bot is **general** (all heritage types, especially built heritage) and can still assess an archaeological asset at a general level — it simply does not carry this specialist layer by default. This file holds the archaeologist-specific additions: evidence-type epistemology, three-state integrity, excavation-as-change-type, and the excavation-documentation prompts.
+**What this is.** The dedicated archaeological-epistemology layer extracted from the InSites-CAA bot core — **shared, platform-agnostic content** that Claude (mono + split), GPT, and Gemini all omit from their general builds and reuse from this single file. The base bot is **general** (all heritage types, especially built heritage) and can still assess an archaeological asset at a general level — it simply does not carry this specialist layer by default. This file holds the archaeologist-specific additions: evidence-type epistemology, three-state integrity, excavation-as-change-type, and the excavation-documentation prompts.
 
 **When to use.** Only for **archaeology-oriented deployments** (excavation reports, survey data, stratified sites). For built-heritage / personal-object / general scenarios it is **not needed** — keep it out of the project entirely (an unused on-demand file still counts toward the Project's file budget / RAG threshold).
 
-**How to deploy (archaeology project only).**
-1. Upload this file as Project Knowledge **only** in an archaeology project.
-2. Add a trigger so the bot loads it when relevant — e.g. add to `cbsa-core.md`'s `<FILE_LOADING_ROUTER>`:
-   `| Stage 0 detects an excavation report / archaeological survey, or "archaeological assessment" | cbsa-archaeology-layer.md |`
-3. The blocks below restore the exact behaviour that was in the core before extraction. Cross-reference them as `[CA-EV]`, the `[SM-3]` three-state model, and the `[CA-T]` methodological change type.
+**How to deploy (archaeology deployments only — same file on every platform).**
+1. Upload this file as knowledge **only** in an archaeology-oriented deployment.
+2. Add a trigger so the bot loads/uses it when relevant:
+   - **Claude:** add a row to `cbsa-core.md`'s `<FILE_LOADING_ROUTER>`: `| Stage 0 detects an excavation report / archaeological survey, or "archaeological assessment" | cbsa-archaeology-layer.md |`
+   - **GPT:** add it as a knowledge file + a workflow-table row that loads it on an archaeology trigger.
+   - **Gemini:** RAG retrieval of a separate file is less reliable — for a Gemini archaeology Gem, prefer pasting these blocks back inline rather than relying on retrieval.
+3. The blocks below restore the exact behaviour that was in the core before extraction (`[CA-EV]`, the `[SM-3]` three-state model, the `[CA-T]` methodological change type).
 
 > **Base bot is unchanged in behaviour for non-archaeological assets.** Removing this layer does not weaken general assessment — the general values, the `Archaeological Context` lens (`[CA-C]`), the finds/material-culture checklist row, and the `Research Potential` comparison criterion all remain in the core.
 
