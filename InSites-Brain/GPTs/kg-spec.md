@@ -35,6 +35,8 @@ If exact execution is blocked, state the blocker and stop. Do not substitute ano
 
 Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge graph", "create kg"). Respond **only** with the Canvas (no surrounding prose).
 
+**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#kg-network` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
+
 ## CBSA Data Extraction → DATA
 
 1. Re-read stage outputs (contexts, timeline, values, comparisons).

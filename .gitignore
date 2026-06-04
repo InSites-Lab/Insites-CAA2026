@@ -135,3 +135,11 @@ InSites-Brain/sites-data/Samples and Sites Descriptions/Sites-Descriptions/huqoq
 
 # Dev screenshots
 *.jpeg
+
+.claude/scratch/
+
+# === Local-only / not part of the InSites heritage project ===
+heritage.db
+delegation-method/
+InSites-Brain/Claude/atar-runtime/npm
+InSites-Brain/Claude/old-mono.md

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>atar-runtime — local test</title>
+</head>
+<body style="font-family:system-ui,sans-serif;padding:20px;max-width:1180px;margin:auto">
+  <h2>atar-runtime — local test (0.2.0)</h2>
+
+  <h3>1. KG (English) — vis-network from cdnjs</h3>
+  <div id="kg" style="height:560px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <h3>2. KG (Hebrew → RTL)</h3>
+  <div id="kg-he" style="height:520px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <h3>3. Assessment Dashboard (English) — Leaflet map + 8 tabs + AI</h3>
+  <div id="db" style="height:680px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <h3>4. Assessment Dashboard (Hebrew → RTL)</h3>
+  <div id="db-he" style="height:640px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <h3>5. Collection Dashboard (English) — multi-site map + depth filter + AI</h3>
+  <div id="coll" style="height:680px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <h3>6. Collection Dashboard (Hebrew → RTL)</h3>
+  <div id="coll-he" style="height:640px;border:1px solid #cbd5e1;border-radius:10px"></div>
+
+  <pre id="results" style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto"></pre>
+
+  <script src="../dist/atar-runtime.umd.js"></script>
+  <script>
+    var fakeHost = { complete: function (p) { return Promise.resolve('(demo answer for: ' + p.slice(-60) + ')'); } };
+
+    var KG = {
+      type: 'kg', title: 'Water Tower — CBSA',
+      nodes: [
+        { id:'asset', name:'Water Tower', type:'Asset', meaning:'Rural water infrastructure, 1923' },
+        { id:'place', name:'Kibbutz Ayelet HaShachar', type:'Place', meaning:'Upper Galilee settlement' },
+        { id:'val', name:'Historical Value', type:'Cultural Value', value_type:'Historical', meaning:'Early Zionist settlement era' },
+        { id:'comm', name:'Communal Value', type:'Cultural Value', value_type:'Social', meaning:'Shared kibbutz landmark' },
+        { id:'period', name:'British Mandate', type:'Historical Period', meaning:'1920–1948' },
+        { id:'person', name:'Yosef Baratz', type:'Person', meaning:'Founding member' },
+        { id:'group', name:'Kibbutz Movement', type:'Social Group', meaning:'Collective settlement movement' },
+        { id:'struct', name:'Pump House', type:'Structure / Building', meaning:'1975 addition' },
+        { id:'event', name:'1948 Defense', type:'Event', meaning:'Used as a lookout', epistemic:'inferred', epistemic_note:'Implied by two oral accounts' },
+        { id:'water', name:'Water Scarcity', type:'Natural Phenomenon', meaning:'Drove the construction', epistemic:'inferred', epistemic_note:'Inferred from regional climate records' },
+        { id:'sym', name:'Pioneer Symbolism', type:'Cultural Value', value_type:'Symbolic', meaning:'Emblem of self-reliance', epistemic:'interpretive', epistemic_note:'My reading of the form' },
+        { id:'mem', name:'Founders’ Memory', type:'Collective Memory', meaning:'Origin narrative', epistemic:'interpretive', epistemic_note:'Reading across oral testimony' }
+      ],
+      edges: [
+        { source:'asset', target:'place', label:'located_in' },
+        { source:'asset', target:'val', label:'embodies' },
+        { source:'asset', target:'comm', label:'embodies' },
+        { source:'asset', target:'period', label:'built_during' },
+        { source:'asset', target:'event', label:'witnessed' },
+        { source:'asset', target:'struct', label:'extended_by' },
+        { source:'person', target:'group', label:'member_of' },
+        { source:'person', target:'asset', label:'commissioned' },
+        { source:'water', target:'asset', label:'motivated' },
+        { source:'val', target:'sym', label:'reframes' },
+        { source:'comm', target:'mem', label:'reframes' },
+        { source:'group', target:'place', label:'founded' }
+      ]
+    };
+    var KG_HE = {
+      type: 'kg', title: 'מגדל המים — הערכת מורשת',
+      nodes: [
+        { id:'a', name:'מגדל המים', type:'נכס מורשת', meaning:'תשתית מים כפרית' },
+        { id:'b', name:'קיבוץ איילת השחר', type:'מקום', meaning:'יישוב בגליל העליון' },
+        { id:'c', name:'ערך היסטורי', type:'ערך תרבותי', value_type:'היסטורי', meaning:'ראשית ההתיישבות' },
+        { id:'d', name:'התקופה המנדטורית', type:'תקופה היסטורית', meaning:'1920–1948' },
+        { id:'e', name:'הגנת 1948', type:'אירוע', meaning:'שימש כעמדת תצפית', epistemic:'inferred', epistemic_note:'משתמע משתי עדויות' },
+        { id:'f', name:'סמליות חלוצית', type:'ערך תרבותי', value_type:'סמלי', meaning:'סמל של עצמאות', epistemic:'interpretive', epistemic_note:'קריאה שלי של הצורה' },
+        { id:'g', name:'זיכרון המייסדים', type:'זיכרון קולקטיבי', meaning:'נרטיב מכונן' }
+      ],
+      edges: [
+        { source:'a', target:'b', label:'ממוקם ב' }, { source:'a', target:'c', label:'מגלם' },
+        { source:'a', target:'d', label:'נבנה בתקופת' }, { source:'a', target:'e', label:'היה עד ל' },
+        { source:'c', target:'f', label:'ממסגר מחדש' }, { source:'f', target:'g', label:'מתקשר ל' }
+      ]
+    };
+
+    var DB = {
+      type: 'assessment',
+      asset: { name: 'Ayelet HaShachar Water Tower', location: 'Upper Galilee', type: 'Water infrastructure', period: '1923',
+        description: 'A reinforced-concrete water tower built in 1923, central to the kibbutz water system and a lookout in 1948.',
+        coordinates: { lat: 33.0186, lng: 35.5731 }, coordinateSource: 'survey map (1925)' },
+      coordinates: { lat: 33.0186, lng: 35.5731 },
+      dataQuality: { sources: ['Kibbutz archive photos', 'Oral testimony (3 members)', '1925 survey map'], gaps: ['No original construction drawings', 'Material composition unverified'] },
+      timeline: [
+        { year: '1923', ys: 1923, label: 'Tower constructed', ct: 'structure' },
+        { year: '1948', ys: 1948, label: 'Used as defensive lookout', ct: 'use' },
+        { year: '1975', ys: 1975, label: 'Pump house added', ct: 'infrastructure' },
+        { year: '2005', ys: 2005, label: 'Surroundings landscaped', ct: 'setting' }
+      ],
+      contexts: [
+        { id: 'c-hist', type: 'historical', label: 'Early Zionist settlement', ts: '1920s', rv: ['Historical'] },
+        { id: 'c-soc', type: 'social', label: 'Communal kibbutz life', ts: '1923–', rv: ['Community'] },
+        { id: 'c-tech', type: 'technological', label: 'Early concrete engineering', ts: '1920s', rv: ['Scientific'] }
+      ],
+      values: [
+        { id: 'v1', name: 'Settlement-era significance', cat: 'Historical', ev: 'sourced', summary: 'Documents the 1920s water-supply effort.' },
+        { id: 'v2', name: 'Communal identity', cat: 'Community', ev: 'inferred', summary: 'A shared landmark for kibbutz members.' },
+        { id: 'v3', name: 'Pioneer symbolism', cat: 'Intangible', ev: 'uncertain', summary: 'Read as an emblem of self-reliance.' }
+      ],
+      attrTable: [
+        { attr: 'Concrete shaft', vals: ['Historical', 'Scientific'], sig: 'Original 1923 fabric', impl: 'Preserve; avoid cladding' },
+        { attr: 'Lookout platform', vals: ['Historical'], sig: '1948 military use', impl: 'Interpret on site' }
+      ],
+      authenticity: {
+        summary: 'High material authenticity; setting partly altered by later landscaping.',
+        grid: [
+          { aspect: 'Form & Design', desc: 'Original cylindrical form intact', ve: 'Historical', rating: 'high' },
+          { aspect: 'Materials', desc: 'Original concrete, minor repairs', ve: 'Scientific', rating: 'high' },
+          { aspect: 'Use & Function', desc: 'No longer supplies water', ve: 'Historical', rating: 'low' },
+          { aspect: 'Setting', desc: 'Landscaped surroundings (2005)', ve: 'Community', rating: 'medium' }
+        ]
+      },
+      vulnerability: [
+        { value: 'Settlement-era significance', form: 1, material: 2, use: 3, setting: 2 },
+        { value: 'Communal identity', form: 0, material: 1, use: 2, setting: 3 }
+      ],
+      comparative: {
+        summary: 'Compared with two contemporaneous Galilee water towers.',
+        comparators: [
+          { name: 'Kfar Giladi Tower', period: '1920', arch: 'unknown', dist: 'Stone construction, not concrete', crit: { rarity: 'moderate', documentation: 'high', condition: 'good' }, coordinates: { lat: 33.2419, lng: 35.5731 } },
+          { name: 'Tel Hai Tower', period: '1921', arch: 'unknown', dist: 'Restored as a museum', crit: { rarity: 'low', documentation: 'high', condition: 'high' }, coordinates: { lat: 33.2333, lng: 35.5783 } }
+        ]
+      },
+      significance: 'The Ayelet HaShachar water tower is a rare in-situ document of 1920s settlement water infrastructure, retaining high material authenticity and embodying the communal and pioneering values of the early kibbutz movement.',
+      themes: {
+        valueThemes: [ { label: 'Settlement infrastructure', description: 'Values tied to the water-supply effort', valueIds: ['v1', 'v2'] } ],
+        threatThemes: [ { label: 'Disuse', description: 'Loss of function threatens meaning', vulnerabilities: ['v2'] } ]
+      },
+      processQuality: { quickBoosts: ['Add construction drawings if found'], nextSteps: ['Verify concrete mix via sampling'] }
+    };
+
+    var DB_HE = {
+      type: 'assessment',
+      asset: { name: 'מגדל המים — איילת השחר', location: 'הגליל העליון', type: 'תשתית מים', period: '1923',
+        description: 'מגדל מים מבטון שנבנה ב-1923, מרכזי במערכת המים של הקיבוץ.',
+        coordinates: { lat: 33.0186, lng: 35.5731 }, coordinateSource: 'מפת מדידה (1925)' },
+      coordinates: { lat: 33.0186, lng: 35.5731 },
+      dataQuality: { sources: ['ארכיון הקיבוץ', 'עדויות בעל-פה'], gaps: ['אין תכניות בנייה מקוריות'] },
+      timeline: [ { year: '1923', ys: 1923, label: 'בניית המגדל', ct: 'structure' }, { year: '1948', ys: 1948, label: 'עמדת תצפית', ct: 'use' } ],
+      contexts: [ { id: 'c1', type: 'historical', label: 'ראשית ההתיישבות הציונית', ts: 'שנות ה-20', rv: ['היסטורי'] } ],
+      values: [ { id: 'v1', name: 'משמעות תקופת ההתיישבות', cat: 'היסטורי', ev: 'sourced', summary: 'מתעד את מאמץ אספקת המים.' } ],
+      authenticity: { summary: 'אותנטיות חומרית גבוהה.', grid: [ { aspect: 'צורה ועיצוב', desc: 'הצורה הגלילית נשמרה', ve: 'היסטורי', rating: 'high' } ] },
+      significance: 'מגדל המים הוא תיעוד נדיר במקומו של תשתית מים מתקופת ההתיישבות בשנות ה-20.'
+    };
+
+    var COLL = {
+      type: 'collection',
+      collection: { name: 'EAC11 Heritage Collection', source: 'EAC submission', depth: 'Rich', date: '2024', itemCount: 4 },
+      sites: [
+        { id: 's1', name: 'Acre Old City', region: 'North', lat: 32.9234, lng: 35.0719, depth: 'rich', type: 'Urban ensemble', typeCategory: 'urban', period: 'Medieval', periodCategory: 'medieval',
+          significanceSummary: 'Crusader and Ottoman port city.', highlight: 'Best-preserved Crusader urban fabric in the region.',
+          values: { Historical: 'e', Architectural: 'e', Community: 'i', Scientific: 'i' }, valueSpecs: { Historical: 'Continuous occupation since antiquity' }, threats: ['tourism pressure'] },
+        { id: 's2', name: 'Masada', region: 'South', lat: 31.3157, lng: 35.3539, depth: 'rich', type: 'Fortress', typeCategory: 'single', period: 'Ancient', periodCategory: 'ancient',
+          significanceSummary: 'Herodian desert fortress.', highlight: 'Iconic symbol of resistance.',
+          values: { Historical: 'e', Landscape: 'e', Community: 'e' }, valueSpecs: { Landscape: 'Dramatic Dead Sea escarpment' }, threats: ['erosion'] },
+        { id: 's3', name: 'Beit Shean', region: 'North', lat: 32.4969, lng: 35.4986, depth: 'medium', type: 'Archaeological park', typeCategory: 'landscape', period: 'Roman', periodCategory: 'ancient',
+          significanceSummary: 'Roman-Byzantine city.', highlight: 'Layered multi-period stratigraphy.',
+          values: { Historical: 'e', Scientific: 'e', Educational: 'i' }, threats: [] },
+        { id: 's4', name: 'Tel Megiddo', region: 'North', lat: 32.5853, lng: 35.1850, depth: 'thin', type: 'Tell', typeCategory: 'single', period: 'Bronze Age', periodCategory: 'ancient',
+          significanceSummary: 'Multi-layered Bronze Age tell.', highlight: '26 layers of occupation.',
+          values: { Historical: 'e', Scientific: 'e' }, threats: ['neglect'] }
+      ],
+      themes: [
+        { id: 't1', label: 'Multi-period continuity', description: 'Sites with deep stratigraphic layering', sites: ['s3', 's4'], evidence: { s3: 'Roman over Hellenistic', s4: '26 occupation layers' } },
+        { id: 't2', label: 'Symbolic landmarks', description: 'Sites carrying strong collective meaning', sites: ['s1', 's2'] }
+      ],
+      collectionSummary: { narrative: 'A geographically dispersed set of high-significance archaeological sites spanning the Bronze Age to the Ottoman period.',
+        patterns: ['Northern concentration', 'Strong historical value across all sites'], gaps: ['Limited community-value documentation'], distinctives: ['Two UNESCO-listed sites'] }
+    };
+
+    var COLL_HE = {
+      type: 'collection',
+      collection: { name: 'אוסף מורשת EAC11', source: 'הגשת EAC', depth: 'עשיר', date: '2024', itemCount: 2 },
+      sites: [
+        { id: 's1', name: 'העיר העתיקה עכו', region: 'צפון', lat: 32.9234, lng: 35.0719, depth: 'rich', type: 'מכלול עירוני', period: 'ימי הביניים',
+          significanceSummary: 'עיר נמל צלבנית ועות׳מאנית.', highlight: 'המרקם העירוני הצלבני השמור ביותר.', values: { 'היסטורי': 'e', 'אדריכלי': 'e' }, threats: ['לחץ תיירותי'] },
+        { id: 's2', name: 'מצדה', region: 'דרום', lat: 31.3157, lng: 35.3539, depth: 'rich', type: 'מבצר', period: 'עתיק',
+          significanceSummary: 'מבצר מדברי הרודיאני.', highlight: 'סמל התנגדות איקוני.', values: { 'היסטורי': 'e', 'נוף': 'e' }, threats: ['סחף'] }
+      ],
+      themes: [ { id: 't1', label: 'ציוני דרך סמליים', description: 'אתרים בעלי משמעות קולקטיבית חזקה', sites: ['s1', 's2'] } ],
+      collectionSummary: { narrative: 'מקבץ אתרים ארכיאולוגיים בעלי משמעות גבוהה.', patterns: ['ערך היסטורי חזק'], gaps: [], distinctives: ['שני אתרי אונסק״ו'] }
+    };
+
+    var r1 = AtarRuntime.mount(document.getElementById('kg'), KG, fakeHost);
+    var r2 = AtarRuntime.mount(document.getElementById('kg-he'), KG_HE, {});
+    var r3 = AtarRuntime.mount(document.getElementById('db'), DB, fakeHost);
+    var r4 = AtarRuntime.mount(document.getElementById('db-he'), DB_HE, {});
+    var r5 = AtarRuntime.mount(document.getElementById('coll'), COLL, fakeHost);
+    var r6 = AtarRuntime.mount(document.getElementById('coll-he'), COLL_HE, {});
+    window.__results = { kg: r1, kgHe: r2, db: r3, dbHe: r4, coll: r5, collHe: r6 };
+
+    // Helper the Playwright run uses to drive tabs.
+    window.__clickTab = function (rootSel, tabId) {
+      var el = document.querySelector(rootSel + ' [data-tab="' + tabId + '"]');
+      if (el) { el.click(); return true; }
+      return false;
+    };
+
+    setTimeout(function () {
+      document.getElementById('results').textContent =
+        'mount: ' + JSON.stringify(window.__results) +
+        '\nkg svg circles: ' + document.querySelectorAll('#kg .kg-network svg circle').length +
+        '\nkg-he review items: ' + document.querySelectorAll('#kg-he .kg-review-item').length +
+        '\ndb tabs: ' + document.querySelectorAll('#db .db-sidebar-tab').length +
+        '\ndb-he root dir: ' + (document.querySelector('#db-he .atar-root') && document.querySelector('#db-he .atar-root').dir) +
+        '\ncoll tabs: ' + document.querySelectorAll('#coll .cd-sidebar-tab').length +
+        '\ncoll-he root dir: ' + (document.querySelector('#coll-he .atar-root') && document.querySelector('#coll-he .atar-root').dir);
+    }, 2500);
+  </script>
+</body>
+</html>

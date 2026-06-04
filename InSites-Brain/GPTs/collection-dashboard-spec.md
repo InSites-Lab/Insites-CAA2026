@@ -10,6 +10,8 @@
 
 HTML shell with inline data JSON. Runtime handles all rendering.
 
+**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#dashboard-root` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
+
 ### HTML Shell Template
 
 ```html
