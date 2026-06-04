@@ -38,8 +38,10 @@ workshop-site/
 
 ```
 InSites-Brain/
-  Claude/InSites-CAA.md                        # Primary Claude bot prompt (skills-split, ~870 lines)
-  Claude/InSites-CAA-mono v5.4.md               # Monolithic version (development/testing)
+  Claude/InSites-CAA-claude.md                 # CURRENT live mono — deployed to claude.ai; KG/dashboard artifacts emit the atar-runtime shell
+  Claude/atar-runtime/                         # Externalized artifact runtime (vanilla JS: D3 KG + Leaflet/vector map + dashboards); npm `insites-lab`, loaded via cdn.jsdelivr.net/npm/atar-runtime@<ver>
+  Claude/InSites-CAA.md                        # Older skills-split prompt (superseded by the mono above)
+  Claude/InSites-CAA-mono v5.4.md              # Older monolithic snapshot (pre-runtime; superseded)
   Claude/skills/*.md                           # 7 Claude.ai Project Skills (on-demand)
   GPTs/                                         # OpenAI GPT spec files (instructions.md + knowledge files)
   GPTs/runtime/                                  # KG frontend engine (deploy to alephplace.com)
@@ -131,8 +133,8 @@ Upload to `/atar.bot/canvas/`:
 2. Upload knowledge files from same directory: `cbsa-method.md` (or `cbsa-method-lim.md`), `kg-spec.md`, `dashboard-spec.md`, `dashboard-reference-shape.md`
 
 ### Claude Bot (Claude.ai Projects)
-- Set `InSites-Brain/Claude/InSites-CAA.md` as the Project prompt
-- Add 4 Project Skills from `InSites-Brain/Claude/skills/`:
+- **Current (mono)**: set `InSites-Brain/Claude/InSites-CAA-claude.md` (the live mono) as the Project prompt. Its KG/dashboard artifacts load the externalized **`atar-runtime`** from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` (thin shell + `DATA`, no inline render code) — no Project Skills required.
+- **Legacy (skills-split)**: set `InSites-Brain/Claude/InSites-CAA.md` as the prompt and add 4 Project Skills from `InSites-Brain/Claude/skills/`:
   - `KG-skill.md` — Knowledge Graph generation
   - `Dashboard-skill-generate.md` — Assessment Dashboard generation
   - `MA-RA-skill.md` — Read-Assessment workflow
@@ -201,21 +203,19 @@ The bot system guides users through a structured heritage assessment:
 - 3-tab sidebar: Info, Analytics, AI Query (placeholder mode for GPT)
 - Edge types include standard relationships + Context Effect verbs (`frames`, `reframes`)
 
-> **KG architecture — open decision for Phase 2.** Two reference implementations exist:
-> - **Bot-Brain [CA-KG]** — simpler Vis.Network template, fewer entity types, no source traceability fields
-> - **SKILL.md** — advanced React/D3 template with source traceability (`source_stage`, `source_ref`), AI query interface, context effect visualization (dashed edges)
+> **KG architecture — RESOLVED (2026-06).** Claude renders the KG (and both dashboards) through the externalized **`atar-runtime`** package — a **vanilla-D3** force engine + Leaflet/vector map + dashboard renderers, loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>`. The bot emits only a thin React **shell** + a `DATA` object; **never** inline d3/SVG/Leaflet/render code. Enforced by the **mandatory exclusive-shell rule** in the mono (`[CA-DB-F]` + `[CA-KG] §1`): if the runtime fails to load, emit the shell anyway and let its `load-error` branch render — a failed load is a finding, not a reason to hand-roll a renderer.
 >
-> The entity type taxonomy also differs: [CA-EC] in Bot-Brain defines 13 categories vs. 14 simplified types in SKILL.md. These are **starting points, not the only options** — the final KG architecture may combine elements from both or take a different approach.
+> **Engine per platform:** Claude = D3 (atar-runtime via jsDelivr) · Gemini = D3 (inline / cdnjs — convergence pending) · GPT = vis-network (`kg-runtime.js` on alephplace — Phase C). The shared **`atar-runtime/data-contract.md`** is the convergence layer (one DATA shape, per-platform deploy targets).
 >
-> KG rendering is **one of the few components with real cross-platform differences**: Claude supports interactive artifacts natively, GPT has canvas with different constraints, and Gemini has limited artifact support. Most other CBSA components (Bot-Brain, HITL, citations) work similarly across platforms.
+> KG rendering remains **one of the few components with real cross-platform differences** (Claude artifacts native; GPT canvas; Gemini limited). Most other CBSA components (Bot-Brain, HITL, citations) work similarly across platforms.
 
 ### Multi-Platform Parallel Versions
 Content is maintained in parallel across platforms. When modifying any of these areas, propagate changes to all relevant files:
 
-- **CBSA stage definitions/templates** → `InSites-CAA.md` (Claude), GPT knowledge files, Gemini files
-- **Entity types or KG schema** → `SKILL.md`, `kg-runtime.js`, `InSites-CAA.md` appendices [CA-KG] + [CA-EC]
-- **Operating rules** (evidence mandate, citation, HITL) → `InSites-CAA.md` (Claude) + GPT `instructions.md`
-- **Trigger phrases** → `InSites-CAA.md` (Claude) + GPT `instructions.md`
+- **CBSA stage definitions/templates** → `InSites-CAA-claude.md` (Claude mono), GPT knowledge files, Gemini files
+- **Entity types or KG schema** → `atar-runtime/data-contract.md` + renderers (Claude/Gemini), `kg-runtime.js` (GPT), `InSites-CAA-claude.md` appendices [CA-KG] + [CA-EC]
+- **Operating rules** (evidence mandate, citation, HITL) → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
+- **Trigger phrases** → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
 
 ### Mini-Agent Specs — Read Workflows
 
@@ -256,6 +256,11 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 ---
 
+## Release Checkpoints
+
+- **`atar-runtime-v0.3.0`** — annotated tag on branch `gpt-gemini-sync` (**not** merged to `main`). The validated externalized-runtime build: mono on `atar-runtime@0.3.0` (D3 KG + dashboards) + the mandatory exclusive-shell rule. Cut 2026-06-04.
+- Forward R&D direction (artifact-as-tool / agentic): `InSites-Brain/research/agentic-artifacts-research-agenda.md`.
+
 ## Git Permissions
 
 Local git commands (commit, add, status, diff, log, branch, etc.) are auto-allowed in `.claude/settings.json`. Remote operations (push, pull, fetch) still require confirmation.
@@ -264,7 +269,7 @@ Local git commands (commit, add, status, diff, log, branch, etc.) are auto-allow
 
 When context is compacted, preserve:
 - Current task description and which files are being modified
-- Which bot prompt version is being edited (mono `InSites-CAA-mono v5.4.md` vs skills-split `InSites-CAA.md`)
+- Which bot prompt is being edited (live mono `InSites-CAA-claude.md` — artifacts via the atar-runtime shell — vs the older skills-split `InSites-CAA.md`)
 - Active platform target (Claude / GPT / Gemini / workshop-site)
 - Any cross-platform sync obligations triggered by the current edit
 

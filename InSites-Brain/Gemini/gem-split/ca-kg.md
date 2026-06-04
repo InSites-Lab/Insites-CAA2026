@@ -1,36 +1,41 @@
 # ═══════════════════════════════════════
 # CA-KG — FULL Knowledge Graph spec (Gemini, hardened)
-# version: v9 - split-gem fit to 3.1-pro
+# version: v9.1 - split-gem fit to 3.1-pro - runtime
 # ═══════════════════════════════════════
 #
-# build: CA-KG-FULL — the COMPLETE canonical KG spec (cbsa-split/ca-kg.md) is reproduced VERBATIM
-#   below, with a single execution-hardening header front-loaded so Gemini reliably follows the
-#   sandbox/RTL rules at the moment it generates the artifact. NOTHING from the canonical spec is
-#   omitted: entity taxonomy ([CA-EC]), extraction priority order, the Per-Claim Epistemic Gate, the
-#   full Analytics tab incl. "💭 Entities to review", live Gemini API (§4j), the final checklist, the
-#   context-effect clarification offer, and the HITL interpretive-entity review are all intact below.
+# build: CA-KG-FULL — the canonical KG DATA-extraction spec (entity taxonomy [CA-EC], extraction
+#   priority order, the Per-Claim Epistemic Gate, the DATA schema, the context-effect offer, and the
+#   HITL interpretive-entity review) is reproduced below. The rendering is EXTERNALIZED: §4 now emits a
+#   thin vanilla-HTML shell that loads the shared `atar-runtime` package from jsDelivr and calls
+#   `mount(container, DATA, host)`. The runtime owns the D3 force graph, the Info/Analytics/AI-Query
+#   sidebar (incl. "💭 Entities to review"), the epistemic display, legend, search, zoom/drag and RTL.
+#   The live AI Query stays live on Gemini — the shell wires `host.complete` to the Gemini API.
 #
 # Parallel review artifact — derived from the canonical Gemini split; NOT the source of truth.
 #   Source of truth: InSites-CAA-GEM.md → cbsa-split/ca-kg.md. Re-sync there, then re-derive.
 
 <EXECUTION_HARDENING>
 Read first — these reinforce rules already present in the spec below; the canonical body governs CONTENT.
-This body is the COMPLETE spec: any "performance" rewrite that drops sections (entity types, the Analytics
-tab, the epistemic/HITL offers, or the final checklist) is NON-CONFORMANT — do not follow it.
+This body is the COMPLETE spec: any "performance" rewrite that drops sections (entity types, the
+epistemic/HITL offers, the DATA schema, or the final checklist) is NON-CONFORMANT — do not follow it.
 
-• Single self-contained HTML artifact. Vanilla JS + D3 only — no React/JSX, no build step.
-• D3 from cdnjs, no ESM: load `<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>`
-  and use it as `window.d3`. Never `import * as d3 from 'd3'` (the canvas sandbox throws "Dynamic require").
-  Guard with `typeof d3 !== 'undefined'` before use.
+• Single self-contained HTML artifact. Vanilla JS — no React/JSX, no build step.
+• Render via the externalized **atar-runtime** package — NOT inline d3/render code. Load the UMD via a
+  `<script>` tag (never ESM `import` — the canvas sandbox throws "Dynamic require"):
+  `<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>`
+  then call `window.AtarRuntime.mount(el, DATA, host)`. The runtime owns ALL rendering (D3 force graph,
+  sidebar tabs, epistemic display, legend, search, zoom/drag, RTL). Guard with
+  `typeof window.AtarRuntime !== 'undefined'`. (jsDelivr is required for the runtime; the runtime loads
+  its own sub-libraries, e.g. D3, from cdnjs internally.)
 • IIFE + no reserved globals: wrap ALL artifact JS in `(function(){ /* all code */ })();`. Never declare a
-  top-level variable named `top`, `name`, `length`, `parent`, `status`, `event`, or `location` (e.g. use
-  `topConnected`, not `top`). Prevents "Identifier 'X' has already been declared" in the canvas sandbox.
-• Defensive sandbox APIs: wrap `navigator.clipboard.*` (and any `history.pushState/replaceState`) in
-  `try { … } catch (e) { /* manual-copy fallback */ }`.
-• Inline data only — embed the graph data as a JS object; never `fetch()`.
-• RTL / Hebrew: when the language is Hebrew, set `dir="rtl" lang="he"` on the root element and
-  `body{direction:rtl;text-align:right}`. Any chat-side table follows the reversed column order defined in
-  [CA-HE] (in the system prompt / cbsa-core.md) — that is the single source of truth for table layout.
+  top-level variable named `top`, `name`, `length`, `parent`, `status`, `event`, or `location`. Prevents
+  "Identifier 'X' has already been declared" in the canvas sandbox.
+• Defensive sandbox APIs / no AbortController: use `Promise.race` + `setTimeout` for fetch timeouts (an
+  `AbortController` cannot cross the artifact boundary → `DataCloneError`).
+• Inline data only — embed the graph data as a JS object; never `fetch()` for the DATA.
+• RTL / Hebrew: when the language is Hebrew, set `dir="rtl" lang="he"` on the root element; the runtime
+  also auto-detects Hebrew content and flips RTL. Any chat-side table follows the reversed column order
+  defined in [CA-HE] (in the system prompt / cbsa-core.md) — the single source of truth for table layout.
 • Output discipline: respond with ONLY the artifact — no prose before or after — EXCEPT the post-artifact
   engagement prompts the spec requires (the context-effect offer and the 💭 interpretive-entity HITL review).
 • Flow control lives in the system prompt's GLOBAL_INTERRUPT_ROUTER + EXECUTION_FRAMEWORK_STATE_MACHINE:
@@ -55,7 +60,7 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 
 - Execute this appendix only on explicit Knowledge Graph requests.
 - Respond **only** with the artifact/Canvas (no surrounding prose).
-- The HTML artifact must use the template defined in §4 below, with D3 for rendering and Gemini API for AI queries.
+- The artifact is the **shell in §4** (loads `atar-runtime` from jsDelivr, passes `DATA` + `host`). The AI Query tab is **live** via `host.complete` → the Gemini API; all rendering is the runtime's. **Never hand-write d3/SVG/force code** — emit the shell even if the runtime fails (the shell shows a finding), not a renderer of your own.
 
 ### 2. CBSA Data Extraction → DATA
 
@@ -76,262 +81,90 @@ Generate an interactive Knowledge Graph artifact when the user explicitly reques
 ⚠ Apply Language Policy to all KG fields.
 
 ```json
-
 {
-
+  "type": "kg",
+  "title": "Asset name / graph title",
   "nodes": [
-
     {
-
       "id": "unique_id",
-
       "name": "Display Name",
-
       "type": "Entity Type",
-
       "meaning": "5-12 words describing its heritage role",
-
       "value_type": "Optional value label from CA-V in cbsa-reference.md",
-
       "epistemic": "sourced | inferred | interpretive (default: sourced)",
-
       "epistemic_note": "Required when epistemic is not sourced: <=15-word rationale"
-
     }
-
   ],
-
   "edges": [
-
     { "source": "source_id", "target": "target_id", "label": "relationship_verb" }
-
   ]
-
 }
-
 ```
 
 **Rules**:
 
-- `type` must use English tokens from CA-EC in cbsa-reference.md for colour mapping (the renderer automatically translates to display labels when needed).
+- `type` must use English tokens from CA-EC in cbsa-reference.md for colour mapping (the runtime translates to display labels when needed).
 - `meaning` is concise, site-specific, written in English.
 - Optional `value_type` must match CA-V in cbsa-reference.md.
 - Edges use lowercase verbs; keep total edges ≤ 25.
-- `epistemic` defaults to `sourced`; use `inferred` (〰️) or `interpretive` (💭) per the notation key, with an `epistemic_note` when not sourced. Surfaced in the Info tab and the review list only — never on the node glyph.
+- `epistemic` defaults to `sourced`; use `inferred` (〰️) or `interpretive` (💭) per the notation key, with an `epistemic_note` when not sourced. Surfaced by the runtime in the Info tab and the review list only — never on the node glyph.
 
-### 4. Artifact Template
+### 4. Artifact — `atar-runtime` shell
 
-Generate an **HTML artifact** (vanilla JS + D3 force simulation, NOT React/JSX) with the following structure and specifications. The artifact must be a single self-contained HTML file — no module imports, no build tools, no JSX.
-
-**CRITICAL — D3 loading**: Do NOT use ESM imports (`import * as d3 from 'd3'`) — the canvas sandbox does not support dynamic `require()` and will throw "Dynamic require" error. Load D3 via a `<script>` tag from CDN and access it as `window.d3`:
+Emit exactly the vanilla-HTML shell below as the artifact, replacing **only** `DATA` with the extracted graph (`type: 'kg'`) and `__GRAPH_TITLE__` with the asset name. The shell loads the shared **`atar-runtime`** package from jsDelivr and calls `mount(container, DATA, host)`. The runtime owns everything visual — force layout (node tiers Asset 14–16 / Cultural-Value 11 / other 8–10; link distance ~140, charge −350; curved arcs + arrowheads), the Info/Analytics/AI-Query sidebar tabs, the epistemic 💭/〰️ display (Info panel + the Analytics "💭 Entities to review" list only — **never** on the node glyph), the entity-type legend, search + type filters, zoom/drag, RTL auto-detection, and the **live AI Query** (wired here to the Gemini API via `host.complete`). **Do not generate any d3/SVG/force/render code yourself** — only the shell + `DATA`.
 
 ```html
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Knowledge Graph</title></head>
+<body>
+  <div id="kg" style="height:90vh"></div>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>
+  <script>
+  (function () {
+    // ↓↓↓ Replace DATA with the extracted graph. Schema: §3 (type:'kg'). For Hebrew set <html lang="he">. ↓↓↓
+    var DATA = {
+      type: 'kg',
+      title: '__GRAPH_TITLE__',
+      nodes: [
+        // 10–15 nodes (≤20); set epistemic + epistemic_note on non-sourced nodes per §2/§3
+      ],
+      edges: [
+        // { source: 'a', target: 'b', label: 'relationship_verb' }   (lowercase verbs, ≤25)
+      ]
+    };
+    // Live AI Query → Gemini API (key injected at runtime). No AbortController — Promise.race timeout.
+    var apiKey = "";
+    function complete(prompt) {
+      var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+      var req = fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+      return Promise.race([req, new Promise(function (_, rej) { setTimeout(function () { rej(new Error('Timeout')); }, 20000); })])
+        .then(function (r) { return r.json(); })
+        .then(function (j) { return (j.candidates && j.candidates[0] && j.candidates[0].content
+          && j.candidates[0].content.parts[0] && j.candidates[0].content.parts[0].text) || 'No response.'; });
+    }
+    function go() {
+      try { window.AtarRuntime.mount(document.getElementById('kg'), DATA, { complete: complete }); }
+      catch (e) { document.getElementById('kg').textContent = 'Graph error: ' + e.message; }
+    }
+    if (window.AtarRuntime) go();
+    else { document.getElementById('kg').textContent = 'Graph runtime unavailable (jsDelivr blocked).'; }
+  })();
+  </script>
+</body>
+</html>
 ```
 
-#### 4a. Layout Contract (mandatory)
-
-```
-
-Graph canvas: 65–70% of viewport width.
-
-Sidebar: 30–35%, minimum 300px.
-
-Sidebar state: open by default, collapsible via a toggle button, not resizable.
-
-```
-
-When the sidebar is collapsed, the graph canvas expands to full width. The toggle button remains visible at the canvas edge.
-
-**Tab CSS Constraint (Critical):** Tailwind's `flex` utilities often override standard display hiding. You MUST forcefully hide inactive tabs by including this exact CSS rule in your `<style>` block:
-
-`.tab-content:not(.active) { display: none !important; }`
-
-#### 4b. Light Chrome Palette (mandatory)
-
-Use the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by CA-EC in cbsa-reference.md. Match the visual language of the Assessment Dashboard CA-DB in ca-db.md — same typography (Noto Sans, Noto Sans Hebrew, system-ui, sans-serif + JetBrains Mono), card styles, spacing patterns, and interaction conventions.
-
-```
-
-Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
-
-Text-primary: #1e293b → text-dim: #64748b → text-muted: #94a3b8
-
-Accent: #3b82f6 (interactive elements, active tab indicator)
-
-```
-
-#### 4c. Node Sizing (mandatory)
-
-Three tiers, compact proportions:
-
-| Tier | Applies to | Radius |
-|------|-----------|--------|
-| Asset (primary) | The assessed heritage subject | 14–16px |
-| Cultural Value | Nodes with `value_type` set | 11px |
-| All others | Every other entity type | 8–10px |
-
-Node labels: placed below the node, font-size ≥ 10px. Truncate at 20 characters with ellipsis.
-
-#### 4d. Edge Geometry (mandatory)
-
-- **Link distance**: 130–152px (D3 force-link distance parameter). Edges should feel spacious, not cramped.
-- **Curvature**: Render edges as gentle arcs (quadratic curve, control point offset 15–25px perpendicular to the midpoint), not straight lines. This prevents edge overlap and gives the graph a looser, more organic feel.
-- **Charge strength**: −300 to −450 (force-many-body). Nodes should not cluster tightly.
-- **Edge labels**: placed at curve midpoint, font-size ≥ 10px.
-- **Arrow markers**: small directional arrowheads at target end of each edge.
-
-#### 4e. Node Interaction States (mandatory)
-
-| Trigger | Visual response |
-|---------|----------------|
-| **Hover** | Enlarge node radius +4px, stroke-width to 3px. Transition ≤ 150ms. |
-| **Click** | Select node → highlight its direct edges (increase stroke-opacity to 1, dim all other edges to 0.15) → populate Info tab with node details and connections. |
-| **Click background** | Deselect: restore all edges to default opacity, clear Info tab selection. |
-
-#### 4f. Sidebar Tabs (mandatory)
-
-Three tabs — **Info**, **Analytics**, **AI Query**:
-
-**Info tab**:
-
-- When no node is selected: placeholder prompt ("Click a node to inspect it").
-- When a node is selected: node name (≥ 1rem, bold), type badge (coloured by CA-EC in cbsa-reference.md), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. Each connection item shows the verb label and target/source node name, styled as a clickable mini-card. Clicking a connection selects that node.
-- **Epistemic status**: if the node's `epistemic` is `interpretive`, show a 💭 line — "💭 Interpretive — my reading, not explicit in the sources" — with its `epistemic_note`; if `inferred`, show a 〰️ line similarly; `sourced` shows nothing. This marker appears in the Info panel only — never on the node glyph.
-
-**Analytics tab**:
-
-- **Search**: text input filtering nodes by name or meaning.
-- **Type filters**: toggle buttons per entity type with count badges. Active filters restrict both the node list and the rendered graph. Clear button when any filter is active.
-- **Statistics**: node count, edge count, entity type count, graph density, plus an epistemic line — "Interpretive (💭): N · Inferred (〰️): M".
-- **💭 Entities to review (N)**: list every `interpretive` (💭) node — with `inferred` (〰️) nodes below them — as clickable mini-cards (name + 1-line `epistemic_note`) that select the node and open the Info tab. Lead line: "These are my readings beyond the sources — to keep, rename, or reject one, mention it in the chat." Hide this entire subsection when there are no non-sourced nodes (N = 0).
-- **Most connected**: top 5 nodes by degree, clickable (navigates to Info tab on click).
-
-**AI Query tab**:
-
-- Prompt field + submit button at the bottom. Pressing Enter also submits.
-- CRITICAL: Do NOT use mock data or hardcoded responses. You MUST implement a live Gemini API connection as specified in section 4j.
-
-- System prompt: instructs the model to answer based on the graph data JSON, referencing specific nodes and edges, concise (≤ 150 words).
-- User messages: right-aligned compact bubbles (accent background).
-- Assistant messages: rendered per §4g below.
-- Suggested starter prompts shown when the message list is empty.
-
-#### 4g. AI Query Response Rendering (mandatory)
-
-**Assistant messages**: Render as full-width cards with the following rules:
-
-1. **Container**: Left border (4px solid #3b82f6), card background (`#ffffff`), padding 12px. Not a chat bubble — full sidebar width minus padding.
-2. Markdown parsing: Use the robust regex parser defined in 4j to handle bold, code, lists, and paragraphs properly.
-3. **Paragraph spacing**: ≥ 8px between paragraphs. Line-height ≥ 1.55 inside assistant cards.
-4. **Code spans**: `font-family: monospace`, background `#f1f5f9`, border-radius 3px, padding 1px 5px.
-5. **Maximum response height**: 60% of sidebar content area, scrollable overflow. User must not lose access to the input field.
-
-#### 4h. Legend Placement (recommended)
-
-Position the entity-type legend as a horizontal wrap strip at the bottom-left of the graph canvas, overlaying the graph. Each item: coloured dot (8px) + type label. Background: semi-transparent card (`rgba(30,41,59,0.85)`) with backdrop blur. Font size ≥ 0.66rem.
-
-#### 4i. Additional Template Requirements
-
-- D3 force-directed graph with zoom (scroll) and drag (nodes)
-- Color mapping by entity type using CA-EC in cbsa-reference.md categories
-- Copy JSON button (copies the full graph data to clipboard via `navigator.clipboard.writeText()`; blob download is blocked by the artifact sandbox)
-- The artifact must be a single self-contained HTML file — no module imports, no build tools, no JSX
-
-#### 4j. AI Integration (Direct Gemini API & Parsing)
-
-Artifacts in this environment execute with the API key provided at runtime. Do NOT use `postMessage` proxies.
-
-1. **API Setup**: Set `const apiKey = "";` (leave empty, injected automatically).
-2. **Endpoint**: `POST` to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`
-3. **Payload**: Pass the query and graph data context:
-
-   `{ contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: "You are a heritage expert analyzing a Knowledge Graph. Format using markdown. Base answer ONLY on this JSON: " + JSON.stringify(GRAPH_DATA) }] } }`
-
-4. **Reliability**: Wrap the `fetch` call in an exponential backoff retry loop (max 5 retries with delays of 1s, 2s, 4s, 8s, 16s). Extract text via `result.candidates?.[0]?.content?.parts?.[0]?.text`.
-5. **Robust Markdown Rendering**: Write a `parseMarkdown(text)` function that handles `**bold**`, `*italic*`, `` `code` ``, parses bullet lists (`- ` or `* `) into proper `<ul>` and `<li>` tags, and converts `\n\n` to `<p>`. Add specific CSS rules for `.msg-assistant ul` (e.g., `padding-left: 24px;`) and `.msg-assistant li` to ensure readability.
-6. **No AbortController (CRITICAL)**: Do NOT use `AbortController`/`AbortSignal` for the fetch timeout — it cannot be cloned across the artifact `postMessage` boundary (`DataCloneError`). Use `Promise.race` with `setTimeout` instead:
-
-   `const fetchWithTimeout = (url, opts, ms = 20000) => Promise.race([fetch(url, opts), new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout")), ms))]);`
-
-#### 4k. D3 Force Implementation Notes (mandatory)
-
-The data contract natively uses `source` and `target` to align with D3.js. Clone the data directly for the simulation:
-
-```js
-
-const links = data.edges.map(d => Object.create(d));
-
-```
-
-**Required D3 setup:**
-
-1. **Node ID accessor** — D3 defaults to array-index linking. Always set:
-
-   ```js
-
-   d3.forceLink(links).id(d => d.id)
-
-   ```
-
-2. **SVG arrow markers** — Define in `<defs>` before rendering edges:
-
-   ```js
-
-   svg.append('defs').append('marker')
-
-     .attr('id', 'arrowhead')
-
-     .attr('viewBox', '0 -5 10 10')
-
-     .attr('refX', 20).attr('refY', 0)
-
-     .attr('markerWidth', 6).attr('markerHeight', 6)
-
-     .attr('orient', 'auto')
-
-     .append('path').attr('d', 'M0,-5L10,0L0,5')
-
-     .attr('fill', '#94a3b8');
-
-   ```
-
-   Apply to edges: `.attr('marker-end', 'url(#arrowhead)')`.
-
-3. **Curved edge paths** — Render edges as `<path>` elements (not `<line>`). Use quadratic Bezier with midpoint offset:
-
-   ```js
-
-   function arcPath(d) {
-
-     const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
-
-     const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
-
-     return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
-
-   }
-
-   ```
-
-4. **Edge label placement** — Position labels at the arc midpoint, not the straight-line midpoint. Calculate from the Bezier control point.
-5. **Selection state** — On node click, call `e.stopPropagation()` before updating sidebar. On SVG background click, deselect and clear sidebar.
-6. **Simulation parameters** — Match §4d values:
-   - `d3.forceManyBody().strength(-350)` (range: −300 to −450)
-   - `d3.forceLink(links).id(d => d.id).distance(140)` (range: 130–152px)
-   - `d3.forceCenter(width/2, height/2)`
-7. **Avoid global-scope identifier collisions (critical)** — The artifact `<script>` runs in the page's global scope, where browser-predefined names already exist on `window` (`top`, `name`, `length`, `parent`, `self`, `status`, `open`, `location`, `event`, `origin`). A top-level `const`/`let`/`var` reusing one throws "Identifier 'X' has already been declared" — e.g., naming the Analytics "Most connected" list `top`. **Fix: wrap all artifact JS in an IIFE** — `(function(){ /* all code */ })();` — so nothing lands on the global object; and don't reuse those reserved names (use `topConnected`, not `top`).
+The shell is the only artifact code — there is no inline renderer to maintain. Full DATA field shapes + the GPT/Claude key aliases live in `atar-runtime/data-contract.md` (`type:'kg'`).
 
 ### 5. Final Checklist
 
-1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes.
-2. **Fields**: every node has `id`, `name`, `type`, `meaning` (English). No orphan nodes.
-3. **Semantics**: relationship verbs describe actual CBSA links (avoid duplicate "related_to" unless necessary).
-4. **Output**: HTML artifact only; no surrounding explanation.
-5. **Placeholders**: replace `__GRAPH_DATA__` with JSON object and `__GRAPH_TITLE__` with asset name.
-6. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note`; Info tab shows the 💭/〰️ marker + note on select; Analytics lists the 💭 review entities (clickable), hidden when N = 0. Per §3 and §4f.
+1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes; no orphans.
+2. **Fields**: every node has `id`, `name`, `type` (English CA-EC token), `meaning`. Edges use `source`/`target` + a lowercase verb.
+3. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note` (≤ 15 words). Per §2 / §3.
+4. **Output**: the §4 shell only (only `DATA` + `__GRAPH_TITLE__` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.0`; no hand-written d3/force/render code.
+5. **Language / RTL**: all fields follow Language Policy; the runtime auto-detects Hebrew → RTL (for Hebrew, also set `<html lang="he">`).
 
 ---
 
