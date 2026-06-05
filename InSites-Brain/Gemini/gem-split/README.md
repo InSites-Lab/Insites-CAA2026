@@ -23,7 +23,7 @@ Filenames here are **exactly** the names the system prompt's loading table refer
 3. Remind users to **activate Canvas mode** before requesting an artifact (KG / Dashboard) — otherwise
    Gemini outputs the code as text.
 
-> **Do NOT upload**: the monolithic `InSites-CAA-GEM-v9.md` (that is the single-file alternative — use the
+> **Do NOT upload**: the monolithic `InSites-CAA-GEM-v9.3.md` (that is the single-file alternative — use the
 > split **or** the mono, not both), `test-mode.md` (dev-only), this `README.md`, or the `OLD/` folder.
 
 ## Rendering — externalized runtime (v9.1)
@@ -32,7 +32,7 @@ The KG and both dashboards no longer ship inline D3 / Leaflet / Chart.js render 
 vanilla-HTML shell** that loads the shared **`atar-runtime`** package and calls `mount(container, DATA, host)`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
 ```
 
 - The runtime owns ALL rendering — the D3 force graph, every dashboard tab, the map (Leaflet + OSM tiles
@@ -74,7 +74,7 @@ routing (the "dashboard" trigger and the MA-RC collection-dashboard hand-off bot
 ## v9.1 changes (runtime externalization)
 
 1. **KG + both dashboards → `atar-runtime` shell** (jsDelivr) instead of inline render code. The mono
-   `InSites-CAA-GEM-v9.md` shrank ~32 KB; `ca-db.md` went from ~717 to ~280 lines.
+   `InSites-CAA-GEM-v9.3.md` shrank ~32 KB; `ca-db.md` went from ~717 to ~280 lines.
 2. **cdnjs-only rule relaxed** — jsDelivr is allowed for the runtime; sub-libraries (D3/Leaflet) still load
    from cdnjs internally. The old "Do NOT use jsdelivr.net" prohibition was removed.
 3. **AI Query stays live on Gemini** — the shell wires `host.complete` to the Gemini API.
@@ -100,7 +100,7 @@ reversed the Chart.js rule). Discarded. The runtime externalization (v9.1) super
 ## Status — this IS the maintained Gemini split
 
 - `gem-split/` (this folder) is the **maintained split** for Gemini.
-- The monolithic `InSites-CAA-GEM-v9.md` (Gemini root) carries the **same content** in one file and was
+- The monolithic `InSites-CAA-GEM-v9.3.md` (Gemini root) carries the **same content** in one file and was
   mirrored to the v9.1 runtime build; keep the two in sync when methodology changes (edit here, then mirror).
 
 ## Remaining note (inherited, by design — not a bug)

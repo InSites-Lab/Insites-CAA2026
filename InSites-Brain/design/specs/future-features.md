@@ -13,7 +13,7 @@ Deferred capabilities intentionally removed from the active bot specs, captured 
 **Why deferred / removed (ALL platforms).** In-artifact `window.print()` / blob-download does not work reliably in **any** of the bot canvases — the Claude React-artifact sandbox blocks it (`URL.createObjectURL`, `window.print()`), and it is likewise non-functional in the **GPT** and **Gemini** canvases. The buttons rendered as broken affordances and contradicted the `[CA-DB-F]` "no in-artifact download / print" rule. So the print/export buttons were removed **sweepingly, across all three platforms**:
 - **Claude** — mono `InSites-CAA-claude.md` + split `cbsa-split/ca-db.md`
 - **GPT** — `GPTs/report-tab-spec.md`
-- **Gemini** — `Gemini/InSites-CAA-GEM-v9.md` + `Gemini/gem-split/ca-db.md`
+- **Gemini** — `Gemini/InSites-CAA-GEM-v9.3.md` + `Gemini/gem-split/ca-db.md`
 
 Export is now **chat-delivered everywhere** (the bot generates a formatted Word/PDF in the conversation on request).
 

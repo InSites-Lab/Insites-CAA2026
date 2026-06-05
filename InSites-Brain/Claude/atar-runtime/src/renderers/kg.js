@@ -189,6 +189,15 @@ export async function renderKG(root, data, host, env) {
   let nodeSel = null, edgeSel = null, edgeLabelSel = null;
 
   function getSize() { const r = container.getBoundingClientRect(); return { w: Math.max(Math.round(r.width) || 0, 60), h: Math.max(Math.round(r.height) || 0, 60) }; }
+  // Aspect-aware force params so the graph FILLS the container instead of sitting in a centered band:
+  // a wide-short container pulls nodes vertically inward (spread horizontally) + longer links; a
+  // tall-narrow container pulls them horizontally inward (narrow → spread vertically).
+  function forceParams(w, h) {
+    const aspect = (w || 1) / Math.max(h || 1, 1);
+    if (aspect > 1.3) return { linkDist: 165, sx: 0.03, sy: 0.12 };   // wide-short
+    if (aspect < 0.8) return { linkDist: 120, sx: 0.14, sy: 0.03 };   // tall-narrow
+    return { linkDist: 140, sx: 0.06, sy: 0.06 };                     // balanced
+  }
   function truncate(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
   function buildSimulation(state, w, h) {
@@ -197,10 +206,13 @@ export async function renderKG(root, data, host, env) {
     const idset = new Set(simNodes.map((n) => n.id));
     simLinks = state.visibleEdges.filter((e) => idset.has(e.from) && idset.has(e.to))
       .map((e) => ({ source: e.from, target: e.to, from: e.from, to: e.to, label: e.label || '' }));
+    const fp = forceParams(w, h);
     sim = d3.forceSimulation(simNodes)
-      .force('link', d3.forceLink(simLinks).id((d) => d.id).distance(140))     // [CA-KG] §4d: 130–152
-      .force('charge', d3.forceManyBody().strength(-350))                       // [CA-KG] §4d: -300…-450
+      .force('link', d3.forceLink(simLinks).id((d) => d.id).distance(fp.linkDist))  // [CA-KG] §4d: 130–152
+      .force('charge', d3.forceManyBody().strength(-350))                            // [CA-KG] §4d: -300…-450
       .force('center', d3.forceCenter(w / 2, h / 2))
+      .force('x', d3.forceX(w / 2).strength(fp.sx))   // aspect-aware: shape the graph to the container
+      .force('y', d3.forceY(h / 2).strength(fp.sy))
       .force('collide', d3.forceCollide().radius((d) => getNodeSize(d) + 6));
     // Synchronous warm-up so nodes have explicit x/y before the first paint (headless-safe).
     sim.stop();
@@ -295,11 +307,28 @@ export async function renderKG(root, data, host, env) {
     if (!simNodes.length) return;
     const xs = simNodes.map((n) => n.x), ys = simNodes.map((n) => n.y);
     const minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs), minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
-    const sz = getSize(), pad = 48;
+    const sz = getSize(), pad = Math.max(24, Math.round(Math.min(sz.w, sz.h) * 0.06));   // % of the smaller dim, not fixed px
     const gw = Math.max(maxX - minX, 1), gh = Math.max(maxY - minY, 1);
     const scale = Math.min(1.6, Math.max(0.2, Math.min((sz.w - 2 * pad) / gw, (sz.h - 2 * pad) / gh)));
     const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
     svg.call(zoomBehavior.transform, d3.zoomIdentity.translate(sz.w / 2 - cx * scale, sz.h / 2 - cy * scale).scale(scale));
+  }
+
+  // Re-tune the aspect-aware forces to the current size, re-settle, and re-fit. Called on every real
+  // size change (ResizeObserver, sidebar collapse, inline↔fullscreen) so the graph re-fills the box.
+  function retuneAndFit() {
+    try {
+      const sz = getSize();
+      if (sim) {
+        const fp = forceParams(sz.w, sz.h);
+        sim.force('center', d3.forceCenter(sz.w / 2, sz.h / 2));
+        if (sim.force('x')) sim.force('x').x(sz.w / 2).strength(fp.sx);
+        if (sim.force('y')) sim.force('y').y(sz.h / 2).strength(fp.sy);
+        if (sim.force('link')) sim.force('link').distance(fp.linkDist);
+        sim.alpha(0.3).restart();
+      }
+      fitToBounds();
+    } catch (e) {}
   }
 
   // --- toolbar (ported verbatim) ---
@@ -461,10 +490,27 @@ export async function renderKG(root, data, host, env) {
     sidebarCollapsed = !sidebarCollapsed;
     root.classList.toggle('kg-collapsed', sidebarCollapsed);
     renderToggle();
-    setTimeout(function () { try { const sz = getSize(); if (sim) { sim.force('center', d3.forceCenter(sz.w / 2, sz.h / 2)); sim.alpha(0.15).restart(); } fitToBounds(); } catch (e) {} }, 80);
+    setTimeout(retuneAndFit, 80);
   });
   renderToggle();
   container.appendChild(toggle);
+
+  // --- responsive: small container (e.g. inline GPT/Claude artifact) → graph-first ---
+  // The renderer's ResizeObserver toggles `.kg-compact` on the root by the container's real
+  // size, and auto-collapses the sidebar so the graph gets the height (the chrome is slimmed
+  // by .kg-compact CSS). When the host expands (fullscreen), it auto-restores the full chrome.
+  let lastCompact = null;
+  function applyResponsive() {
+    const r = root.getBoundingClientRect();
+    const compact = (r.width || 0) < 820 || (r.height || 0) < 560;
+    root.classList.toggle('kg-compact', compact);
+    if (compact !== lastCompact) {        // auto-sync the sidebar only on a compact-state change
+      sidebarCollapsed = compact;         // compact → collapse (graph full area); large → expand
+      root.classList.toggle('kg-collapsed', sidebarCollapsed);
+      renderToggle();
+      lastCompact = compact;
+    }
+  }
 
   // Size-aware recenter + refit. Container is often 0-size at mount and grows without a window
   // resize event (same lesson as the dashboards' map). On a real size change → recenter + refit.
@@ -474,13 +520,14 @@ export async function renderKG(root, data, host, env) {
       const r = entries[0] && entries[0].contentRect;
       if (!r || r.width < 5 || r.height < 5) return;
       if (t) clearTimeout(t);
-      t = setTimeout(function () { try { const sz = getSize(); if (sim) { sim.force('center', d3.forceCenter(sz.w / 2, sz.h / 2)); sim.alpha(0.15).restart(); } fitToBounds(); } catch (e) {} }, 80);
+      t = setTimeout(function () { applyResponsive(); retuneAndFit(); }, 80);
     });
     ro.observe(container);
     if (root && root !== container) ro.observe(root);
   }
 
   update();
+  setTimeout(function () { try { applyResponsive(); } catch (e) {} }, 150);
 }
 
 // Static fallback when d3 can't load — never blank.

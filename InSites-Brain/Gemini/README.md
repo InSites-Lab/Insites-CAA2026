@@ -3,7 +3,7 @@
 # מוחות Gemini — InSites CAA
 
 גרסה נוכחית: **v9** — קיימות שתי צורות פריסה זהות בתוכן:
-**`gem-split/`** (מפוצל, מומלץ ל-Gem) ו-**`InSites-CAA-GEM-v9.md`** (מונוליטי).
+**`gem-split/`** (מפוצל, מומלץ ל-Gem) ו-**`InSites-CAA-GEM-v9.3.md`** (מונוליטי).
 
 » version: v9 - split parity + RTL chat tables natural-order
 
@@ -12,7 +12,7 @@
 | קובץ | תיאור |
 |------|-------|
 | `gem-split/` | גרסה מפוצלת — `cbsa-main.md` (הדבקה ל-Instructions, fat-core) + 5 קבצי ידע (`ca-kg.md`, `ca-db.md`, `ma-ra.md`, `ma-rc.md`, `ca-img.md`) |
-| `InSites-CAA-GEM-v9.md` | מונוליטי — הכול בקובץ אחד, מתאים להעתקה ל-Gem בודד |
+| `InSites-CAA-GEM-v9.3.md` | מונוליטי — הכול בקובץ אחד, מתאים להעתקה ל-Gem בודד |
 | `README.md` | קובץ זה |
 
 גרסאות קודמות (v8 ומטה, וריאנט newHE) הועברו ל-`OLD/`.

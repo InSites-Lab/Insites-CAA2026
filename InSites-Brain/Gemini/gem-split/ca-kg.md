@@ -22,7 +22,7 @@ epistemic/HITL offers, the DATA schema, or the final checklist) is NON-CONFORMAN
 • Single self-contained HTML artifact. Vanilla JS — no React/JSX, no build step.
 • Render via the externalized **atar-runtime** package — NOT inline d3/render code. Load the UMD via a
   `<script>` tag (never ESM `import` — the canvas sandbox throws "Dynamic require"):
-  `<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>`
+  `<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>`
   then call `window.AtarRuntime.mount(el, DATA, host)`. The runtime owns ALL rendering (D3 force graph,
   sidebar tabs, epistemic display, legend, search, zoom/drag, RTL). Guard with
   `typeof window.AtarRuntime !== 'undefined'`. (jsDelivr is required for the runtime; the runtime loads
@@ -119,7 +119,7 @@ Emit exactly the vanilla-HTML shell below as the artifact, replacing **only** `D
 <head><meta charset="utf-8"><title>Knowledge Graph</title></head>
 <body>
   <div id="kg" style="height:90vh"></div>
-  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
   <script>
   (function () {
     // ↓↓↓ Replace DATA with the extracted graph. Schema: §3 (type:'kg'). For Hebrew set <html lang="he">. ↓↓↓
@@ -163,7 +163,7 @@ The shell is the only artifact code — there is no inline renderer to maintain.
 1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes; no orphans.
 2. **Fields**: every node has `id`, `name`, `type` (English CA-EC token), `meaning`. Edges use `source`/`target` + a lowercase verb.
 3. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note` (≤ 15 words). Per §2 / §3.
-4. **Output**: the §4 shell only (only `DATA` + `__GRAPH_TITLE__` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.0`; no hand-written d3/force/render code.
+4. **Output**: the §4 shell only (only `DATA` + `__GRAPH_TITLE__` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.4`; no hand-written d3/force/render code.
 5. **Language / RTL**: all fields follow Language Policy; the runtime auto-detects Hebrew → RTL (for Hebrew, also set `<html lang="he">`).
 
 ---

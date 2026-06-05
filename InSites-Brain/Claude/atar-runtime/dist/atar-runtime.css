@@ -336,7 +336,6 @@
   border-radius: 7px; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.92); color: #334155; cursor: pointer;
   font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(15,23,42,0.08); }
 .atar-kg .kg-collapse-toggle:hover { background: #ffffff; }
-.atar-kg.rtl .kg-collapse-toggle { left: auto; right: 8px; }
 
 .kg-tab-bar { display: flex; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; min-height: 40px; width: 100%; }
 .kg-tab { flex: 1 1 0%; padding: 10px 8px; margin: 0; font-size: 0.85rem; font-weight: 700; font-family: inherit; text-align: center;
@@ -406,22 +405,30 @@
 
 /* RTL: a dir=rtl container already reverses the flex main axis, so plain `row` puts the
    sidebar on the right — no flex-direction override needed (row-reverse would double-flip it). */
-.atar-kg.rtl .kg-sidebar { border-right: none; border-left: 1px solid #e2e8f0; }
+/* Panel (sidebar) always on the LEFT, uniform across languages — force the body's flex order to LTR;
+   text inside the sidebar/graph stays language-appropriate (RTL for Hebrew). */
+.atar-kg.rtl .kg-body { direction: ltr; }
+.atar-kg.rtl .kg-sidebar, .atar-kg.rtl .kg-network { direction: rtl; }
+.atar-kg.rtl .kg-sidebar { border-right: 1px solid #e2e8f0; border-left: none; }
 .atar-kg.rtl .kg-legend { left: auto; right: 12px; }
 .atar-kg.rtl .kg-toolbar-controls { align-items: flex-start; }
 .atar-kg.rtl .kg-fb-dot { margin-right: 0; margin-left: 6px; }
 
-/* Narrow: stack sidebar under the graph */
-@media (max-width: 820px) {
-  .atar-kg .kg-toolbar { flex-direction: column; align-items: stretch; }
-  .atar-kg .kg-body { flex-direction: column; }
-  .atar-kg .kg-network { flex: 1 1 auto; min-height: 300px; }
-  .atar-kg .kg-sidebar { flex: 0 0 auto; max-height: 42%; border-right: none; border-bottom: 1px solid #e2e8f0; }
-  .kg-toolbar-controls { align-items: stretch; }
-  .kg-search-wrap input { min-width: 0; flex: 1; }
-  .atar-kg.rtl .kg-body { flex-direction: column; }
-  .atar-kg.rtl .kg-sidebar { border-left: none; }
-}
+/* Responsive layout is driven SOLELY by the renderer's container measurement (`.kg-compact` on the
+   root, set by its ResizeObserver) — deliberately NOT by a viewport @media query, which inside an
+   artifact iframe reacts to the host page/viewport rather than the artifact container, and fought
+   the JS toggle (the inconsistency). Single source of truth = the JS container size. */
+
+/* Compact mode — small container (inline GPT/Claude artifact): graph-first.
+   Toggled by the renderer (.kg-compact on the root, via its ResizeObserver); the sidebar is
+   auto-collapsed in JS, and here the toolbar is slimmed/stacked so the graph gets the height. */
+.atar-kg.kg-compact .kg-toolbar { flex-direction: column; align-items: stretch; padding: 6px 10px; gap: 6px; }
+.atar-kg.kg-compact .kg-toolbar-main, .atar-kg.kg-compact .kg-toolbar-controls { gap: 6px; align-items: stretch; }
+.atar-kg.kg-compact .kg-title { font-size: 14px; }
+.atar-kg.kg-compact .kg-subtitle { display: none; }
+.atar-kg.kg-compact .kg-filter-row { display: none; }   /* entity-type chips hidden in compact; full chrome only when expanded */
+.atar-kg.kg-compact .kg-search-wrap input { min-width: 0; flex: 1; }
+.atar-kg.kg-compact .kg-network { min-height: 240px; }
 
 /* map.css */
 /* Leaflet 1.9.4 core CSS, embedded verbatim.

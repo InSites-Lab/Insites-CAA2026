@@ -21,7 +21,7 @@ shell, or downgrades the live AI-Query, is NON-CONFORMANT.
 • Single self-contained HTML artifact. Vanilla JS — no React/JSX, no build step.
 • Render via the externalized **atar-runtime** package — NOT inline Leaflet/Chart.js/d3/tab code. Load the
   UMD via a `<script>` tag (never ESM `import`):
-  `<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>`
+  `<script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>`
   then call `window.AtarRuntime.mount(el, DATA, host)`. The runtime owns ALL rendering — every tab, the map
   (Leaflet + OSM + zero-network vector fallback), charts/matrices, cross-tab highlighting, RTL. Guard with
   `typeof window.AtarRuntime !== 'undefined'`. (jsDelivr is required for the runtime; the runtime loads its
@@ -143,7 +143,7 @@ Emit exactly the vanilla-HTML shell below, replacing **only** `DATA` with the ex
 <head><meta charset="utf-8"><title>Assessment Dashboard</title></head>
 <body>
   <div id="dash" style="height:92vh"></div>
-  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
   <script>
   (function () {
     // ↓↓↓ Replace DATA with the extracted assessment. Schema: §3 (type:'assessment'). Hebrew → <html lang="he">. ↓↓↓
@@ -196,7 +196,7 @@ Other MA-RA reading results also go in `tabs[]` (types `table`/`cards`/`matrix`/
 
 ### 6. Final Checklist
 
-1. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.0`; no hand-written Leaflet/Chart/d3/tab code.
+1. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.4`; no hand-written Leaflet/Chart/d3/tab code.
 2. **Data**: matches §3 — structured `authenticity.grid`, per-comparator objects, `timeline[].changeType`, `contexts[].relatedValues`, `vulnerability` cross-matrix. Only real conversation data.
 3. **Tabs**: Report always present (prose tab); Debrief/Session only when they occurred; Themes data only when warranted (runtime shows it when ≥2).
 4. **Coordinates**: set with `coordinateSource`; `null` when unknown (runtime shows a placeholder / vector fallback).
@@ -250,7 +250,7 @@ Emit exactly the vanilla-HTML shell below, replacing **only** `DATA` with the ex
 <head><meta charset="utf-8"><title>Collection Dashboard</title></head>
 <body>
   <div id="dash" style="height:92vh"></div>
-  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
   <script>
   (function () {
     // ↓↓↓ Replace DATA with the extracted collection. Schema: §2 (type:'collection'). Hebrew → <html lang="he">. ↓↓↓
@@ -292,7 +292,7 @@ Dynamic `tabs[]` (MA-RC Step-3 results) — `table` (Arguments), `matrix` (Gaps 
 
 ### 5. Final Checklist
 
-1. **Output**: the §3 shell only (only `DATA` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.0`.
+1. **Output**: the §3 shell only (only `DATA` replaced); no surrounding prose; `atar-runtime` pinned `@0.3.4`.
 2. **Data**: per §2 + `data-contract.md` (`type:'collection'`). `themes[]` MANDATORY (≥1); every site has a non-empty `highlight`; values use `e`/`i`/`a`; no fabricated data.
 3. **Language/RTL**: fields follow Language Policy; the runtime auto-detects Hebrew → RTL.
 

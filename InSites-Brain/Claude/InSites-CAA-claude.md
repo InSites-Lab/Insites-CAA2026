@@ -1091,7 +1091,7 @@ Emit exactly the React shell below as the artifact, replacing **only** `DATA` wi
 import { useEffect, useRef, useState } from 'react';
 
 // Pinned runtime version — never change to @latest (published versions are immutable).
-const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js';
+const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js';
 
 // ↓↓↓ Replace DATA with the extracted graph. Schema: §3 + atar-runtime/data-contract.md (type:'kg'). ↓↓↓
 const DATA = {
@@ -1142,7 +1142,7 @@ The shell's `load-error` branch is the only render code that stays in-prompt —
 1. **Counts**: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes; no orphans.
 2. **Fields**: every node has `id`, `name`, `type` (English [CA-EC] token), `meaning`. Edges use `source`/`target` + a lowercase verb.
 3. **Epistemic**: every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note` (≤ 15 words). Per §2 / §3.
-4. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.0`.
+4. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.4`.
 5. **Language / RTL**: all fields follow Language Policy; the runtime auto-detects Hebrew → RTL (no manual `dir`).
 
 ---
@@ -1278,7 +1278,7 @@ Emit exactly the React shell below as the artifact, replacing **only** `DATA` wi
 ```jsx
 import { useEffect, useRef, useState } from 'react';
 
-const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js';
+const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js';
 
 // ↓↓↓ Replace DATA with the extracted assessment. Schema: §3 + atar-runtime/data-contract.md (type:'assessment'). ↓↓↓
 const DATA = {
@@ -1337,7 +1337,7 @@ Fixed tabs, rendered automatically from `DATA` in this order: **Overview** (KPIs
 Other MA-RA reading results also go in `tabs[]` (types `table`/`cards`/`matrix`/`prose`/`custom`). Use exact entity names (asset, comparators) in tab data so the runtime's cross-tab links resolve.
 
 ### 6. Final Checklist
-1. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.0`.
+1. **Output**: the §4 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.4`.
 2. **Data**: matches §3 — structured `authenticity.grid`, per-comparator objects, `timeline[].changeType`, `contexts[].relatedValues`, `vulnerability` cross-matrix. Only real conversation data; omit skipped stages.
 3. **Tabs**: Themes only when ≥2 total; Report always present (prose tab); Debrief/Session only when they occurred.
 4. **Coordinates**: set with `coordinateSource`; `null` when unknown (runtime shows a placeholder / vector fallback).
@@ -1824,7 +1824,7 @@ Emit exactly the React shell below, replacing **only** `DATA` with the extracted
 ```jsx
 import { useEffect, useRef, useState } from 'react';
 
-const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.0/dist/atar-runtime.umd.js';
+const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js';
 
 // ↓↓↓ Replace DATA with the extracted collection. Schema: §2 + atar-runtime/data-contract.md (type:'collection'). ↓↓↓
 const DATA = {
@@ -1874,7 +1874,7 @@ Fixed tabs from `DATA`: **Overview** (KPIs + region/type/period/depth distributi
 Dynamic `tabs[]` (MA-RC Step-3 analysis results) — types `table` (Arguments), `matrix` (Gaps traffic-light), `custom` (Cross-Tabs), `cards` (Management Clusters), `prose`.
 
 ### 5. Final Checklist
-1. **Output**: the §3 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.0`.
+1. **Output**: the §3 shell only (only `DATA` replaced); no surrounding prose; `RUNTIME_URL` pinned `@0.3.4`.
 2. **Data**: per §2 + `data-contract.md` (`type:'collection'`). `themes[]` MANDATORY (≥1); every site has a non-empty `highlight`; values use `e`/`i`/`a`.
 3. **Language/RTL**: fields follow Language Policy; the runtime auto-detects Hebrew → RTL.
 
