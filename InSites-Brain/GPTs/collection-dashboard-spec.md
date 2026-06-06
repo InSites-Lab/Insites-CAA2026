@@ -10,7 +10,13 @@
 
 HTML shell with inline data JSON. Runtime handles all rendering.
 
-**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#dashboard-root` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
+**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`) whenever Canvas/`canmore` is exposed in the current runtime.
+
+**Canvas unavailable fallback**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which no longer offer Canvas) or the call fails, do NOT refuse and do NOT invent a substitute — generate the same collection-dashboard shell as a downloadable `/mnt/data/{collection-name}-cbsa-collection-dashboard.html` file, labelled `HTML shell fallback — Canvas unavailable`. A file opened in a real browser loads the runtime correctly (the empty-container caveat applies only to the inline sandbox preview).
+
+**Fallback compliance**: the fallback file must follow this spec exactly — the external runtime + inline data object as defined in the HTML Shell Template below, no `fetch()`, no inline CSS/JS beyond the data assignment, and no custom standalone UI. Never use the KG runtime for a dashboard.
+
+**Download/export copy**: when Canvas is available, offer a download/export copy only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
 
 ### HTML Shell Template
 

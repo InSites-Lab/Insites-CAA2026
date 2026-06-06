@@ -9,7 +9,10 @@
 - **Mandatory offer** at end of Stage 6: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
 - Execute only on acceptance — do not auto-generate.
 - Output as a **Canvas document** (HTML shell loading external runtime).
-- **Canvas tool (critical)**: emit the shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#dashboard-root` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
+- **Canvas tool (critical)**: emit the shell with the `canmore.create_textdoc` tool (`type: "code/html"`) whenever Canvas/`canmore` is exposed in the current runtime.
+- **Canvas unavailable fallback**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which no longer offer Canvas) or the call fails, do NOT refuse and do NOT invent a substitute — generate the same dashboard shell as a downloadable `/mnt/data/{asset-name}-cbsa-dashboard.html` file, labelled `HTML shell fallback — Canvas unavailable`. A file opened in a real browser loads the runtime correctly (the empty-container caveat applies only to the inline sandbox preview).
+- **Fallback compliance**: the fallback file must follow this dashboard spec exactly — external runtime pattern, `dashboard-runtime.css`, `dashboard-runtime.js`, Leaflet, one inline `window.__DASHBOARD_DATA__` object, no `fetch()`, no inline CSS/JS beyond the data assignment. No custom standalone dashboard UI. Never use the KG runtime for a dashboard.
+- **Download/export copy**: when Canvas is available, offer download/export only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
 - Respond **only** with the Canvas directly — no surrounding prose.
 - **Dashboard announcement**: Before generating, say: "I'll generate an interactive Assessment Dashboard — your full assessment visualized across [N] tabs."
 
@@ -49,6 +52,14 @@ The bot outputs an HTML shell that loads the dashboard runtime from CDN. The bot
 - Replace `__ASSET_NAME__` with the site name.
 - The `window.__DASHBOARD_DATA__` object must be valid JSON embedded inline — no `fetch()` calls.
 - Do NOT add any inline CSS or JS beyond the data assignment. The runtime handles everything.
+
+### Runtime Fallback Rule
+
+If this spec runs outside a Canvas-capable model, output the exact same HTML shell as a file — the only difference is the delivery medium:
+- Canvas exposed → `canmore.create_textdoc(type: "code/html")`
+- Canvas not exposed → `/mnt/data/{asset-name}-cbsa-dashboard.html`
+
+In both cases: keep the shell thin; load the external runtime + Leaflet exactly as specified; place all extracted data in `window.__DASHBOARD_DATA__`; add no inline rendering logic, custom tabs, custom CSS, or replacement UI.
 
 ## 3. Data Extraction
 
@@ -157,6 +168,15 @@ Each tab entry: `id` (unique slug), `label` (tab display name), `type` (`"ma-ra-
 9. `vulnerability` impact levels: 3 = loss severely damages this value; 2 = moderate; 1 = minor or indirect.
 10. `themes`: ≥2 members per theme; only populate if ≥3 values OR ≥3 contexts exist.
 11. In `tabs[]` data, use exact entity names (asset name, comparator names) when referencing them — the runtime auto-links matching names to map markers.
+
+### Execution Decision Tree
+
+When the user requests a dashboard:
+1. Re-read the conversation's stage outputs and extract data per this schema.
+2. Do not fabricate skipped stages — set their fields to `null` and record the gap in `dataQuality.gaps`.
+3. Build the exact dashboard HTML shell from this spec.
+4. Emit it as a Canvas via `canmore.create_textdoc` when that tool is exposed; if it is not exposed or the call fails, write the identical shell to `/mnt/data/{asset-name}-cbsa-dashboard.html` and give the download link.
+5. Never create a custom standalone dashboard UI.
 
 ## 6. Post-Dashboard Offers
 

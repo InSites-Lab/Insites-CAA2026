@@ -29,13 +29,19 @@ Forbidden:
 
 **Why external runtime**: GPT Canvas truncates long inline code. The runtime handles ALL rendering — colors, sidebar (3 tabs), legend, physics, selection. The canvas must stay thin.
 
-If exact execution is blocked, state the blocker and stop. Do not substitute another implementation.
+If exact execution is blocked because the required runtime/CDN/spec shell cannot be used, state the blocker and stop. If the ONLY blocker is Canvas/`canmore` availability, do not stop: generate the exact same KG shell as a downloadable `/mnt/data` HTML file (see Trigger → Canvas unavailable fallback). Do not substitute another implementation.
 
 ## Trigger
 
 Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge graph", "create kg"). Respond **only** with the Canvas (no surrounding prose).
 
-**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`), NOT a `/mnt/data` download file — the sandbox preview won't run the external runtime, leaving `#kg-network` empty. Offer a download/export copy only on explicit user request, after the Canvas exists.
+**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`) whenever the Canvas/`canmore` tool is exposed in the current runtime.
+
+**Canvas unavailable fallback (critical)**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which no longer offer Canvas) or the call fails, do NOT refuse and do NOT invent a substitute — generate the same KG shell as a downloadable `/mnt/data/{asset-name}-knowledge-graph.html` file, labelled `HTML shell fallback — Canvas unavailable`. A file opened in a real browser loads the external runtime correctly (the empty-container caveat applies only to the inline sandbox preview).
+
+**Fallback compliance**: the fallback file must follow this KG spec exactly — approved `vis-network` CDN, external `kg-runtime.css` + `kg-runtime.js`, the exact shell structure, only graph data in `window.__DATA_JSON__`. No custom standalone graph UI, no inline toolbar/sidebar/filter/search, no alternative framework (D3/Chart.js/React/SVG), no embedded colors/sizing. Never use the Dashboard runtime for a KG.
+
+**Download/export copy**: when Canvas is available, offer a download/export copy only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
 
 ## CBSA Data Extraction → DATA
 
@@ -123,6 +129,23 @@ Generate exactly this structure. Only replace `{LANG}`, `{DIR}`, `{TITLE}`, and 
 ```
 
 Only the graph data belongs in the inline script block. Everything else is handled by the external runtime.
+
+### Runtime Fallback Rule
+
+If this spec runs outside a Canvas-capable model, output the exact same HTML shell as a file — the only difference is the delivery medium:
+- Canvas exposed → `canmore.create_textdoc(type: "code/html")`
+- Canvas not exposed → `/mnt/data/{asset-name}-knowledge-graph.html`
+
+In both cases: load `vis-network` from the approved CDN; load `kg-runtime.css` + `kg-runtime.js` from `alephplace.com`; place only graph data in `window.__DATA_JSON__`; add no custom rendering, no D3/Chart.js/React/SVG, no embedded color/sizing logic.
+
+### Execution Decision Tree
+
+When the user requests KG / Knowledge Graph:
+1. Execute this spec only on explicit KG triggers.
+2. Extract 10–15 nodes (max 20) in the required priority order; use the required node/edge schema; keep `type` as English CA-EC tokens.
+3. Build the exact KG HTML shell from this spec.
+4. Emit it as a Canvas via `canmore.create_textdoc` when that tool is exposed; if it is not exposed or the call fails, write the identical shell to `/mnt/data/{asset-name}-knowledge-graph.html` and give the download link.
+5. Never create a custom standalone KG, inline network app, or alternate visualization.
 
 ## Data Contract
 
