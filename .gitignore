@@ -66,8 +66,14 @@ InSites-Brain/MANIFEST.md
 # === Paper content (gitignore for now) ===
 InSites-Brain/Heritage4.0/
 InSites-Brain/CN-Paper/
+InSites-Brain/Papers/
 
-# === Claude: keep only mono prompt + setup guide ===
+# === Internal workshop proposals (logistics, not for students) ===
+shimur-workshop/
+
+# === Claude: keep only mono prompt + setup guide (students copy the mono) ===
+InSites-Brain/Claude/cbsa-split/
+InSites-Brain/Claude/claude-code-split-instructions-en.md
 InSites-Brain/Claude/not-used/
 InSites-Brain/Claude/plans/
 InSites-Brain/Claude/tests/
@@ -92,7 +98,8 @@ InSites-Brain/GPTs/CAA/
 InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/
 InSites-Brain/GPTs/CAA-GTPs-InSites v4_current_files_package/
 
-# === Gemini: keep only current version ===
+# === Gemini: keep only current mono version (students copy the mono) ===
+InSites-Brain/Gemini/gem-split/
 InSites-Brain/Gemini/MISC-CHECK/
 InSites-Brain/Gemini/InSites-CAA-mono- GEM v5.1.md
 InSites-Brain/Gemini/InSites-CAA-mono- GEM v5.2.md
