@@ -272,14 +272,9 @@ When context is compacted, preserve:
 
 ---
 
-## Workshop Development (CAA 2026)
+## Workshop Design — Principles & Lessons
 
-**Workshop date:** 31.3.2026 | **~20 participants** | **4 hours**
-
-Planning documents (primary reference for all development decisions):
-- [management/InSites_CAA26_DevPlan_v1.md](management/InSites_CAA26_DevPlan_v1.md) — strategy, tool requirements, architecture options, open decisions
-- [management/InSites_CAA26_Timeline_v1.md](management/InSites_CAA26_Timeline_v1.md) — phased milestones with owners and completion criteria
-- [management/InSites_Budget_20260208 (1).docx](management/InSites_Budget_20260208%20(1).docx) — Lab rationale and research framework (context only — not for budgeting details)
+> **CAA 2026 workshop completed 31.3.2026** (configuration landed on **α — A+B+D**). Active context is now the **Technion** workshops — see branch `tec26-atar.bot`. The design principles + lessons below remain the guide; historical CAA planning docs (DevPlan, Timeline, Budget) live in `management/`.
 
 ### Design North Star — 5 Experience Components
 
@@ -291,52 +286,16 @@ Every tool and session decision is evaluated against these five components. When
 4. **New representations** — KG, timeline, dashboard, narrative create the insight moment
 5. **Transfer** — participants leave able to apply the approach (not just the tool) themselves
 
-### Tool Architecture Decision Space
-
-Seven available components that can be combined (A–G):
-
-| Component | Description | Platform |
-|-----------|-------------|----------|
-| **A** | Bot-Brain improvements (progressive disclosure, status tracking, citation) | All |
-| **B** | Interactive artifacts (KG, Timeline, Dashboard, Nara Grid — partially exist) | All |
-| **C** | API-in-Artifact (LLM calls from within a rendered artifact) | Claude only |
-| **D** | Deep HITL (explicit approval checkpoints, reflection moments) | All |
-| **E** | MCP (connections to external tools/databases) | Claude primary |
-| **F** | Dedicated web app (full frontend + backend, independent of chat) | Independent |
-| **G** | Claude Skills (e.g., existing `cbsa-knowledge-graph` skill) | Claude only |
-
-Four candidate configurations under evaluation:
-
-- **α — evolutionary:** A + B + D — lowest risk, fully cross-platform
-- **β — Claude-hybrid:** A + B + C + G — richest Claude experience, not fully cross-platform
-- **γ — dedicated system:** F + A — full control and research logging, significant dev time, fallback required
-- **δ — targeted hybrid:** A + B + one component (C/E/F) for a specific stage only
-
-**Decision #9 (configuration choice) is the master open decision** — open decisions #10–19 in the DevPlan all depend on it. Resolve this first. See DevPlan §10.6 for evaluation rubric. Default to α if undecided by 3.3.
-
-### Development Timeline
-
-| Phase | Dates | Key output | Hard deadline |
-|-------|-------|------------|---------------|
-| 1. Configuration decision | 27.2–1.3 | Architecture choice documented (DevPlan §10) | — |
-| 2. Tool development | 2.3–20.3 | Bot-Brain, artifacts, research logging | — |
-| 3. Workshop content (parallel to 2) | 2.3–20.3 | Demo script (~10.3), participant guide, companion site | **Send materials by 17.3** |
-| 4. Integration & dry run | 21.3–27.3 | Full run-through, fallback scenarios validated | — |
-| 5. Final prep | 28.3–30.3 | GitHub repo public, backups, logistics | — |
-| **Workshop** | **31.3** | | |
-
-**Sync gates:** ~5.3 (Bot-Brain draft reviewed + research mode decided) | ~10.3 (demo script + artifacts ready for testing) | 17.3 (participant materials sent — hard deadline)
-
 ### Previous Workshop Lessons (Design Constraints)
 
 These problems were identified from participant feedback and must be addressed in the new tool:
 
 | Problem | Required design response |
 |---------|--------------------------|
-| Text overload, especially Stage 1 | Progressive disclosure (Component A) |
+| Text overload, especially Stage 1 | Progressive disclosure |
 | Lost orientation — "which stage am I in?" | Persistent status tracker |
 | Energy drain toward session end | Deliberate time/energy management in session design |
-| Too little visualization | Interactive artifacts (Component B) |
+| Too little visualization | Interactive artifacts |
 | Inconsistent citations | Reinforced citation mechanism in Bot-Brain |
 | Hard to navigate between stages | Safe back-navigation without losing context |
 
