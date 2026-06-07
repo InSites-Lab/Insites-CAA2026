@@ -1,68 +1,56 @@
-# kg-spec.md — CA-KG Knowledge Graph Specification (GPT)
+# kg-spec.md — CA-KG Knowledge Graph (GPT · atar-runtime build)
+
+> **atar-runtime build — the canonical GPT KG spec.** Renders through the shared **`atar-runtime`** package (vanilla **D3**, loaded from `cdn.jsdelivr.net/npm`) — the SAME runtime Claude and Gemini use. (The legacy alephplace `vis-network` build is archived.)
 
 ## Purpose
 
-Create CA-KG Knowledge Graph canvases with a minimal HTML shell and shared external runtime files hosted on `alephplace.com`.
-
-Entity colors follow `[CA-EC]` in cbsa-appendices.md. AI Query uses placeholder mode.
+Create a CA-KG Knowledge Graph as a thin HTML shell that loads `atar-runtime` and calls `mount(container, DATA, host)`. The runtime owns ALL rendering: D3 force layout, 3-tab sidebar, legend, search/filter, zoom/drag, epistemic display, RTL. Entity colours follow `[CA-EC]`; AI Query uses copy-to-chat placeholder mode on GPT.
 
 ## Hard Contract
 
 This specification is a required implementation contract, not guidance.
 
-When CA-KG is triggered, the assistant must execute this specification exactly.
-
 Required:
-- use the CA-KG HTML shell structure below
-- load `vis-network` from the approved CDN
-- load external `kg-runtime.css` from `alephplace.com`
-- load external `kg-runtime.js` from `alephplace.com`
-- place only the graph data in `window.__DATA_JSON__`
+- Emit the exact HTML shell below (one `<div id="root">` + the runtime UMD + a `DATA` object + a `mount` call).
+- Load the runtime UMD from the pinned jsDelivr URL: `atar-runtime@0.3.4`.
+- Pass a single `DATA` object with `type: "kg"` to `window.AtarRuntime.mount(container, DATA, {})`.
 
 Forbidden:
-- custom standalone inline JS app
-- custom standalone inline CSS system
-- alternative graph framework (no React, D3, Chart.js, etc.)
-- recreating toolbar, search, filter, sidebar, or status logic inline
-- "equivalent" implementations based on assistant judgment
-- embedding entity colors, node sizing, or sidebar rendering inline
+- Any custom rendering engine (no vis-network, D3, Chart.js, React, SVG, inline toolbar/sidebar/filter/search/physics).
+- Embedding entity colours, node sizing, or sidebar logic.
+- Separate CSS files or `<style>` rendering rules — the runtime injects its own styles and fonts.
 
-**Why external runtime**: GPT Canvas truncates long inline code. The runtime handles ALL rendering — colors, sidebar (3 tabs), legend, physics, selection. The canvas must stay thin.
-
-If exact execution is blocked because the required runtime/CDN/spec shell cannot be used, state the blocker and stop. If the ONLY blocker is Canvas/`canmore` availability, do not stop: generate the exact same KG shell as a downloadable `/mnt/data` HTML file (see Trigger → Canvas unavailable fallback). Do not substitute another implementation.
+If exact execution is blocked because the runtime/CDN/shell cannot be used, state the blocker and stop. If the ONLY blocker is Canvas/`canmore` availability, do not stop — emit the same shell as a `/mnt/data` file (see Fallback). Do not substitute another implementation.
 
 ## Trigger
 
-Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge graph", "create kg"). Respond **only** with the Canvas (no surrounding prose).
+Execute only on explicit Knowledge Graph requests ("kg", "knowledge graph", "create kg"). Respond **only** with the artifact (no surrounding prose).
 
-**Canvas tool (critical)**: emit this shell with the `canmore.create_textdoc` tool (`type: "code/html"`) whenever the Canvas/`canmore` tool is exposed in the current runtime.
-
-**Canvas unavailable fallback (critical)**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which no longer offer Canvas) or the call fails, do NOT refuse and do NOT invent a substitute — generate the same KG shell as a downloadable `/mnt/data/{asset-name}-knowledge-graph.html` file, labelled `HTML shell fallback — Canvas unavailable`. A file opened in a real browser loads the external runtime correctly (the empty-container caveat applies only to the inline sandbox preview).
-
-**Fallback compliance**: the fallback file must follow this KG spec exactly — approved `vis-network` CDN, external `kg-runtime.css` + `kg-runtime.js`, the exact shell structure, only graph data in `window.__DATA_JSON__`. No custom standalone graph UI, no inline toolbar/sidebar/filter/search, no alternative framework (D3/Chart.js/React/SVG), no embedded colors/sizing. Never use the Dashboard runtime for a KG.
-
-**Download/export copy**: when Canvas is available, offer a download/export copy only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
+**Canvas tool**: emit the shell via `canmore.create_textdoc` (`type:"code/html"`) when Canvas/`canmore` is exposed.
+**Canvas unavailable fallback**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which dropped Canvas) or the call fails, deliver the **identical** shell as `/mnt/data/{asset-name}-knowledge-graph.html`, labelled `HTML shell fallback — Canvas unavailable`. A downloaded file runs the runtime fine (the empty-container caveat applies only to the inline preview). Never a custom UI.
+**Download/export copy**: when Canvas is available, offer it only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
 
 ## CBSA Data Extraction → DATA
 
 1. Re-read stage outputs (contexts, timeline, values, comparisons).
 2. List candidate nodes (target 10–15, maximum 20) in this priority order:
-   - **Value-bearing entities** central to Stage 2 (the things that carry identified values)
-   - **Key places/structures** and **major events** (the central heritage subject and temporal anchors)
-   - **Context anchors** (geographic, social, political entities that shape significance)
-   - **Social actors** (individuals, groups, communities relevant to the asset)
-   - **Up to 3 Cultural Value nodes** (abstract value entities for KG illustration)
+   - **Value-bearing entities** central to Stage 2
+   - **Key places/structures** and **major events**
+   - **Context anchors** (geographic, social, political)
+   - **Social actors** (individuals, groups, communities)
+   - **Up to 3 Cultural Value nodes**
 3. Capture relationship verbs that show CBSA logic (`located_in`, `expresses_value`, `part_of`, `commemorates`, `influenced_by`, `supports`, etc.).
-4. Drop weak/duplicate nodes; avoid orphans (every node must connect at least once).
-5. Assign each node a `type` from the [CA-EC] entity categories. Default to the closest existing category. A new type may be introduced only when a node genuinely falls outside all 14 categories and forcing a match would misrepresent its heritage role — in that case, name the new type clearly (the runtime gives it a fallback colour automatically) and mark the node `interpretive` (💭).
-6. Set each node's `epistemic` status per the Per-Claim Epistemic Gate (cbsa-stages.md): explicit in source → `sourced`; connected from 2+ pieces of evidence → `inferred` (〰️); a reading a peer could contest, or an entity/type proposed beyond the sources → `interpretive` (💭). For non-sourced nodes, add an `epistemic_note` (≤15 words).
+4. Drop weak/duplicate nodes; avoid orphans (every node connects at least once).
+5. Assign each node a `type` from the [CA-EC] tokens (closest match). A new type is allowed only when a node genuinely falls outside all categories — name it clearly (the runtime gives it a fallback colour) and mark the node `interpretive` (💭).
+6. Set each node's `epistemic` per the Per-Claim Epistemic Gate (cbsa-stages.md): explicit → `sourced`; connected from 2+ pieces → `inferred` (〰️); contestable / proposed beyond sources → `interpretive` (💭). Non-sourced nodes carry an `epistemic_note` (≤15 words).
 
-## DATA Schema (strict)
+## DATA schema (`type: "kg"`)
 
 ⚠ Apply Language Policy to all KG fields.
 
 ```json
 {
+  "type": "kg",
   "title": "Asset Name",
   "nodes": [
     {
@@ -76,20 +64,21 @@ Execute this spec only on explicit Knowledge Graph requests ("kg", "knowledge gr
     }
   ],
   "edges": [
-    { "from": "source_id", "to": "target_id", "label": "relationship_verb" }
+    { "source": "source_id", "target": "target_id", "label": "relationship_verb" }
   ]
 }
 ```
 
 **Rules**:
-- `type` must use English tokens from [CA-EC] for colour mapping (the renderer automatically translates to display labels when needed).
-- `meaning` is concise, site-specific, written in English.
-- Optional `value_type` must match [CA-V].
-- Edges use lowercase verbs; keep total edges ≤ 25.
+- Edges: canonical `source`/`target`; the runtime also accepts vis-network's `from`/`to`.
+- `type`: English [CA-EC] token (the runtime maps colour + Hebrew display label automatically). Do NOT set `color` per node.
+- Sizing automatic: Asset 16 · Cultural Value / has `value_type` 11 · others 9.
+- Budget: 10–15 nodes (≤20), ≤25 edges, ≤3 Cultural Value, orphan-free.
+- Epistemic markers (💭/〰️) appear in the Info tab + the Analytics "entities to review" list — never on the node glyph.
 
-## HTML Generation Pattern
+## HTML shell (atar-runtime)
 
-Generate exactly this structure. Only replace `{LANG}`, `{DIR}`, `{TITLE}`, and the `DATA` content:
+Generate exactly this; replace only `{LANG}`, `{DIR}`, `{TITLE}`, and the `DATA` content:
 
 ```html
 <!DOCTYPE html>
@@ -98,241 +87,63 @@ Generate exactly this structure. Only replace `{LANG}`, `{DIR}`, `{TITLE}`, and 
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{TITLE} — Knowledge Graph</title>
-  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Hebrew:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://alephplace.com/atar.bot/canvas/kg-runtime.css"/>
-  <style>
-    #kg-app { width: 100vw; height: 100vh; }
-  </style>
 </head>
 <body>
-  <div id="kg-app">
-    <div id="kg-toolbar"></div>
-    <div id="kg-network"></div>
-    <aside id="kg-sidebar"></aside>
-  </div>
-
+  <div id="root" style="height:100vh"></div>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
   <script>
-    window.__DATA_JSON__ = {
+    var DATA = {
+      type: "kg",
       title: "{TITLE}",
       nodes: [
         /* bot fills extracted nodes here */
       ],
       edges: [
-        /* bot fills extracted edges here */
+        /* bot fills extracted edges here: { source, target, label } */
       ]
     };
+    (function () {
+      function go() { window.AtarRuntime.mount(document.getElementById("root"), DATA, {}); }
+      if (window.AtarRuntime) go(); else window.addEventListener("load", go);
+    })();
   </script>
-  <script src="https://alephplace.com/atar.bot/canvas/kg-runtime.js"></script>
 </body>
 </html>
 ```
 
-Only the graph data belongs in the inline script block. Everything else is handled by the external runtime.
+Only `DATA` belongs inline. The runtime injects its own styles and fonts. `host` is `{}` on GPT (no `window.claude.complete`) → the AI Query tab shows starter prompts + copy-to-chat.
 
-### Runtime Fallback Rule
-
-If this spec runs outside a Canvas-capable model, output the exact same HTML shell as a file — the only difference is the delivery medium:
+### Fallback delivery
 - Canvas exposed → `canmore.create_textdoc(type: "code/html")`
 - Canvas not exposed → `/mnt/data/{asset-name}-knowledge-graph.html`
 
-In both cases: load `vis-network` from the approved CDN; load `kg-runtime.css` + `kg-runtime.js` from `alephplace.com`; place only graph data in `window.__DATA_JSON__`; add no custom rendering, no D3/Chart.js/React/SVG, no embedded color/sizing logic.
+Same shell either way; only the delivery medium differs.
 
-### Execution Decision Tree
+## Entity types [CA-EC]
 
-When the user requests KG / Knowledge Graph:
-1. Execute this spec only on explicit KG triggers.
-2. Extract 10–15 nodes (max 20) in the required priority order; use the required node/edge schema; keep `type` as English CA-EC tokens.
-3. Build the exact KG HTML shell from this spec.
-4. Emit it as a Canvas via `canmore.create_textdoc` when that tool is exposed; if it is not exposed or the call fails, write the identical shell to `/mnt/data/{asset-name}-knowledge-graph.html` and give the download link.
-5. Never create a custom standalone KG, inline network app, or alternate visualization.
+Use these English tokens for `type` (the runtime maps colours + Hebrew labels; unknown types get a dynamic fallback colour). Do NOT embed hex colours:
 
-## Data Contract
+Asset · Place · Structure / Building · Architectural Element · Person · Event · Story / Narrative · Cultural Value · Natural Phenomenon · Artwork / Artefact · Tradition / Custom · Social Group · Historical Period · Religion / Belief · Collective Memory.
 
-### Required Node Fields
+## Runtime-provided UX (do NOT implement)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique identifier (snake_case, e.g. `asset_tower`) |
-| `name` | string | Display name |
-| `type` | string | One of the 14 canonical entity types (see below) |
-| `meaning` | string | Heritage significance description (5-12 words) |
-
-### Optional Node Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `value_type` | string | For Cultural Value nodes: Historical, Aesthetic, Social, etc. |
-| `epistemic` | string | `sourced` (default) / `inferred` (〰️) / `interpretive` (💭) — shown in the Info tab + review list, never on the node glyph |
-| `epistemic_note` | string | Short rationale (≤15 words); required when `epistemic` ≠ `sourced` |
-| `meta` | object | Additional key-value pairs displayed in sidebar |
-
-### Required Edge Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `from` | string | Source node `id` |
-| `to` | string | Target node `id` |
-| `label` | string | Relationship verb (e.g. `embodies`, `frames`, `situates`) |
-
-## Entity Types and Colors [CA-EC]
-
-The runtime resolves colors automatically from the `type` field. The bot must NOT specify `color` per node — only `type`.
-
-14 canonical types:
-
-| Type | Description |
-|------|-------------|
-| Place | A geographic location, area, or region relevant to the heritage asset |
-| Structure / Building | A constructed edifice or architectural ensemble |
-| Architectural Element | A specific component of a structure (column, arch, frieze, etc.) |
-| Person | An individual historically or culturally linked to the asset |
-| Event | A discrete historical occurrence tied to the asset's timeline |
-| Story / Narrative | An oral tradition, legend, or documented account |
-| Cultural Value | An abstract value category from the CBSA assessment |
-| Natural Phenomenon | A geological, ecological, or climatic feature |
-| Artwork / Artefact | A movable object, inscription, or decorative element |
-| Tradition / Custom | A recurring cultural practice associated with the asset |
-| Social Group | A community, guild, congregation, or population segment |
-| Historical Period | A defined chronological era relevant to the assessment |
-| Religion / Belief | A faith system, cosmology, or spiritual practice |
-| Collective Memory | A shared remembrance, commemoration, or cultural narrative |
-
-**Runtime color mapping**: The runtime maps each type to its hex color automatically:
-
-| Type | Hex |
-|------|-----|
-| Asset | #E53935 |
-| Natural Phenomenon | #0ea5e9 |
-| Structure / Building | #f59e0b |
-| Architectural Element | #d97706 |
-| Person | #ec4899 |
-| Event | #ef4444 |
-| Story / Narrative | #8b5cf6 |
-| Social Group | #3b82f6 |
-| Cultural Value | #6366f1 |
-| Place | #10b981 |
-| Artwork / Artefact | #f43f5e |
-| Tradition / Custom | #14b8a6 |
-| Historical Period | #64748b |
-| Religion / Belief | #a855f7 |
-| Collective Memory | #84cc16 |
-
-The runtime also accepts Hebrew type names (e.g., "מבנה", "ערך תרבותי") and maps them automatically. Unknown types receive a dynamic fallback color.
-
-## Node Sizing
-
-The runtime applies three sizing tiers automatically:
-
-| Tier | Applies to | Radius |
-|------|-----------|--------|
-| Asset (primary) | The assessed heritage subject | 14–16px |
-| Cultural Value | Nodes with `value_type` set | 11px |
-| All others | Every other entity type | 8–10px |
-
-Node labels: placed below the node, font-size ≥ 10px. Truncate at 20 characters with ellipsis.
-
-## Edge Geometry
-
-- **Curvature**: Edges rendered as gentle arcs (curved Bézier), not straight lines. Prevents edge overlap and gives the graph a looser, organic feel.
-- **Edge labels**: placed at curve midpoint, font-size ≥ 10px.
-- **Arrow markers**: small directional arrowheads at target end of each edge.
-
-## Graph Limits
-
-- Target: 10–15 nodes, max 20
-- Edges: max 25
-- ≤ 3 Cultural Value nodes
-- User can request more
-
-## Runtime-Provided UX
-
-The external runtime (`kg-runtime.js` + `kg-runtime.css`) provides all of the following automatically. The bot does NOT need to implement any of this:
-
-### Graph
-- Colored dot nodes with labels below (per [CA-EC])
-- Curved edges (cubic Bézier) with arrow markers
-- Pan and zoom
-- Click node → selects, dims non-connected nodes (opacity 0.22), updates sidebar
-- Click empty space → clears selection
-- Physics stabilization then auto-disable (prevents jumping on Canvas re-render)
-
-### Toolbar
-- Title and subtitle
-- Node/edge count pills
-- Search (applies on Enter, does not restart physics)
-- Type filter buttons with colored dots
-
-### Sidebar (3 tabs)
-- **Info**: node details (name, type badge, meaning, value_type, meta) + outgoing/incoming connections as clickable cards. When no node is selected: placeholder prompt ("Click a node to inspect it"). When selected: node name (≥ 1rem, bold), type badge (coloured by [CA-EC]), meaning text (≥ 0.88rem), connections list grouped into outgoing and incoming. If the node's `epistemic` is `inferred`/`interpretive`, a 〰️/💭 status line + `epistemic_note` is shown here (Info panel only — never on the node glyph).
-- **Analytics**: Search input filtering nodes by name or meaning. Type filter toggle buttons with count badges. Statistics: node count, edge count, entity type count, graph density. A **💭 Entities to review (N)** list — interpretive (💭) and inferred (〰️) nodes, clickable → Info tab; hidden when none. Top 5 most connected nodes by degree, clickable (navigates to Info tab on click).
-- **AI Query**: placeholder mode — title, description, example prompts for the GPT chat. No live API calls from the Canvas.
-
-### Legend
-- Bottom of canvas, shows only types present in current data
-- Colored dot + type label
-
-### Language
-- Auto-detects RTL from node content (Hebrew, Arabic)
-- Switches all UI labels to Hebrew when RTL detected
-- Respects `lang` and `dir` attributes on `<html>`
-
-## Light Chrome Palette
-
-The runtime uses the following palette for all KG UI chrome (background, sidebar, borders, text). Entity node colours remain governed by [CA-EC]:
-
-```
-Background: #f8fafc → sidebar: #f1f5f9 → cards: #ffffff → borders: #e2e8f0
-Text-primary: #1e293b → text-dim: #64748b → text-muted: #94a3b8
-Accent: #3b82f6 (interactive elements, active tab indicator)
-```
-
-## Language and Direction
-
-Set `lang` and `dir` on `<html>` to match the user's instruction language:
-- English → `lang="en" dir="ltr"`
-- Hebrew → `lang="he" dir="rtl"`
-- Arabic → `lang="ar" dir="rtl"`
-
-## AI Query Tab [CA-AIQ]
-
-Follows **placeholder mode** (GPT platform). No live API calls from the Canvas — all interpretation is routed through the GPT conversation. The runtime displays:
-- Title ("Deep Graph Query")
-- Explanation of capabilities
-- 5 starter prompts users can copy into chat:
-  1. "What are the key relationships in this knowledge graph?"
-  2. "Which entities are most connected?"
-  3. "How do contexts relate to values?"
-  4. "Explain the context-effect relationships"
-  5. "What patterns emerge from the graph structure?"
-
-When user clicks a starter prompt or types a question, display: "💬 Copy this question to the chat conversation for an answer based on the full assessment context." Include a copy-to-clipboard button for the question text.
+D3 force graph (curved arcs + arrowheads), pan/zoom/drag, click-to-select with non-neighbour dimming, 3-tab sidebar (**Info** · **Analytics** incl. a "💭 entities to review" list · **AI Query** placeholder), legend (present types only), search + type filters, RTL auto-detected from content. Full field shapes: `atar-runtime` data-contract (`type:'kg'`).
 
 ## After KG
 
 Offer to highlight one context-effect edge pair. If accepted: 2 sentences max — Context→Asset, Asset→Context. No theory preamble.
 
-**Review interpretive entities (HITL)**: When the graph has any `interpretive` (💭) entities, follow the Canvas with a ≤2-sentence offer — "This graph has N interpretive (💭) entities (see '💭 Entities to review' in the Analytics tab). Want to confirm, rename, reject, or cite-and-promote any?" On the user's reply, rename/remove the entity or promote it to `sourced` when evidence is cited, then offer to regenerate the KG. Skip this offer when N = 0.
+**Review interpretive entities (HITL)**: when the graph has any `interpretive` (💭) entities, follow it with a ≤2-sentence offer — "This graph has N interpretive (💭) entities (see '💭 Entities to review' in the Analytics tab). Want to confirm, rename, reject, or cite-and-promote any?" On reply, rename/remove or promote to `sourced` when evidence is cited, then offer to regenerate. Skip when N = 0.
 
 ## Compliance Check
 
-Before returning a Knowledge Graph Canvas, verify:
-
-- [ ] HTML is a thin shell (~30 lines max, no inline JS logic)
-- [ ] `vis-network` loaded from `unpkg.com`
-- [ ] `kg-runtime.css` loaded from `alephplace.com`
-- [ ] `kg-runtime.js` loaded from `alephplace.com`
-- [ ] Google Fonts link for Noto Sans included
-- [ ] Graph data is only in `window.__DATA_JSON__`
-- [ ] Node `type` values use canonical entity types from the table above
-- [ ] No `color` specified per node
-- [ ] No inline toolbar, sidebar, search, filter, legend, or physics logic
-- [ ] No inline CSS beyond `#kg-app { width: 100vw; height: 100vh; }`
-- [ ] `lang` and `dir` match user language
-- [ ] Counts: 10–15 nodes (≤ 20), ≤ 25 edges, ≤ 3 Cultural Value nodes
-- [ ] Every node has `id`, `name`, `type`, `meaning` (English). No orphan nodes.
+- [ ] Output is the thin shell only: one `<div id="root">` + the UMD script + `DATA` + the `mount` call.
+- [ ] Runtime loaded from `cdn.jsdelivr.net/npm/atar-runtime@0.3.4`; `mount(root, DATA, {})` called.
+- [ ] `DATA.type === "kg"`; every node has `id`, `name`, `type` (English [CA-EC] token), `meaning`; edges use `source`/`target` + lowercase verb.
+- [ ] No vis-network / D3 / React / SVG / inline UI / per-node colour / sizing / CSS.
+- [ ] Counts: 10–15 nodes (≤20), ≤25 edges, ≤3 Cultural Value; no orphans.
 - [ ] Every node has `epistemic` (default `sourced`); non-sourced nodes carry an `epistemic_note` (≤15 words).
-- [ ] Relationship verbs describe actual CBSA links (avoid duplicate "related_to" unless necessary)
-- [ ] Output: Canvas document only; no surrounding explanation
+- [ ] `lang`/`dir` match the user's language; Canvas if exposed, else `/mnt/data` shell.
+- [ ] Output: artifact only; no surrounding explanation.
 
 If any item fails, revise before returning output.

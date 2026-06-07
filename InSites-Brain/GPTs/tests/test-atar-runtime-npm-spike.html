@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>atar-runtime jsDelivr SPIKE — kg / assessment / collection</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; }
+    h1 { font-size: 16px; padding: 12px 16px; margin: 0; background: #0f172a; color: #fff; }
+    #status { padding: 10px 16px; font-weight: 700; }
+    .ok { color: #15803d; } .bad { color: #b91c1c; }
+    section { margin: 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    section > h2 { font-size: 13px; margin: 0; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .box { height: 560px; }
+    .err { padding: 12px; color: #b91c1c; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>atar-runtime SPIKE — load from jsDelivr, mount 3 DATA types</h1>
+  <div id="status">Loading runtime…</div>
+
+  <section><h2>type: 'kg'</h2><div id="kg" class="box"></div></section>
+  <section><h2>type: 'assessment'</h2><div id="assessment" class="box"></div></section>
+  <section><h2>type: 'collection'</h2><div id="collection" class="box"></div></section>
+
+  <!-- Pinned runtime (same URL Claude/Gemini use) -->
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
+  <script>
+    (function () {
+      var statusEl = document.getElementById('status');
+      function fail(msg) { statusEl.className = 'bad'; statusEl.textContent = '✗ ' + msg; }
+      function ok(msg) { statusEl.className = 'ok'; statusEl.textContent = '✓ ' + msg; }
+
+      if (!window.AtarRuntime || typeof window.AtarRuntime.mount !== 'function') {
+        fail('atar-runtime did NOT load from jsDelivr (window.AtarRuntime.mount missing).');
+        return;
+      }
+
+      var KG = {
+        type: 'kg', title: 'Spike KG',
+        nodes: [
+          { id: 'asset', name: 'Test Asset', type: 'Asset', meaning: 'the primary subject' },
+          { id: 'place', name: 'Test Place', type: 'Place', meaning: 'where it sits' },
+          { id: 'val', name: 'Historical Value', type: 'Cultural Value', meaning: 'why it matters', value_type: 'Historical' },
+          { id: 'event', name: 'Founding', type: 'Event', meaning: 'temporal anchor', epistemic: 'inferred', epistemic_note: 'date inferred from two sources' }
+        ],
+        edges: [
+          { source: 'asset', target: 'place', label: 'located_in' },
+          { source: 'asset', target: 'val', label: 'expresses_value' },
+          { source: 'event', target: 'asset', label: 'shaped' }
+        ]
+      };
+
+      var ASSESSMENT = {
+        type: 'assessment',
+        asset: { name: 'Test Asset', location: 'Test Valley', type: 'Water Tower', period: '1920s', description: 'A short test description for the spike.', coordinates: { lat: 33.0, lng: 35.5 }, coordinateSource: 'inferred' },
+        dataQuality: { sources: ['test.pdf'], gaps: ['no original plans'] },
+        timeline: [{ year: '1923', yearStart: 1923, label: 'Built', changeType: 'structure' }, { year: '1960', yearStart: 1960, label: 'Use ceased', changeType: 'use' }],
+        contexts: [{ id: 'c1', type: 'historical', label: 'Built in the Mandate period', timespan: '1920s', relatedValues: ['Historical'] }],
+        values: [{ id: 'v1', name: 'Historical', category: 'Historical', evidence: 'sourced', summary: 'evidence of early regional infrastructure' }],
+        attrTable: [{ attribute: 'Form', values: ['Historical'], significance: 'legible original profile', implication: 'loss reduces legibility' }],
+        authenticity: { summary: 'High material integrity, low use integrity.', grid: [{ aspect: 'Form & Design', description: 'original profile remains', valueExpression: 'Historical', rating: 'high' }] },
+        vulnerability: [{ value: 'Historical', form: 3, material: 2, use: 1, setting: 2 }],
+        comparative: { summary: 'Distinctive locally.', sites: [{ name: 'Other Tower', period: '1930s', distinction: 'less intact', criteria: { rarity: 'moderate', documentation: 'low', condition: 'unknown' }, coordinates: { lat: 32.9, lng: 35.4 } }] },
+        significance: 'A concise test significance statement weaving the stages together.',
+        processQuality: { quickBoosts: ['add original plans'], nextSteps: ['photograph the west side'] }
+      };
+
+      var COLLECTION = {
+        type: 'collection',
+        collection: { name: 'Test Collection', source: 'spike', depth: 'medium', itemCount: 2 },
+        sites: [
+          { id: 's1', name: 'Site One', region: 'North', lat: 33.1, lng: 35.5, depth: 'rich', type: 'Tower', period: 'Modern', description: 'first test site', significanceSummary: 'matters because of X', highlight: 'only example in the region', values: { Historical: 'e', Scientific: 'i' }, threats: ['neglect'] },
+          { id: 's2', name: 'Site Two', region: 'South', lat: 32.8, lng: 35.2, depth: 'thin', type: 'Mill', period: 'Ottoman', description: 'second test site', significanceSummary: 'matters because of Y', highlight: 'rare mill type', values: { Historical: 'i', Scientific: 'a' } }
+        ],
+        themes: [{ id: 't1', label: 'Industrial heritage', description: 'shared industrial character', sites: ['s1', 's2'], evidence: { s1: 'tower', s2: 'mill' } }],
+        collectionSummary: { narrative: 'Two test sites for the spike.', patterns: ['industrial'], gaps: ['partial coordinates'], distinctives: ['type variety'] }
+      };
+
+      var results = [];
+      function tryMount(id, data) {
+        try { window.AtarRuntime.mount(document.getElementById(id), data, {}); results.push(id + ':OK'); }
+        catch (e) {
+          results.push(id + ':ERR');
+          document.getElementById(id).innerHTML = '<div class="err">mount(' + id + ') threw:\n' + (e && e.stack || e) + '</div>';
+        }
+      }
+      tryMount('kg', KG);
+      tryMount('assessment', ASSESSMENT);
+      tryMount('collection', COLLECTION);
+
+      var anyErr = results.some(function (r) { return r.indexOf(':ERR') > -1; });
+      if (anyErr) fail('Runtime loaded, but a mount threw — ' + results.join('  '));
+      else ok('Runtime loaded from jsDelivr and all 3 mounts succeeded — ' + results.join('  '));
+    })();
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# [CA-DB] Assessment Dashboard — CBSA Integration
+# [CA-DB] Assessment Dashboard (GPT · atar-runtime build)
 
-> **Architecture**: External runtime pattern. The GPT outputs a short HTML shell (~30 lines) with extracted data as JSON. All rendering, tabs, styling, cross-referencing, guide boxes, navigation, and interactivity are handled by `dashboard-runtime.js` and `dashboard-runtime.css` loaded from CDN.
+> **atar-runtime build — the canonical GPT dashboard spec.** Renders through the shared **`atar-runtime`** package (vanilla JS + D3 / Leaflet, loaded from `cdn.jsdelivr.net/npm`) — the SAME runtime Claude and Gemini use. The bot's only job is **data extraction**; the runtime owns all tabs, the map, charts, cross-referencing, RTL, and AI Query. (The legacy alephplace `dashboard-runtime` build is archived.)
 
 ---
 
@@ -8,194 +8,132 @@
 
 - **Mandatory offer** at end of Stage 6: "Would you like me to generate an interactive Assessment Dashboard that visualizes the complete CBSA process?"
 - Execute only on acceptance — do not auto-generate.
-- Output as a **Canvas document** (HTML shell loading external runtime).
-- **Canvas tool (critical)**: emit the shell with the `canmore.create_textdoc` tool (`type: "code/html"`) whenever Canvas/`canmore` is exposed in the current runtime.
-- **Canvas unavailable fallback**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which no longer offer Canvas) or the call fails, do NOT refuse and do NOT invent a substitute — generate the same dashboard shell as a downloadable `/mnt/data/{asset-name}-cbsa-dashboard.html` file, labelled `HTML shell fallback — Canvas unavailable`. A file opened in a real browser loads the runtime correctly (the empty-container caveat applies only to the inline sandbox preview).
-- **Fallback compliance**: the fallback file must follow this dashboard spec exactly — external runtime pattern, `dashboard-runtime.css`, `dashboard-runtime.js`, Leaflet, one inline `window.__DASHBOARD_DATA__` object, no `fetch()`, no inline CSS/JS beyond the data assignment. No custom standalone dashboard UI. Never use the KG runtime for a dashboard.
-- **Download/export copy**: when Canvas is available, offer download/export only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
-- Respond **only** with the Canvas directly — no surrounding prose.
-- **Dashboard announcement**: Before generating, say: "I'll generate an interactive Assessment Dashboard — your full assessment visualized across [N] tabs."
+- Respond **only** with the artifact — no surrounding prose.
+- **Canvas tool**: emit the shell via `canmore.create_textdoc` (`type:"code/html"`) when Canvas/`canmore` is exposed.
+- **Canvas unavailable fallback**: if `canmore`/Canvas is not exposed (e.g. GPT-5.5 Thinking/Instant, which dropped Canvas) or the call fails, deliver the **identical** shell as `/mnt/data/{asset-name}-cbsa-dashboard.html`, labelled `HTML shell fallback — Canvas unavailable`. A downloaded file runs the runtime fine (empty-container caveat = inline preview only). Never a custom UI.
+- **Download/export copy**: when Canvas is available, offer it only on explicit request, after the Canvas exists; when Canvas is unavailable, the downloadable shell IS the primary output.
 
-## 2. Output Format — External Runtime
+## 2. HTML shell (atar-runtime)
 
-The bot outputs an HTML shell that loads the dashboard runtime from CDN. The bot's only job is **data extraction** — all rendering, tab structure, cross-referencing, guide boxes, navigation, print CSS, and AI Query are handled by the runtime.
-
-### HTML Shell Template
+The bot outputs a thin shell that loads `atar-runtime` and calls `mount(container, DATA, {})` with `DATA.type = "assessment"`. The runtime injects its own styles/fonts and loads Leaflet itself — do NOT add Leaflet, a CSS file, or any `<style>`/render code.
 
 ```html
 <!DOCTYPE html>
-<html lang="__LANG__" dir="__DIR__">
+<html lang="{LANG}" dir="{DIR}">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>__ASSET_NAME__ — CBSA Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-  <link rel="stylesheet" href="https://alephplace.com/atar.bot/canvas/dashboard-runtime.css"/>
+  <title>{ASSET_NAME} — CBSA Dashboard</title>
 </head>
 <body>
-  <div id="dashboard-root"></div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <div id="root" style="height:100vh"></div>
+  <script src="https://cdn.jsdelivr.net/npm/atar-runtime@0.3.4/dist/atar-runtime.umd.js"></script>
   <script>
-    window.__DASHBOARD_DATA__ = {
-      // ... extracted data object (see §4 Data Schema) ...
+    var DATA = {
+      type: "assessment"
+      // ... extracted fields (see §4 Data Schema) ...
     };
+    (function () {
+      function go() { window.AtarRuntime.mount(document.getElementById("root"), DATA, {}); }
+      if (window.AtarRuntime) go(); else window.addEventListener("load", go);
+    })();
   </script>
-  <script src="https://alephplace.com/atar.bot/canvas/dashboard-runtime.js"></script>
 </body>
 </html>
 ```
 
 **Rules**:
-- Set `__LANG__` to `"he"` / `"en"` and `__DIR__` to `"rtl"` / `"ltr"` based on content language.
-- Replace `__ASSET_NAME__` with the site name.
-- The `window.__DASHBOARD_DATA__` object must be valid JSON embedded inline — no `fetch()` calls.
-- Do NOT add any inline CSS or JS beyond the data assignment. The runtime handles everything.
+- Set `{LANG}`/`{DIR}` to `he`/`rtl` or `en`/`ltr` by content language; the runtime also auto-detects Hebrew → RTL.
+- `DATA` must be valid inline JS — no `fetch()`.
+- Add no inline CSS/JS beyond the `DATA` assignment + the `mount` call.
 
-### Runtime Fallback Rule
-
-If this spec runs outside a Canvas-capable model, output the exact same HTML shell as a file — the only difference is the delivery medium:
-- Canvas exposed → `canmore.create_textdoc(type: "code/html")`
+### Fallback delivery
+- Canvas exposed → `canmore.create_textdoc(type:"code/html")`
 - Canvas not exposed → `/mnt/data/{asset-name}-cbsa-dashboard.html`
 
-In both cases: keep the shell thin; load the external runtime + Leaflet exactly as specified; place all extracted data in `window.__DASHBOARD_DATA__`; add no inline rendering logic, custom tabs, custom CSS, or replacement UI.
+Same shell either way; only the delivery medium differs.
 
 ## 3. Data Extraction
 
-Re-read all stage outputs from the conversation and extract:
+Re-read all stage outputs and extract:
 
 | Section | Source | Data to extract |
 | --- | --- | --- |
-| Asset Identity | Stage 0 | Name, location, type, period, brief description (~20 words) |
-| Data Quality | Stage 0 | Sources uploaded, identified gaps (list) |
-| Timeline | Stage 1 | 5–10 key dated events with year, label, and change type (use/structure/setting/infrastructure) |
-| Contexts | Stage 1 | Each context: type label, description, related value categories, timespan |
-| Values | Stage 2 | Each value: name, category ([CA-V]), evidence strength (sourced/inferred/uncertain), 1-line summary |
-| Attribute Table | Stage 2.1 | Each row: attribute name, associated value categories, site-specific significance, implication |
-| Authenticity | Stage 3 | Nara Grid as structured objects: aspect, attribute description, value expression, integrity rating (high/medium/low-medium/low). Plus summary. |
-| Comparative | Stage 4 | Each comparator: name, period, architect, distinction, criteria ratings (rarity, documentation, condition). Plus summary. |
+| Asset Identity | Stage 0 | Name, location, type, period, brief description (~20 words), coordinates |
+| Data Quality | Stage 0 | Sources uploaded, identified gaps |
+| Timeline | Stage 1 | 5–10 dated events with year, label, changeType (use/structure/setting/infrastructure) |
+| Contexts | Stage 1 | Each: type, label, relatedValues, timespan |
+| Values | Stage 2 | Each: name, category ([CA-V]), evidence (sourced/inferred/uncertain), summary |
+| Attribute Table | Stage 2.1 | Each: attribute, values, significance, implication |
+| Authenticity | Stage 3 | Nara Grid as structured objects (aspect, description, valueExpression, rating) + summary |
+| Comparative | Stage 4 | Each comparator: name, period, architect, distinction, criteria + summary |
 | Significance | Stage 5 | Full statement text |
-| Vulnerability | Stages 2+3 | Cross-matrix: each value × each Nara aspect → impact level (3=high, 2=medium, 1=low) |
-| Process Quality | Stage 6 | Quick boosts, next steps, strengths count, gaps count |
-| Knowledge Graph | [CA-KG] | If KG was generated: full nodes and edges JSON. If not: null. |
-| Location | Stage 0 + context | Lat/lng for asset and each comparator. Explicit, inferred, or null. |
-| Thematic Clusters | Stages 1–3 | Group values by overlapping contexts, contexts by temporal/causal overlap, vulnerability cells by shared high-impact patterns. ≥2 members per theme. |
+| Vulnerability | Stages 2+3 | Each value × Nara aspect → impact 3/2/1 |
+| Process Quality | Stage 6 | quickBoosts, nextSteps, strengths, gaps |
+| Location | Stage 0 + context | Lat/lng for asset + comparators (explicit / inferred / null) |
+| Themes | Stages 1–3 | Group values/contexts/threats by narrative thread (≥2 members) |
 
-## 4. Data Schema
+## 4. Data Schema (`type: "assessment"`)
 
-```json
+The runtime's `normalize()` accepts BOTH these canonical keys and the GPT abbreviated keys — this schema works as-is.
+
+```jsonc
 {
-  "asset": {
-    "name": "", "location": "", "type": "", "period": "",
-    "description": "", "coordinates": { "lat": null, "lng": null },
-    "coordinateSource": "explicit|inferred|unknown"
-  },
+  "type": "assessment",
+  "asset": { "name": "", "location": "", "type": "", "period": "", "description": "",
+             "coordinates": { "lat": null, "lng": null }, "coordinateSource": "explicit|inferred|unknown" },
   "dataQuality": { "sources": ["filename.pdf"], "gaps": ["missing X"] },
-  "timeline": [
-    { "year": "1923–1924", "yearStart": 1923, "label": "...", "changeType": "structure" }
-  ],
-  "contexts": [
-    { "id": "ctx_hist", "type": "historical", "label": "...", "relatedValues": ["Historical", "Technological"], "timespan": "1915–1960s" }
-  ],
-  "values": [
-    { "id": "v_hist", "name": "...", "category": "Historical", "evidence": "sourced", "summary": "..." }
-  ],
-  "attributeTable": [
-    { "attribute": "...", "values": ["Social", "Symbolic"], "significance": "...", "implication": "..." }
-  ],
-  "authenticity": {
-    "grid": [
-      { "aspect": "Form & Design", "description": "...", "valueExpression": "Historical, Aesthetic", "rating": "medium" }
-    ],
-    "summary": "..."
-  },
-  "comparative": {
-    "summary": "...",
-    "comparators": [
-      { "name": "...", "period": "...", "architect": "...", "distinction": "...", "criteria": { "rarity": "high", "documentation": "moderate", "condition": "unknown" }, "coordinates": { "lat": null, "lng": null } }
-    ]
-  },
-  "significance": { "statement": "..." },
-  "vulnerability": [
-    { "value": "Historical", "form": 3, "material": 3, "use": 2, "setting": 2 }
-  ],
-  "processQuality": { "strengths": 3, "gaps": 6, "quickBoosts": ["..."], "nextSteps": ["..."] },
-  "stagesCompleted": [0,1,2,3,4,5,6],
-  "kg": null,
-  "themes": {
-    "valueThemes": [{ "id": "", "label": "", "description": "", "valueIds": [], "color": "" }],
-    "contextThemes": [{ "id": "", "label": "", "description": "", "contextIds": [], "color": "" }],
-    "threatThemes": [{ "id": "", "label": "", "description": "", "vulnerabilities": [], "color": "" }]
-  },
+  "timeline": [ { "year": "1923–1924", "yearStart": 1923, "label": "...", "changeType": "structure" } ],
+  "contexts": [ { "id": "ctx_hist", "type": "historical", "label": "...", "relatedValues": ["Historical"], "timespan": "1915–1960s" } ],
+  "values": [ { "id": "v_hist", "name": "...", "category": "Historical", "evidence": "sourced", "summary": "..." } ],
+  "attrTable": [ { "attribute": "...", "values": ["Social"], "significance": "...", "implication": "..." } ],
+  "authenticity": { "grid": [ { "aspect": "Form & Design", "description": "...", "valueExpression": "Historical", "rating": "high|medium|low|low-medium" } ], "summary": "..." },
+  "comparative": { "summary": "...", "sites": [ { "name": "...", "period": "...", "architect": "...", "distinction": "...", "criteria": { "rarity": "high", "documentation": "moderate", "condition": "unknown" }, "coordinates": { "lat": null, "lng": null } } ] },
+  "significance": "full statement text",
+  "vulnerability": [ { "value": "Historical", "form": 3, "material": 3, "use": 2, "setting": 2 } ],
+  "processQuality": { "quickBoosts": ["..."], "nextSteps": ["..."] },
+  "themes": { "valueThemes": [], "contextThemes": [], "threatThemes": [] },
   "tabs": []
 }
 ```
 
-### Dynamic Tabs (`data.tabs[]`)
+Key aliases (either works): `attrTable`↔`attributeTable` · `comparative.sites`↔`comparators` · `significance` string ↔ `{statement}`.
 
-If MA-RA readings were performed during the session, include them as additional tabs. The runtime renders each entry as a new tab after the core tabs.
+## 5. Tabs the runtime renders
 
-```json
-"tabs": [
-  {
-    "id": "reading_evidence",
-    "label": "Evidence Weight",
-    "type": "ma-ra-reading",
-    "data": { "readingType": "evidence-weight", "content": "..." }
-  },
-  {
-    "id": "reading_stakeholder",
-    "label": "Stakeholder Lens",
-    "type": "ma-ra-reading",
-    "data": { "readingType": "stakeholder-lens", "content": "..." }
-  }
-]
-```
+Fixed (auto, in order): **Overview · Map · Timeline · Contexts & Values · [Themes] · Integrity · Comparative · Significance**, then your dynamic `tabs[]`, then a live **AI Query** tab (on GPT `host={}` → copy-to-chat). Themes hides when fewer than 2 themes total.
 
-Each tab entry: `id` (unique slug), `label` (tab display name), `type` (`"ma-ra-reading"` | `"debrief"` | `"session-analysis"`), `data` (type-specific payload — the runtime knows how to render each type).
+**Dynamic `tabs[]`** — types: `table` (`{columns, rows}`) · `cards` (`{cards:[{title,subtitle,body,level,badges}]}`) · `matrix` (`{rowLabels,colLabels,cells}` 0–3) · `prose` (`{sections:[{title,body}]}`, `**bold**` supported) · `custom` (`{html}`). Cells matching an asset/comparator name auto-link.
 
-## 5. Data Quality Rules
+**Report / Debrief / Session-Analysis → `prose` tabs** (emit in this order after Significance, with these ids/icons):
+- `{ id:"report", label:"Report", icon:"📄", type:"prose", data:{ sections:[…] } }` — **always**; target 800–1200 words; end with a "📥 Ask in chat to export…" section.
+- `{ id:"debrief", label:"Debrief", icon:"💬", type:"prose" }` — only if the post-Stage-6 Debrief was completed (3 Q/A sections).
+- `{ id:"session", label:"Session Analysis", icon:"📊", type:"prose" }` — only if opted in (Interaction Map · Self-Reflection · Session Signature).
 
-1. Only include data that actually appeared in the conversation — never fabricate.
-2. If a stage was skipped or incomplete, set its fields to `null` and include the stage number in `stagesCompleted` only if it was actually completed.
-3. Evidence markers must match Stage 2 notation (sourced/inferred/uncertain).
-4. `authenticity.grid` must be **structured objects** — never flatten the Nara Grid to strings.
-5. `comparative.comparators` must be **per-site objects** with criteria — never a flat name list.
-6. `timeline[].changeType` is mandatory for every event.
-7. `contexts[].relatedValues` must link each context to the value categories it generates.
-8. Coordinates: extract if explicit in source, infer from well-known place names, or set `null`. Set `coordinateSource` accordingly.
-9. `vulnerability` impact levels: 3 = loss severely damages this value; 2 = moderate; 1 = minor or indirect.
-10. `themes`: ≥2 members per theme; only populate if ≥3 values OR ≥3 contexts exist.
-11. In `tabs[]` data, use exact entity names (asset name, comparator names) when referencing them — the runtime auto-links matching names to map markers.
+## 6. Data Quality Rules
 
-### Execution Decision Tree
+1. Only data that appeared in the conversation — never fabricate; skipped stage → `null` + record in `dataQuality.gaps`.
+2. `authenticity.grid` = structured objects (never flatten to strings).
+3. `comparative.sites` = per-site objects with criteria (never a flat name list).
+4. `timeline[].changeType` mandatory; `contexts[].relatedValues` links each context to value categories.
+5. Coordinates: explicit / inferred / `null` + `coordinateSource`.
+6. `vulnerability`: 3 = severe, 2 = moderate, 1 = minor.
+7. `themes`: ≥2 members each; populate only if ≥3 values OR ≥3 contexts.
+8. In `tabs[]` use exact asset/comparator names so cross-links resolve.
 
-When the user requests a dashboard:
-1. Re-read the conversation's stage outputs and extract data per this schema.
-2. Do not fabricate skipped stages — set their fields to `null` and record the gap in `dataQuality.gaps`.
-3. Build the exact dashboard HTML shell from this spec.
-4. Emit it as a Canvas via `canmore.create_textdoc` when that tool is exposed; if it is not exposed or the call fails, write the identical shell to `/mnt/data/{asset-name}-cbsa-dashboard.html` and give the download link.
-5. Never create a custom standalone dashboard UI.
+## 7. Post-Dashboard Offers
 
-## 6. Post-Dashboard Offers
+> "Would you like me to: 1. **Export** as a formatted Word document? 2. **Read-Assessment** — analyze from different angles? You can do both, one, or neither. After that → Session Debrief."
 
-After generating the Dashboard, offer next steps in the workflow chain [CA-WF]:
+Use **Code Interpreter** for DOCX export. After Debrief + [CA-IP] Session Report, offer to append them as `prose` tabs (ids `debrief`/`session`) and regenerate.
 
-> "Would you like me to:
-> 1. **Export** as a formatted Word document?
-> 2. **Read-Assessment** — analyze from different angles (evidence weight, stakeholder lens, context-effect audit)?
->
-> You can do both, one, or neither. After that → Session Debrief."
+## 8. Compliance Check
 
-Use **Code Interpreter** for DOCX export. Do not stop at file delivery if a logical next step exists.
+- [ ] Output is the thin shell only (one `<div id="root">` + UMD script + `DATA` + `mount`).
+- [ ] Runtime from `cdn.jsdelivr.net/npm/atar-runtime@0.3.4`; `mount(root, DATA, {})`; `DATA.type === "assessment"`.
+- [ ] No Leaflet/CSS/`<style>`/render code in the shell (runtime loads them).
+- [ ] Structured `authenticity.grid`, per-site `comparative.sites`, `timeline[].changeType`, `contexts[].relatedValues`, `vulnerability`.
+- [ ] Themes only when ≥2 total; Report prose tab always present; Debrief/Session only when they occurred.
+- [ ] Only real conversation data; `lang`/`dir` match language; Canvas if exposed else `/mnt/data` shell.
 
-**Post-session augmentation**: After Debrief and [CA-IP] Session Report, offer to append them as dashboard tabs (add entries to `tabs[]` and regenerate the shell). Debrief/Session Analysis content uses `type: "debrief"` and `type: "session-analysis"` — the runtime renders these with muted process styling, visually separated from heritage evidence.
-
-## 7. Reference
-
-The Ayelet HaShachar water tower assessment dashboard (`Single-Dashboard-example.html`) is a working example of the data shape this spec produces. Use it as reference for data extraction — not as a rendering template (the runtime handles rendering).
-
----
-
-**END OF DASHBOARD SPECIFICATION**
+**Export Offer (mandatory)**: after generating, offer — "Would you like me to export this assessment as a formatted Word document?"
