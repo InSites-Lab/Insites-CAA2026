@@ -1,5 +1,7 @@
 # GPT Dashboard & KG Runtimes
 
+> ⚠️ **LEGACY / ARCHIVED — no longer deployed or uploaded.** GPT visual products now render via the shared **`atar-runtime`** package (D3, loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>`), converged with Claude/Gemini — see the `InSites-Brain/GPTs/*-spec.md` shells and `InSites-Brain/Claude/atar-runtime/data-contract.md`. The vis-network/alephplace runtime documented below is kept for reference only; the legacy specs that used it are in `InSites-Brain/GPTs/OLD/`.
+
 External JS/CSS files that render GPT-generated dashboards and knowledge graphs. The GPT outputs a short HTML shell with data JSON; these runtimes handle all rendering.
 
 ## Deployment

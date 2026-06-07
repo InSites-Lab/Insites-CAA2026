@@ -7,6 +7,8 @@ description: Analyze dashboard code and suggest UX and data-visualization improv
 
 Scan a dashboard codebase and produce a structured improvement report. The goal is to help the developer see their dashboard through a user's eyes — what's confusing, what's missing, what could communicate the data more powerfully.
 
+> **InSites context (atar-runtime):** InSites KG + both dashboards now render on **all three** platforms (Claude/Gemini/GPT) via the shared **`atar-runtime`** package — the bot emits a thin shell + a `DATA` object (validated against `InSites-Brain/Claude/atar-runtime/data-contract.md`) and the runtime owns all rendering. When reviewing an InSites dashboard, critique the **DATA shape** and the runtime's rendered output — do **not** recommend reintroducing per-product inline chart/map code.
+
 ## Philosophy
 
 Dashboards exist to create understanding, not just display data. A good dashboard review asks: "Does each view earn its place? Does the user leave with insight they didn't have before?" This is especially important for research and heritage assessment dashboards, where the audience may be domain experts (archaeologists, planners, conservators) rather than data analysts — they need the visualization to surface meaning, not just render numbers.

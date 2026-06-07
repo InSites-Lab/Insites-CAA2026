@@ -17,7 +17,7 @@ Launch the full InSites expert panel (4 agents in parallel) to review any projec
 - When updating workshop-site content or design
 - When updating GitHub documentation or guides for workshop participants
 - When planning workshop content or session design
-- When checking cross-platform alignment (Claude ↔ Gemini ↔ GPT)
+- When checking cross-platform alignment (Claude ↔ Gemini ↔ GPT). **Note:** KG + both dashboards are CONVERGED on the shared `atar-runtime` (D3, jsDelivr) across all three platforms; GPT Canvas may be unavailable on GPT-5.5 → `/mnt/data` shell fallback (never a custom UI).
 
 ## How It Works
 

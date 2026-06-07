@@ -33,7 +33,7 @@ Export is now **chat-delivered everywhere** (the bot generates a formatted Word/
 
 ## 2. External runtime via jsdelivr / GitHub (token-reduction path)
 
-**Status:** CSP behavior **measured & validated**; implementation deferred (post-workshop).
+**Status:** CSP behavior **measured & validated** → **✅ IMPLEMENTED** as the **`atar-runtime`** npm package (loaded via `cdn.jsdelivr.net/npm/atar-runtime@<ver>`). All three platforms (Claude / Gemini / GPT) now emit a thin shell + `DATA` object and call `mount(root, DATA, host)`; GPT was the last to converge (2026-06). The analysis below is retained as the rationale/record.
 
 **The lever.** ~40,361 chars (~27%) of the Claude mono are embedded artifact code blocks (KG, Dashboard, Map components — largest single block is the iframe-Leaflet Map ~5.8K). Under claude.ai full-injection (see [[project_claude_ai_full_injection]]) every char of that is re-sent every turn. If the heavy runtime code lived **outside** the prompt and the bot emitted only a short shell + data JSON (the pattern GPT/Gemini already use with `kg-runtime.js` on alephplace.com), the mono could shed an estimated **~20–30K chars** — by far the biggest instruction-side reduction available.
 
