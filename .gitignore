@@ -31,7 +31,9 @@ InSites Budget.md
 *.code-workspace
 
 # === Developer tooling ===
-.claude/
+# Track project skills (shared/versioned); ignore the rest of .claude/ (local/ephemeral)
+.claude/*
+!.claude/skills/
 CLAUDE.md
 InSites-Brain/CLAUDE.md
 InSites-Brain/Claude/InSites-CAA-mono*.md
