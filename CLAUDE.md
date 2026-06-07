@@ -10,7 +10,7 @@ The project is an output of the **InSites Knowledge Lab**, which develops comput
 
 ## Platform Development Guide
 
-For all platform-specific development rules (GPT, Claude, Gemini), cross-platform sync policies, and the convergence principle, see `InSites-Brain/CLAUDE.md`.
+For platform-specific rendering architecture and cross-platform convergence, see `InSites-Brain/design/contracts/artifact-ux-contract.md` (§5) and `InSites-Brain/Claude/atar-runtime/data-contract.md` (the shared DATA contract). All three platforms (Claude/Gemini/GPT) now render visual products via the shared `atar-runtime`.
 
 ## Repository Structure — Active vs Inactive
 
@@ -44,7 +44,7 @@ InSites-Brain/
   Claude/InSites-CAA-mono v5.4.md              # Older monolithic snapshot (pre-runtime; superseded)
   Claude/skills/*.md                           # 7 Claude.ai Project Skills (on-demand)
   GPTs/                                         # OpenAI GPT spec files (instructions.md + knowledge files)
-  GPTs/runtime/                                  # KG frontend engine (deploy to alephplace.com)
+  GPTs/runtime/                                  # LEGACY vis-network runtime (archived; GPT now uses atar-runtime)
   GPTs/tests/                                    # GPT KG test HTML files (EN, HE, CDN)
   GPTs/CAA-GTPs (Claude.ai-Spilts)/             # GPT upload package (frozen backups in Original/)
   Gemini/*.md                                  # Google Gemini bot prompts (4 files)
@@ -52,13 +52,13 @@ InSites-Brain/
   agent-for-agents/agent-for-agents-he.md
 ```
 
-### ✅ ACTIVE — Claude Code skills (.claude/skills/)
+### ✅ Claude Code skills — one loaded home per skill
 
-```
-.claude/skills/agent-builder/SKILL.md          # /agent-builder
-.claude/skills/prompt-qa/SKILL.md              # /prompt-qa
-.claude/skills/cbsa-ux-review/SKILL.md         # /cbsa-ux-review
-```
+- **Generic** (global, loaded everywhere) — `~/.claude/skills/` (NOT in repo): `expert-review` (4-expert panel), `dashboard-ux-reviewer`, `lim`, `skill-creator`.
+- **Active project** — `.claude/skills/` (tracked via `.gitignore` `!.claude/skills/`): none currently.
+- **Archive** (tracked, NOT loaded — `cp` into a skills dir to activate) — `InSites-Brain/skills-archive/`: `expert-review` (versioned source/backup of the global copy) · `agent-builder` (skill name `cbsa-agent-builder`) · `cbsa-ux-review` · `prompt-qa` · `claim-extractor` · `source-refiner`.
+
+> Claude Code scans only `.claude/skills/` (project) + `~/.claude/skills/` (global); `skills-archive/` is deliberately not scanned (backup + on-demand). `expert-review` is generic → runs from global, with its versioned source/backup in the archive. See `InSites-Brain/skills-archive/README.md`.
 
 ### 📝 ACTIVE WRITING — Heritage 4.0 Paper (Florence)
 
@@ -95,7 +95,7 @@ InSites-Brain/research/                        # Lab research insights & validat
   genius-loci-experiential-method.md           # Experiential knowledge layer -> CBSA (validated, Madatech)
 InSites-Brain/Claude/KG-Skill-en/SKILL.md     # Advanced KG spec (reference only)
 InSites-Brain/Claude/plans/                    # Enhancement roadmap
-InSites-Brain/CLAUDE.md                        # Cross-platform dev guide
+InSites-Brain/Claude/atar-runtime/data-contract.md  # Shared cross-platform DATA contract (convergence)
 ```
 
 ### 📦 DATA — Heritage site data, test inputs, benchmark outputs
@@ -113,7 +113,7 @@ InSites-Brain/sites-data/
 
 ```
 **/OLD/                                        # All OLD/ folders (gitignored + claudeignored)
-InSites-Brain/Claude/KG-artifacts/             # Legacy kg.js — superseded by GPTs/runtime/kg-runtime.js
+InSites-Brain/Claude/KG-artifacts/             # Legacy kg.js — superseded by atar-runtime
 InSites-Brain/Claude/global-claude-ai-skills/  # Superseded by project skills
 management/                                    # Workshop logistics (.claudeignore)
 content-dev/                                   # Staging area (.claudeignore)
@@ -123,14 +123,12 @@ sakem-li/                                      # Research background (.claudeign
 
 ## Deployment
 
-### KG Frontend (alephplace.com)
-Upload to `/atar.bot/canvas/`:
-- `InSites-Brain/GPTs/runtime/kg-runtime.js` (vis-network engine, [CA-EC] colors, 3-tab sidebar, RTL/LTR)
-- `InSites-Brain/GPTs/runtime/kg-runtime.css` (full UI styling, responsive)
+### Visual Runtime (atar-runtime — all platforms)
+KG + both dashboards render via the shared **`atar-runtime`** npm package, loaded at view time from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` — nothing is uploaded/hosted. The bot emits a thin shell + `DATA` and calls `mount(root, DATA, host)`. (Legacy vis-network/alephplace runtime archived in `InSites-Brain/GPTs/OLD/` + `GPTs/runtime/`.)
 
 ### OpenAI Custom GPT
-1. Paste `InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/instructions.md` → GPT Instructions field
-2. Upload knowledge files from same directory: `cbsa-method.md` (or `cbsa-method-lim.md`), `kg-spec.md`, `dashboard-spec.md`, `dashboard-reference-shape.md`
+1. Paste `InSites-Brain/GPTs/instructions.md` → GPT Instructions field (≤ 8000 chars)
+2. Upload knowledge files from `InSites-Brain/GPTs/`: `cbsa-stages.md`, `cbsa-appendices.md`, `kg-spec.md`, `dashboard-spec.md`, `collection-dashboard-spec.md`, `ma-ra-spec.md`, `ma-rc-spec.md` (all atar-runtime shells — see `GPTs/README.md`). Canvas optional on GPT-5.5 → `/mnt/data` shell fallback.
 
 ### Claude Bot (Claude.ai Projects)
 - **Current (mono)**: set `InSites-Brain/Claude/InSites-CAA-claude.md` (the live mono) as the Project prompt. Its KG/dashboard artifacts load the externalized **`atar-runtime`** from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` (thin shell + `DATA`, no inline render code) — no Project Skills required.
@@ -143,10 +141,9 @@ Upload to `/atar.bot/canvas/`:
 
 ### Testing KG Rendering
 
-**GPT (vis-network + external runtime):**
-- `InSites-Brain/GPTs/tests/test-kg-en.html` — LTR layout, English (loads local runtime)
-- `InSites-Brain/GPTs/tests/test-kg-he.html` — RTL layout, Hebrew (loads local runtime)
-- `InSites-Brain/GPTs/tests/test-kg-gpt.html` — CDN test (loads from alephplace.com)
+**GPT (atar-runtime via jsDelivr):**
+- `InSites-Brain/GPTs/tests/test-atar-runtime-npm-spike.html` — loads atar-runtime@0.3.4 from jsDelivr, mounts kg/assessment/collection (open in a browser)
+- Legacy vis-network tests (`test-kg-en.html`, `test-kg-he.html`, `test-kg-gpt.html`) exercise the archived alephplace runtime
 
 **Claude / Gemini (D3 inline):**
 - `InSites-Brain/Claude/KG-artifacts/tests/test-kg-claude.html` — D3 + Anthropic API
@@ -196,24 +193,24 @@ The bot system guides users through a structured heritage assessment:
 - Human-in-the-Loop: pause after each stage for user review
 - Context Effect: bidirectional analysis between contexts and values
 
-### Knowledge Graph (`kg-runtime.js`)
-- Canonical vis-network engine in `GPTs/runtime/` (deployed to alephplace.com)
+### Knowledge Graph (`atar-runtime`)
+- Canonical engine = the shared **`atar-runtime`** (vanilla D3 force), loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` — same on Claude/Gemini/GPT
 - Auto-detects RTL/LTR from data language
-- 15 entity types per [CA-EC], color-coded (defined in `kg-runtime.js` + `kg-runtime.css`)
-- 3-tab sidebar: Info, Analytics, AI Query (placeholder mode for GPT)
+- 15 entity types per [CA-EC], color-coded (owned by the runtime; see `atar-runtime/data-contract.md`)
+- 3-tab sidebar: Info, Analytics, AI Query (live on Claude via `window.claude.complete`; copy-to-chat on Gemini/GPT)
 - Edge types include standard relationships + Context Effect verbs (`frames`, `reframes`)
 
 > **KG architecture — RESOLVED (2026-06).** Claude renders the KG (and both dashboards) through the externalized **`atar-runtime`** package — a **vanilla-D3** force engine + Leaflet/vector map + dashboard renderers, loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>`. The bot emits only a thin React **shell** + a `DATA` object; **never** inline d3/SVG/Leaflet/render code. Enforced by the **mandatory exclusive-shell rule** in the mono (`[CA-DB-F]` + `[CA-KG] §1`): if the runtime fails to load, emit the shell anyway and let its `load-error` branch render — a failed load is a finding, not a reason to hand-roll a renderer.
 >
-> **Engine per platform:** Claude = D3 (atar-runtime via jsDelivr) · Gemini = D3 (inline / cdnjs — convergence pending) · GPT = vis-network (`kg-runtime.js` on alephplace — Phase C). The shared **`atar-runtime/data-contract.md`** is the convergence layer (one DATA shape, per-platform deploy targets).
+> **Engine per platform (CONVERGED 2026-06):** Claude · Gemini · GPT all = **`atar-runtime`** (vanilla D3) via `cdn.jsdelivr.net/npm`. The shared **`atar-runtime/data-contract.md`** is the one DATA contract; `normalize()` accepts each platform's key aliases. GPT was last to converge (legacy vis-network archived in `GPTs/OLD/`).
 >
-> KG rendering remains **one of the few components with real cross-platform differences** (Claude artifacts native; GPT canvas; Gemini limited). Most other CBSA components (Bot-Brain, HITL, citations) work similarly across platforms.
+> KG/dashboards now render through the **same** `atar-runtime` on all platforms; the only differences are the shell wrapper (Claude = React artifact; Gemini/GPT = vanilla HTML) and AI Query (live on Claude via `window.claude.complete`, copy-to-chat elsewhere). Bot-Brain, HITL, citations already work similarly across platforms.
 
 ### Multi-Platform Parallel Versions
 Content is maintained in parallel across platforms. When modifying any of these areas, propagate changes to all relevant files:
 
 - **CBSA stage definitions/templates** → `InSites-CAA-claude.md` (Claude mono), GPT knowledge files, Gemini files
-- **Entity types or KG schema** → `atar-runtime/data-contract.md` + renderers (Claude/Gemini), `kg-runtime.js` (GPT), `InSites-CAA-claude.md` appendices [CA-KG] + [CA-EC]
+- **Entity types or KG schema** → `atar-runtime/data-contract.md` (the shared contract for all platforms) + `InSites-CAA-claude.md` appendices [CA-KG] + [CA-EC] + the GPT/Gemini spec files
 - **Operating rules** (evidence mandate, citation, HITL) → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
 - **Trigger phrases** → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
 
@@ -234,7 +231,7 @@ Both dashboards share visual language (stone/amber palette, serif typography) bu
 
 ## Security
 
-Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instructions.md`). When writing or modifying any JavaScript (e.g., `kg-runtime.js`):
+Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instructions.md`). When writing or modifying any JavaScript (e.g., the `atar-runtime` source or `workshop-site/`):
 - Run a Snyk code scan
 - Fix any issues found before finalizing
 - Rescan to confirm no new issues were introduced

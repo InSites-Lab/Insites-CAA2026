@@ -34,8 +34,6 @@ InSites Budget.md
 # Track project skills (shared/versioned); ignore the rest of .claude/ (local/ephemeral)
 .claude/*
 !.claude/skills/
-CLAUDE.md
-InSites-Brain/CLAUDE.md
 InSites-Brain/Claude/InSites-CAA-mono*.md
 InSites-Brain/Gemini/InSites-CAA-mono*.md
 
