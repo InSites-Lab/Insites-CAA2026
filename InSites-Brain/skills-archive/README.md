@@ -18,16 +18,17 @@ Rule: a skill lives in exactly **one** of these.
 cp -r InSites-Brain/skills-archive/<name> .claude/skills/<name>
 ```
 
-It loads next session. To deactivate, move it back here.
+It loads next session. To deactivate, move it back here. (For the generic `expert-review`, activate into the **global** dir instead: `cp -r InSites-Brain/skills-archive/expert-review ~/.claude/skills/expert-review`.)
 
 ## What's archived
 
 | Skill | Purpose |
 |-------|---------|
+| `expert-review` | 4-expert parallel review panel. **Generic → runs from the global `~/.claude/skills/`; this copy is its versioned source/backup.** Edit here, then `cp` to `~/.claude/skills/expert-review/`. |
 | `agent-builder` | "The Architect" — guide participants to build their own AI instructions (workshop "Ethics in Practice"). Skill name: `cbsa-agent-builder`. |
 | `cbsa-ux-review` | Review CBSA bot prompts / artifacts for UX, HITL, cognitive load, flow. |
 | `prompt-qa` | Audit & optimize large system prompts for token efficiency (LIM + 7 categories). |
 | `claim-extractor` | Extract/classify substantive claims from CBSA sessions (paper research). |
 | `source-refiner` | Refine heavy heritage source docs into lean, citation-ready material. |
 
-The only **active** project skill is `expert-review` (in `.claude/skills/`). Generic skills (`dashboard-ux-reviewer`, `lim`, `skill-creator`) live in the global `~/.claude/skills/`.
+**No active project skills currently** (`.claude/skills/` is empty). `expert-review` is generic → runs from the global `~/.claude/skills/` (its versioned source/backup is here). Other generic skills (`dashboard-ux-reviewer`, `lim`, `skill-creator`) also live in global.

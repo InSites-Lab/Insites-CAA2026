@@ -1,6 +1,6 @@
 ---
 name: expert-review
-description: Launch 4 parallel expert agents (Heritage, Learning, UX, AI Architect) to review InSites project components — bot prompts, workshop site, workshop program, or GitHub repo. Trigger on "expert review", "team review", "review with experts".
+description: Launch 4 parallel expert agents (Heritage, Learning, UX, AI Architect) to review a project's components — system/bot prompts, web app, program/docs, or repo. Trigger on "expert review", "team review", "review with experts".
 user-invocable: true
 ---
 
@@ -26,7 +26,9 @@ Launch the full InSites expert panel (4 agents in parallel) to review any projec
 3. Launches **ALL 4 expert agents IN PARALLEL** — each reads the target through their lens
 4. Results synthesized into prioritized, actionable findings with convergence analysis
 
-## Expert Panel — InSites Team (4 experts, all parallel)
+## Expert Panel (4 experts, all parallel)
+
+_Reusable across projects — these four lenses suit heritage / learning / UX / AI-system work; swap personas via **Customization** (below). The example file paths are for the InSites project._
 
 | Expert | Lens | Key Review Questions |
 |--------|------|---------------------|
@@ -42,15 +44,14 @@ Launch the full InSites expert panel (4 agents in parallel) to review any projec
 ### Bot Prompts
 Review the bot brain for methodology, instruction quality, and cross-platform alignment.
 
-**Primary files:**
-- Claude: `InSites-Brain/Claude/InSites-CAA-mono v5.3.md`
-- Gemini: `InSites-Brain/Gemini/InSites-CAA-mono- GEM v5.3.md`
-- GPT: `InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/instructions.md` + knowledge files in same dir
+**Primary files (InSites example):**
+- Claude: `InSites-Brain/Claude/InSites-CAA-claude.md` (live mono)
+- Gemini: `InSites-Brain/Gemini/InSites-CAA-GEM-v9.3.md`
+- GPT: `InSites-Brain/GPTs/instructions.md` + knowledge files in same dir
 
 **Cross-reference (agents must check):**
-- Cross-platform guide: `InSites-Brain/CLAUDE.md`
-- Design specs: `InSites-Brain/design/artifact-ux-contract.md`
-- Skills: `InSites-Brain/Claude/skills/`
+- Cross-platform rendering + convergence: `InSites-Brain/design/contracts/artifact-ux-contract.md` + `InSites-Brain/Claude/atar-runtime/data-contract.md`
+- Skills: `.claude/skills/` (active) + `InSites-Brain/skills-archive/` (archived)
 
 ### Workshop Site
 Review the companion website for UX, learning flow, and technical quality.
@@ -94,7 +95,7 @@ When reviewing any single platform's bot prompt, EVERY agent must also read the 
 - Optional features (Workshop Mode, Epistemic Visibility)
 - Artifact specs (KG, Dashboard tab structure, Report)
 
-**Rule:** Shared content must be identical across platforms per the convergence principle (`InSites-Brain/CLAUDE.md`). Platform-specific differences (artifact format, API integration) are expected — flag only when shared content diverges.
+**Rule:** Shared content must be identical across platforms per the convergence principle (`InSites-Brain/Claude/atar-runtime/data-contract.md`). Platform-specific differences (artifact format, API integration) are expected — flag only when shared content diverges.
 
 ## Process
 
