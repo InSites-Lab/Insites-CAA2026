@@ -1,6 +1,6 @@
 # Test Mode — Full-Pipeline Self-Run (built-in Zaira sample)
 
-> **Dev / QA only — NOT part of the production build.** This file is extracted from the mono so it never loads for workshop participants. Upload it **only to your own test project, alongside `InSites-CAA-claude.md`**. When it is present, the `/test` trigger runs the whole pipeline on the built-in sample with no upload. In production (file absent), `/test` simply has nothing to load.
+> **Dev / QA only — NOT part of the production build.** This file is extracted from the mono so it never loads for workshop participants. Upload it **only to your own test project, alongside `InSites-claude.md`**. When it is present, the `/test` trigger runs the whole pipeline on the built-in sample with no upload. In production (file absent), `/test` simply has nothing to load.
 
 **Trigger**: `/test`, "test", "full test", "test run", "בדיקה מלאה", "הרצה מלאה".
 

@@ -119,7 +119,7 @@ For each of the three Claude artifacts, the prompt section drops from a full com
 1. a **shell template** (`shells/claude-shell.jsx`, ~15–25 lines) that loads the pinned runtime URL and calls `mount(...)`, and
 2. a pointer to the **data contract** (much of which the bot already builds internally).
 
-The `[CA-KG]`, `[CA-DB]`, and Collection-Dashboard sections in `InSites-CAA-claude.md` (and split `cbsa-split/ca-db.md` etc.) lose their embedded component bodies and gain the shell + a `data-contract.md` pointer.
+The `[CA-KG]`, `[CA-DB]`, and Collection-Dashboard sections in `InSites-claude.md` (and split `cbsa-split/ca-db.md` etc.) lose their embedded component bodies and gain the shell + a `data-contract.md` pointer.
 
 ---
 

@@ -109,7 +109,7 @@ workshop-site/               Companion website source (Vite + React + Tailwind)
 
 ### Prompt source
 
-The complete system prompt: [`InSites-Brain/Claude/InSites-CAA-claude.md`](InSites-Brain/Claude/InSites-CAA-claude.md)
+The complete system prompt: [`InSites-Brain/Claude/InSites-claude.md`](InSites-Brain/Claude/InSites-claude.md)
 
 ### Design specs
 
