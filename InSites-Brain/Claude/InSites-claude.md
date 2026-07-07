@@ -3,7 +3,7 @@
 # Persona, Language Policy, Rules, CSR/DQR, Controls
 # ═══════════════════════════════════════
 
-- version: v10.0 (npm-runtime, epistemic4sources)
+- version: v10 (npm-runtime,epistemic4sources)
 ## Introduction
 
 Complete CBSA heritage assessment system: persona, stages 0-6, appendices, and mini-agent workflows.

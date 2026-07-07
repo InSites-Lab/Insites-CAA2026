@@ -214,6 +214,8 @@ Content is maintained in parallel across platforms. When modifying any of these 
 - **Operating rules** (evidence mandate, citation, HITL) → `InSites-claude.md` (Claude) + GPT `instructions.md`
 - **Trigger phrases** → `InSites-claude.md` (Claude) + GPT `instructions.md`
 
+> **⚠ Cross-platform drift — OPEN (2026-06-17)**: the **v10.0 epistemic upgrade** (source-doubt + interpretive-depth rungs in the Per-Claim Epistemic Gate) landed in **`InSites-claude.md` (Claude) only**. NOT yet propagated to GPT (`InSites-Brain/GPTs/`) or Gemini (`InSites-Brain/Gemini/`); the design spec `design/epistemic-notation-for-user-documents.md` still describes the superseded "citation-distinguishes" mechanism. Deferred by decision — review in depth, then propagate to GPT + Gemini and re-sync the spec. See memory `project_epistemic_source_doubt`.
+
 ### Mini-Agent Specs — Read Workflows
 
 Two "Read" mini-agents handle post-assessment analysis. Source-of-truth specs live in `design/`; deployed versions are embedded inline in bot prompts.
@@ -240,16 +242,18 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 ## Mono Prompt Versioning
 
-**Convention**: `InSites-CAA-mono-v{major}.{minor}.md` — two levels only.
+**Live mono**: `InSites-Brain/Claude/InSites-claude.md` — **stable filename** (no "CAA", no version in the name, post-workshop). The version lives **inside** the file (the `- version: vX.Y` line near the top) and is frozen with a git tag (e.g. `claude-v10.0`). Two-level `v{major}.{minor}`.
 
 | Bump | When | Examples |
 |------|------|----------|
-| **Major** (v2→v3) | Structural change: new/removed stages, reorganized architecture, deployment freeze | Adding a Stage, removing an appendix, final workshop freeze |
-| **Minor** (v2.1→v2.2) | Content enhancement: new appendix entries, refined rules, added examples | Doc-tier patch, EAC enhancements, context-effect additions |
+| **Major** (v9→v10) | Structural change: new/removed stages, reorganized architecture, new governance rule, deployment freeze | Epistemic source-doubt gate (v10), adding a Stage, final workshop freeze |
+| **Minor** (v10.0→v10.1) | Content enhancement: new appendix entries, refined rules, added examples | Doc-tier patch, EAC enhancements, context-effect additions |
 
 **Before bumping**: Ask the user whether to version-bump or keep as-is. Do not auto-rename.
 
-**On bump**: Copy current version to `Claude/OLD/` (gitignored), rename file, update version line inside the file, update all references in `CLAUDE.md`.
+**On bump**: archive the prior version to `Claude/OLD/` (gitignored), update the in-file `version:` line, commit, and add a `claude-v{major}.{minor}` git tag. Keep the **filename stable** — putting the version in the name churns every reference on each bump.
+
+> History: v9.1 (`InSites-CAA-claude.md`, pre-epistemic, CAA-era) → **v10.0** (`InSites-claude.md`, epistemic source-doubt + interpretive depth, "CAA" dropped), tag `claude-v10.0`; v9.1 archived in `Claude/OLD/`.
 
 ---
 
