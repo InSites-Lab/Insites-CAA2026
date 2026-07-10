@@ -643,7 +643,7 @@ export const LOOKING_GLASS_CARDS = [
   {
     id: 'mirror',
     title: 'Mirror, Not Magic',
-    tagline: 'The LLM is a looking glass — more than a wonderland.',
+    tagline: 'The LLM is more Looking Glass than Wonderland.',
     color: 'rose',
     content: `It reflects your material back, structured through CBSA.\nEvery claim sourced. Every step approved by you.\nAlice decides where and when to step.`,
   },

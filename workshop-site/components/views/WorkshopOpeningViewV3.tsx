@@ -54,7 +54,7 @@ export const WorkshopOpeningViewV3: React.FC<WorkshopOpeningViewV3Props> = ({ on
           className="w-full rounded-2xl border border-slate-200 shadow-sm"
         />
         <p className="text-center text-base text-slate-500 italic mt-3">
-          "The LLM is a looking glass — more than a wonderland"
+          "The LLM is more Looking Glass than Wonderland"
         </p>
       </section>
 

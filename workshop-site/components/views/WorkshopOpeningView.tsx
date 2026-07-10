@@ -41,7 +41,7 @@ export const WorkshopOpeningView: React.FC<WorkshopOpeningViewProps> = ({ onNavi
           className="w-full rounded-2xl border border-slate-200 shadow-sm"
         />
         <p className="text-center text-sm text-slate-500 italic mt-3 mb-1">
-          "The LLM is a looking glass — more than a wonderland"
+          "The LLM is more Looking Glass than Wonderland"
         </p>
       </section>
 

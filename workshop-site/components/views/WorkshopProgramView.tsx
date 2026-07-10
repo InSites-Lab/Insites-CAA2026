@@ -61,20 +61,19 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
       <div className="max-w-4xl mx-auto w-full px-6 py-4 space-y-4 shrink-0">
 
         {/* Tab Bar */}
-        <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
+        <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base md:text-lg font-bold transition-all cursor-pointer ${
                 activeTab === tab.id
                   ? 'bg-white text-slate-800 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
               }`}
             >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              {React.cloneElement(tab.icon as React.ReactElement<{ size?: number }>, { size: 20 })}
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
@@ -126,46 +125,46 @@ const challengeColors: Record<string, { border: string; bg: string; text: string
 };
 
 const ChallengesTab: React.FC = () => (
-  <div className="space-y-5">
+  <div className="space-y-6">
     {/* Poster */}
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       <img
         src="./poster-light.jpg"
         alt="InSites-CAA — CBSA Workshop"
-        className="w-full rounded-2xl border border-slate-200 shadow-sm"
+        className="w-full rounded-2xl border border-slate-200 shadow-md"
       />
-      <p className="text-center text-base text-slate-500 italic mt-2">
-        "The LLM is a looking glass — more than a wonderland"
+      <p className="text-center text-2xl md:text-3xl text-slate-700 italic mt-4 leading-snug">
+        The LLM is more <span className="font-semibold text-indigo-600">Looking Glass</span> than Wonderland
       </p>
-      <p className="text-center text-sm text-slate-400 mt-1">
+      <p className="text-center text-base text-slate-400 mt-2">
         CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
 
     {/* Intro line */}
-    <p className="text-base text-slate-600 leading-relaxed">
+    <p className="text-xl text-slate-600 leading-relaxed">
       AI already speaks our language and is becoming an active partner in culture. In this workshop, we examine how it can help with the assessment challenges:
     </p>
 
     {/* 3 Challenge cards with character avatars */}
-    <div className="space-y-3">
+    <div className="space-y-4">
       {CHALLENGES.map((ch, idx) => {
         const c = challengeColors[ch.color] || challengeColors.amber;
         const isRight = idx % 2 === 0;
         return (
-          <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
-            <summary className={`p-4 cursor-pointer flex items-center gap-3 select-none ${isRight ? '' : 'flex-row-reverse text-right'}`}>
+          <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-2xl overflow-hidden group`}>
+            <summary className={`p-5 cursor-pointer flex items-center gap-4 select-none ${isRight ? '' : 'flex-row-reverse text-right'}`}>
               <img
                 src={ch.avatar}
                 alt=""
-                className="w-16 h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
+                className="w-24 h-24 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-              <span className={`font-bold text-base ${c.quote} flex-1`}>"{ch.quote}"</span>
-              <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+              <span className={`font-bold text-2xl ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <ChevronDown size={22} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
-            <div className="px-4 pb-4 pt-1">
-              <p className={`text-base ${c.text} leading-relaxed`}>{ch.response}</p>
+            <div className="px-5 pb-5 pt-1">
+              <p className={`text-2xl ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>
         );
@@ -173,13 +172,13 @@ const ChallengesTab: React.FC = () => (
     </div>
 
     {/* Lab intro */}
-    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
-      <h4 className="font-bold text-base text-slate-800">InSites Knowledge Lab</h4>
-      <p className="text-sm text-slate-400">Technion — Israel Institute of Technology</p>
-      <p className="text-base text-slate-700 leading-relaxed">
+    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2.5">
+      <h4 className="font-bold text-2xl text-slate-800">InSites Knowledge Lab</h4>
+      <p className="text-base text-slate-400">Technion — Israel Institute of Technology</p>
+      <p className="text-lg text-slate-700 leading-relaxed">
         At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
       </p>
-      <p className="text-base text-slate-700 leading-relaxed">
+      <p className="text-lg text-slate-700 leading-relaxed">
         InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
@@ -189,10 +188,10 @@ const ChallengesTab: React.FC = () => (
 // ─── Principles Tab (uses shared DesignPrinciplesView) ────────────
 
 const PrinciplesTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigate }) => (
-  <div className="space-y-4">
+  <div className="space-y-5">
     <div>
-      <h3 className="text-2xl font-black text-slate-800">Design Principles</h3>
-      <p className="text-sm text-slate-500 mt-0.5">How transparency, control, and evidence governance work in InSites-CAA</p>
+      <h3 className="text-3xl font-black text-slate-800">Design Principles</h3>
+      <p className="text-lg text-slate-500 mt-1">How transparency, control, and evidence governance work in InSites-CAA</p>
     </div>
     <DesignPrinciplesView onNavigate={onNavigate} />
   </div>
@@ -203,67 +202,67 @@ const PrinciplesTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onN
 const CbsaTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigate }) => (
   <div className="space-y-5">
     <div>
-      <h3 className="text-2xl font-black text-slate-800">Context-Based Significance Assessment</h3>
-      <p className="text-sm text-slate-500 mt-0.5">A structured heritage method — not a bot feature</p>
+      <h3 className="text-3xl font-black text-slate-800">Context-Based Significance Assessment</h3>
+      <p className="text-lg text-slate-500 mt-1">A structured heritage method — not a bot feature</p>
     </div>
 
-    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-      <p className="text-base text-slate-700 leading-relaxed">
+    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+      <p className="text-lg text-slate-700 leading-relaxed">
         CBSA is a values-based heritage assessment method. It structures the thinking process through 7 stages — each building on the previous — from data inventory to a synthesized significance statement. The method is platform-independent; the bot implements it.
       </p>
     </div>
 
     {/* Context Effect — visual explanation */}
     <details className="bg-indigo-50 border border-indigo-200 border-l-4 border-l-indigo-400 rounded-xl overflow-hidden group">
-      <summary className="p-4 cursor-pointer flex items-center justify-between select-none">
-        <div className="flex items-center gap-2">
-          <ArrowRight size={16} className="text-indigo-600 rotate-45" />
+      <summary className="p-5 cursor-pointer flex items-center justify-between select-none">
+        <div className="flex items-center gap-3">
+          <ArrowRight size={20} className="text-indigo-600 rotate-45" />
           <div>
-            <h4 className="font-bold text-base text-indigo-900">Context Effect</h4>
-            <p className="text-xs text-indigo-600/70">The core CBSA principle — bidirectional, evaluative</p>
+            <h4 className="font-bold text-xl text-indigo-900">Context Effect</h4>
+            <p className="text-base text-indigo-600/70">The core CBSA principle — bidirectional, evaluative</p>
           </div>
         </div>
-        <ChevronDown size={16} className="text-indigo-400 group-open:rotate-180 transition-transform shrink-0" />
+        <ChevronDown size={20} className="text-indigo-400 group-open:rotate-180 transition-transform shrink-0" />
       </summary>
-      <div className="px-4 pb-4 pt-2 border-t border-indigo-200 space-y-4">
+      <div className="px-5 pb-5 pt-2 border-t border-indigo-200 space-y-4">
         {/* Visual diagram */}
-        <div className="flex items-center justify-center gap-3 py-3">
-          <div className="bg-white border-2 border-indigo-300 rounded-xl px-4 py-3 text-center shadow-sm">
-            <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide">Context</p>
-            <p className="text-[10px] text-indigo-400">(lens)</p>
+        <div className="flex items-center justify-center gap-4 py-4">
+          <div className="bg-white border-2 border-indigo-300 rounded-xl px-5 py-4 text-center shadow-sm">
+            <p className="text-base font-bold text-indigo-600 uppercase tracking-wide">Context</p>
+            <p className="text-xs text-indigo-400">(lens)</p>
           </div>
-          <div className="flex flex-col items-center gap-0.5 text-indigo-500">
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] font-bold">frames</span>
-              <span>→</span>
+          <div className="flex flex-col items-center gap-1 text-indigo-500">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold">frames</span>
+              <span className="text-lg">→</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span>←</span>
-              <span className="text-[10px] font-bold">reframes</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg">←</span>
+              <span className="text-xs font-bold">reframes</span>
             </div>
           </div>
-          <div className="bg-white border-2 border-amber-300 rounded-xl px-4 py-3 text-center shadow-sm">
-            <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">Asset</p>
-            <p className="text-[10px] text-amber-400">(significance)</p>
+          <div className="bg-white border-2 border-amber-300 rounded-xl px-5 py-4 text-center shadow-sm">
+            <p className="text-base font-bold text-amber-600 uppercase tracking-wide">Asset</p>
+            <p className="text-xs text-amber-400">(significance)</p>
           </div>
         </div>
 
         {/* Example */}
-        <div className="bg-white/60 rounded-lg p-3 space-y-1.5">
-          <p className="text-[11px] font-bold text-indigo-800">Example:</p>
-          <p className="text-xs text-indigo-800/70">
+        <div className="bg-white/60 rounded-lg p-4 space-y-2">
+          <p className="text-sm font-bold text-indigo-800">Example:</p>
+          <p className="text-base text-indigo-800/70">
             🏛 <strong>"Mamluk trade route"</strong> (context)
           </p>
-          <p className="text-xs text-indigo-800/60 ml-4">
+          <p className="text-base text-indigo-800/60 ml-4">
             → frames the caravanserai as having economic + social value
           </p>
-          <p className="text-xs text-indigo-800/60 ml-4">
+          <p className="text-base text-indigo-800/60 ml-4">
             ← the caravanserai's survival reframes the trade route as heritage-significant
           </p>
         </div>
 
         {/* Rule */}
-        <p className="text-[11px] text-indigo-700/60 italic">
+        <p className="text-sm text-indigo-700/60 italic">
           Evaluative, not causal. Never "caused" or "led to" — always "frames" and "reframes."
         </p>
       </div>

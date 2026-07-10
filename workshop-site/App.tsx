@@ -240,7 +240,7 @@ const App: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
   const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
   const [rawData] = useState<string>(DEMO_DATA);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(340);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(380);
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
@@ -1400,7 +1400,7 @@ const App: React.FC = () => {
                       className="w-full rounded-2xl border border-slate-200 shadow-sm"
                     />
                     <p className="text-center text-lg text-slate-900 italic mt-2">
-                      "The LLM is a looking glass — more than a wonderland"
+                      "The LLM is more Looking Glass than Wonderland"
                     </p>
                   </div>
 

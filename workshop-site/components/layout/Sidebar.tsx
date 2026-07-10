@@ -47,8 +47,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-4 pt-1 text-left flex flex-col h-full">
           <div className="space-y-1 relative">
             <div className="py-2 mb-0">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 text-center">
-             Assessment Process (<span className="text-[12px]">CBSA</span> Approach)
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 text-center">
+             Assessment Process (<span className="text-sm">CBSA</span> Approach)
               </h3>
             </div>
 
@@ -58,17 +58,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <React.Fragment key={agent.id}>
                   <div
                     onClick={() => onAgentSelect(agent.id)}
-                    className={`relative flex items-center justify-between p-2 rounded-xl border-2 cursor-pointer transition-all duration-300 ${theme.card}`}
+                    className={`relative flex items-center justify-between p-2.5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${theme.card}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${theme.icon}`}>
-                        {React.cloneElement(agent.icon as React.ReactElement<{ size?: number }>, { size: 16 })}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 shrink-0 ${theme.icon}`}>
+                        {React.cloneElement(agent.icon as React.ReactElement<{ size?: number }>, { size: 20 })}
                       </div>
                       <div>
-                        <h3 className={`font-bold text-[13px] leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
+                        <h3 className={`font-bold text-base leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
                           {agent.name}
                         </h3>
-                        <p className="text-[12px] text-slate-500  uppercase tracking-wide">{agent.role}</p>
+                        <p className="text-[13px] text-slate-500 uppercase tracking-wide">{agent.role}</p>
                       </div>
                     </div>
                   </div>
@@ -94,15 +94,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md'}`}
             >
               <div className="flex items-center gap-3">
-                <div className={`p-1.5 rounded-lg transition-all ${showResearchAids ? 'bg-white/20 text-white' : 'bg-slate-50 text-indigo-500 group-hover:bg-indigo-50'}`}>
-                  <Zap size={14} />
+                <div className={`p-2 rounded-lg transition-all ${showResearchAids ? 'bg-white/20 text-white' : 'bg-slate-50 text-indigo-500 group-hover:bg-indigo-50'}`}>
+                  <Zap size={18} />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-[13px] uppercase tracking-wider">Extensions & Tools</h3>
+                  <h3 className="font-bold text-sm uppercase tracking-wider">Extensions & Tools</h3>
                 </div>
               </div>
               <ChevronRight
-                size={14}
+                size={18}
                 className={`transition-transform duration-300 ${showResearchAids ? 'text-indigo-200 translate-x-1' : 'text-slate-300 group-hover:text-indigo-300'}`}
               />
             </button>
@@ -115,15 +115,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showDesignView ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-200' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600 hover:shadow-md'}`}
             >
               <div className="flex items-center gap-3">
-                <div className={`p-1.5 rounded-lg transition-all ${showDesignView ? 'bg-white/20 text-white' : 'bg-slate-50 text-rose-500 group-hover:bg-rose-50'}`}>
-                  <Eye size={14} />
+                <div className={`p-2 rounded-lg transition-all ${showDesignView ? 'bg-white/20 text-white' : 'bg-slate-50 text-rose-500 group-hover:bg-rose-50'}`}>
+                  <Eye size={18} />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-[13px] uppercase tracking-wider">Design Principles</h3>
+                  <h3 className="font-bold text-sm uppercase tracking-wider">Design Principles</h3>
                 </div>
               </div>
               <ChevronRight
-                size={14}
+                size={18}
                 className={`transition-transform duration-300 ${showDesignView ? 'text-rose-200 translate-x-1' : 'text-slate-300 group-hover:text-rose-300'}`}
               />
             </button>
