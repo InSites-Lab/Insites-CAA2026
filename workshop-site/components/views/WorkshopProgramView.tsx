@@ -136,7 +136,7 @@ const ChallengesTab: React.FC = () => (
       <p className="text-center text-2xl md:text-3xl text-slate-700 italic mt-4 leading-snug">
         The LLM is more <span className="font-semibold text-indigo-600">Looking Glass</span> than Wonderland
       </p>
-      <p className="text-center text-base text-slate-400 mt-2">
+      <p className="text-center text-lg text-slate-400 mt-2">
         CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
@@ -229,27 +229,27 @@ const CbsaTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigat
         <div className="flex items-center justify-center gap-4 py-4">
           <div className="bg-white border-2 border-indigo-300 rounded-xl px-5 py-4 text-center shadow-sm">
             <p className="text-base font-bold text-indigo-600 uppercase tracking-wide">Context</p>
-            <p className="text-xs text-indigo-400">(lens)</p>
+            <p className="text-sm text-indigo-400">(lens)</p>
           </div>
           <div className="flex flex-col items-center gap-1 text-indigo-500">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold">frames</span>
-              <span className="text-lg">→</span>
+              <span className="text-sm font-bold">frames</span>
+              <span className="text-xl">→</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-lg">←</span>
-              <span className="text-xs font-bold">reframes</span>
+              <span className="text-xl">←</span>
+              <span className="text-sm font-bold">reframes</span>
             </div>
           </div>
           <div className="bg-white border-2 border-amber-300 rounded-xl px-5 py-4 text-center shadow-sm">
             <p className="text-base font-bold text-amber-600 uppercase tracking-wide">Asset</p>
-            <p className="text-xs text-amber-400">(significance)</p>
+            <p className="text-sm text-amber-400">(significance)</p>
           </div>
         </div>
 
         {/* Example */}
         <div className="bg-white/60 rounded-lg p-4 space-y-2">
-          <p className="text-sm font-bold text-indigo-800">Example:</p>
+          <p className="text-base font-bold text-indigo-800">Example:</p>
           <p className="text-base text-indigo-800/70">
             🏛 <strong>"Mamluk trade route"</strong> (context)
           </p>
@@ -262,7 +262,7 @@ const CbsaTab: React.FC<{ onNavigate?: (route: string) => void }> = ({ onNavigat
         </div>
 
         {/* Rule */}
-        <p className="text-sm text-indigo-700/60 italic">
+        <p className="text-base text-indigo-700/60 italic">
           Evaluative, not causal. Never "caused" or "led to" — always "frames" and "reframes."
         </p>
       </div>

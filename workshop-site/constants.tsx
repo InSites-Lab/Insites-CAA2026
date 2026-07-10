@@ -284,11 +284,11 @@ export const PROMPT_TRANSLATIONS: Record<number, string> = {
 
 export const CORE_AGENTS: AgentConfig[] = [
   { id: 0, name: "0 - Pre-check & Data Inventory", role: "Verify data gaps in uploaded material", color: "slate", icon: <ShieldCheck size={20} /> },
-  { id: 1, name: "1 - Description & Contexts", role: "Description, timeline & context analysis", color: "blue", icon: <Network size={20} /> },
-  { id: 2, name: "2 - Value Analysis", role: "Identify heritage values & meanings", color: "amber", icon: <Gem size={20} /> },
+  { id: 1, name: "1 - Description & Contexts", role: "Description, timeline & context lenses", color: "blue", icon: <Network size={20} /> },
+  { id: 2, name: "2 - Values (and Meanings)", role: "Identify heritage values", color: "amber", icon: <Gem size={20} /> },
   { id: 3, name: "3 - Authenticity & Integrity", role: "Authenticity and physical condition", color: "emerald", icon: <Puzzle size={20} /> },
   { id: 4, name: "4 - Comparative Evaluation", role: "Comparison criteria vs. other assets", color: "indigo", icon: <Scale size={20} /> },
-  { id: 5, name: "5 - Synthesis & Significance", role: "Formulate significance statement", color: "purple", icon: <Scroll size={20} /> },
+  { id: 5, name: "5 - Synthesis of Significance", role: "Formulate significance statement", color: "purple", icon: <Scroll size={20} /> },
   { id: 6, name: "6 - Quality Audit", role: "Logic review and gap summary", color: "rose", icon: <SearchCheck size={20} /> }
 ];
 

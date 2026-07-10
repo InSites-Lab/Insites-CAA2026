@@ -30,7 +30,7 @@ export const GlossaryModal: React.FC<GlossaryModalProps> = ({ isOpen, onClose, o
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Search terms..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all"
           />
         </div>
 
@@ -42,8 +42,8 @@ export const GlossaryModal: React.FC<GlossaryModalProps> = ({ isOpen, onClose, o
             <div key={item.term} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h4 className="font-bold text-sm text-slate-800">{item.term}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{item.definition}</p>
+                  <h4 className="font-bold text-base text-slate-800">{item.term}</h4>
+                  <p className="text-base text-slate-600 leading-relaxed mt-0.5">{item.definition}</p>
                 </div>
                 {item.relatedHash && onNavigate && (
                   <button

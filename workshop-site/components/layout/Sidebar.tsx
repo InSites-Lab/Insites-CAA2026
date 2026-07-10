@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, ChevronRight, Eye } from 'lucide-react';
+import { Zap, ChevronRight, Eye, Home } from 'lucide-react';
 import { AgentConfig } from '../../types';
 
 export interface SidebarProps {
@@ -13,6 +13,8 @@ export interface SidebarProps {
   onAgentSelect: (agentId: number) => void;
   onResearchAidsClick: () => void;
   onDesignClick: () => void;
+  onPresentationClick?: () => void;
+  onWorkshopHomeClick?: () => void;
   getAgentTheme: (agentId: number, colorName: string, isSelected: boolean) => { card: string; icon: string };
 }
 
@@ -27,12 +29,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onAgentSelect,
   onResearchAidsClick,
   onDesignClick,
+  onPresentationClick,
+  onWorkshopHomeClick,
   getAgentTheme,
 }) => {
   return (
     <aside
       style={{ width }}
-      className={`shrink-0 border-r border-slate-200 bg-slate-50/80 backdrop-blur-md transition-shadow duration-300 will-change-transform z-20 flex-col sticky top-[48px] h-[calc(100vh-48px)] hidden md:flex ${selectedAgentId !== null || showResearchAids || showDesignView ? 'shadow-2xl shadow-indigo-200/40' : 'shadow-none'}`}
+      className={`shrink-0 border-r border-slate-200 bg-slate-50/80 backdrop-blur-md transition-shadow duration-300 will-change-transform z-20 flex-col sticky top-0 h-[calc(100vh-48px)] hidden md:flex ${selectedAgentId !== null || showResearchAids || showDesignView ? 'shadow-2xl shadow-indigo-200/40' : 'shadow-none'}`}
     >
       {/* Resize handle */}
       <div
@@ -44,13 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar-right">
-        <div className="p-4 pt-1 text-left flex flex-col h-full">
-          <div className="space-y-1 relative">
-            <div className="py-2 mb-0">
-              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 text-center">
-             Assessment Process (<span className="text-sm">CBSA</span> Approach)
-              </h3>
-            </div>
+        <div className="px-4 pt-3 pb-4 text-left flex flex-col h-full">
+          <div className="space-y-2.5 relative">
 
             {agents.map((agent) => {
               const theme = getAgentTheme(agent.id, agent.color, selectedAgentId === agent.id);
@@ -58,17 +57,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <React.Fragment key={agent.id}>
                   <div
                     onClick={() => onAgentSelect(agent.id)}
-                    className={`relative flex items-center justify-between p-2.5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${theme.card}`}
+                    className={`relative flex items-center justify-between p-2.5 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:ring-2 hover:ring-indigo-400/60 hover:scale-[1.02] hover:bg-white ${theme.card}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 shrink-0 ${theme.icon}`}>
                         {React.cloneElement(agent.icon as React.ReactElement<{ size?: number }>, { size: 20 })}
                       </div>
                       <div>
-                        <h3 className={`font-bold text-base leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
+                        <h3 className={`font-bold text-lg leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
                           {agent.name}
                         </h3>
-                        <p className="text-[13px] text-slate-500 uppercase tracking-wide">{agent.role}</p>
+                        <p className="text-sm text-slate-500">{agent.role}</p>
                       </div>
                     </div>
                   </div>
@@ -126,6 +125,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 size={18}
                 className={`transition-transform duration-300 ${showDesignView ? 'text-rose-200 translate-x-1' : 'text-slate-300 group-hover:text-rose-300'}`}
               />
+            </button>
+          </div>
+
+          {/* Workshop Home — quick access to the bot links (ChatGPT/Gemini/Claude) & GitHub */}
+          <div className="px-3 pb-3">
+            <button
+              onClick={onWorkshopHomeClick}
+              className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white border border-transparent hover:border-indigo-200 transition-all cursor-pointer"
+              title="Workshop home — bot links & resources"
+            >
+              <Home size={15} />
+              <span className="font-bold text-[13px] uppercase tracking-wider">Workshop Home</span>
             </button>
           </div>
         </div>

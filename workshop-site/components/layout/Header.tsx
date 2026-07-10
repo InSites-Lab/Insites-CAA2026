@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Cpu, Info } from "lucide-react";
+import { Cpu, Info, Layers } from "lucide-react";
 
 export interface HeaderProps {
   onAboutClick: () => void;
   onHomeClick: () => void;
+  sidebarWidth?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onAboutClick,
   onHomeClick,
+  sidebarWidth = 380,
 }) => {
   const [brand] = useState<string>(() => {
     try {
@@ -39,9 +41,21 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       style={headerStyle}
-      className="bg-[#020617] text-white shadow-xl z-50 shrink-0 border-b border-slate-800 px-3 py-1.5 md:py-2 md:px-6"
+      className="flex shrink-0 z-50 shadow-xl"
     >
-      <div className="w-full flex items-center justify-between gap-2">
+      {/* Left zone — top of the sidebar column; light, matches the sidebar (desktop only) */}
+      <div
+        style={{ width: sidebarWidth }}
+        className="hidden md:flex items-center justify-center gap-2 shrink-0 bg-slate-50/90 backdrop-blur-md border-r border-b border-slate-200 px-4"
+      >
+        <Layers size={18} className="text-indigo-500 shrink-0" />
+        <h3 className="text-sm font-black tracking-wide text-indigo-700 leading-none text-center">
+          InSites Process Stages · Demo
+        </h3>
+      </div>
+
+      {/* Right zone — presentation identity; dark */}
+      <div className="flex-1 min-w-0 bg-[#020617] text-white border-b border-slate-800 flex items-center justify-between gap-2 px-3 py-1.5 md:py-2 md:pr-6 md:pl-10">
          <div className="flex items-center gap-3 min-w-2">
           <div
             className="p-1 md:p-1.5 rounded-lg shadow-inner cpu-box"
@@ -49,11 +63,11 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Cpu size={20} />
           </div>
-     
+
          <button
   onClick={onHomeClick}
-  title="Back to home"
-  aria-label="Back to home"
+  title="Back to the presentation"
+  aria-label="Back to the presentation"
   className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-0 py-1.5 flex items-center"
 >
   <h1 className="font-black tracking-tight leading-none text-indigo-100 group-hover:text-white text-base md:text-lg truncate relative inline-block transition-colors duration-300">

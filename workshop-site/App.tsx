@@ -62,9 +62,6 @@ import {
   StepsList,
   StepDetailView,
   WorkshopProgramView,
-  WorkshopOpeningView,
-  WorkshopOpeningViewV2,
-  WorkshopOpeningViewV3,
 } from "./components/views";
 import {
   PrinciplesModal,
@@ -369,7 +366,7 @@ const App: React.FC = () => {
     opening: () => setIsOpeningSlideOpen(true),
     design: () => {
       openDesignView();
-      setMobileView(window.innerWidth < 768 ? "DESIGN" : "HOME");
+      if (window.innerWidth < 768) setMobileView("DESIGN");
     },
     // Legacy routes — redirect to MA-RA modal with the relevant reading pre-selected
     "q-narratives": () => {
@@ -404,43 +401,43 @@ const App: React.FC = () => {
       setSelectedAgentId(0);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-1": () => {
       setSelectedAgentId(1);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-2": () => {
       setSelectedAgentId(2);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-3": () => {
       setSelectedAgentId(3);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-4": () => {
       setSelectedAgentId(4);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-5": () => {
       setSelectedAgentId(5);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     "step-6": () => {
       setSelectedAgentId(6);
       setShowResearchAids(false);
       setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
+      if (window.innerWidth < 768) setMobileView("STEP_DETAIL");
     },
     home: () => {
       setSelectedAgentId(null);
@@ -450,7 +447,7 @@ const App: React.FC = () => {
     },
     tools: () => {
       openResearchTools();
-      setMobileView("TOOLS");
+      if (window.innerWidth < 768) setMobileView("TOOLS");
     },
     steps: () => {
       setMobileView("STEPS");
@@ -470,6 +467,7 @@ const App: React.FC = () => {
       setMobileView("PROGRAM");
       setSelectedAgentId(null);
       setShowResearchAids(false);
+      setShowDesignView(false);
     },
   };
 
@@ -530,8 +528,17 @@ const App: React.FC = () => {
     selectedAgentId !== null
       ? CORE_AGENTS.find((a) => a.id === selectedAgentId)
       : null;
-  const selectedStepDetails =
-    selectedAgentId !== null ? STEP_DETAILS[selectedAgentId] : undefined;
+  // Keep the last opened stage renderable during the overlay Modal's exit
+  // animation (state is cleared on close, but the panel fades out for 400ms).
+  const lastStageIdRef = useRef<number | null>(null);
+  if (selectedAgentId !== null) lastStageIdRef.current = selectedAgentId;
+  const displayStageId = selectedAgentId ?? lastStageIdRef.current;
+  const displayStageAgent =
+    displayStageId !== null
+      ? (CORE_AGENTS.find((a) => a.id === displayStageId) ?? null)
+      : null;
+  const displayStageDetails =
+    displayStageId !== null ? STEP_DETAILS[displayStageId] : undefined;
   const isResizing = useRef<boolean>(false);
 
   const startResizing = useCallback((e: React.MouseEvent) => {
@@ -693,23 +700,531 @@ const App: React.FC = () => {
     }
   }, [graphData]);
 
-  // mainViewKey determines which view is shown - modals are separate overlays, not part of this
+  // mainViewKey determines which view is shown - modals are separate overlays, not part of this.
+  // Order must mirror the JSX branch order: PROGRAM wins over a selected stage, so opening a
+  // stage/tools/design overlay from the presentation never remounts the program view underneath.
   const mainViewKey =
-    selectedAgentId !== null && currentAgent
-      ? `step-${selectedAgentId}`
-      : mobileView === "STEPS"
-        ? "steps"
-        : mobileView === "ABOUT"
-          ? "about"
-          : mobileView === "PROGRAM"
-            ? "program"
-            : mobileView === "STEP_DETAIL" && currentAgent
-              ? `step-detail-${selectedAgentId}`
+    mobileView === "STEPS"
+      ? "steps"
+      : mobileView === "ABOUT"
+        ? "about"
+        : mobileView === "PROGRAM"
+          ? "program"
+          : mobileView === "STEP_DETAIL" && currentAgent
+            ? `step-detail-${selectedAgentId}`
+            : selectedAgentId !== null && currentAgent
+              ? `step-${selectedAgentId}`
               : showDesignView
                 ? "design"
                 : showResearchAids || mobileView === "TOOLS"
                   ? "tools"
                   : "home";
+
+  // ─── Shared content renderers ─────────────────────────────────────
+  // Used in two contexts: inline in the main area (legacy home context, mobile)
+  // and inside overlay Modals when opened from the presentation (PROGRAM) —
+  // so the presentation stays mounted underneath and is never navigated away from.
+  const renderStepDetailContent = (inModal: boolean) => {
+    const stageId = displayStageId;
+    const stageAgent = displayStageAgent;
+    const stageDetails = displayStageDetails;
+    if (stageId === null || !stageAgent) return null;
+    return (
+      <div
+        className={`flex-1 flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar ${inModal ? "pb-6" : "pb-[140px] sm:pb-[90px] md:pb-16"}`}
+        dir="ltr"
+      >
+        <div className="p-6 md:p-8 max-w-3xl mx-auto w-full space-y-6">
+          {!inModal && (
+            <div className="flex items-center gap-2 text-sm">
+              <button
+                onClick={() => navigateTo("home")}
+                className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
+              >
+                <BookOpen size={16} />
+                <span>Home</span>
+              </button>
+              <ChevronLeft size={16} className="text-slate-400 rotate-180" />
+              <span className="text-slate-600 font-medium">
+                {stageAgent.name}
+              </span>
+            </div>
+          )}
+          {/* Why Important & Cognitive Link - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={18} className="text-amber-600" />
+                <h3 className="font-bold text-amber-800 text-base">
+                  Why is this stage important?
+                </h3>
+              </div>
+              <p className="text-amber-900/80 text-base leading-relaxed">
+                {stageDetails?.whyImportant}
+              </p>
+            </div>
+            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Layers size={18} className="text-indigo-600" />
+                <h3 className="font-bold text-indigo-800 text-base">
+                  Link to previous stages
+                </h3>
+              </div>
+              <p className="text-indigo-900/80 text-base leading-relaxed">
+                {stageDetails?.cognitiveLink}
+              </p>
+            </div>
+          </div>
+
+          {/* What Happens */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <ListChecks size={18} className="text-emerald-600" />
+              <h3 className="font-bold text-slate-800 text-base">
+                What happens in this stage?
+              </h3>
+            </div>
+            <ul className="space-y-2">
+              {(stageDetails?.whatHappens ?? []).map((item, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-start gap-2 text-base text-slate-700"
+                >
+                  <span className="text-emerald-500 mt-0.5">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            {stageId === 5 && STEP_DETAILS[5]?.extensions && (
+              <div className="mt-3 pt-3 border-t border-slate-200">
+                <div className="text-[13.5px] text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="font-bold text-slate-700">
+                    Extension tracks:
+                  </span>
+                  {STEP_DETAILS[5].extensions
+                    .filter((ext) => ext.url !== "q-jester")
+                    .map((ext) => (
+                      <button
+                        key={ext.url}
+                        onClick={() => navigateTo(ext.url)}
+                        title={ext.description}
+                        className="cursor-pointer text-indigo-600 hover:text-indigo-800 underline underline-offset-2"
+                      >
+                        {ext.name}
+                      </button>
+                    ))}
+                  <button
+                    onClick={() => navigateTo("tools")}
+                    className="cursor-pointer text-slate-500 hover:text-slate-700 underline underline-offset-2"
+                  >
+                    All tools
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Prompt Section - Collapsible */}
+          <details className="bg-slate-100 border border-slate-200 rounded-xl overflow-hidden group">
+            <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-slate-200/50 transition-all">
+              <div className="flex items-center gap-2">
+                <Code size={16} className="text-slate-500" />
+                <h3 className="font-bold text-slate-700 text-base">
+                  Bot Instructions (Prompt)
+                </h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex bg-white rounded-lg p-0.5 border border-slate-200"
+                  dir="ltr"
+                >
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPromptLang("he");
+                    }}
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded transition-all ${
+                      promptLang === "he"
+                        ? "bg-indigo-600 text-white"
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    עברית
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPromptLang("en");
+                    }}
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded transition-all ${
+                      promptLang === "en"
+                        ? "bg-indigo-600 text-white"
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    English
+                  </button>
+                </div>
+                <ChevronLeft
+                  size={16}
+                  className="text-slate-400 group-open:-rotate-90 transition-transform"
+                />
+              </div>
+            </summary>
+            <div className="p-4 pt-0 border-t border-slate-200 bg-white">
+              <div className="bg-slate-950 rounded-lg p-4 mt-3 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                <MarkdownRenderer
+                  text={
+                    promptLang === "he"
+                      ? PROMPT_TRANSLATIONS[stageId] ||
+                        PROMPT_TEMPLATES[stageId](rawData).toString()
+                      : PROMPT_PREVIEWS_EN[stageId] ||
+                        PROMPT_TEMPLATES[stageId](rawData).toString()
+                  }
+                  dir={promptLang === "he" ? "rtl" : "ltr"}
+                  theme="dark"
+                />
+              </div>
+            </div>
+            <div className="relative">
+              <textarea
+                className="w-full h-32 p-4 bg-white rounded-2xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-slate-700 placeholder:text-slate-300 resize-none shadow-inner"
+                placeholder=""
+                value={consultationInput}
+                onChange={(e) => setConsultationInput(e.target.value)}
+              ></textarea>
+              <button
+                onClick={handleConsult}
+                disabled={isConsulting || !consultationInput.trim()}
+                className="absolute bottom-4 left-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white p-2.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2 font-black text-[11px]"
+              >
+                {isConsulting ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Sparkles size={14} />
+                )}
+                <span>Build Prompt</span>
+              </button>
+            </div>
+
+            {/* Consultation Result Display Area */}
+            <div className="w-full">
+              {consultationResult &&
+                (() => {
+                  const [promptText, explanationText] =
+                    consultationResult.includes("---PROMPT_BOUNDARY---")
+                      ? consultationResult.split("---PROMPT_BOUNDARY---")
+                      : [consultationResult, ""];
+                  const cleanPrompt = promptText
+                    .replace(/^```(markdown|json)?/g, "")
+                    .replace(/```$/g, "")
+                    .trim();
+
+                  return (
+                    <div className="space-y-6">
+                      <div
+                        className="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 text-left w-full"
+                        dir="ltr"
+                      >
+                        <div className="bg-slate-800/50 p-3 border-b border-white/5 flex items-center justify-between">
+                          <div className="flex gap-1.5 px-2">
+                            <div className="w-2 h-2 rounded-full bg-red-400/20"></div>
+                            <div className="w-2 h-2 rounded-full bg-amber-400/20"></div>
+                            <div className="w-2 h-2 rounded-full bg-emerald-400/20"></div>
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(cleanPrompt)}
+                            className="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white px-3 py-1.5 rounded transition-all flex items-center gap-2 font-bold"
+                          >
+                            <Copy size={14} /> Copy Prompt
+                          </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto custom-scrollbar max-h-[500px]">
+                          <MarkdownRenderer
+                            text={cleanPrompt}
+                            dir="ltr"
+                            theme="dark"
+                          />
+                        </div>
+                      </div>
+
+                      {explanationText && (
+                        <div className="bg-white p-5 rounded-xl border-l-4 border-indigo-500 shadow-sm text-sm text-slate-700 leading-relaxed">
+                          <h4 className="font-bold text-slate-900 text-xs mb-2 flex items-center gap-2">
+                            <Sparkles size={14} className="text-indigo-500" />{" "}
+                            Advisor's Note
+                          </h4>
+                          {explanationText.trim()}
+                        </div>
+                      )}
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => setConsultationResult(null)}
+                          className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors"
+                        >
+                          Clear Results
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>
+          </details>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDesignContent = (inModal: boolean) => (
+    <div className={`flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar ${inModal ? "pb-6" : "pb-[140px] sm:pb-[90px] md:pb-16"}`}>
+      <div className="max-w-4xl mx-auto w-full px-6 py-6 space-y-6">
+        {!inModal && (
+          <div className="flex items-center gap-2 text-sm">
+            <button
+              onClick={() => navigateTo("home")}
+              className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
+            >
+              <BookOpen size={16} />
+              <span>Home</span>
+            </button>
+            <ChevronLeft size={16} className="text-slate-400 rotate-180" />
+            <span className="text-slate-600 font-medium">
+              Design Principles
+            </span>
+          </div>
+        )}
+
+        <div>
+          <h3 className="text-2xl font-black text-slate-500 mb-2">
+            Design Principles
+          </h3>
+          <p className="text-slate-500">
+            How transparency, control, and evidence governance work in
+            InSites-CAA
+          </p>
+        </div>
+
+        <DesignPrinciplesView onNavigate={navigateTo} />
+      </div>
+    </div>
+  );
+
+  const renderToolsContent = (inModal: boolean) => (
+    <div className={`flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar ${inModal ? "pb-6" : "pb-[140px] sm:pb-[90px] md:pb-16"}`}>
+      <div className="max-w-4xl mx-auto w-full px-6 py-6 space-y-6">
+        {!inModal && (
+          <div className="flex items-center gap-2 text-sm">
+            <button
+              onClick={() => navigateTo("home")}
+              className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
+            >
+              <BookOpen size={16} />
+              <span>Home</span>
+            </button>
+            <ChevronLeft size={16} className="text-slate-400 rotate-180" />
+            <span className="text-slate-600 font-medium">
+              Extensions & Tools
+            </span>
+          </div>
+        )}
+
+        <div>
+          <h3 className="text-2xl font-black text-slate-500 mb-2">
+            Toolbox & Extensions
+          </h3>
+          <p className="text-slate-500">
+            Advanced tools for analysis, visualization and deep exploration{" "}
+          </p>
+        </div>
+
+        {/* Tools Section */}
+        <div className="space-y-2">
+          <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+            Tools integrated in <span className="normal-case">InSites-CAA</span>
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Assessment Dashboard */}
+            <button
+              onClick={() => navigateTo("dashboard-preview")}
+              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 hover:bg-blue-50/30 transition-all group cursor-pointer"
+            >
+              <div className="w-9 h-9 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <LayoutDashboard size={18} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-800 text-sm">
+                  Assessment Dashboard
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  10-tab interactive visualization of a complete assessment
+                </p>
+              </div>
+            </button>
+
+            {/* Knowledge Graph */}
+            <button
+              onClick={() => navigateTo("graph")}
+              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group cursor-pointer"
+            >
+              <div className="w-9 h-9 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <Zap size={18} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-800 text-sm">
+                  Knowledge Graph
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  Visual mapping of entities and semantic relationships
+                </p>
+              </div>
+            </button>
+
+            {/* Visual Analysis */}
+            <button
+              onClick={() => navigateTo("visual")}
+              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group cursor-pointer"
+            >
+              <div className="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <Box size={18} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-800 text-sm">
+                  Visual Decoding
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  Analyze attributes, relationships and values from images
+                </p>
+              </div>
+            </button>
+
+            {/* Collection Analysis */}
+            <button
+              onClick={() => navigateTo("inventory")}
+              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-amber-200 hover:bg-amber-50/30 transition-all group cursor-pointer"
+            >
+              <div className="w-9 h-9 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <Library size={18} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-800 text-sm">
+                  Collection Analysis
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  Cross-sectional analysis of assessment collections (MA-RC)
+                </p>
+              </div>
+            </button>
+
+            {/* Read Assessment (MA-RA) */}
+            <button
+              onClick={() => navigateTo("read-assessment")}
+              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-purple-200 hover:bg-purple-50/30 transition-all group cursor-pointer"
+            >
+              <div className="w-9 h-9 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <Scroll size={18} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-slate-800 text-sm">
+                  Read Assessment
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-2">
+                  Structured readings: analytical, interpretive, and generative
+                  lenses
+                </p>
+              </div>
+            </button>
+
+            {/* Examples */}
+            <div className="pt-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">Examples</p>
+              <div className="flex flex-wrap gap-1.5">
+                <a href="./chaco-kg.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-full transition-colors">KG: Chaco</a>
+                <a href="./chaco-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-2.5 py-1 rounded-full transition-colors">Dashboard: Chaco</a>
+                <a href="./mills-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2.5 py-1 rounded-full transition-colors">Collection: Mills</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Prompt Advisor Section */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 bg-violet-100 text-violet-600 rounded-lg flex items-center justify-center">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800">
+                Prompt Building Advisor
+              </h4>
+              <p className="text-xs text-slate-500">
+                Preparation stage: role definition and methodology
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-600 mb-3">
+            Enter your goal (e.g., "I want to analyze the social values"), and
+            the advisor will build a customized prompt for the language model.
+          </p>
+          <div className="relative">
+            <textarea
+              className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-slate-700 placeholder:text-slate-400 resize-none"
+              placeholder="Describe your goal or question..."
+              value={consultationInput}
+              onChange={(e) => setConsultationInput(e.target.value)}
+            />
+            <button
+              onClick={handleConsult}
+              disabled={isConsulting || !consultationInput.trim()}
+              className="absolute bottom-2 left-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-2 font-bold text-xs cursor-pointer disabled:cursor-not-allowed"
+            >
+              {isConsulting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Send size={14} />
+              )}
+              <span>Build Prompt</span>
+            </button>
+          </div>
+          {consultationResult && (
+            <div className="mt-3 bg-slate-900 rounded-xl p-4 max-h-[250px] overflow-y-auto custom-scrollbar">
+              <MarkdownRenderer
+                text={consultationResult
+                  .split("---PROMPT_BOUNDARY---")[0]
+                  .replace(/^```(markdown|json)?/g, "")
+                  .replace(/```$/g, "")
+                  .trim()}
+                dir="ltr"
+                theme="dark"
+              />
+              <div className="flex justify-end mt-2 gap-2">
+                <button
+                  onClick={() =>
+                    copyToClipboard(
+                      consultationResult
+                        .split("---PROMPT_BOUNDARY---")[0]
+                        .replace(/^```(markdown|json)?/g, "")
+                        .replace(/```$/g, "")
+                        .trim(),
+                    )
+                  }
+                  className="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white px-2 py-1 rounded transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <Copy size={12} /> Copy
+                </button>
+                <button
+                  onClick={() => setConsultationResult(null)}
+                  className="text-xs text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -722,7 +1237,8 @@ const App: React.FC = () => {
 
       <Header
         onAboutClick={() => navigateTo("welcome")}
-        onHomeClick={() => navigateTo("home")}
+        onHomeClick={() => navigateTo("program")}
+        sidebarWidth={sidebarWidth}
       />
 
       {/* Mobile Horizontal Navigation (Sticky) */}
@@ -763,6 +1279,8 @@ const App: React.FC = () => {
           selectedAgentId={selectedAgentId}
           showResearchAids={showResearchAids}
           showDesignView={showDesignView}
+          onPresentationClick={() => navigateTo("program")}
+          onWorkshopHomeClick={() => navigateTo("home")}
           agents={CORE_AGENTS}
           onAgentSelect={(agentId) => {
             navigateTo(`step-${agentId}`);
@@ -857,537 +1375,12 @@ const App: React.FC = () => {
                   rawData={rawData}
                 />
               ) : selectedAgentId !== null && currentAgent ? (
-                // Desktop Detail View (Existing)
-                <>
-                  <div
-                    className="flex-1 flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"
-                    dir="ltr"
-                  >
-                    <div className="p-6 md:p-8 max-w-3xl mx-auto w-full space-y-6">
-                      {/* Breadcrumb Navigation */}
-                      <div className="flex items-center gap-2 text-sm">
-                        <button
-                          onClick={() => navigateTo("home")}
-                          className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
-                        >
-                          <BookOpen size={16} />
-                          <span>Home</span>
-                        </button>
-                        <ChevronLeft
-                          size={16}
-                          className="text-slate-400 rotate-180"
-                        />
-                        <span className="text-slate-600 font-medium">
-                          {currentAgent.name}
-                        </span>
-                      </div>
-                      {/* Why Important & Cognitive Link - Side by Side */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Lightbulb size={16} className="text-amber-600" />
-                            <h3 className="font-bold text-amber-800 text-sm">
-                              Why is this stage important?
-                            </h3>
-                          </div>
-                          <p className="text-amber-900/80 text-sm leading-relaxed">
-                            {selectedStepDetails?.whyImportant}
-                          </p>
-                        </div>
-                        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Layers size={16} className="text-indigo-600" />
-                            <h3 className="font-bold text-indigo-800 text-sm">
-                              Link to previous stages
-                            </h3>
-                          </div>
-                          <p className="text-indigo-900/80 text-sm leading-relaxed">
-                            {selectedStepDetails?.cognitiveLink}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* What Happens */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                          <ListChecks size={16} className="text-emerald-600" />
-                          <h3 className="font-bold text-slate-800 text-sm">
-                            What happens in this stage?
-                          </h3>
-                        </div>
-                        <ul className="space-y-2">
-                          {(selectedStepDetails?.whatHappens ?? []).map(
-                            (item, idx) => (
-                              <li
-                                key={idx}
-                                className="flex items-start gap-2 text-sm text-slate-700"
-                              >
-                                <span className="text-emerald-500 mt-0.5">
-                                  •
-                                </span>
-                                <span>{item}</span>
-                              </li>
-                            ),
-                          )}
-                        </ul>
-
-                        {selectedAgentId === 5 &&
-                          STEP_DETAILS[5]?.extensions && (
-                            <div className="mt-3 pt-3 border-t border-slate-200">
-                              <div className="text-[13.5px] text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                <span className="font-bold text-slate-700">
-                                  Extension tracks:
-                                </span>
-                                {STEP_DETAILS[5].extensions
-                                  .filter((ext) => ext.url !== "q-jester")
-                                  .map((ext) => (
-                                    <button
-                                      key={ext.url}
-                                      onClick={() => navigateTo(ext.url)}
-                                      title={ext.description}
-                                      className="cursor-pointer text-indigo-600 hover:text-indigo-800 underline underline-offset-2"
-                                    >
-                                      {ext.name}
-                                    </button>
-                                  ))}
-                                <button
-                                  onClick={() => navigateTo("tools")}
-                                  className="cursor-pointer text-slate-500 hover:text-slate-700 underline underline-offset-2"
-                                >
-                                  All tools
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                      </div>
-
-                      {/* Prompt Section - Collapsible */}
-                      <details className="bg-slate-100 border border-slate-200 rounded-xl overflow-hidden group">
-                        <summary className="p-4 cursor-pointer flex items-center justify-between hover:bg-slate-200/50 transition-all">
-                          <div className="flex items-center gap-2">
-                            <Code size={16} className="text-slate-500" />
-                            <h3 className="font-bold text-slate-700 text-sm">
-                              Bot Instructions (Prompt)
-                            </h3>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="flex bg-white rounded-lg p-0.5 border border-slate-200"
-                              dir="ltr"
-                            >
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setPromptLang("he");
-                                }}
-                                className={`px-2 py-0.5 text-[10px] font-bold rounded transition-all ${
-                                  promptLang === "he"
-                                    ? "bg-indigo-600 text-white"
-                                    : "text-slate-500 hover:text-slate-700"
-                                }`}
-                              >
-                                עברית
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setPromptLang("en");
-                                }}
-                                className={`px-2 py-0.5 text-[10px] font-bold rounded transition-all ${
-                                  promptLang === "en"
-                                    ? "bg-indigo-600 text-white"
-                                    : "text-slate-500 hover:text-slate-700"
-                                }`}
-                              >
-                                English
-                              </button>
-                            </div>
-                            <ChevronLeft
-                              size={16}
-                              className="text-slate-400 group-open:-rotate-90 transition-transform"
-                            />
-                          </div>
-                        </summary>
-                        <div className="p-4 pt-0 border-t border-slate-200 bg-white">
-                          <div className="bg-slate-950 rounded-lg p-4 mt-3 max-h-[50vh] overflow-y-auto custom-scrollbar">
-                            <MarkdownRenderer
-                              text={
-                                selectedAgentId !== null
-                                  ? promptLang === "he"
-                                    ? PROMPT_TRANSLATIONS[selectedAgentId] ||
-                                      PROMPT_TEMPLATES[selectedAgentId](
-                                        rawData,
-                                      ).toString()
-                                    : PROMPT_PREVIEWS_EN[selectedAgentId] ||
-                                      PROMPT_TEMPLATES[selectedAgentId](
-                                        rawData,
-                                      ).toString()
-                                  : ""
-                              }
-                              dir={promptLang === "he" ? "rtl" : "ltr"}
-                              theme="dark"
-                            />
-                          </div>
-                        </div>
-                        <div className="relative">
-                          <textarea
-                            className="w-full h-32 p-4 bg-white rounded-2xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-slate-700 placeholder:text-slate-300 resize-none shadow-inner"
-                            placeholder=""
-                            value={consultationInput}
-                            onChange={(e) =>
-                              setConsultationInput(e.target.value)
-                            }
-                          ></textarea>
-                          <button
-                            onClick={handleConsult}
-                            disabled={isConsulting || !consultationInput.trim()}
-                            className="absolute bottom-4 left-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white p-2.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2 font-black text-[11px]"
-                          >
-                            {isConsulting ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : (
-                              <Sparkles size={14} />
-                            )}
-                            <span>Build Prompt</span>
-                          </button>
-                        </div>
-
-                        {/* Consultation Result Display Area */}
-                        <div className="w-full">
-                          {consultationResult &&
-                            (() => {
-                              const [promptText, explanationText] =
-                                consultationResult.includes(
-                                  "---PROMPT_BOUNDARY---",
-                                )
-                                  ? consultationResult.split(
-                                      "---PROMPT_BOUNDARY---",
-                                    )
-                                  : [consultationResult, ""];
-                              const cleanPrompt = promptText
-                                .replace(/^```(markdown|json)?/g, "")
-                                .replace(/```$/g, "")
-                                .trim();
-
-                              return (
-                                <div className="space-y-6">
-                                  <div
-                                    className="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 text-left w-full"
-                                    dir="ltr"
-                                  >
-                                    <div className="bg-slate-800/50 p-3 border-b border-white/5 flex items-center justify-between">
-                                      <div className="flex gap-1.5 px-2">
-                                        <div className="w-2 h-2 rounded-full bg-red-400/20"></div>
-                                        <div className="w-2 h-2 rounded-full bg-amber-400/20"></div>
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400/20"></div>
-                                      </div>
-                                      <button
-                                        onClick={() =>
-                                          copyToClipboard(cleanPrompt)
-                                        }
-                                        className="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white px-3 py-1.5 rounded transition-all flex items-center gap-2 font-bold"
-                                      >
-                                        <Copy size={14} /> Copy Prompt
-                                      </button>
-                                    </div>
-                                    <div className="p-6 overflow-y-auto custom-scrollbar max-h-[500px]">
-                                      <MarkdownRenderer
-                                        text={cleanPrompt}
-                                        dir="ltr"
-                                        theme="dark"
-                                      />
-                                    </div>
-                                  </div>
-
-                                  {explanationText && (
-                                    <div className="bg-white p-5 rounded-xl border-l-4 border-indigo-500 shadow-sm text-sm text-slate-700 leading-relaxed">
-                                      <h4 className="font-bold text-slate-900 text-xs mb-2 flex items-center gap-2">
-                                        <Sparkles
-                                          size={14}
-                                          className="text-indigo-500"
-                                        />{" "}
-                                        Advisor's Note
-                                      </h4>
-                                      {explanationText.trim()}
-                                    </div>
-                                  )}
-                                  <div className="flex justify-end">
-                                    <button
-                                      onClick={() =>
-                                        setConsultationResult(null)
-                                      }
-                                      className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors"
-                                    >
-                                      Clear Results
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                        </div>
-                      </details>
-                    </div>
-                  </div>
-                </>
+                renderStepDetailContent(false)
               ) : null
             ) : showDesignView ? (
-              /* DESIGN PRINCIPLES VIEW */
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-4xl mx-auto w-full px-6 py-6 space-y-6">
-                  {/* Breadcrumb */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <button
-                      onClick={() => navigateTo("home")}
-                      className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
-                    >
-                      <BookOpen size={16} />
-                      <span>Home</span>
-                    </button>
-                    <ChevronLeft
-                      size={16}
-                      className="text-slate-400 rotate-180"
-                    />
-                    <span className="text-slate-600 font-medium">
-                      Design Principles
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-500 mb-2">
-                      Design Principles
-                    </h3>
-                    <p className="text-slate-500">
-                      How transparency, control, and evidence governance work in
-                      InSites-CAA
-                    </p>
-                  </div>
-
-                  <DesignPrinciplesView onNavigate={navigateTo} />
-                </div>
-              </div>
+              renderDesignContent(false)
             ) : showResearchAids || mobileView === "TOOLS" ? (
-              /* EXTENSIONS TOOLBOX VIEW (The "Tools") */
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-4xl mx-auto w-full px-6 py-6 space-y-6">
-                  {/* Breadcrumb Navigation */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <button
-                      onClick={() => navigateTo("home")}
-                      className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
-                    >
-                      <BookOpen size={16} />
-                      <span>Home</span>
-                    </button>
-                    <ChevronLeft
-                      size={16}
-                      className="text-slate-400 rotate-180"
-                    />
-                    <span className="text-slate-600 font-medium">
-                      Extensions & Tools
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-500 mb-2">
-                      Toolbox & Extensions
-                    </h3>
-                    <p className="text-slate-500">
-                      Advanced tools for analysis, visualization and deep
-                      exploration{" "}
-                    </p>
-                  </div>
-
-                  {/* Tools Section */}
-                  <div className="space-y-2">
-                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                      Tools integrated in InSites-CAA
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {/* Assessment Dashboard */}
-                      <button
-                        onClick={() => navigateTo("dashboard-preview")}
-                        className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 hover:bg-blue-50/30 transition-all group cursor-pointer"
-                      >
-                        <div className="w-9 h-9 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <LayoutDashboard size={18} />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">
-                            Assessment Dashboard
-                          </h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-2">
-                            10-tab interactive visualization of a complete
-                            assessment
-                          </p>
-                        </div>
-                      </button>
-
-                      {/* Knowledge Graph */}
-                      <button
-                        onClick={() => navigateTo("graph")}
-                        className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group cursor-pointer"
-                      >
-                        <div className="w-9 h-9 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <Zap size={18} />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">
-                            Knowledge Graph
-                          </h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-2">
-                            Visual mapping of entities and semantic
-                            relationships
-                          </p>
-                        </div>
-                      </button>
-
-                      {/* Visual Analysis */}
-                      <button
-                        onClick={() => navigateTo("visual")}
-                        className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group cursor-pointer"
-                      >
-                        <div className="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <Box size={18} />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">
-                            Visual Decoding
-                          </h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-2">
-                            Analyze attributes, relationships and values from
-                            images
-                          </p>
-                        </div>
-                      </button>
-
-                      {/* Collection Analysis */}
-                      <button
-                        onClick={() => navigateTo("inventory")}
-                        className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-amber-200 hover:bg-amber-50/30 transition-all group cursor-pointer"
-                      >
-                        <div className="w-9 h-9 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <Library size={18} />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">
-                            Collection Analysis
-                          </h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-2">
-                            Cross-sectional analysis of assessment collections
-                            (MA-RC)
-                          </p>
-                        </div>
-                      </button>
-
-                      {/* Read Assessment (MA-RA) */}
-                      <button
-                        onClick={() => navigateTo("read-assessment")}
-                        className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-purple-200 hover:bg-purple-50/30 transition-all group cursor-pointer"
-                      >
-                        <div className="w-9 h-9 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <Scroll size={18} />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="font-bold text-slate-800 text-sm">
-                            Read Assessment
-                          </h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-2">
-                            Structured readings: analytical, interpretive, and
-                            generative lenses
-                          </p>
-                        </div>
-                      </button>
-
-                      {/* Examples */}
-                      <div className="pt-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">Examples</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          <a href="./chaco-kg.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-full transition-colors">KG: Chaco</a>
-                          <a href="./chaco-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-2.5 py-1 rounded-full transition-colors">Dashboard: Chaco</a>
-                          <a href="./mills-dashboard.html" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2.5 py-1 rounded-full transition-colors">Collection: Mills</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Prompt Advisor Section */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-9 h-9 bg-violet-100 text-violet-600 rounded-lg flex items-center justify-center">
-                        <Sparkles size={18} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800">
-                          Prompt Building Advisor
-                        </h4>
-                        <p className="text-xs text-slate-500">
-                          Preparation stage: role definition and methodology
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-600 mb-3">
-                      Enter your goal (e.g., "I want to analyze the social
-                      values"), and the advisor will build a customized prompt
-                      for the language model.
-                    </p>
-                    <div className="relative">
-                      <textarea
-                        className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-slate-700 placeholder:text-slate-400 resize-none"
-                        placeholder="Describe your goal or question..."
-                        value={consultationInput}
-                        onChange={(e) => setConsultationInput(e.target.value)}
-                      />
-                      <button
-                        onClick={handleConsult}
-                        disabled={isConsulting || !consultationInput.trim()}
-                        className="absolute bottom-2 left-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white px-3 py-1.5 rounded-lg shadow transition-all active:scale-95 flex items-center gap-2 font-bold text-xs cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        {isConsulting ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Send size={14} />
-                        )}
-                        <span>Build Prompt</span>
-                      </button>
-                    </div>
-                    {consultationResult && (
-                      <div className="mt-3 bg-slate-900 rounded-xl p-4 max-h-[250px] overflow-y-auto custom-scrollbar">
-                        <MarkdownRenderer
-                          text={consultationResult
-                            .split("---PROMPT_BOUNDARY---")[0]
-                            .replace(/^```(markdown|json)?/g, "")
-                            .replace(/```$/g, "")
-                            .trim()}
-                          dir="ltr"
-                          theme="dark"
-                        />
-                        <div className="flex justify-end mt-2 gap-2">
-                          <button
-                            onClick={() =>
-                              copyToClipboard(
-                                consultationResult
-                                  .split("---PROMPT_BOUNDARY---")[0]
-                                  .replace(/^```(markdown|json)?/g, "")
-                                  .replace(/```$/g, "")
-                                  .trim(),
-                              )
-                            }
-                            className="text-xs bg-white/10 hover:bg-white/20 text-indigo-200 hover:text-white px-2 py-1 rounded transition-all flex items-center gap-1 cursor-pointer"
-                          >
-                            <Copy size={12} /> Copy
-                          </button>
-                          <button
-                            onClick={() => setConsultationResult(null)}
-                            className="text-xs text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              renderToolsContent(false)
             ) : (
               /* DEFAULT HOME VIEW */
               <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
@@ -1405,29 +1398,10 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {/* Workshop Program Card */}
-                    <button
-                      onClick={() => navigateTo("program")}
-                      className="w-full flex items-center gap-4 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-2xl border border-indigo-200 hover:border-indigo-300 transition-all group cursor-pointer text-left shadow-sm"
-                    >
-                      <div className="p-2.5 bg-indigo-600 text-white rounded-xl shrink-0 group-hover:scale-110 transition-transform">
-                        <Layout size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-base text-indigo-900 mb-0.5">
-                          Workshop Introduction
-                        </h4>
-                        <p className="text-sm text-indigo-600/70">
-                          What is the story of "InSites"?, Design Principles,
-                          Workshop Program{" "}
-                        </p>
-                      </div>
-                    </button>
-
                     {/* Bot Platform Cards */}
                     <div>
                       <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                        Try InSites-CAA
+                        Try <span className="normal-case">InSites-CAA</span>
                       </h4>
                       <p className="text-[11px] text-slate-500 mb-2">
                         Recommended: paid account with reasoning mode
@@ -1507,6 +1481,14 @@ const App: React.FC = () => {
                     {/* Links */}
                     <div className="space-y-2">
                       <ResourceLink
+                        href="https://github.com/InSites-Lab/Insites-CAA2026"
+                        icon={<Github size={16} />}
+                        label="GitHub Repository"
+                        secondaryLabel="Source code and system instructions"
+                        highlight={true}
+                        colorScheme="slate"
+                      />
+                      <ResourceLink
                         href="https://drive.google.com/drive/folders/1HxWjZ1GVGtRsoGWZZi4kaiNuhhLPTfO1?usp=sharing"
                         icon={<BookOpen size={16} />}
                         label="Shared Materials"
@@ -1529,14 +1511,6 @@ const App: React.FC = () => {
                         secondaryLabel="Share your session link for our research"
                         highlight={true}
                         colorScheme="amber"
-                      />
-                      <ResourceLink
-                        href="https://github.com/InSites-Lab/Insites-CAA2026"
-                        icon={<Github size={16} />}
-                        label="GitHub Repository"
-                        secondaryLabel="Source code and system instructions"
-                        highlight={true}
-                        colorScheme="slate"
                       />
                     </div>
 
@@ -1621,6 +1595,25 @@ const App: React.FC = () => {
                         </div>
                       </details>
                     </div>
+
+                    {/* Workshop Introduction — presentation frame; last for DHSS */}
+                    <button
+                      onClick={() => navigateTo("program")}
+                      className="w-full flex items-center gap-4 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-2xl border border-indigo-200 hover:border-indigo-300 transition-all group cursor-pointer text-left shadow-sm"
+                    >
+                      <div className="p-2.5 bg-indigo-600 text-white rounded-xl shrink-0 group-hover:scale-110 transition-transform">
+                        <Layout size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-base text-indigo-900 mb-0.5">
+                          Workshop Introduction
+                        </h4>
+                        <p className="text-sm text-indigo-600/70">
+                          What is the story of "InSites"?, Design Principles,
+                          Workshop Program{" "}
+                        </p>
+                      </div>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1654,6 +1647,38 @@ const App: React.FC = () => {
           </footer>
         </main>
       </div>
+
+      {/* Presentation-context overlays — when the program (presentation) view is active,
+          sidebar destinations open ABOVE it instead of replacing it. The program view
+          stays mounted underneath, so closing returns to the exact same tab/state. */}
+      <Modal
+        isOpen={
+          mobileView === "PROGRAM" && selectedAgentId !== null && !!currentAgent
+        }
+        onClose={() => navigateTo("program")}
+        title={displayStageAgent ? displayStageAgent.name : ""}
+        maxWidth="max-w-4xl"
+      >
+        {renderStepDetailContent(true)}
+      </Modal>
+
+      <Modal
+        isOpen={mobileView === "PROGRAM" && showResearchAids}
+        onClose={() => navigateTo("program")}
+        title="Extensions & Tools"
+        maxWidth="max-w-4xl"
+      >
+        {renderToolsContent(true)}
+      </Modal>
+
+      <Modal
+        isOpen={mobileView === "PROGRAM" && showDesignView}
+        onClose={() => navigateTo("program")}
+        title="Design Principles"
+        maxWidth="max-w-4xl"
+      >
+        {renderDesignContent(true)}
+      </Modal>
 
       <InventoryModal
         isOpen={isInventoryModalOpen}
