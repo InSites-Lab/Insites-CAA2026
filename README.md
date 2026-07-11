@@ -147,7 +147,7 @@ At the intersection of assessment methods, novel technologies, and built-heritag
 **Dr. Yael Alef** — Heritage assessment methodology, CBSA development
 **Yuval Shafriri** — AI system architecture, and web development
 
-[InSites Knowledge Lab](https://github.com/InSites-Lab) · Technion — Israel Institute of Technology
+InSites Knowledge Lab · Technion — Israel Institute of Technology
 
 ---
 

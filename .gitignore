@@ -4,6 +4,10 @@
 # === Workshop results (local only) ===
 workshop-results/
 
+# === Local-only files (untracked, kept on disk) ===
+Ayelet-WaterTower.pdf
+test-rtl-hebrew.md
+
 # === Internal logistics ===
 management/
 content-dev/
