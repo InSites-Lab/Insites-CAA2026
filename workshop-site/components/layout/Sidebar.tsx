@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Design Principles button removed — duplicated by the "Design Principles" tab in the program view */}
 
           {/* Workshop Home — quick access to the bot links (ChatGPT/Gemini/Claude) & GitHub */}
-          <div className="px-3 pb-3">
+          {/* <div className="px-3 pb-3">
             <button
               onClick={onWorkshopHomeClick}
               className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white border border-transparent hover:border-indigo-200 transition-all cursor-pointer"
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Home size={15} />
               <span className="font-bold text-[13px] uppercase tracking-wider">Workshop Home</span>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </aside>

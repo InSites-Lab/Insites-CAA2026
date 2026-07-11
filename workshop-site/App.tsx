@@ -469,6 +469,13 @@ const App: React.FC = () => {
       setShowResearchAids(false);
       setShowDesignView(false);
     },
+    // Workshop tab deep link — the program view reads #workshop on mount and opens the tab
+    workshop: () => {
+      setMobileView("PROGRAM");
+      setSelectedAgentId(null);
+      setShowResearchAids(false);
+      setShowDesignView(false);
+    },
   };
 
   // Navigate to hash route
@@ -1226,167 +1233,18 @@ const App: React.FC = () => {
     </div>
   );
 
-  return (
-    <div
-      className="flex flex-col min-h-screen min-h-dvh bg-slate-100 text-slate-800 overflow-hidden"
-      dir="ltr"
-    >
-      {/* Phone-only bottom tabs overlay: ensure scroll areas don't end under it */}
-
-      {/**/}
-
-      <Header
-        onAboutClick={() => navigateTo("welcome")}
-        onHomeClick={() => navigateTo("program")}
-        sidebarWidth={sidebarWidth}
-      />
-
-      {/* Mobile Horizontal Navigation (Sticky) */}
-      <MobileNav
-        currentView={mobileView}
-        selectedAgentId={selectedAgentId}
-        agents={CORE_AGENTS}
-        onHomeClick={() => {
-          navigateTo("home");
-        }}
-        onAboutClick={() => {
-          navigateTo("welcome");
-        }}
-        onResearchAidsClick={() => {
-          navigateTo("tools");
-        }}
-        onProgramClick={() => {
-          navigateTo("program");
-        }}
-        onDesignClick={() => {
-          navigateTo("design");
-        }}
-        onStepsClick={() => {
-          navigateTo("steps");
-        }}
-        onAgentSelect={(agentId) => {
-          navigateTo(`step-${agentId}`);
-        }}
-        getMobileStageTheme={getMobileStageTheme}
-        getAgentTheme={getAgentTheme}
-      />
-
-      <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
-        <Sidebar
-          width={sidebarWidth}
-          isResizing={isResizingState}
-          onStartResize={startResizing}
-          selectedAgentId={selectedAgentId}
-          showResearchAids={showResearchAids}
-          showDesignView={showDesignView}
-          onPresentationClick={() => navigateTo("program")}
-          onWorkshopHomeClick={() => navigateTo("home")}
-          agents={CORE_AGENTS}
-          onAgentSelect={(agentId) => {
-            navigateTo(`step-${agentId}`);
-            handleCloseWelcome();
-          }}
-          onResearchAidsClick={() => {
-            navigateTo("tools");
-            handleCloseWelcome();
-          }}
-          onDesignClick={() => {
-            navigateTo("design");
-            handleCloseWelcome();
-          }}
-          getAgentTheme={getAgentTheme}
-        />
-
-        <main className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden">
-          {/* Welcome/About Overlay - Desktop Only */}
-          <div className="hidden md:block">
-            <WelcomeOverlay
-              isOpen={showWelcome}
-              onClose={handleCloseWelcomeAndClearHash}
-              onNavigate={navigateTo}
-            />
-          </div>
-
-          <SwitchTransition
-            transitionKey={mainViewKey}
-            className="flex-1 min-h-0 flex flex-col"
-            duration={250}
-          >
-            {mobileView === "STEPS" ? (
-              <StepsList
-                agents={CORE_AGENTS}
-                selectedAgentId={selectedAgentId}
-                onAgentSelect={(agentId) => {
-                  navigateTo(`step-${agentId}`);
-                }}
-                getAgentTheme={getAgentTheme}
-              />
-            ) : mobileView === "ABOUT" ? (
-              <div
-                className="flex-1 overflow-y-auto bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"
-                dir="ltr"
-              >
-                <div className="px-6 pt-4">
-                  {/* Breadcrumb Navigation */}
-                  <div className="flex items-center gap-2 text-sm mb-4">
-                    <button
-                      onClick={() => navigateTo("home")}
-                      className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
-                    >
-                      <BookOpen size={16} />
-                      <span>Home</span>
-                    </button>
-                    <ChevronLeft
-                      size={16}
-                      className="text-slate-400 rotate-180"
-                    />
-                    <span className="text-slate-600 font-medium">About</span>
-                  </div>
-                </div>
-                <AboutView onNavigate={navigateTo} />
-              </div>
-            ) : mobileView === "PROGRAM" ? (
-              <div className="relative h-full">
-                <button
-                  onClick={() => navigateTo("presentation")}
-                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-700 shadow-sm border border-slate-200 transition-all"
-                  aria-label="Fullscreen presentation"
-                  title="Fullscreen presentation"
-                >
-                  <Maximize2 size={16} />
-                </button>
-                <WorkshopProgramView onNavigate={navigateTo} />
-              </div>
-            ) : mobileView === "STEP_DETAIL" ||
-              (selectedAgentId !== null && currentAgent) ? (
-              // Unified Step Detail View logic
-              mobileView === "STEP_DETAIL" && currentAgent ? (
-                <StepDetailView
-                  agent={currentAgent}
-                  onBack={() => navigateTo("steps")}
-                  consultationInput={consultationInput}
-                  setConsultationInput={setConsultationInput}
-                  consultationResult={consultationResult}
-                  setConsultationResult={setConsultationResult}
-                  isConsulting={isConsulting}
-                  onConsult={handleConsult}
-                  promptLang={promptLang}
-                  setPromptLang={setPromptLang}
-                  rawData={rawData}
-                />
-              ) : selectedAgentId !== null && currentAgent ? (
-                renderStepDetailContent(false)
-              ) : null
-            ) : showDesignView ? (
-              renderDesignContent(false)
-            ) : showResearchAids || mobileView === "TOOLS" ? (
-              renderToolsContent(false)
-            ) : (
-              /* DEFAULT HOME VIEW */
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
+  // Shared workshop/home links panel — rendered at #home (full page) AND inside the
+  // program view's Workshop tab (inTab=true skips the poster block and big bottom padding).
+  const renderHomeContent = (inTab: boolean) => (
+              <div className={inTab ? "pb-6" : "flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"}>
                 <div className="max-w-3xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
-                  {/* Poster — slightly constrained width */}
-                  <div className="pt-2 md:pt-3 max-w-2xl mx-auto">
+                  {/* Workshop-tab header: Hands On title above a smaller poster, links right after */}
+                  {inTab && (
+                    <h4 className="text-xl font-bold text-slate-600 tracking-wide text-center pt-1">
+                      InSites-CAA — Hands On
+                    </h4>
+                  )}
+                  <div className={inTab ? "max-w-2xl mx-auto" : "pt-2 md:pt-3 max-w-2xl mx-auto"}>
                     <img
                       src="./poster-light.jpg"
                       alt="InSites-CAA — CBSA Workshop Poster"
@@ -1400,12 +1258,11 @@ const App: React.FC = () => {
                   <div className="space-y-4">
                     {/* Bot Platform Cards */}
                     <div>
-                      <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                        Try <span className="normal-case">InSites-CAA</span>
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mb-2">
-                        Recommended: paid account with reasoning mode
-                      </p>
+                      {!inTab && (
+                        <h4 className="text-md font-black text-slate-700 tracking-wide mb-3">
+                          InSites-CAA — Hands On
+                        </h4>
+                      )}
                       <div className="grid grid-cols-3 gap-2">
                         <a
                           href="https://chatgpt.com/g/g-69ca986712f88191828a4a1122278392-insites-caa26"
@@ -1617,6 +1474,166 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </div>
+  );
+
+  return (
+    <div
+      className="flex flex-col min-h-screen min-h-dvh bg-slate-100 text-slate-800 overflow-hidden"
+      dir="ltr"
+    >
+      {/* Phone-only bottom tabs overlay: ensure scroll areas don't end under it */}
+
+      {/**/}
+
+      <Header
+        onAboutClick={() => navigateTo("welcome")}
+        onHomeClick={() => navigateTo("program")}
+        sidebarWidth={sidebarWidth}
+      />
+
+      {/* Mobile Horizontal Navigation (Sticky) */}
+      <MobileNav
+        currentView={mobileView}
+        selectedAgentId={selectedAgentId}
+        agents={CORE_AGENTS}
+        onHomeClick={() => {
+          navigateTo("home");
+        }}
+        onAboutClick={() => {
+          navigateTo("welcome");
+        }}
+        onResearchAidsClick={() => {
+          navigateTo("tools");
+        }}
+        onProgramClick={() => {
+          navigateTo("program");
+        }}
+        onDesignClick={() => {
+          navigateTo("design");
+        }}
+        onStepsClick={() => {
+          navigateTo("steps");
+        }}
+        onAgentSelect={(agentId) => {
+          navigateTo(`step-${agentId}`);
+        }}
+        getMobileStageTheme={getMobileStageTheme}
+        getAgentTheme={getAgentTheme}
+      />
+
+      <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
+        <Sidebar
+          width={sidebarWidth}
+          isResizing={isResizingState}
+          onStartResize={startResizing}
+          selectedAgentId={selectedAgentId}
+          showResearchAids={showResearchAids}
+          showDesignView={showDesignView}
+          onPresentationClick={() => navigateTo("program")}
+          onWorkshopHomeClick={() => navigateTo("home")}
+          agents={CORE_AGENTS}
+          onAgentSelect={(agentId) => {
+            navigateTo(`step-${agentId}`);
+            handleCloseWelcome();
+          }}
+          onResearchAidsClick={() => {
+            navigateTo("tools");
+            handleCloseWelcome();
+          }}
+          onDesignClick={() => {
+            navigateTo("design");
+            handleCloseWelcome();
+          }}
+          getAgentTheme={getAgentTheme}
+        />
+
+        <main className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden">
+          {/* Welcome/About Overlay - Desktop Only */}
+          <div className="hidden md:block">
+            <WelcomeOverlay
+              isOpen={showWelcome}
+              onClose={handleCloseWelcomeAndClearHash}
+              onNavigate={navigateTo}
+            />
+          </div>
+
+          <SwitchTransition
+            transitionKey={mainViewKey}
+            className="flex-1 min-h-0 flex flex-col"
+            duration={250}
+          >
+            {mobileView === "STEPS" ? (
+              <StepsList
+                agents={CORE_AGENTS}
+                selectedAgentId={selectedAgentId}
+                onAgentSelect={(agentId) => {
+                  navigateTo(`step-${agentId}`);
+                }}
+                getAgentTheme={getAgentTheme}
+              />
+            ) : mobileView === "ABOUT" ? (
+              <div
+                className="flex-1 overflow-y-auto bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"
+                dir="ltr"
+              >
+                <div className="px-6 pt-4">
+                  {/* Breadcrumb Navigation */}
+                  <div className="flex items-center gap-2 text-sm mb-4">
+                    <button
+                      onClick={() => navigateTo("home")}
+                      className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
+                    >
+                      <BookOpen size={16} />
+                      <span>Home</span>
+                    </button>
+                    <ChevronLeft
+                      size={16}
+                      className="text-slate-400 rotate-180"
+                    />
+                    <span className="text-slate-600 font-medium">About</span>
+                  </div>
+                </div>
+                <AboutView onNavigate={navigateTo} />
+              </div>
+            ) : mobileView === "PROGRAM" ? (
+              <div className="relative h-full">
+                <button
+                  onClick={() => navigateTo("presentation")}
+                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-700 shadow-sm border border-slate-200 transition-all"
+                  aria-label="Fullscreen presentation"
+                  title="Fullscreen presentation"
+                >
+                  <Maximize2 size={16} />
+                </button>
+                <WorkshopProgramView onNavigate={navigateTo} workshopPanel={renderHomeContent(true)} />
+              </div>
+            ) : mobileView === "STEP_DETAIL" ||
+              (selectedAgentId !== null && currentAgent) ? (
+              // Unified Step Detail View logic
+              mobileView === "STEP_DETAIL" && currentAgent ? (
+                <StepDetailView
+                  agent={currentAgent}
+                  onBack={() => navigateTo("steps")}
+                  consultationInput={consultationInput}
+                  setConsultationInput={setConsultationInput}
+                  consultationResult={consultationResult}
+                  setConsultationResult={setConsultationResult}
+                  isConsulting={isConsulting}
+                  onConsult={handleConsult}
+                  promptLang={promptLang}
+                  setPromptLang={setPromptLang}
+                  rawData={rawData}
+                />
+              ) : selectedAgentId !== null && currentAgent ? (
+                renderStepDetailContent(false)
+              ) : null
+            ) : showDesignView ? (
+              renderDesignContent(false)
+            ) : showResearchAids || mobileView === "TOOLS" ? (
+              renderToolsContent(false)
+            ) : (
+              /* Workshop / home links panel — shared with the Workshop tab */
+              renderHomeContent(false)
             )}
           </SwitchTransition>
 
@@ -1825,9 +1842,11 @@ const App: React.FC = () => {
           navigateTo("program");
         }}
         onNavigate={navigateTo}
+        workshopPanel={renderHomeContent(true)}
       />
 
-      {/* Opening Slide — presenter only */}
+      {/* Opening Slide — presenter only (SwitchTransition gives it fade in/out) */}
+      <SwitchTransition transitionKey={isOpeningSlideOpen ? "opening" : "no-opening"} duration={200}>
       {isOpeningSlideOpen && (
         <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-8">
           <button
@@ -1863,6 +1882,7 @@ const App: React.FC = () => {
           </a>
         </div>
       )}
+      </SwitchTransition>
 
       <style
         dangerouslySetInnerHTML={{

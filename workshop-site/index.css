@@ -38,3 +38,29 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* Content modals (common/Modal.tsx body): bump every text tier one Tailwind step
+   for projector readability. Fullscreen modals are excluded (no .modal-body). */
+.modal-body {
+    font-size: 1.125rem; /* base 16px -> lg 18px for unstyled text */
+}
+
+.modal-body .text-xs {
+    font-size: 0.875rem;  /* xs -> sm */
+    line-height: 1.25rem;
+}
+
+.modal-body .text-sm {
+    font-size: 1rem;      /* sm -> base */
+    line-height: 1.5rem;
+}
+
+.modal-body .text-base {
+    font-size: 1.125rem;  /* base -> lg */
+    line-height: 1.75rem;
+}
+
+.modal-body .text-lg {
+    font-size: 1.25rem;   /* lg -> xl */
+    line-height: 1.75rem;
+}

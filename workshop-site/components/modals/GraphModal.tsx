@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Zap, Loader2 } from 'lucide-react';
 import { getNodeColor, TYPE_HE } from '../../constants';
 
@@ -24,11 +24,25 @@ export const GraphModal: React.FC<GraphModalProps> = ({
   isLoading,
   graphContainerRef,
 }) => {
-  if (!isOpen) return null;
+  // Fade in AND out (kept mounted during the exit transition)
+  const [mounted, setMounted] = useState<boolean>(isOpen);
+  const [entered, setEntered] = useState<boolean>(false);
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+    if (isOpen) {
+      setMounted(true);
+      t = setTimeout(() => setEntered(true), 10);
+    } else if (mounted) {
+      setEntered(false);
+      t = setTimeout(() => setMounted(false), 200);
+    }
+    return () => t && clearTimeout(t);
+  }, [isOpen, mounted]);
+  if (!mounted) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-slate-900/35 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-2 animate-in fade-in duration-300"
+      className={`fixed inset-0 bg-slate-900/35 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-2 transition-opacity duration-200 motion-reduce:transition-none ${entered ? 'opacity-100' : 'opacity-0'}`}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) {
           onClose();

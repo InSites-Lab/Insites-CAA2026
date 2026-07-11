@@ -164,8 +164,8 @@ export const ReadAssessmentModal: React.FC<ReadAssessmentModalProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialReadingRoute && isOpen) {
-      setExpandedId(initialReadingRoute);
+    if (isOpen) {
+      setExpandedId(initialReadingRoute || 'q-narratives');
     }
   }, [initialReadingRoute, isOpen]);
 
@@ -175,7 +175,7 @@ export const ReadAssessmentModal: React.FC<ReadAssessmentModalProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const categories = ['analytical', 'interpretive', 'generative'] as const;
+  const categories = ['interpretive', 'analytical', 'generative'] as const;
 
   return (
     <Modal

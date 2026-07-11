@@ -52,7 +52,7 @@ const SwitchTransition: React.FC<SwitchTransitionProps> = ({
 
   return (
     <div
-      className={`${className} transition-opacity ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
+      className={`${className} transition-opacity ease-out motion-reduce:transition-none ${visible ? 'opacity-100' : 'opacity-0'}`}
       style={{ transitionDuration: `${duration}ms` }}
       data-switch-transition={renderKey}
     >

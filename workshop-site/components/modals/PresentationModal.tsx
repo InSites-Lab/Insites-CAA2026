@@ -6,10 +6,11 @@ export interface PresentationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate?: (route: string) => void;
+  workshopPanel?: React.ReactNode;
 }
 
-export const PresentationModal: React.FC<PresentationModalProps> = ({ isOpen, onClose, onNavigate }) => (
+export const PresentationModal: React.FC<PresentationModalProps> = ({ isOpen, onClose, onNavigate, workshopPanel }) => (
   <Modal isOpen={isOpen} onClose={onClose} title="Workshop Presentation" fullscreen>
-    <WorkshopProgramView onNavigate={onNavigate} />
+    <WorkshopProgramView onNavigate={onNavigate} workshopPanel={workshopPanel} />
   </Modal>
 );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Clock, BookOpen, PenTool, MessageSquare, Presentation, Coffee, ChevronDown, ArrowRight, Users, Lightbulb, ShieldCheck, Home, Eye, Bot } from 'lucide-react';
+import SwitchTransition from '../common/SwitchTransition';
 import { SESSION_RESOURCES } from '../../constants';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
 
@@ -41,6 +42,7 @@ const PROGRAM_TABS = [
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
   { id: 'principles', label: 'Design Principles', icon: <Eye size={14} /> },
   { id: 'example', label: 'Example', icon: <Presentation size={14} /> },
+  { id: 'workshop', label: 'Workshop', icon: <Bot size={14} /> },
 ] as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'];
@@ -49,16 +51,20 @@ type TabId = typeof PROGRAM_TABS[number]['id'];
 
 export interface WorkshopProgramViewProps {
   onNavigate?: (route: string) => void;
+  /** Content of the Workshop tab — the shared home/workshop links panel, injected by App */
+  workshopPanel?: React.ReactNode;
 }
 
-export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<TabId>('challenges');
+export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate, workshopPanel }) => {
+  const [activeTab, setActiveTab] = useState<TabId>(() =>
+    typeof window !== 'undefined' && window.location.hash === '#workshop' ? 'workshop' : 'challenges'
+  );
 
   const totalMinutes = WORKSHOP_PROGRAM.reduce((sum, b) => sum + (parseInt(b.duration) || 0), 0);
 
   return (
     <div className={`flex-1 flex flex-col h-full bg-white ${activeTab !== 'example' ? 'overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16' : 'overflow-hidden'}`} dir="ltr">
-      <div className="max-w-4xl mx-auto w-full px-6 py-4 space-y-4 shrink-0">
+      <div className="max-w-5xl mx-auto w-full px-6 py-4 space-y-4 shrink-0">
 
         {/* Tab Bar */}
         <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
@@ -66,7 +72,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base md:text-lg font-bold transition-all cursor-pointer ${
+              className={`flex-1 min-w-fit whitespace-nowrap flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base md:text-lg font-bold transition-all cursor-pointer ${
                 activeTab === tab.id
                   ? 'bg-white text-slate-800 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
@@ -76,31 +82,26 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
               <span>{tab.label}</span>
             </button>
           ))}
-
-          {/* Workshop — exits to the hands-on space (bot links); visually quieter than the talk tabs */}
-          <button
-            onClick={() => onNavigate?.('home')}
-            className="ml-2 flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl text-sm md:text-base font-bold text-indigo-500/80 hover:text-indigo-700 hover:bg-white/60 border-l border-slate-200 pl-4 transition-all cursor-pointer shrink-0"
-            title="Workshop space — try the bots"
-          >
-            <Bot size={18} />
-            <span>Workshop</span>
-          </button>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'challenges' && <ChallengesTab />}
-        {activeTab === 'principles' && <PrinciplesTab onNavigate={onNavigate} />}
-        {activeTab === 'cbsa' && <CbsaTab onNavigate={onNavigate} />}
+        {/* Tab Content — cross-fades between tabs (no hard swap) */}
+        <SwitchTransition transitionKey={activeTab} duration={200}>
+          {activeTab === 'challenges' && <ChallengesTab />}
+          {activeTab === 'principles' && <PrinciplesTab onNavigate={onNavigate} />}
+          {activeTab === 'cbsa' && <CbsaTab onNavigate={onNavigate} />}
+          {activeTab === 'workshop' && workshopPanel}
+        </SwitchTransition>
       </div>
-      {activeTab === 'example' && (
-        <iframe
-          src="./notation.html"
-          className="w-full border-0"
-          style={{ height: 'calc(100vh - 110px)' }}
-          title="Notation Example"
-        />
-      )}
+      <SwitchTransition transitionKey={activeTab === 'example' ? 'example' : 'other'} duration={200}>
+        {activeTab === 'example' && (
+          <iframe
+            src="./notation.html"
+            className="w-full border-0"
+            style={{ height: 'calc(100vh - 110px)' }}
+            title="Notation Example"
+          />
+        )}
+      </SwitchTransition>
     </div>
   );
 };
