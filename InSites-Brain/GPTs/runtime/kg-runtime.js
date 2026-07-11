@@ -557,6 +557,18 @@
         html += '<div class="kg-meta-row"><strong>' + escapeHtml(key) + ':</strong> <span>' + escapeHtml(selectedNode.meta[key]) + '</span></div>';
       });
     }
+    // Epistemic status (sourced | inferred | interpretive) — Info panel only, never on the node glyph
+    if (selectedNode.epistemic && selectedNode.epistemic !== 'sourced') {
+      var epiMark = selectedNode.epistemic === 'interpretive' ? '💭' : '〰️';
+      var epiText = selectedNode.epistemic === 'interpretive'
+        ? 'Interpretive — my reading, not explicit in the sources'
+        : 'Inferred — connected from multiple sources';
+      html += '<div class="kg-meta-row kg-epistemic-row"><strong>' + epiMark + ' ' + escapeHtml(epiText) + '</strong>';
+      if (selectedNode.epistemic_note) {
+        html += '<div class="kg-epistemic-note">' + escapeHtml(selectedNode.epistemic_note) + '</div>';
+      }
+      html += '</div>';
+    }
     html += '</div>';
 
     // Connections: outgoing
@@ -601,6 +613,21 @@
       '<div class="kg-stat-card"><div class="kg-stat-value">' + typeCount + '</div><div class="kg-stat-label">' + escapeHtml(ui.types) + '</div></div>' +
       '<div class="kg-stat-card"><div class="kg-stat-value">' + density + '</div><div class="kg-stat-label">' + escapeHtml(ui.density) + '</div></div>' +
     '</div>';
+
+    // Epistemic: summary + "entities to review" (interpretive / inferred), clickable. Hidden when none.
+    var epiNon = state.visibleNodes.filter(function (n) { return n.epistemic && n.epistemic !== 'sourced'; });
+    if (epiNon.length) {
+      var nInt = epiNon.filter(function (n) { return n.epistemic === 'interpretive'; }).length;
+      var nInf = epiNon.length - nInt;
+      html += '<div class="kg-panel-section"><div class="kg-section-label">' + escapeHtml(ui.entitiesToReview || 'Entities to review') + '</div>';
+      html += '<div class="kg-epistemic-summary">' + (nInt ? '💭 ' + nInt : '') + (nInt && nInf ? ' · ' : '') + (nInf ? '〰️ ' + nInf : '') + '</div>';
+      html += '<div class="kg-review-prompt">' + escapeHtml(ui.reviewPrompt || 'Readings beyond the sources — to keep, rename, or reject one, mention it in the chat.') + '</div>';
+      epiNon.slice().sort(function (a, b) { return (a.epistemic === 'interpretive' ? 0 : 1) - (b.epistemic === 'interpretive' ? 0 : 1); }).forEach(function (node) {
+        var ic = node.epistemic === 'interpretive' ? '💭' : '〰️';
+        html += '<button class="kg-result-btn kg-review-item" data-node-id="' + escapeHtml(node.id) + '"><span class="kg-review-icon">' + ic + '</span><span class="kg-result-name">' + escapeHtml(node.name) + '</span></button>';
+      });
+      html += '</div>';
+    }
 
     // Most connected (top 5)
     var sorted = state.visibleNodes.slice().sort(function (a, b) { return (degreeMap.get(b.id) || 0) - (degreeMap.get(a.id) || 0); }).slice(0, 5);

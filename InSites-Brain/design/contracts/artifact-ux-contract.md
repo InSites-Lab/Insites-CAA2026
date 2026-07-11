@@ -247,25 +247,25 @@ Asset nodes may have a star (★) overlay to distinguish the primary heritage as
 
 ## §5 — Platform Rendering Architecture
 
-| Artifact | Claude & Gemini | GPT |
-|----------|----------------|-----|
-| KG | Inline React/D3 artifact | External `kg-runtime.js` + `kg-runtime.css` (vis-network) |
-| Single Dashboard | Inline HTML/JS + D3 | Same inline code, AI Query in placeholder mode |
-| Collection Dashboard | Inline HTML/JS + Chart.js + Leaflet | Same inline code, AI Query in placeholder mode |
+| Artifact | Claude (React artifact) | Gemini (HTML shell) | GPT (HTML shell) |
+|----------|----------------------|--------|-----|
+| KG | `atar-runtime` via React shell; **live** AI Query (`window.claude.complete`) | `atar-runtime` shell; AI Query copy-to-chat | `atar-runtime` shell; AI Query copy-to-chat |
+| Single Dashboard | `atar-runtime` (`type:'assessment'`); **live** AI Query | `atar-runtime` (`type:'assessment'`); copy-to-chat | `atar-runtime` (`type:'assessment'`); copy-to-chat |
+| Collection Dashboard | `atar-runtime` (`type:'collection'`); **live** AI Query | `atar-runtime` (`type:'collection'`); copy-to-chat | `atar-runtime` (`type:'collection'`); copy-to-chat |
 
-**Claude and Gemini use the same skill files and produce identical artifact code.** The only difference is the API call block in the AI Query tab — documented in `[CA-AIQ]` §2 above.
+**All three platforms now render via the shared `atar-runtime`** (vanilla D3 + Leaflet, published to npm, loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>`). The bot emits a thin shell + a `DATA` object (`type: kg | assessment | collection`) and calls `mount(root, DATA, host)`; the runtime owns all rendering (force graph, map, tabs, RTL, legend, search). Claude wraps the shell in a native React artifact and passes `host.complete = window.claude.complete` → **live** AI Query; Gemini and GPT emit a vanilla HTML shell with `host = {}` → AI Query = copy-to-chat. See `[CA-AIQ]` §2 above.
 
-**GPT uses a separate rendering system** (external hosted runtime for KG, same inline code for dashboards) but targets the **same visual result** using the tokens from §1 and colors from §3.
+**Convergence note:** GPT was the last to converge (2026-06; the legacy vis-network/alephplace build is archived in `OLD/`). On GPT-5.5, Canvas/`canmore` may be unavailable → the identical shell is delivered as a `/mnt/data` download (never a custom UI). All platforms target the **same visual result** using the tokens from §1 and colors from §3.
 
 ### Architecture Constraints
 
 | Platform | Constraint | Consequence |
 |----------|-----------|-------------|
-| GPT | Canvas doesn't handle large inline code well | KG uses external `kg-runtime.js` + `kg-runtime.css` hosted on `alephplace.com/atar.bot/canvas/` |
-| GPT | No native API calls from canvas | AI Query = placeholder mode only |
-| Claude | Native artifact support | Inline React/D3, native API access |
+| GPT | Canvas removed on GPT-5.5; canvas doesn't handle large inline code | All visual products = external `atar-runtime` shell from `cdn.jsdelivr.net/npm`; Canvas optional → `/mnt/data` shell fallback |
+| GPT | No native API calls from the shell | AI Query = placeholder / copy-to-chat |
+| Claude | Native artifact support | React shell loads `atar-runtime`; live API via `window.claude.complete` |
 | Gemini | Must manually activate canvas mode | Without activation, outputs code as text instead of rendering |
-| Gemini | Same artifact capabilities as Claude | Identical code, swap API call only |
+| Gemini | No native API calls from the shell | AI Query = copy-to-chat (same shell as Claude, `host={}`) |
 
 ---
 

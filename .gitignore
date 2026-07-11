@@ -18,6 +18,7 @@ InSites-Brain/sites-data/misc-sites-data/*.pdf
 InSites-Brain/sites-data/*.txt
 InSites-Brain/sites-data/*.js
 InSites-Brain/sites-data/*.json
+InSites-Brain/sites-data/*.png
 InSites-Brain/sites-data/EAC/
 InSites-Brain/sites-data/Samples*/
 InSites-Brain/sites-data/TabghaSample/
@@ -30,9 +31,9 @@ InSites Budget.md
 *.code-workspace
 
 # === Developer tooling ===
-.claude/
-CLAUDE.md
-InSites-Brain/CLAUDE.md
+# Track project skills (shared/versioned); ignore the rest of .claude/ (local/ephemeral)
+.claude/*
+!.claude/skills/
 InSites-Brain/Claude/InSites-CAA-mono*.md
 InSites-Brain/Gemini/InSites-CAA-mono*.md
 
@@ -65,8 +66,15 @@ InSites-Brain/MANIFEST.md
 
 # === Paper content (gitignore for now) ===
 InSites-Brain/Heritage4.0/
+InSites-Brain/CN-Paper/
+InSites-Brain/Papers/
 
-# === Claude: keep only mono prompt + setup guide ===
+# === Internal workshop proposals (logistics, not for students) ===
+shimur-workshop/
+
+# === Claude: keep only mono prompt + setup guide (students copy the mono) ===
+InSites-Brain/Claude/cbsa-split/
+InSites-Brain/Claude/claude-code-split-instructions-en.md
 InSites-Brain/Claude/not-used/
 InSites-Brain/Claude/plans/
 InSites-Brain/Claude/tests/
@@ -91,7 +99,8 @@ InSites-Brain/GPTs/CAA/
 InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/
 InSites-Brain/GPTs/CAA-GTPs-InSites v4_current_files_package/
 
-# === Gemini: keep only current version ===
+# === Gemini: keep only current mono version (students copy the mono) ===
+InSites-Brain/Gemini/gem-split/
 InSites-Brain/Gemini/MISC-CHECK/
 InSites-Brain/Gemini/InSites-CAA-mono- GEM v5.1.md
 InSites-Brain/Gemini/InSites-CAA-mono- GEM v5.2.md
@@ -134,3 +143,13 @@ InSites-Brain/sites-data/Samples and Sites Descriptions/Sites-Descriptions/huqoq
 
 # Dev screenshots
 *.jpeg
+
+.claude/scratch/
+
+# === Local-only / not part of the InSites heritage project ===
+heritage.db
+delegation-method/
+InSites-Brain/Claude/atar-runtime/npm
+InSites-Brain/Claude/old-mono.md
+# WIP Haifa-conservation Gem — keep local for now (not ready to track)
+Dana-Haifa-conservation/

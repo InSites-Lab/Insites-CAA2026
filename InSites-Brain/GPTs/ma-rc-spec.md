@@ -37,14 +37,16 @@ Two parts. Do both before stopping.
 
 **2a. Extraction.** For every item, extract into a normalized record. Work from text only — do not invent.
 
+Fields are grouped: **Core (mandatory)** — Name, Location, Type, Period, Site description, Significance summary — always attempt these. **Optional enrichment** — the rest — extract only where the text supports them.
+
 | Field | If absent |
 |-------|-----------|
-| Name | Use file/row ID |
-| Location | `—` |
-| Type | `—` |
-| Period | `—` |
-| Site description — *what* this site is. 1–2 sentences. | `—` |
-| Significance summary — *why* this site matters. 1–3 sentences. | `⚠ not stated` |
+| **Core** — Name | Use file/row ID |
+| **Core** — Location | `—` |
+| **Core** — Type | `—` |
+| **Core** — Period | `—` |
+| **Core** — Site description — *what* this site is. 1–2 sentences. | `—` |
+| **Core** — Significance summary — *why* this site matters. 1–3 sentences. | `⚠ not stated` |
 | Values identified — use the text's own terms | `⚠ none explicit` |
 | Integrity / Authenticity | `—` |
 | Comparative references — what compared to, on what basis | `—` |

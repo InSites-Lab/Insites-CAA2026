@@ -1,29 +1,30 @@
-# InSites-CAA on Google Gemini
+<div dir="rtl">
 
-## Quick Start
+# מוחות Gemini — InSites CAA
 
-Use the ready-made Gem: [Open InSites-CAA Gem](https://gemini.google.com/gem/1PMAcB6O2FGJPYonixa3ZA7_2xwiTIVKA?usp=sharing)
+גרסה נוכחית: **v9.3 (מונוליטי)** — `InSites-CAA-GEM-v9.3.md`. זו צורת הפריסה המומלצת ל-Gem: הכול בקובץ אחד.
 
-## Manual Setup
+» version: v9.3 - mono · RTL chat tables natural-order
 
-1. Open [gemini.google.com](https://gemini.google.com) → Gems → Create New Gem
-2. Copy the contents of the desired version and paste into System Instructions
-3. Save, upload a heritage document, type **"start"** (or **"התחל"** for Hebrew)
+## קבצים
 
-## Files
+| קובץ | תיאור |
+|------|-------|
+| `InSites-CAA-GEM-v9.3.md` | **מונוליטי — מומלץ.** הכול בקובץ אחד, מתאים להדבקה ל-Gem בודד |
+| `README.md` | קובץ זה |
 
-```
-InSites-CAA-GEM.md       ← System instructions (paste into Gem)
-README.md                ← This file
-```
+> **למה מונו ולא פיצול ב-Gemini?** ה-Gem טוען קבצי ידע דרך RAG (אחזור חלקי), ולכן פריסה מפוצלת עלולה לדלג על שלבים או לבלבל את המספור. המונו טוען את כל ההנחיות יחד ועקבי יותר.
 
-## Prompt Structure
+## פריסה
 
-| Part | Content | Appendix Codes |
-|------|---------|----------------|
-| **PART 1: System & Governance** | Persona, Language Policy, Rules, CSR/DQR, Controls | — |
-| **PART 2: CBSA Stages 0–6** | The structured assessment process + Session Report [CA-IP] | — |
-| **PART 3: Reference Appendices** | Vocabularies, rules, classification aids | [GB-1] [CA-V] [CA-C] [CA-T] [SM-3] [CA-E] [CA-CS] [CA-EV] [CA-IMG] [CA-EC] [CA-HE] |
-| **PART 4: Post-Assessment Extensions** | Triggered on explicit user request only | — |
-| ↳ Write → Visualize | Knowledge Graph, Dashboard | [CA-KG] [CA-DB-F] [CA-DB] |
-| ↳ Read → Analyze → Visualize | Read workflows, Collection Dashboard | [MA-RA] [MA-RC] [CA-DB-C] |
+1. צור Gem חדש ב-Gemini.
+2. העתק את **כל התוכן** של `InSites-CAA-GEM-v9.3.md` והדבק בשדה ההנחיות (Instructions).
+3. השתמש ב-Thinking mode.
+4. העלה מסמך מורשת והקלד **"start"**.
+
+## הערות v9
+
+- טבלאות צ'אט בעברית: סדר עמודות **טבעי** (העמודה הראשונה בקוד מופיעה מימין ב-RTL). אין שימוש ב-U+200F (RLM).
+- `cbsa-main.md` עבר QA: גדרות קוד מאוזנות, ה-`[CA-HE]` והשלבים מרונדרים כ-Markdown תקין.
+
+</div>

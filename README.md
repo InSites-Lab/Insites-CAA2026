@@ -109,7 +109,7 @@ workshop-site/               Companion website source (Vite + React + Tailwind)
 
 ### Prompt source
 
-The complete system prompt: [`InSites-Brain/Claude/InSites-CAA-claude.md`](InSites-Brain/Claude/InSites-CAA-claude.md)
+The complete system prompt: [`InSites-Brain/Claude/InSites-claude.md`](InSites-Brain/Claude/InSites-claude.md)
 
 ### Design specs
 
@@ -121,7 +121,7 @@ The complete system prompt: [`InSites-Brain/Claude/InSites-CAA-claude.md`](InSit
 | [Epistemic Notation](InSites-Brain/design/contracts/epistemic-notation.md) | Three-tier evidence marking system |
 | [Dashboard Reference](InSites-Brain/design/examples/Single-Dashboard-example.html) | Assessment dashboard implementation |
 | [Session Report](InSites-Brain/design/specs/Bot-Research-Skiil/) | Research instrument for documenting sessions |
-| [Claude Code Skills](InSites-Brain/design/skills/) | Reusable skills: LIM, dashboard review, expert review |
+| [Claude Code Skills](InSites-Brain/skills-archive/) | Reusable Claude Code skills (active in `.claude/skills/`; others archived here) |
 
 ---
 

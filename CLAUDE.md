@@ -10,7 +10,7 @@ The project is an output of the **InSites Knowledge Lab**, which develops comput
 
 ## Platform Development Guide
 
-For all platform-specific development rules (GPT, Claude, Gemini), cross-platform sync policies, and the convergence principle, see `InSites-Brain/CLAUDE.md`.
+For platform-specific rendering architecture and cross-platform convergence, see `InSites-Brain/design/contracts/artifact-ux-contract.md` (§5) and `InSites-Brain/Claude/atar-runtime/data-contract.md` (the shared DATA contract). All three platforms (Claude/Gemini/GPT) now render visual products via the shared `atar-runtime`.
 
 ## Repository Structure — Active vs Inactive
 
@@ -38,11 +38,13 @@ workshop-site/
 
 ```
 InSites-Brain/
-  Claude/InSites-CAA.md                        # Primary Claude bot prompt (skills-split, ~870 lines)
-  Claude/InSites-CAA-mono v5.4.md               # Monolithic version (development/testing)
+  Claude/InSites-claude.md                 # CURRENT live mono — deployed to claude.ai; KG/dashboard artifacts emit the atar-runtime shell
+  Claude/atar-runtime/                         # Externalized artifact runtime (vanilla JS: D3 KG + Leaflet/vector map + dashboards); npm `insites-lab`, loaded via cdn.jsdelivr.net/npm/atar-runtime@<ver>
+  Claude/InSites-CAA.md                        # Older skills-split prompt (superseded by the mono above)
+  Claude/InSites-CAA-mono v5.4.md              # Older monolithic snapshot (pre-runtime; superseded)
   Claude/skills/*.md                           # 7 Claude.ai Project Skills (on-demand)
   GPTs/                                         # OpenAI GPT spec files (instructions.md + knowledge files)
-  GPTs/runtime/                                  # KG frontend engine (deploy to alephplace.com)
+  GPTs/runtime/                                  # LEGACY vis-network runtime (archived; GPT now uses atar-runtime)
   GPTs/tests/                                    # GPT KG test HTML files (EN, HE, CDN)
   GPTs/CAA-GTPs (Claude.ai-Spilts)/             # GPT upload package (frozen backups in Original/)
   Gemini/*.md                                  # Google Gemini bot prompts (4 files)
@@ -50,13 +52,13 @@ InSites-Brain/
   agent-for-agents/agent-for-agents-he.md
 ```
 
-### ✅ ACTIVE — Claude Code skills (.claude/skills/)
+### ✅ Claude Code skills — one loaded home per skill
 
-```
-.claude/skills/agent-builder/SKILL.md          # /agent-builder
-.claude/skills/prompt-qa/SKILL.md              # /prompt-qa
-.claude/skills/cbsa-ux-review/SKILL.md         # /cbsa-ux-review
-```
+- **Generic** (global, loaded everywhere) — `~/.claude/skills/` (NOT in repo): `expert-review` (4-expert panel), `dashboard-ux-reviewer`, `lim`, `skill-creator`.
+- **Active project** — `.claude/skills/` (tracked via `.gitignore` `!.claude/skills/`): none currently.
+- **Archive** (tracked, NOT loaded — `cp` into a skills dir to activate) — `InSites-Brain/skills-archive/`: `expert-review` (versioned source/backup of the global copy) · `agent-builder` (skill name `cbsa-agent-builder`) · `cbsa-ux-review` · `prompt-qa` · `claim-extractor` · `source-refiner`.
+
+> Claude Code scans only `.claude/skills/` (project) + `~/.claude/skills/` (global); `skills-archive/` is deliberately not scanned (backup + on-demand). `expert-review` is generic → runs from global, with its versioned source/backup in the archive. See `InSites-Brain/skills-archive/README.md`.
 
 ### 📝 ACTIVE WRITING — Heritage 4.0 Paper (Florence)
 
@@ -88,9 +90,12 @@ InSites-Brain/design/                          # Source-of-truth workflow specs
   Single-Dashboard-example.html                # Dashboard reference implementation
   less-is-more.md, prompt-qa-principles.md     # Optimization principles
   Bot-Research-Skiil/                          # [CA-IP] Session Report specs
+  specs/experiential-layer-source-spec.md      # How the bot consumes an experiential-layer source
+InSites-Brain/research/                        # Lab research insights & validated methods (cross-paper)
+  genius-loci-experiential-method.md           # Experiential knowledge layer -> CBSA (validated, Madatech)
 InSites-Brain/Claude/KG-Skill-en/SKILL.md     # Advanced KG spec (reference only)
 InSites-Brain/Claude/plans/                    # Enhancement roadmap
-InSites-Brain/CLAUDE.md                        # Cross-platform dev guide
+InSites-Brain/Claude/atar-runtime/data-contract.md  # Shared cross-platform DATA contract (convergence)
 ```
 
 ### 📦 DATA — Heritage site data, test inputs, benchmark outputs
@@ -108,7 +113,7 @@ InSites-Brain/sites-data/
 
 ```
 **/OLD/                                        # All OLD/ folders (gitignored + claudeignored)
-InSites-Brain/Claude/KG-artifacts/             # Legacy kg.js — superseded by GPTs/runtime/kg-runtime.js
+InSites-Brain/Claude/KG-artifacts/             # Legacy kg.js — superseded by atar-runtime
 InSites-Brain/Claude/global-claude-ai-skills/  # Superseded by project skills
 management/                                    # Workshop logistics (.claudeignore)
 content-dev/                                   # Staging area (.claudeignore)
@@ -118,18 +123,16 @@ sakem-li/                                      # Research background (.claudeign
 
 ## Deployment
 
-### KG Frontend (alephplace.com)
-Upload to `/atar.bot/canvas/`:
-- `InSites-Brain/GPTs/runtime/kg-runtime.js` (vis-network engine, [CA-EC] colors, 3-tab sidebar, RTL/LTR)
-- `InSites-Brain/GPTs/runtime/kg-runtime.css` (full UI styling, responsive)
+### Visual Runtime (atar-runtime — all platforms)
+KG + both dashboards render via the shared **`atar-runtime`** npm package, loaded at view time from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` — nothing is uploaded/hosted. The bot emits a thin shell + `DATA` and calls `mount(root, DATA, host)`. (Legacy vis-network/alephplace runtime archived in `InSites-Brain/GPTs/OLD/` + `GPTs/runtime/`.)
 
 ### OpenAI Custom GPT
-1. Paste `InSites-Brain/GPTs/CAA-GTPs (Claude.ai-Spilts)/instructions.md` → GPT Instructions field
-2. Upload knowledge files from same directory: `cbsa-method.md` (or `cbsa-method-lim.md`), `kg-spec.md`, `dashboard-spec.md`, `dashboard-reference-shape.md`
+1. Paste `InSites-Brain/GPTs/instructions.md` → GPT Instructions field (≤ 8000 chars)
+2. Upload knowledge files from `InSites-Brain/GPTs/`: `cbsa-stages.md`, `cbsa-appendices.md`, `kg-spec.md`, `dashboard-spec.md`, `collection-dashboard-spec.md`, `ma-ra-spec.md`, `ma-rc-spec.md` (all atar-runtime shells — see `GPTs/README.md`). Canvas optional on GPT-5.5 → `/mnt/data` shell fallback.
 
 ### Claude Bot (Claude.ai Projects)
-- Set `InSites-Brain/Claude/InSites-CAA.md` as the Project prompt
-- Add 4 Project Skills from `InSites-Brain/Claude/skills/`:
+- **Current (mono)**: set `InSites-Brain/Claude/InSites-claude.md` (the live mono) as the Project prompt. Its KG/dashboard artifacts load the externalized **`atar-runtime`** from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` (thin shell + `DATA`, no inline render code) — no Project Skills required.
+- **Legacy (skills-split)**: set `InSites-Brain/Claude/InSites-CAA.md` as the prompt and add 4 Project Skills from `InSites-Brain/Claude/skills/`:
   - `KG-skill.md` — Knowledge Graph generation
   - `Dashboard-skill-generate.md` — Assessment Dashboard generation
   - `MA-RA-skill.md` — Read-Assessment workflow
@@ -138,10 +141,9 @@ Upload to `/atar.bot/canvas/`:
 
 ### Testing KG Rendering
 
-**GPT (vis-network + external runtime):**
-- `InSites-Brain/GPTs/tests/test-kg-en.html` — LTR layout, English (loads local runtime)
-- `InSites-Brain/GPTs/tests/test-kg-he.html` — RTL layout, Hebrew (loads local runtime)
-- `InSites-Brain/GPTs/tests/test-kg-gpt.html` — CDN test (loads from alephplace.com)
+**GPT (atar-runtime via jsDelivr):**
+- `InSites-Brain/GPTs/tests/test-atar-runtime-npm-spike.html` — loads atar-runtime@0.3.4 from jsDelivr, mounts kg/assessment/collection (open in a browser)
+- Legacy vis-network tests (`test-kg-en.html`, `test-kg-he.html`, `test-kg-gpt.html`) exercise the archived alephplace runtime
 
 **Claude / Gemini (D3 inline):**
 - `InSites-Brain/Claude/KG-artifacts/tests/test-kg-claude.html` — D3 + Anthropic API
@@ -191,28 +193,28 @@ The bot system guides users through a structured heritage assessment:
 - Human-in-the-Loop: pause after each stage for user review
 - Context Effect: bidirectional analysis between contexts and values
 
-### Knowledge Graph (`kg-runtime.js`)
-- Canonical vis-network engine in `GPTs/runtime/` (deployed to alephplace.com)
+### Knowledge Graph (`atar-runtime`)
+- Canonical engine = the shared **`atar-runtime`** (vanilla D3 force), loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` — same on Claude/Gemini/GPT
 - Auto-detects RTL/LTR from data language
-- 15 entity types per [CA-EC], color-coded (defined in `kg-runtime.js` + `kg-runtime.css`)
-- 3-tab sidebar: Info, Analytics, AI Query (placeholder mode for GPT)
+- 15 entity types per [CA-EC], color-coded (owned by the runtime; see `atar-runtime/data-contract.md`)
+- 3-tab sidebar: Info, Analytics, AI Query (live on Claude via `window.claude.complete`; copy-to-chat on Gemini/GPT)
 - Edge types include standard relationships + Context Effect verbs (`frames`, `reframes`)
 
-> **KG architecture — open decision for Phase 2.** Two reference implementations exist:
-> - **Bot-Brain [CA-KG]** — simpler Vis.Network template, fewer entity types, no source traceability fields
-> - **SKILL.md** — advanced React/D3 template with source traceability (`source_stage`, `source_ref`), AI query interface, context effect visualization (dashed edges)
+> **KG architecture — RESOLVED (2026-06).** Claude renders the KG (and both dashboards) through the externalized **`atar-runtime`** package — a **vanilla-D3** force engine + Leaflet/vector map + dashboard renderers, loaded from `cdn.jsdelivr.net/npm/atar-runtime@<ver>`. The bot emits only a thin React **shell** + a `DATA` object; **never** inline d3/SVG/Leaflet/render code. Enforced by the **mandatory exclusive-shell rule** in the mono (`[CA-DB-F]` + `[CA-KG] §1`): if the runtime fails to load, emit the shell anyway and let its `load-error` branch render — a failed load is a finding, not a reason to hand-roll a renderer.
 >
-> The entity type taxonomy also differs: [CA-EC] in Bot-Brain defines 13 categories vs. 14 simplified types in SKILL.md. These are **starting points, not the only options** — the final KG architecture may combine elements from both or take a different approach.
+> **Engine per platform (CONVERGED 2026-06):** Claude · Gemini · GPT all = **`atar-runtime`** (vanilla D3) via `cdn.jsdelivr.net/npm`. The shared **`atar-runtime/data-contract.md`** is the one DATA contract; `normalize()` accepts each platform's key aliases. GPT was last to converge (legacy vis-network archived in `GPTs/OLD/`).
 >
-> KG rendering is **one of the few components with real cross-platform differences**: Claude supports interactive artifacts natively, GPT has canvas with different constraints, and Gemini has limited artifact support. Most other CBSA components (Bot-Brain, HITL, citations) work similarly across platforms.
+> KG/dashboards now render through the **same** `atar-runtime` on all platforms; the only differences are the shell wrapper (Claude = React artifact; Gemini/GPT = vanilla HTML) and AI Query (live on Claude via `window.claude.complete`, copy-to-chat elsewhere). Bot-Brain, HITL, citations already work similarly across platforms.
 
 ### Multi-Platform Parallel Versions
 Content is maintained in parallel across platforms. When modifying any of these areas, propagate changes to all relevant files:
 
-- **CBSA stage definitions/templates** → `InSites-CAA.md` (Claude), GPT knowledge files, Gemini files
-- **Entity types or KG schema** → `SKILL.md`, `kg-runtime.js`, `InSites-CAA.md` appendices [CA-KG] + [CA-EC]
-- **Operating rules** (evidence mandate, citation, HITL) → `InSites-CAA.md` (Claude) + GPT `instructions.md`
-- **Trigger phrases** → `InSites-CAA.md` (Claude) + GPT `instructions.md`
+- **CBSA stage definitions/templates** → `InSites-claude.md` (Claude mono), GPT knowledge files, Gemini files
+- **Entity types or KG schema** → `atar-runtime/data-contract.md` (the shared contract for all platforms) + `InSites-claude.md` appendices [CA-KG] + [CA-EC] + the GPT/Gemini spec files
+- **Operating rules** (evidence mandate, citation, HITL) → `InSites-claude.md` (Claude) + GPT `instructions.md`
+- **Trigger phrases** → `InSites-claude.md` (Claude) + GPT `instructions.md`
+
+> **⚠ Cross-platform drift — OPEN (2026-06-17)**: the **v10.0 epistemic upgrade** (source-doubt + interpretive-depth rungs in the Per-Claim Epistemic Gate) landed in **`InSites-claude.md` (Claude) only**. NOT yet propagated to GPT (`InSites-Brain/GPTs/`) or Gemini (`InSites-Brain/Gemini/`); the design spec `design/epistemic-notation-for-user-documents.md` still describes the superseded "citation-distinguishes" mechanism. Deferred by decision — review in depth, then propagate to GPT + Gemini and re-sync the spec. See memory `project_epistemic_source_doubt`.
 
 ### Mini-Agent Specs — Read Workflows
 
@@ -231,7 +233,7 @@ Both dashboards share visual language (stone/amber palette, serif typography) bu
 
 ## Security
 
-Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instructions.md`). When writing or modifying any JavaScript (e.g., `kg-runtime.js`):
+Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instructions.md`). When writing or modifying any JavaScript (e.g., the `atar-runtime` source or `workshop-site/`):
 - Run a Snyk code scan
 - Fix any issues found before finalizing
 - Rescan to confirm no new issues were introduced
@@ -240,18 +242,25 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 ## Mono Prompt Versioning
 
-**Convention**: `InSites-CAA-mono-v{major}.{minor}.md` — two levels only.
+**Live mono**: `InSites-Brain/Claude/InSites-claude.md` — **stable filename** (no "CAA", no version in the name, post-workshop). The version lives **inside** the file (the `- version: vX.Y` line near the top) and is frozen with a git tag (e.g. `claude-v10.0`). Two-level `v{major}.{minor}`.
 
 | Bump | When | Examples |
 |------|------|----------|
-| **Major** (v2→v3) | Structural change: new/removed stages, reorganized architecture, deployment freeze | Adding a Stage, removing an appendix, final workshop freeze |
-| **Minor** (v2.1→v2.2) | Content enhancement: new appendix entries, refined rules, added examples | Doc-tier patch, EAC enhancements, context-effect additions |
+| **Major** (v9→v10) | Structural change: new/removed stages, reorganized architecture, new governance rule, deployment freeze | Epistemic source-doubt gate (v10), adding a Stage, final workshop freeze |
+| **Minor** (v10.0→v10.1) | Content enhancement: new appendix entries, refined rules, added examples | Doc-tier patch, EAC enhancements, context-effect additions |
 
 **Before bumping**: Ask the user whether to version-bump or keep as-is. Do not auto-rename.
 
-**On bump**: Copy current version to `Claude/OLD/` (gitignored), rename file, update version line inside the file, update all references in `CLAUDE.md`.
+**On bump**: archive the prior version to `Claude/OLD/` (gitignored), update the in-file `version:` line, commit, and add a `claude-v{major}.{minor}` git tag. Keep the **filename stable** — putting the version in the name churns every reference on each bump.
+
+> History: v9.1 (`InSites-CAA-claude.md`, pre-epistemic, CAA-era) → **v10.0** (`InSites-claude.md`, epistemic source-doubt + interpretive depth, "CAA" dropped), tag `claude-v10.0`; v9.1 archived in `Claude/OLD/`.
 
 ---
+
+## Release Checkpoints
+
+- **`atar-runtime-v0.3.0`** — annotated tag on branch `gpt-gemini-sync` (**not** merged to `main`). The validated externalized-runtime build: mono on `atar-runtime@0.3.0` (D3 KG + dashboards) + the mandatory exclusive-shell rule. Cut 2026-06-04.
+- Forward R&D direction (artifact-as-tool / agentic): `InSites-Brain/research/agentic-artifacts-research-agenda.md`.
 
 ## Git Permissions
 
@@ -261,20 +270,15 @@ Local git commands (commit, add, status, diff, log, branch, etc.) are auto-allow
 
 When context is compacted, preserve:
 - Current task description and which files are being modified
-- Which bot prompt version is being edited (mono `InSites-CAA-mono v5.4.md` vs skills-split `InSites-CAA.md`)
+- Which bot prompt is being edited (live mono `InSites-claude.md` — artifacts via the atar-runtime shell — vs the older skills-split `InSites-CAA.md`)
 - Active platform target (Claude / GPT / Gemini / workshop-site)
 - Any cross-platform sync obligations triggered by the current edit
 
 ---
 
-## Workshop Development (CAA 2026)
+## Workshop Design — Principles & Lessons
 
-**Workshop date:** 31.3.2026 | **~20 participants** | **4 hours**
-
-Planning documents (primary reference for all development decisions):
-- [management/InSites_CAA26_DevPlan_v1.md](management/InSites_CAA26_DevPlan_v1.md) — strategy, tool requirements, architecture options, open decisions
-- [management/InSites_CAA26_Timeline_v1.md](management/InSites_CAA26_Timeline_v1.md) — phased milestones with owners and completion criteria
-- [management/InSites_Budget_20260208 (1).docx](management/InSites_Budget_20260208%20(1).docx) — Lab rationale and research framework (context only — not for budgeting details)
+> **CAA 2026 workshop completed 31.3.2026** (configuration landed on **α — A+B+D**). Active context is now the **Technion** workshops — see branch `tec26-atar.bot`. The design principles + lessons below remain the guide; historical CAA planning docs (DevPlan, Timeline, Budget) live in `management/`.
 
 ### Design North Star — 5 Experience Components
 
@@ -286,52 +290,16 @@ Every tool and session decision is evaluated against these five components. When
 4. **New representations** — KG, timeline, dashboard, narrative create the insight moment
 5. **Transfer** — participants leave able to apply the approach (not just the tool) themselves
 
-### Tool Architecture Decision Space
-
-Seven available components that can be combined (A–G):
-
-| Component | Description | Platform |
-|-----------|-------------|----------|
-| **A** | Bot-Brain improvements (progressive disclosure, status tracking, citation) | All |
-| **B** | Interactive artifacts (KG, Timeline, Dashboard, Nara Grid — partially exist) | All |
-| **C** | API-in-Artifact (LLM calls from within a rendered artifact) | Claude only |
-| **D** | Deep HITL (explicit approval checkpoints, reflection moments) | All |
-| **E** | MCP (connections to external tools/databases) | Claude primary |
-| **F** | Dedicated web app (full frontend + backend, independent of chat) | Independent |
-| **G** | Claude Skills (e.g., existing `cbsa-knowledge-graph` skill) | Claude only |
-
-Four candidate configurations under evaluation:
-
-- **α — evolutionary:** A + B + D — lowest risk, fully cross-platform
-- **β — Claude-hybrid:** A + B + C + G — richest Claude experience, not fully cross-platform
-- **γ — dedicated system:** F + A — full control and research logging, significant dev time, fallback required
-- **δ — targeted hybrid:** A + B + one component (C/E/F) for a specific stage only
-
-**Decision #9 (configuration choice) is the master open decision** — open decisions #10–19 in the DevPlan all depend on it. Resolve this first. See DevPlan §10.6 for evaluation rubric. Default to α if undecided by 3.3.
-
-### Development Timeline
-
-| Phase | Dates | Key output | Hard deadline |
-|-------|-------|------------|---------------|
-| 1. Configuration decision | 27.2–1.3 | Architecture choice documented (DevPlan §10) | — |
-| 2. Tool development | 2.3–20.3 | Bot-Brain, artifacts, research logging | — |
-| 3. Workshop content (parallel to 2) | 2.3–20.3 | Demo script (~10.3), participant guide, companion site | **Send materials by 17.3** |
-| 4. Integration & dry run | 21.3–27.3 | Full run-through, fallback scenarios validated | — |
-| 5. Final prep | 28.3–30.3 | GitHub repo public, backups, logistics | — |
-| **Workshop** | **31.3** | | |
-
-**Sync gates:** ~5.3 (Bot-Brain draft reviewed + research mode decided) | ~10.3 (demo script + artifacts ready for testing) | 17.3 (participant materials sent — hard deadline)
-
 ### Previous Workshop Lessons (Design Constraints)
 
 These problems were identified from participant feedback and must be addressed in the new tool:
 
 | Problem | Required design response |
 |---------|--------------------------|
-| Text overload, especially Stage 1 | Progressive disclosure (Component A) |
+| Text overload, especially Stage 1 | Progressive disclosure |
 | Lost orientation — "which stage am I in?" | Persistent status tracker |
 | Energy drain toward session end | Deliberate time/energy management in session design |
-| Too little visualization | Interactive artifacts (Component B) |
+| Too little visualization | Interactive artifacts |
 | Inconsistent citations | Reinforced citation mechanism in Bot-Brain |
 | Hard to navigate between stages | Safe back-navigation without losing context |
 
