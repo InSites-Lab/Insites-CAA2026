@@ -7,7 +7,7 @@
 1. Go to [claude.ai](https://claude.ai) → **Projects** → **Create Project**
 2. Name it: `InSites-CAA`
 3. Open project settings → **Custom Instructions**
-4. Copy the **entire contents** of [`InSites-claude.md`](InSites-claude.md) and paste
+4. Copy the **entire contents** of [`InSites-CAA-claude.md`](InSites-CAA-claude.md) and paste
 5. Save
 
 > **Tip:** Use a paid account (Pro). Run on **Opus** for best quality — if Claude slows down or auto-switches to **Sonnet**, that's expected; just keep working.

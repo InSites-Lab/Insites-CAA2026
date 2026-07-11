@@ -11,7 +11,7 @@ Deferred capabilities intentionally removed from the active bot specs, captured 
 **What it was.** The dashboard Report tab originally specified two in-artifact buttons — **📄 Export HTML** (clone DOM → self-contained HTML file) and **🖨️ Print / PDF** (`window.print()`) — plus an `@media print` stylesheet and a sandbox-detection fallback.
 
 **Why deferred / removed (ALL platforms).** In-artifact `window.print()` / blob-download does not work reliably in **any** of the bot canvases — the Claude React-artifact sandbox blocks it (`URL.createObjectURL`, `window.print()`), and it is likewise non-functional in the **GPT** and **Gemini** canvases. The buttons rendered as broken affordances and contradicted the `[CA-DB-F]` "no in-artifact download / print" rule. So the print/export buttons were removed **sweepingly, across all three platforms**:
-- **Claude** — mono `InSites-claude.md` + split `cbsa-split/ca-db.md`
+- **Claude** — mono `InSites-CAA-claude.md` + split `cbsa-split/ca-db.md`
 - **GPT** — `GPTs/report-tab-spec.md`
 - **Gemini** — `Gemini/InSites-CAA-GEM-v9.3.md` + `Gemini/gem-split/ca-db.md`
 
@@ -27,7 +27,7 @@ Export is now **chat-delivered everywhere** (the bot generates a formatted Word/
 - A change in Claude artifact sandbox policy (download / `window.print()` becoming available), **or**
 - A decision to standardize on chat-delivered Word/PDF export across all InSites artifacts ([CA-DB-F] contract).
 
-**Where the active behavior lives now:** `cbsa-split/ca-db.md` §4c Report Tab (chat-delivered note) and the mirrored section in `InSites-claude.md`.
+**Where the active behavior lives now:** `cbsa-split/ca-db.md` §4c Report Tab (chat-delivered note) and the mirrored section in `InSites-CAA-claude.md`.
 
 ---
 

@@ -45,7 +45,7 @@ _Reusable across projects — these four lenses suit heritage / learning / UX / 
 Review the bot brain for methodology, instruction quality, and cross-platform alignment.
 
 **Primary files (InSites example):**
-- Claude: `InSites-Brain/Claude/InSites-claude.md` (live mono)
+- Claude: `InSites-Brain/Claude/InSites-CAA-claude.md` (live mono)
 - Gemini: `InSites-Brain/Gemini/InSites-CAA-GEM-v9.3.md`
 - GPT: `InSites-Brain/GPTs/instructions.md` + knowledge files in same dir
 

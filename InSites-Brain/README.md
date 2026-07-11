@@ -8,7 +8,7 @@ This folder holds everything you need to run the InSites CBSA heritage-assessmen
 
 | Platform | Copy this | Setup |
 |----------|-----------|-------|
-| **Claude.ai** | [`Claude/InSites-claude.md`](Claude/InSites-claude.md) | [SETUP-GUIDE.md](Claude/SETUP-GUIDE.md) · [עברית](Claude/SETUP-GUIDE.he.md) |
+| **Claude.ai** | [`Claude/InSites-CAA-claude.md`](Claude/InSites-CAA-claude.md) | [SETUP-GUIDE.md](Claude/SETUP-GUIDE.md) · [עברית](Claude/SETUP-GUIDE.he.md) |
 | **Google Gemini** | [`Gemini/InSites-CAA-GEM-v9.3.md`](Gemini/InSites-CAA-GEM-v9.3.md) | [Gemini/README.md](Gemini/README.md) |
 | **ChatGPT** | [`GPTs/instructions.md`](GPTs/instructions.md) + knowledge files | [GPTs/README.md](GPTs/README.md) |
 

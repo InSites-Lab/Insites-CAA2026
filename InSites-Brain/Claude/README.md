@@ -2,7 +2,7 @@
 
 > 🇮🇱 גרסה עברית: [README.he.md](README.he.md) · מדריך התקנה לסטודנטים: [SETUP-GUIDE.he.md](SETUP-GUIDE.he.md)
 
-`InSites-claude.md` is the primary bot prompt. Deploy as a Claude.ai Project custom instruction.
+`InSites-CAA-claude.md` is the primary bot prompt. Deploy as a Claude.ai Project custom instruction.
 
 **Setup:** See [`SETUP-GUIDE.md`](SETUP-GUIDE.md) (English) or [`SETUP-GUIDE.he.md`](SETUP-GUIDE.he.md) (Hebrew) for step-by-step deployment.
 

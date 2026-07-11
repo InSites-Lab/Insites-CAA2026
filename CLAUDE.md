@@ -38,7 +38,7 @@ workshop-site/
 
 ```
 InSites-Brain/
-  Claude/InSites-claude.md                 # CURRENT live mono — deployed to claude.ai; KG/dashboard artifacts emit the atar-runtime shell
+  Claude/InSites-CAA-claude.md                 # CURRENT live mono — deployed to claude.ai; KG/dashboard artifacts emit the atar-runtime shell
   Claude/atar-runtime/                         # Externalized artifact runtime (vanilla JS: D3 KG + Leaflet/vector map + dashboards); npm `insites-lab`, loaded via cdn.jsdelivr.net/npm/atar-runtime@<ver>
   Claude/InSites-CAA.md                        # Older skills-split prompt (superseded by the mono above)
   Claude/InSites-CAA-mono v5.4.md              # Older monolithic snapshot (pre-runtime; superseded)
@@ -131,7 +131,7 @@ KG + both dashboards render via the shared **`atar-runtime`** npm package, loade
 2. Upload knowledge files from `InSites-Brain/GPTs/`: `cbsa-stages.md`, `cbsa-appendices.md`, `kg-spec.md`, `dashboard-spec.md`, `collection-dashboard-spec.md`, `ma-ra-spec.md`, `ma-rc-spec.md` (all atar-runtime shells — see `GPTs/README.md`). Canvas optional on GPT-5.5 → `/mnt/data` shell fallback.
 
 ### Claude Bot (Claude.ai Projects)
-- **Current (mono)**: set `InSites-Brain/Claude/InSites-claude.md` (the live mono) as the Project prompt. Its KG/dashboard artifacts load the externalized **`atar-runtime`** from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` (thin shell + `DATA`, no inline render code) — no Project Skills required.
+- **Current (mono)**: set `InSites-Brain/Claude/InSites-CAA-claude.md` (the live mono) as the Project prompt. Its KG/dashboard artifacts load the externalized **`atar-runtime`** from `cdn.jsdelivr.net/npm/atar-runtime@<ver>` (thin shell + `DATA`, no inline render code) — no Project Skills required.
 - **Legacy (skills-split)**: set `InSites-Brain/Claude/InSites-CAA.md` as the prompt and add 4 Project Skills from `InSites-Brain/Claude/skills/`:
   - `KG-skill.md` — Knowledge Graph generation
   - `Dashboard-skill-generate.md` — Assessment Dashboard generation
@@ -209,12 +209,12 @@ The bot system guides users through a structured heritage assessment:
 ### Multi-Platform Parallel Versions
 Content is maintained in parallel across platforms. When modifying any of these areas, propagate changes to all relevant files:
 
-- **CBSA stage definitions/templates** → `InSites-claude.md` (Claude mono), GPT knowledge files, Gemini files
-- **Entity types or KG schema** → `atar-runtime/data-contract.md` (the shared contract for all platforms) + `InSites-claude.md` appendices [CA-KG] + [CA-EC] + the GPT/Gemini spec files
-- **Operating rules** (evidence mandate, citation, HITL) → `InSites-claude.md` (Claude) + GPT `instructions.md`
-- **Trigger phrases** → `InSites-claude.md` (Claude) + GPT `instructions.md`
+- **CBSA stage definitions/templates** → `InSites-CAA-claude.md` (Claude mono), GPT knowledge files, Gemini files
+- **Entity types or KG schema** → `atar-runtime/data-contract.md` (the shared contract for all platforms) + `InSites-CAA-claude.md` appendices [CA-KG] + [CA-EC] + the GPT/Gemini spec files
+- **Operating rules** (evidence mandate, citation, HITL) → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
+- **Trigger phrases** → `InSites-CAA-claude.md` (Claude) + GPT `instructions.md`
 
-> **⚠ Cross-platform drift — OPEN (2026-06-17)**: the **v10.0 epistemic upgrade** (source-doubt + interpretive-depth rungs in the Per-Claim Epistemic Gate) landed in **`InSites-claude.md` (Claude) only**. NOT yet propagated to GPT (`InSites-Brain/GPTs/`) or Gemini (`InSites-Brain/Gemini/`); the design spec `design/epistemic-notation-for-user-documents.md` still describes the superseded "citation-distinguishes" mechanism. Deferred by decision — review in depth, then propagate to GPT + Gemini and re-sync the spec. See memory `project_epistemic_source_doubt`.
+> **⚠ Cross-platform drift — OPEN (2026-06-17)**: the **v10.0 epistemic upgrade** (source-doubt + interpretive-depth rungs in the Per-Claim Epistemic Gate) landed in **`InSites-CAA-claude.md` (Claude) only**. NOT yet propagated to GPT (`InSites-Brain/GPTs/`) or Gemini (`InSites-Brain/Gemini/`); the design spec `design/epistemic-notation-for-user-documents.md` still describes the superseded "citation-distinguishes" mechanism. Deferred by decision — review in depth, then propagate to GPT + Gemini and re-sync the spec. See memory `project_epistemic_source_doubt`.
 
 ### Mini-Agent Specs — Read Workflows
 
@@ -242,7 +242,7 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 ## Mono Prompt Versioning
 
-**Live mono**: `InSites-Brain/Claude/InSites-claude.md` — **stable filename** (no "CAA", no version in the name, post-workshop). The version lives **inside** the file (the `- version: vX.Y` line near the top) and is frozen with a git tag (e.g. `claude-v10.0`). Two-level `v{major}.{minor}`.
+**Live mono**: `InSites-Brain/Claude/InSites-CAA-claude.md` — **stable filename** (no "CAA", no version in the name, post-workshop). The version lives **inside** the file (the `- version: vX.Y` line near the top) and is frozen with a git tag (e.g. `claude-v10.0`). Two-level `v{major}.{minor}`.
 
 | Bump | When | Examples |
 |------|------|----------|
@@ -253,7 +253,7 @@ Snyk is configured with always-on rules (`.github/instructions/snyk_rules.instru
 
 **On bump**: archive the prior version to `Claude/OLD/` (gitignored), update the in-file `version:` line, commit, and add a `claude-v{major}.{minor}` git tag. Keep the **filename stable** — putting the version in the name churns every reference on each bump.
 
-> History: v9.1 (`InSites-CAA-claude.md`, pre-epistemic, CAA-era) → **v10.0** (`InSites-claude.md`, epistemic source-doubt + interpretive depth, "CAA" dropped), tag `claude-v10.0`; v9.1 archived in `Claude/OLD/`.
+> History: v9.1 (`InSites-CAA-claude.md`, pre-epistemic, CAA-era) → **v10.0** (`InSites-CAA-claude.md`, epistemic source-doubt + interpretive depth, "CAA" dropped), tag `claude-v10.0`; v9.1 archived in `Claude/OLD/`.
 
 ---
 
@@ -270,7 +270,7 @@ Local git commands (commit, add, status, diff, log, branch, etc.) are auto-allow
 
 When context is compacted, preserve:
 - Current task description and which files are being modified
-- Which bot prompt is being edited (live mono `InSites-claude.md` — artifacts via the atar-runtime shell — vs the older skills-split `InSites-CAA.md`)
+- Which bot prompt is being edited (live mono `InSites-CAA-claude.md` — artifacts via the atar-runtime shell — vs the older skills-split `InSites-CAA.md`)
 - Active platform target (Claude / GPT / Gemini / workshop-site)
 - Any cross-platform sync obligations triggered by the current edit
 
