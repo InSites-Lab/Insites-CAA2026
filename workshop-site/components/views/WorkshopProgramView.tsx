@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, BookOpen, PenTool, MessageSquare, Presentation, Coffee, ChevronDown, ArrowRight, Users, Lightbulb, ShieldCheck, Home, Eye } from 'lucide-react';
+import { Clock, BookOpen, PenTool, MessageSquare, Presentation, Coffee, ChevronDown, ArrowRight, Users, Lightbulb, ShieldCheck, Home, Eye, Bot } from 'lucide-react';
 import { SESSION_RESOURCES } from '../../constants';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
 
@@ -39,7 +39,7 @@ const TYPE_LABELS: Record<string, string> = {
 const PROGRAM_TABS = [
   { id: 'challenges', label: 'Our Story', icon: <Users size={14} /> },
   { id: 'cbsa', label: 'CBSA', icon: <Lightbulb size={14} /> },
-  { id: 'principles', label: 'Principles', icon: <Eye size={14} /> },
+  { id: 'principles', label: 'Design Principles', icon: <Eye size={14} /> },
   { id: 'example', label: 'Example', icon: <Presentation size={14} /> },
 ] as const;
 
@@ -76,6 +76,16 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
               <span>{tab.label}</span>
             </button>
           ))}
+
+          {/* Workshop — exits to the hands-on space (bot links); visually quieter than the talk tabs */}
+          <button
+            onClick={() => onNavigate?.('home')}
+            className="ml-2 flex items-center justify-center gap-1.5 px-3 py-3 rounded-xl text-sm md:text-base font-bold text-indigo-500/80 hover:text-indigo-700 hover:bg-white/60 border-l border-slate-200 pl-4 transition-all cursor-pointer shrink-0"
+            title="Workshop space — try the bots"
+          >
+            <Bot size={18} />
+            <span>Workshop</span>
+          </button>
         </div>
 
         {/* Tab Content */}

@@ -107,26 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* Design Principles Button */}
-          <div className="pt-0 px-3 mt-0 pb-2">
-            <button
-              onClick={onDesignClick}
-              className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 group cursor-pointer ${showDesignView ? 'bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-200' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300 hover:text-rose-600 hover:shadow-md'}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg transition-all ${showDesignView ? 'bg-white/20 text-white' : 'bg-slate-50 text-rose-500 group-hover:bg-rose-50'}`}>
-                  <Eye size={18} />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-sm uppercase tracking-wider">Design Principles</h3>
-                </div>
-              </div>
-              <ChevronRight
-                size={18}
-                className={`transition-transform duration-300 ${showDesignView ? 'text-rose-200 translate-x-1' : 'text-slate-300 group-hover:text-rose-300'}`}
-              />
-            </button>
-          </div>
+          {/* Design Principles button removed — duplicated by the "Design Principles" tab in the program view */}
 
           {/* Workshop Home — quick access to the bot links (ChatGPT/Gemini/Claude) & GitHub */}
           <div className="px-3 pb-3">

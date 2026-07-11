@@ -1043,6 +1043,25 @@ const App: React.FC = () => {
           <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
             Tools integrated in <span className="normal-case">InSites-CAA</span>
           </h4>
+          {/* Read Assessment (MA-RA) — featured: the demo path goes here */}
+          <button
+            onClick={() => navigateTo("read-assessment")}
+            className="w-full flex items-center gap-4 p-4 mb-3 bg-purple-50 border-2 border-purple-300 ring-2 ring-purple-200/60 rounded-xl shadow-sm hover:shadow-md hover:border-purple-400 hover:bg-purple-50/80 transition-all group cursor-pointer"
+          >
+            <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <Scroll size={24} />
+            </div>
+            <div className="text-left">
+              <h4 className="font-bold text-purple-900 text-lg">
+                Read Assessment
+              </h4>
+              <p className="text-sm text-purple-700/80">
+                Structured readings: analytical, interpretive, and generative
+                lenses
+              </p>
+            </div>
+          </button>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Assessment Dashboard */}
             <button
@@ -1053,10 +1072,10 @@ const App: React.FC = () => {
                 <LayoutDashboard size={18} />
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-slate-800 text-sm">
+                <h4 className="font-bold text-slate-800 text-base">
                   Assessment Dashboard
                 </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2">
+                <p className="text-sm text-slate-500 line-clamp-2">
                   10-tab interactive visualization of a complete assessment
                 </p>
               </div>
@@ -1071,10 +1090,10 @@ const App: React.FC = () => {
                 <Zap size={18} />
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-slate-800 text-sm">
+                <h4 className="font-bold text-slate-800 text-base">
                   Knowledge Graph
                 </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2">
+                <p className="text-sm text-slate-500 line-clamp-2">
                   Visual mapping of entities and semantic relationships
                 </p>
               </div>
@@ -1089,10 +1108,10 @@ const App: React.FC = () => {
                 <Box size={18} />
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-slate-800 text-sm">
+                <h4 className="font-bold text-slate-800 text-base">
                   Visual Decoding
                 </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2">
+                <p className="text-sm text-slate-500 line-clamp-2">
                   Analyze attributes, relationships and values from images
                 </p>
               </div>
@@ -1107,30 +1126,11 @@ const App: React.FC = () => {
                 <Library size={18} />
               </div>
               <div className="text-left">
-                <h4 className="font-bold text-slate-800 text-sm">
+                <h4 className="font-bold text-slate-800 text-base">
                   Collection Analysis
                 </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2">
+                <p className="text-sm text-slate-500 line-clamp-2">
                   Cross-sectional analysis of assessment collections (MA-RC)
-                </p>
-              </div>
-            </button>
-
-            {/* Read Assessment (MA-RA) */}
-            <button
-              onClick={() => navigateTo("read-assessment")}
-              className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-purple-200 hover:bg-purple-50/30 transition-all group cursor-pointer"
-            >
-              <div className="w-9 h-9 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <Scroll size={18} />
-              </div>
-              <div className="text-left">
-                <h4 className="font-bold text-slate-800 text-sm">
-                  Read Assessment
-                </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-2">
-                  Structured readings: analytical, interpretive, and generative
-                  lenses
                 </p>
               </div>
             </button>
@@ -1657,7 +1657,7 @@ const App: React.FC = () => {
         }
         onClose={() => navigateTo("program")}
         title={displayStageAgent ? displayStageAgent.name : ""}
-        maxWidth="max-w-4xl"
+        maxWidth="max-w-5xl"
       >
         {renderStepDetailContent(true)}
       </Modal>
@@ -1666,7 +1666,7 @@ const App: React.FC = () => {
         isOpen={mobileView === "PROGRAM" && showResearchAids}
         onClose={() => navigateTo("program")}
         title="Extensions & Tools"
-        maxWidth="max-w-4xl"
+        maxWidth="max-w-5xl"
       >
         {renderToolsContent(true)}
       </Modal>
@@ -1675,7 +1675,7 @@ const App: React.FC = () => {
         isOpen={mobileView === "PROGRAM" && showDesignView}
         onClose={() => navigateTo("program")}
         title="Design Principles"
-        maxWidth="max-w-4xl"
+        maxWidth="max-w-5xl"
       >
         {renderDesignContent(true)}
       </Modal>
