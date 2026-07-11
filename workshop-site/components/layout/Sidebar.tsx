@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       style={{ width }}
-      className={`shrink-0 border-r border-slate-200 bg-slate-50/80 backdrop-blur-md transition-shadow duration-300 will-change-transform z-20 flex-col sticky top-0 h-[calc(100vh-48px)] hidden md:flex ${selectedAgentId !== null || showResearchAids || showDesignView ? 'shadow-2xl shadow-indigo-200/40' : 'shadow-none'}`}
+      className={`shrink-0 border-r border-slate-300 bg-slate-50/80 backdrop-blur-md transition-shadow duration-300 will-change-transform z-20 flex-col sticky top-0 h-[calc(100vh-48px)] hidden md:flex ${selectedAgentId !== null || showResearchAids || showDesignView ? 'shadow-2xl shadow-indigo-200/40' : 'shadow-[6px_0_16px_-8px_rgba(15,23,42,0.18)]'}`}
     >
       {/* Resize handle */}
       <div

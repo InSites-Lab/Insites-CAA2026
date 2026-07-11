@@ -49,8 +49,8 @@ export const Header: React.FC<HeaderProps> = ({
         className="hidden md:flex items-center justify-center gap-2 shrink-0 bg-slate-50/90 backdrop-blur-md border-r border-b border-slate-200 px-4"
       >
         <Layers size={18} className="text-indigo-500 shrink-0" />
-        <h3 className="text-sm font-black tracking-wide text-indigo-700 leading-none text-center">
-          InSites Process Stages · Demo
+        <h3 className="text-lg font-black tracking-wide text-indigo-700 leading-none text-center">
+          InSites Workflow · Demo
         </h3>
       </div>
 
@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
 </button>
  
           <span className="hidden md:inline text-slate-500 mx-3">|</span>
-          <span className="hidden md:inline text-indigo-100 font-bold text-xl">Alef &amp; Shafriri</span>
+          <span className="hidden md:inline text-indigo-100 font-bold text-lg">Alef &amp; Shafriri</span>
         </div>
         <div
           className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"

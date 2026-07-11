@@ -242,9 +242,16 @@ const App: React.FC = () => {
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
   // Mobile View State
+  // Initialized from the hash so the first paint already shows the view the
+  // hash effect would resolve to (prevents a HOME->PROGRAM flash on load).
   const [mobileView, setMobileView] = useState<
     "HOME" | "TOOLS" | "STEPS" | "ABOUT" | "STEP_DETAIL" | "PROGRAM" | "DESIGN"
-  >("HOME");
+  >(() => {
+    const h = window.location.hash.slice(1);
+    if (h === "home") return "HOME";
+    if (h === "steps") return "STEPS";
+    return "PROGRAM";
+  });
 
   // Welcome/About overlay state
   const [showWelcome, setShowWelcome] = useState<boolean>(false);
@@ -567,7 +574,8 @@ const App: React.FC = () => {
 
   const resize = useCallback((e: MouseEvent) => {
     if (!isResizing.current) return;
-    const newWidth = window.innerWidth - e.clientX;
+    // Sidebar sits on the LEFT, so its width is simply the cursor's X position
+    const newWidth = e.clientX;
     if (newWidth > 220 && newWidth < 700) {
       setSidebarWidth(newWidth);
     }
