@@ -145,7 +145,7 @@ The complete system prompt: [`InSites-Brain/Claude/InSites-CAA-claude.md`](InSit
 At the intersection of assessment methods, novel technologies, and built-heritage data — we develop computational methods for evidence-based heritage assessment.
 
 **Dr. Yael Alef** — Heritage assessment methodology, CBSA development
-**Yuval Shafriri** — AI systems architecture, prompt engineering
+**Yuval Shafriri** — AI system architecture, and web development
 
 [InSites Knowledge Lab](https://github.com/InSites-Lab) · Technion — Israel Institute of Technology
 
