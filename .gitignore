@@ -47,6 +47,7 @@ InSites-Brain/Gemini/InSites-CAA-mono*.md
 node_modules/
 workshop-site/dist/
 workshop-site/.vite/
+workshop-site/offline-package/
 
 # Local tooling config
 .playwright-mcp/

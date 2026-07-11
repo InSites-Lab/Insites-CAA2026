@@ -1246,12 +1246,6 @@ const App: React.FC = () => {
   const renderHomeContent = (inTab: boolean) => (
               <div className={inTab ? "pb-6" : "flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"}>
                 <div className="max-w-3xl mx-auto w-full px-6 py-2 md:py-3 space-y-5">
-                  {/* Workshop-tab header: Hands On title above a smaller poster, links right after */}
-                  {inTab && (
-                    <h4 className="text-xl font-bold text-slate-600 tracking-wide text-center pt-1">
-                      InSites-CAA — Hands On
-                    </h4>
-                  )}
                   <div className={inTab ? "max-w-2xl mx-auto" : "pt-2 md:pt-3 max-w-2xl mx-auto"}>
                     <img
                       src="./poster-light.jpg"
@@ -1345,14 +1339,17 @@ const App: React.FC = () => {
 
                     {/* Links */}
                     <div className="space-y-2">
-                      <ResourceLink
-                        href="https://github.com/InSites-Lab/Insites-CAA2026"
-                        icon={<Github size={16} />}
-                        label="GitHub Repository"
-                        secondaryLabel="Source code and system instructions"
-                        highlight={true}
-                        colorScheme="slate"
-                      />
+                      <div className="rounded-xl border border-slate-300 bg-slate-100/80 shadow-sm hover:border-slate-400 transition-colors">
+                        <ResourceLink
+                          href="https://github.com/InSites-Lab/Insites-CAA2026"
+                          icon={<Github size={16} />}
+                          label="GitHub Repository"
+                          secondaryLabel="Source code and system instructions"
+                          highlight={true}
+                          colorScheme="slate"
+                          noBorder={true}
+                        />
+                      </div>
                       <ResourceLink
                         href="https://drive.google.com/drive/folders/1HxWjZ1GVGtRsoGWZZi4kaiNuhhLPTfO1?usp=sharing"
                         icon={<BookOpen size={16} />}
