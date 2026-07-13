@@ -90,6 +90,7 @@ InSites-Brain/design/                          # Source-of-truth workflow specs
   Single-Dashboard-example.html                # Dashboard reference implementation
   less-is-more.md, prompt-qa-principles.md     # Optimization principles
   Bot-Research-Skiil/                          # [CA-IP] Session Report specs
+  ca-ll-lessons-loop.md                        # [CA-LL] Lessons Loop mini-agent — CANDIDATE, not in build; depends on [CA-IP]; integrate only on explicit request
   specs/experiential-layer-source-spec.md      # How the bot consumes an experiential-layer source
 InSites-Brain/research/                        # Lab research insights & validated methods (cross-paper)
   genius-loci-experiential-method.md           # Experiential knowledge layer -> CBSA (validated, Madatech)
