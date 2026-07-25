@@ -62,24 +62,23 @@ InSites-Brain/
 
 ### 📝 ACTIVE WRITING — Heritage 4.0 Paper (Florence)
 
+> **Current focus (2026-07-25)**: writing the FINAL Heritage 4.0 paper, on a single unified working tree on `main`. The `DHSS-v3` lecture worktree was closed on 2026-07-25 (branch `DHSS-v3` remains, pushed to origin — reopen with `git worktree add ../insites-caa2026-lecture DHSS-v3`).
+
+`InSites-Brain/Papers/` (siblings: `Heritage4.0/`, `CN-Paper/`, `CAA-Paper/`, `DHSS/`) is **entirely gitignored** (`.gitignore:76`, plus legacy lines 74-75 for the old `Heritage4.0/`/`CN-Paper/` paths) — paper content is local-only on disk, not tracked on `main`.
+
 ```
-InSites-Brain/Heritage4.0/
+InSites-Brain/Papers/Heritage4.0/
   PROJECT-INSTRUCTIONS.md                      # Claude.ai Project instructions (paste-ready)
-  writing/                                     # Direct writing task
-    Heritage4_0-Draft-v1.md                    # Paper draft (extended abstract, 6p Springer CCIS)
-    Heritage4_0-Draft-v1.docx                  # Same in Springer CCIS template
-    Heritage4_0-Adapted-Structure-2303.md      # Section-by-section writing scaffold
-    Writing-Plan.md                            # Full plan, methodology, page budget, checklist
-    splnproc2510.docm                          # Springer CCIS Word template
-    instructions for Authors heritage 4.0.pdf  # Venue submission guidelines
-  evidence/                                    # Session-generated analysis (Claude Code output)
-    Heritage4_0-Case-Evidence-2303.md          # Source-traced demonstrations + performance profile
-    Manual-vs-Bot-Comparison-2303.md           # Manual SA vs AI-assisted SA comparison
-    Claim-Level-Count-2303.md                  # 45-claim epistemic analysis (quantitative backbone)
-    Tuba-Run-Analysis-2303.md                  # Bot session analysis
-    InSites_Observation_Guide.docx             # Expert observation rubric
-  source-materials/                            # Case study source PDFs (A, B, C)
+  writing/                                     # Springer template + historical drafts (incl. writing/OLD/ v1-v4)
+  old/                                         # Live version lineage Heritage4.0_V6 -> V10.1 — BACKUP, never mix new work in
+  evidence/                                    # Session-generated analysis (12 files)
+  source-materials/                            # Case study source PDFs (3 files)
+  research-tools/                              # core/, further-reading/, reproducibility/ (18 files)
+  papers/                                      # (empty)
+  comments.docx, Plan-Assessment-Report-1507.md, Heritage40_InSites_Abstract*.docx/.pdf
 ```
+
+**Recovery if this content ever disappears again (lost twice already)**: `research-tools/` (18 files) is preserved on branch `heritage-4.0.1` under the old path `InSites-Brain/Heritage4.0/research-tools/`; `evidence/` (12), `source-materials/` (3 PDFs), `writing/` (9) and `PROJECT-INSTRUCTIONS.md` are preserved on `main` at commit `11bc7fd^` under the same old path. Restore without dirtying the index: `git archive -o <tmp.tar> <ref> <path>` + `tar -xf`, then copy in with `robocopy /E /XC /XN /XO` (skips existing files). Note: `heritage-4.0.1` is 50 commits behind main (its mono is v7 vs. main's v10) — it is a supplementary-materials publication branch only; do not switch to it to work on the paper.
 
 ### 📐 REFERENCE — Read-only specs, don't modify unless asked
 
