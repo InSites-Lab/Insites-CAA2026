@@ -505,6 +505,7 @@ const App: React.FC = () => {
         hashRoutes[hash]();
       } else if (!hash) {
         closeAllModals();
+        hashRoutes['program']();
       }
     };
 
@@ -1394,7 +1395,7 @@ const App: React.FC = () => {
                   {/* Poster — slightly constrained width */}
                   <div className="pt-2 md:pt-3 max-w-2xl mx-auto">
                     <img
-                      src="./poster.png"
+                      src="./poster-light.jpg"
                       alt="InSites-CAA — CBSA Workshop Poster"
                       className="w-full rounded-2xl border border-slate-200 shadow-sm"
                     />
@@ -1814,7 +1815,7 @@ const App: React.FC = () => {
             ✕
           </button>
           <img
-            src="./poster.png"
+            src="./poster-light.jpg"
             alt="InSites Workshop"
             className="max-h-[55vh] rounded-2xl border border-slate-200 shadow-lg mb-6"
           />
