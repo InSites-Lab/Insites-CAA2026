@@ -211,7 +211,7 @@ const getAgentTheme = (
     return { card: style.selectedCard, icon: style.selectedIcon };
   }
   return {
-    card: "bg-white hover:shadow-md border-slate-200",
+    card: "bg-white shadow-sm hover:shadow-md border-slate-300",
     icon: style.unselectedIcon,
   };
 };
@@ -240,7 +240,7 @@ const App: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
   const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
   const [rawData] = useState<string>(DEMO_DATA);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(340);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(390);
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
@@ -762,7 +762,6 @@ const App: React.FC = () => {
           onStartResize={startResizing}
           selectedAgentId={selectedAgentId}
           showResearchAids={showResearchAids}
-          showDesignView={showDesignView}
           agents={CORE_AGENTS}
           onAgentSelect={(agentId) => {
             navigateTo(`step-${agentId}`);
@@ -770,10 +769,6 @@ const App: React.FC = () => {
           }}
           onResearchAidsClick={() => {
             navigateTo("tools");
-            handleCloseWelcome();
-          }}
-          onDesignClick={() => {
-            navigateTo("design");
             handleCloseWelcome();
           }}
           getAgentTheme={getAgentTheme}
