@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown } from 'lucide-react';
 import { Modal } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
-import { SandboxTab, SANDBOX_LABEL, SANDBOX_LABEL_SHORT } from './SandboxTab';
-
-// Dev-only experiment slot. Vite substitutes `false` here in a production
-// build, so the tab and everything it imports drop out of the bundle.
-const SHOW_SANDBOX = import.meta.env.DEV;
 
 // ─── Tab Definitions ──────────────────────────────────────────────
 
@@ -18,18 +13,10 @@ const PROGRAM_TABS = [
   { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={14} /> },
 ] as const;
 
-// In dev the sandbox REPLACES tab 2 in place rather than adding a sixth tab:
-// the experiment is judged in the slot it would actually occupy, and the bar
-// keeps the same five items. `WhatIsInSitesTab` stays in the file untouched.
-const VISIBLE_TABS = PROGRAM_TABS.map((tab) =>
-  SHOW_SANDBOX && tab.id === 'insites'
-    ? { ...tab, id: 'sandbox' as const, label: SANDBOX_LABEL, short: SANDBOX_LABEL_SHORT, isSandbox: true }
-    : { ...tab, isSandbox: false },
-);
 
 const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={14} /> } as const;
 
-type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'sandbox';
+type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa';
 
 const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
 
@@ -40,8 +27,7 @@ export interface WorkshopProgramViewProps {
 }
 
 export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate }) => {
-  // Opens on the first tab, whichever it is — in dev that is the sandbox.
-  const [activeTab, setActiveTab] = useState<TabId>(VISIBLE_TABS[0].id);
+  const [activeTab, setActiveTab] = useState<TabId>(PROGRAM_TABS[0].id);
   const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
   const [isDesignOpen, setIsDesignOpen] = useState(false);
 
@@ -76,18 +62,11 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
 
         {/* Tab Bar */}
         <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
-          {VISIBLE_TABS.map((tab) => (
+          {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              // Gated on SHOW_SANDBOX, not just tab.isSandbox, so the minifier
-              // can fold the branch away and these literals never ship.
-              title={SHOW_SANDBOX && tab.isSandbox ? 'Dev-only experiment — not in the production build' : undefined}
-              className={`flex-1 ${tabClass(tab.id)} ${
-                SHOW_SANDBOX && tab.isSandbox
-                  ? `border border-dashed ${activeTab === tab.id ? 'border-amber-400 text-amber-700' : 'border-amber-300 text-amber-600/80 hover:text-amber-700'}`
-                  : ''
-              }`}
+              className={`flex-1 ${tabClass(tab.id)}`}
             >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
@@ -121,7 +100,6 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
               onOpenDesign={() => setIsDesignOpen(true)}
             />
           )}
-          {SHOW_SANDBOX && activeTab === 'sandbox' && <SandboxTab />}
         </SwitchTransition>
       </div>
 
@@ -275,43 +253,94 @@ const DualTensionTab: React.FC = () => (
 
 // ─── 2 · What is InSites ──────────────────────────────────────────
 
-const INSITES_PRINCIPLES = [
-  { label: 'Grounded', hint: "Every claim traced to the site's own written sources" },
-  { label: 'Staged', hint: 'Staged reasoning — from scope declaration to significance statement' },
-  { label: 'HITL by principle', hint: 'Expert review as assessment practice, not compensation for model limits' },
-  { label: 'Platform-agnostic', hint: 'What transfers is the expert–system interaction, not a model or a platform' },
+const CHALLENGES = [
+  {
+    // Merges the two original cards ("too complex" + "too heavy, no one reads
+    // it"), so the response merges their answers too.
+    quote: "It's important but too complex — and nobody reads it",
+    response: "With AI trained in our assessment principles we can simplify the process and link outputs directly to surveys and systems — and with natural language queries and visual tools like knowledge graphs, make the results usable rather than shelved.",
+    color: 'amber',
+    avatar: './rabbit.png',
+  },
+  {
+    // New card. The response below is a DRAFT — it answers the black box with
+    // the paper's own mechanism (epistemic notation). Rewrite as you see fit.
+    quote: 'The assessment reasoning is a Black Box',
+    response: "Every claim carries a mark for its distance from the sources — what was read, what was inferred, what is hypothesis. The reasoning path stops being tacit and becomes reviewable, claim by claim.",
+    color: 'indigo',
+    avatar: './hatter.jpg',
+  },
+  {
+    quote: "So will AI replace the professionals?",
+    response: "No. Experts remain essential. AI is a smart partner for detecting connections and contexts — but it needs our guidance.",
+    color: 'emerald',
+    avatar: './robot.png',
+  },
 ];
 
+const challengeColors: Record<string, { border: string; bg: string; text: string; quote: string }> = {
+  amber: { border: 'border-l-amber-400', bg: 'bg-amber-50', text: 'text-amber-900/70', quote: 'text-amber-900' },
+  indigo: { border: 'border-l-indigo-400', bg: 'bg-indigo-50', text: 'text-indigo-900/70', quote: 'text-indigo-900' },
+  emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-900/70', quote: 'text-emerald-900' },
+};
+
 const WhatIsInSitesTab: React.FC = () => (
-  <div className="space-y-8">
-    <div className="space-y-2.5 mt-6">
-      <Eyebrow>The tool</Eyebrow>
-      <h3 className="text-4xl leading-tight font-extrabold text-slate-900">Analytical scaffolding.</h3>
-      <p className="text-[17px] text-slate-600">
-        Not a trained model — staged reasoning anchored to the sources, expert review between stages.
+  <div className="space-y-5">
+    {/* Poster */}
+    <div className="max-w-3xl mx-auto">
+      <img
+        src="./poster-light.jpg"
+        alt="InSites-CAA — CBSA Workshop"
+        className="w-full rounded-2xl border border-slate-200 shadow-sm"
+      />
+      <p className="text-center text-base text-slate-500 italic mt-2">
+        "The LLM is a looking glass — more than a wonderland"
+      </p>
+      <p className="text-center text-sm text-slate-400 mt-1">
+        CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
 
-    <div className="inline-flex items-center gap-3.5 bg-indigo-50 border-2 border-indigo-200 rounded-xl px-5 py-4">
-      <span className="w-[34px] h-[34px] rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 12H5" />
-          <path d="m12 19-7-7 7-7" />
-        </svg>
-      </span>
-      <span className="text-base font-bold text-indigo-900">The process is live on the left — step into any stage.</span>
+    {/* Intro line */}
+    <p className="text-base text-slate-600 leading-relaxed">
+      AI already speaks our language and is becoming an active partner in culture. We examine how it can help with the cultural assessment challenges:
+    </p>
+
+    {/* 3 Challenge cards with character avatars */}
+    <div className="space-y-3">
+      {CHALLENGES.map((ch, idx) => {
+        const c = challengeColors[ch.color] || challengeColors.amber;
+        const isRight = idx % 2 === 0;
+        return (
+          <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
+            <summary className={`p-4 cursor-pointer flex items-center gap-3 select-none ${isRight ? '' : 'flex-row-reverse text-right'}`}>
+              <img
+                src={ch.avatar}
+                alt=""
+                className="w-16 h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+              <span className={`font-bold text-base ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+            </summary>
+            <div className="px-4 pb-4 pt-1">
+              <p className={`text-base ${c.text} leading-relaxed`}>{ch.response}</p>
+            </div>
+          </details>
+        );
+      })}
     </div>
 
-    <div className="flex flex-wrap gap-2.5">
-      {INSITES_PRINCIPLES.map((p) => (
-        <span
-          key={p.label}
-          title={p.hint}
-          className="border border-slate-300 bg-white rounded-full px-4 py-2 text-[13px] font-bold text-slate-700 cursor-help"
-        >
-          {p.label}
-        </span>
-      ))}
+    {/* Lab intro */}
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+      <h4 className="font-bold text-base text-slate-800">InSites Knowledge Lab</h4>
+      <p className="text-sm text-slate-400">Technion — Israel Institute of Technology</p>
+      <p className="text-base text-slate-700 leading-relaxed">
+        At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
+      </p>
+      <p className="text-base text-slate-700 leading-relaxed">
+        InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
+      </p>
     </div>
   </div>
 );
