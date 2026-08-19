@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Assistant', system-ui, sans-serif; background: #f8fafc; }
+    a { color: #4f46e5; } a:hover { color: #4338ca; }
+  </style>
+</helmet>
+<div style="width: 1280px; height: 800px; background: #ffffff; display: flex; flex-direction: column; overflow: hidden;">
+  <div style="width: 896px; margin: 0 auto; padding: 20px 24px 0 24px; display: flex; flex-direction: column; gap: 34px;">
+
+    <div style="display: flex; gap: 6px; background: #f1f5f9; padding: 4px; border-radius: 12px; align-items: stretch;">
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #64748b;">The Dual Tension</div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; background: #ffffff; color: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">What is InSites</div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #64748b;">Epistemic Notation</div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #64748b;">From Report to Inquiry</div>
+      <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 8px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; color: #94a3b8;">Q&amp;A</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #94a3b8;">The tool</div>
+      <div style="font-size: 36px; line-height: 1.2; font-weight: 800; color: #0f172a;">Analytical scaffolding.</div>
+      <div style="font-size: 17px; color: #475569;">Not a trained model — staged reasoning anchored to the sources, expert review between stages.</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; background: #eef2ff; border: 2px solid #c7d2fe; border-radius: 12px; padding: 16px 20px; align-self: flex-start;">
+      <div style="width: 34px; height: 34px; border-radius: 999px; background: #4f46e5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+      </div>
+      <div style="font-size: 16px; font-weight: 700; color: #312e81;">The process is live on the left — step into any stage.</div>
+    </div>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: #334155;" title="Grounded in the site's three written sources">Grounded</div>
+      <div style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: #334155;" title="Staged reasoning — from scope declaration to significance statement">Staged</div>
+      <div style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: #334155;" title="Expert review as assessment practice, not compensation for model limits">HITL by principle</div>
+      <div style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: #334155;" title="What transfers is the expert-system interaction, not a model or platform">Platform-agnostic</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

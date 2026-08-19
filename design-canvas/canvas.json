@@ -1,0 +1,62 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "1 · The Dual Tension",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 800
+    },
+    {
+      "file": "WhatIsInSites.dc.html",
+      "title": "2 · What is InSites",
+      "x": 1360,
+      "y": 0,
+      "w": 1280,
+      "h": 800
+    },
+    {
+      "file": "EpistemicNotation.dc.html",
+      "title": "3 · Epistemic Notation",
+      "x": 0,
+      "y": 900,
+      "w": 1280,
+      "h": 800
+    },
+    {
+      "file": "FromReportToInquiry.dc.html",
+      "title": "4 · From Report to Inquiry",
+      "x": 1360,
+      "y": 900,
+      "w": 1280,
+      "h": 800
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-carousel",
+      "x": 0,
+      "y": -150,
+      "w": 320,
+      "text": "Tab 1 photo strip: in the real site this crossfades quietly (~6s) through the site photos - dolmen, aerial, and more can join the rotation. No arrows, no dots."
+    },
+    {
+      "id": "note-modals",
+      "x": 0,
+      "y": 1730,
+      "w": 320,
+      "text": "'The notation' opens the existing EpistemicNotationModal (#notation). 'Worked example' opens notation.html - the annotated Tuba assessment that used to be the Example tab - in a fullscreen modal."
+    },
+    {
+      "id": "note-tab5",
+      "x": 1360,
+      "y": -150,
+      "w": 320,
+      "text": "5th tab is Q&A (muted): GitHub repository link + backup material for questions. Design Principles is HIDDEN from the tab bar but kept in the code, still reachable via the #design route if needed during Q&A. Chips on tab 2 carry short tooltips on hover."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

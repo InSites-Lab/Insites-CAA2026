@@ -56,9 +56,9 @@ export const Header: React.FC<HeaderProps> = ({
   aria-label="Back to home"
   className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-0 py-1.5 flex items-center"
 >
-  <h1 className="font-black tracking-tight leading-none text-indigo-100 group-hover:text-white text-base md:text-lg truncate relative inline-block transition-colors duration-300">
-    <span className="md:hidden">InSites-CAA Workshop</span>
-    <span className="hidden md:inline">CAA26 — Significance Assessment through the Looking Glass of Gen-AI</span>
+  <h1 className="font-black tracking-tight leading-tight py-0.5 text-indigo-100 group-hover:text-white text-base md:text-lg truncate relative inline-block transition-colors duration-300">
+    <span className="md:hidden">From Report to Inquiry</span>
+    <span className="hidden md:inline">From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</span>
     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
   </h1>
 </button>
