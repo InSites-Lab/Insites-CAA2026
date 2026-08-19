@@ -1,8 +1,13 @@
 # Enable Rewrite Engine for SPA routing
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
-  
+  # Must match the URL path this build is deployed under. With "/" the SPA
+  # fallback below resolves to the DOMAIN root's index.html, so any unknown
+  # sub-path under this app would serve alephplace.com's home page instead of
+  # this one. Inert today (the app routes by #hash, so no sub-paths are
+  # requested), but wrong, and confusing the moment someone mistypes a URL.
+  RewriteBase /insites/heritage4.0/
+
   # If the request is not for an existing file
   RewriteCond %{REQUEST_FILENAME} !-f
   # If the request is not for an existing directory
