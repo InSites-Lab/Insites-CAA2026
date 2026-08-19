@@ -9,7 +9,7 @@ export interface PresentationModalProps {
 }
 
 export const PresentationModal: React.FC<PresentationModalProps> = ({ isOpen, onClose, onNavigate }) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Workshop Presentation" fullscreen>
+  <Modal isOpen={isOpen} onClose={onClose} title="From Report to Inquiry — Heritage 4.0, Florence" fullscreen>
     <WorkshopProgramView onNavigate={onNavigate} />
   </Modal>
 );

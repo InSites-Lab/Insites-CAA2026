@@ -240,7 +240,12 @@ const App: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
   const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
   const [rawData] = useState<string>(DEMO_DATA);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(390);
+  // ── SIDEBAR WIDTH — tune here ────────────────────────────────────
+  // Default width of the process sidebar, in px. Not persisted: dragging the
+  // handle changes it for the session only, every reload comes back here.
+  // Drag limits are 220–700 (see `resize` below) — keep this inside them.
+  // Font/icon sizes are a separate knob: `SIZE` in components/layout/Sidebar.tsx
+  const [sidebarWidth, setSidebarWidth] = useState<number>(430);
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
@@ -534,13 +539,22 @@ const App: React.FC = () => {
     selectedAgentId !== null ? STEP_DETAILS[selectedAgentId] : undefined;
   const isResizing = useRef<boolean>(false);
 
-  const startResizing = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isResizing.current = true;
-    setIsResizingState(true);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-  }, []);
+  // Where the drag began, and how wide the sidebar was at that moment.
+  // The new width is derived from the DELTA, so the handle never jumps to
+  // meet the cursor and the maths does not depend on where the sidebar sits.
+  const resizeStart = useRef<{ x: number; width: number }>({ x: 0, width: 0 });
+
+  const startResizing = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      resizeStart.current = { x: e.clientX, width: sidebarWidth };
+      isResizing.current = true;
+      setIsResizingState(true);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+    },
+    [sidebarWidth],
+  );
 
   const stopResizing = useCallback(() => {
     if (isResizing.current) {
@@ -553,10 +567,11 @@ const App: React.FC = () => {
 
   const resize = useCallback((e: MouseEvent) => {
     if (!isResizing.current) return;
-    const newWidth = window.innerWidth - e.clientX;
-    if (newWidth > 220 && newWidth < 700) {
-      setSidebarWidth(newWidth);
-    }
+    // The sidebar is docked LEFT — dragging right widens it. Clamp rather
+    // than ignore out-of-range values, so the edge follows the cursor to the
+    // limit instead of freezing the drag.
+    const next = resizeStart.current.width + (e.clientX - resizeStart.current.x);
+    setSidebarWidth(Math.min(700, Math.max(220, next)));
   }, []);
 
   useEffect(() => {
@@ -1650,6 +1665,17 @@ const App: React.FC = () => {
         </main>
       </div>
 
+      {/* Rendered first so the content modals below it (notation, graph, dashboards)
+          paint ABOVE the fullscreen presentation — they share the same z-index. */}
+      <PresentationModal
+        isOpen={isPresentationModalOpen}
+        onClose={() => {
+          setIsPresentationModalOpen(false);
+          navigateTo("program");
+        }}
+        onNavigate={navigateTo}
+      />
+
       <InventoryModal
         isOpen={isInventoryModalOpen}
         onClose={() => {
@@ -1784,15 +1810,6 @@ const App: React.FC = () => {
         onClose={() => {
           setIsGlossaryModalOpen(false);
           window.location.hash = "";
-        }}
-        onNavigate={navigateTo}
-      />
-
-      <PresentationModal
-        isOpen={isPresentationModalOpen}
-        onClose={() => {
-          setIsPresentationModalOpen(false);
-          navigateTo("program");
         }}
         onNavigate={navigateTo}
       />
