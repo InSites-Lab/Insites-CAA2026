@@ -3,19 +3,33 @@ import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLi
 import { Modal } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
+import { SandboxTab, SANDBOX_LABEL, SANDBOX_LABEL_SHORT } from './SandboxTab';
+
+// Dev-only experiment slot. Vite substitutes `false` here in a production
+// build, so the tab and everything it imports drop out of the bundle.
+const SHOW_SANDBOX = import.meta.env.DEV;
 
 // ─── Tab Definitions ──────────────────────────────────────────────
 
 const PROGRAM_TABS = [
-  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={14} /> },
   { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={14} /> },
+  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={14} /> },
   { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={14} /> },
   { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={14} /> },
 ] as const;
 
+// In dev the sandbox REPLACES tab 2 in place rather than adding a sixth tab:
+// the experiment is judged in the slot it would actually occupy, and the bar
+// keeps the same five items. `WhatIsInSitesTab` stays in the file untouched.
+const VISIBLE_TABS = PROGRAM_TABS.map((tab) =>
+  SHOW_SANDBOX && tab.id === 'insites'
+    ? { ...tab, id: 'sandbox' as const, label: SANDBOX_LABEL, short: SANDBOX_LABEL_SHORT, isSandbox: true }
+    : { ...tab, isSandbox: false },
+);
+
 const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={14} /> } as const;
 
-type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa';
+type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'sandbox';
 
 const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
 
@@ -26,25 +40,55 @@ export interface WorkshopProgramViewProps {
 }
 
 export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<TabId>('tension');
+  // Opens on the first tab, whichever it is — in dev that is the sandbox.
+  const [activeTab, setActiveTab] = useState<TabId>(VISIBLE_TABS[0].id);
   const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
   const [isDesignOpen, setIsDesignOpen] = useState(false);
 
+  // Tabs that must never scroll: the column is bounded to the frame instead of
+  // being allowed to grow past it, and the tab yields height from its images.
+  // Every other tab keeps `shrink-0`, so tall content scrolls as before.
+  const fitsFrame = activeTab === 'inquiry' || activeTab === 'tension';
+  const fillClass = fitsFrame ? 'grow min-h-0' : 'grow shrink-0';
+
   const tabClass = (id: TabId) =>
-    `flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+    `flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
       activeTab === id
         ? 'bg-white text-slate-800 shadow-sm'
         : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
     }`;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-white overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16" dir="ltr">
-      <div className="max-w-4xl mx-auto w-full px-6 py-4 space-y-5 shrink-0">
+    <div
+      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16 ${
+        fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
+      }`}
+      dir="ltr"
+    >
+      {/* Content column. 4xl (896px) is the width the design canvas was drawn
+          at; the wider steps only kick in on large screens, so the tab bar has
+          room for full labels instead of compressing them. Drop the xl/2xl
+          classes to pin every screen back to the canvas width. */}
+      {/* `grow shrink-0` (not flex-1) makes the column fill the viewport down to
+          the bottom while still growing past it when a tab is tall — so a tab
+          can hand its spare height to an image strip instead of leaving a gap. */}
+      <div className={`max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto w-full px-6 py-4 ${fillClass} flex flex-col gap-5`}>
 
         {/* Tab Bar */}
-        <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
-          {PROGRAM_TABS.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 ${tabClass(tab.id)}`}>
+        <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
+          {VISIBLE_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              // Gated on SHOW_SANDBOX, not just tab.isSandbox, so the minifier
+              // can fold the branch away and these literals never ship.
+              title={SHOW_SANDBOX && tab.isSandbox ? 'Dev-only experiment — not in the production build' : undefined}
+              className={`flex-1 ${tabClass(tab.id)} ${
+                SHOW_SANDBOX && tab.isSandbox
+                  ? `border border-dashed ${activeTab === tab.id ? 'border-amber-400 text-amber-700' : 'border-amber-300 text-amber-600/80 hover:text-amber-700'}`
+                  : ''
+              }`}
+            >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.short}</span>
@@ -60,7 +104,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
         </div>
 
         {/* Tab Content */}
-        <SwitchTransition transitionKey={activeTab}>
+        <SwitchTransition transitionKey={activeTab} className={`${fillClass} flex flex-col`}>
           {activeTab === 'tension' && <DualTensionTab />}
           {activeTab === 'insites' && <WhatIsInSitesTab />}
           {activeTab === 'notation' && (
@@ -77,6 +121,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
               onOpenDesign={() => setIsDesignOpen(true)}
             />
           )}
+          {SHOW_SANDBOX && activeTab === 'sandbox' && <SandboxTab />}
         </SwitchTransition>
       </div>
 
@@ -115,80 +160,116 @@ const SITE_PHOTOS = [
   { src: './h40-dolmen-archive.jpg', alt: 'A dolmen in the Upper Galilee landscape, archival photograph' },
 ];
 
-/** Two panels crossfading quietly through the site photos — no arrows, no dots. */
-const PhotoStrip: React.FC = () => {
+/**
+ * Panels crossfading quietly through a photo set — no arrows, no dots. With two
+ * panels they are offset by one, so the same picture is never on screen twice.
+ *
+ * The strip always yields its height first: `basis-0` means it claims none of
+ * its own and only takes what the tab has left over, so nothing below it is
+ * ever pushed out of the frame. The two knobs below bound the result.
+ */
+const PhotoStrip: React.FC<{
+  photos?: { src: string; alt: string }[];
+  caption?: string;
+  columns?: 1 | 2;
+  /** WIDTH KNOB — a Tailwind max-w class. 'max-w-full' fills the content
+   *  column; narrower values centre the strip inside it. Set per tab. */
+  maxWidth?: string;
+  /** HEIGHT KNOB — a Tailwind max-h class. Keep the /var(--app-zoom) divisor,
+   *  or the cap is painted 1.1x too tall. Set per tab. */
+  maxHeight?: string;
+}> = ({
+  photos = SITE_PHOTOS,
+  caption,
+  columns = 2,
+  maxWidth = 'max-w-full',
+  maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]',
+}) => {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % SITE_PHOTOS.length), 6000);
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % photos.length), 6000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [photos.length]);
 
-  const panel = (offset: number, caption?: string) => (
+  const panel = (offset: number, panelCaption?: string) => (
     <div className="relative rounded-2xl overflow-hidden bg-slate-100">
-      {SITE_PHOTOS.map((photo, i) => (
+      {photos.map((photo, i) => (
         <img
           key={photo.src}
           src={photo.src}
-          alt={i === (index + offset) % SITE_PHOTOS.length ? photo.alt : ''}
+          alt={i === (index + offset) % photos.length ? photo.alt : ''}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${
-            i === (index + offset) % SITE_PHOTOS.length ? 'opacity-100' : 'opacity-0'
+            i === (index + offset) % photos.length ? 'opacity-100' : 'opacity-0'
           }`}
         />
       ))}
-      {caption && (
+      {panelCaption && (
         <div className="absolute inset-x-0 bottom-0 px-4 pt-7 pb-2.5 text-white text-[13px] font-semibold bg-gradient-to-t from-slate-900/75 to-transparent">
-          {caption}
+          {panelCaption}
         </div>
       )}
     </div>
   );
 
   return (
-    <div className="grid grid-cols-2 gap-3.5 h-[190px]">
-      {panel(0, 'One experimental answer, from one site — a dolmen field in northern Israel.')}
-      {panel(1)}
+    <div
+      // basis-0 + min-h-0 so the strip claims no height of its own, plus a hard
+      // viewport cap. The cap is what actually bounds it — the app root is
+      // `min-h-screen`, so the frame handed down here can be taller than the
+      // window and `grow` alone would over-allocate.
+      className={`grid gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto ${maxWidth} ${maxHeight} ${
+        columns === 1 ? 'grid-cols-1' : 'grid-cols-2'
+      }`}
+    >
+      {panel(0, caption)}
+      {columns === 2 && panel(1)}
     </div>
   );
 };
 
+// Like tab 4, this tab never scrolls: bounded to the frame, everything
+// shrink-0 except the photo strip, which takes only what is left over.
 const DualTensionTab: React.FC = () => (
-  <div className="space-y-5">
-    <div className="space-y-1.5">
-      <Eyebrow>Why governance</Eyebrow>
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-5">
+    <div className="space-y-1.5 shrink-0">
+      <Eyebrow>The challenge</Eyebrow>
+      {/* "hallucinates", not "fabricates" — the paper's own abstract wording. */}
       <h3 className="text-3xl md:text-[33px] leading-tight font-extrabold text-slate-900">
-        Give it freedom — it fabricates.
+        Give it freedom — it hallucinates.
         <br />
         Lock it down — it loses the synthesis we came for.
       </h3>
+      {/* Picks up tab 1's "meaning emerges from context" and turns the two
+          risks into one mechanism — which is why suppression cannot be the
+          answer, and governance has to be. Delete this line if it crowds. */}
+      <p className="text-lg text-slate-600 pt-1">
+        One capability, two faces — meaning emerges from context, in the transformer as in CBSA.
+      </p>
     </div>
 
-    <div className="flex flex-col items-center gap-3">
-      <div className="grid grid-cols-2 gap-4 w-full">
-        <div className="bg-white border-2 border-slate-300 rounded-xl px-[18px] py-3.5 shadow-sm">
-          <p className="text-[11px] font-extrabold tracking-[0.1em] text-amber-700">FREEDOM</p>
-          <p className="text-[15px] text-slate-700 mt-1">Fluent claims no source supports</p>
-        </div>
-        <div className="bg-white border-2 border-slate-300 rounded-xl px-[18px] py-3.5 shadow-sm">
-          <p className="text-[11px] font-extrabold tracking-[0.1em] text-indigo-700">GUARDRAILS</p>
-          <p className="text-[15px] text-slate-700 mt-1">The synthesis we came for is lost</p>
-        </div>
-      </div>
-      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M10 1v13" />
-        <path d="m4 9 6 6 6-6" />
-      </svg>
-      <div className="bg-slate-900 text-white rounded-xl px-[26px] py-3 text-[15px] font-semibold">
-        Both share one cause — the reasoning path stays tacit.
-      </div>
+    {/* "afford" deliberately echoes "affordances" below, so the two read as one
+        question and its research phrasing rather than as two competing ones. */}
+    <div className="space-y-2 shrink-0 text-center">
+      <p className="text-2xl font-bold text-slate-900 leading-snug">
+        How can we afford both: accountability and the growth of new insight?
+      </p>
+      <p className="text-lg font-bold text-indigo-600">
+        Under which affordances — and which human oversight — can AI assess accountably?
+      </p>
     </div>
 
-    <p className="text-lg font-bold text-indigo-600 text-center">
-      Under which affordances — and which human oversight — can AI assess accountably?
-    </p>
-
-    <PhotoStrip />
+    {/* ── TAB 2 IMAGE KNOBS ──────────────────────────────────────────
+        maxWidth  — max-w-full is the whole content column; max-w-5xl /
+                    4xl / 3xl narrow and centre it.
+        maxHeight — lower the vh number for a shorter strip. Keep the
+                    /var(--app-zoom) divisor. */}
+    <PhotoStrip
+      maxWidth="max-w-6xl"
+      maxHeight="max-h-[calc(45vh/var(--app-zoom))]"
+      caption="One experimental answer, from one site — a dolmen field in northern Israel."
+    />
   </div>
 );
 
@@ -243,11 +324,16 @@ const NOTATION_TIERS = [
   { mark: <span className="bg-purple-100 rounded px-2 text-[15px] font-semibold">💭</span>, title: 'Hypothesis', titleColor: 'text-purple-800', body: 'Reading between the lines' },
 ];
 
+// 24 + 14 + 4 + 3 = 45. The fifth tile is what used to be missing from the
+// sum: three claims counted apart because they are the ones that failed.
 const CLAIM_COUNTS = [
   { n: '45', label: 'claims', color: 'text-slate-900' },
   { n: '24', label: 'unmarked', color: 'text-slate-900' },
   { n: '14', label: 'inferred 〰️', color: 'text-amber-800' },
   { n: '4', label: 'hypotheses 💭', color: 'text-purple-800' },
+  // Same verb as the bottom line below ("the expert caught the other three"),
+  // so the tile and the sentence read as one statement.
+  { n: '3', label: 'caught', color: 'text-slate-900' },
 ];
 
 const EpistemicNotationTab: React.FC<{
@@ -273,7 +359,7 @@ const EpistemicNotationTab: React.FC<{
       ))}
     </div>
 
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5">
       {CLAIM_COUNTS.map((c) => (
         <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5">
           <p className={`text-[26px] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
@@ -282,13 +368,16 @@ const EpistemicNotationTab: React.FC<{
       ))}
     </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-      <div className="bg-white border-2 border-dashed border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-700">
-        <strong className="text-slate-900">An unmarked hierarchy claim</strong> — stopped by the expert.
-      </div>
-      <div className="bg-white border-2 border-dashed border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-700">
-        <strong className="text-slate-900">A correctly marked 〰️ claim — still removed.</strong> A mark is not analytical value.
-      </div>
+    {/* The bottom line on performance: what the marking was worth, and where
+        the three missing from the sum went. No percentage — the paper reports
+        none, and one case with one expert does not support one. */}
+    <div className="border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
+      <p className="text-xl font-bold text-slate-900 leading-snug">
+        42 of 45 held. The expert caught the other three — in the session.
+      </p>
+      <p className="text-sm text-slate-500 mt-1.5">
+        One claim was wrong · one did not belong · one inference went unmarked.
+      </p>
     </div>
 
     <div className="flex flex-wrap gap-3">
@@ -311,66 +400,63 @@ const EpistemicNotationTab: React.FC<{
 // ─── 4 · From Report to Inquiry ───────────────────────────────────
 
 const readingIcon = (paths: React.ReactNode) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
     {paths}
   </svg>
 );
 
+// Two of the five, chosen as the ones that carry the talk: the long arc and
+// the landscape of imagination. The other three are in git history at aecd58b.
 const NEW_READINGS: { icon: React.ReactNode; text: React.ReactNode }[] = [
   {
     icon: readingIcon(<><path d="M3 17c2.5-9 15.5-9 18 0" /><circle cx="3" cy="17" r="1.5" /><circle cx="21" cy="17" r="1.5" /></>),
     text: 'A four-millennia pastoral arc — the dolmen builders to the Tuba-Zangariyye Bedouin',
   },
   {
-    icon: readingIcon(<><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></>),
-    text: 'A resource node within a landscape corridor — built from the four mapped springs',
-  },
-  {
     icon: readingIcon(<><path d="M17.5 19a4.5 4.5 0 1 0-1.7-8.7 6 6 0 1 0-9.8 5.4" /><path d="M6 19h11.5" /></>),
     text: 'A persistent landscape for imagination — gathered from a single footnote',
-  },
-  {
-    icon: readingIcon(<><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></>),
-    text: (
-      <>
-        The field's place in a mortuary landscape <span className="bg-purple-100 rounded px-1.5 text-[13px]">💭</span>
-      </>
-    ),
-  },
-  {
-    icon: readingIcon(<path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z" />),
-    text: 'An interpretive inversion — the absence of excavation read as a form of preservation',
   },
 ];
 
 const FromReportToInquiryTab: React.FC = () => (
-  <div className="space-y-5">
-    <div className="space-y-1.5">
-      <Eyebrow>What it yielded</Eyebrow>
+  // This tab never scrolls. It is bounded to the frame (`min-h-0` +
+  // `overflow-hidden`), everything except the photo is `shrink-0`, and the photo
+  // flexes — so the closing panel is always on screen and the image is what
+  // gives way when the viewport is short.
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-4">
+    <div className="space-y-1.5 shrink-0">
+      {/* <Eyebrow>What it yielded</Eyebrow> */}
       <h3 className="text-3xl leading-tight font-extrabold text-slate-900">
-        Not a report to be accepted —
-        <br />
-        an inquiry to be examined, claim by claim.
+        From a final report — To an inquiry to be examined. <span className="text-[22px] font-medium text-slate-500">
+    &nbsp; &nbsp; &nbsp;( Two LLM InSites examples)</span>
+        {/* <br /> */}
+        
       </h3>
     </div>
 
-    <div className="space-y-2.5">
-      <p className="text-xs font-extrabold tracking-[0.1em] uppercase text-slate-500">
-        Five readings the manual assessment had not reached
-      </p>
+    <div className="space-y-2.5 shrink-0">
+      {/* <p className="text-sm font-extrabold tracking-[0.1em] uppercase text-slate-500">
+        Two examples from readings the manual assessment had not reached
+      </p> */}
       {NEW_READINGS.map((r, i) => (
-        <div key={i} className="flex items-center gap-3 bg-white border border-slate-200 rounded-[10px] px-3.5 py-2.5">
+        <div key={i} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-3">
           {r.icon}
-          <p className="text-sm text-slate-700">{r.text}</p>
+          <p className="text-xl text-slate-700 leading-snug">{r.text}</p>
         </div>
       ))}
     </div>
 
-    <div className="bg-slate-900 rounded-2xl px-7 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+    {/* Placeholder photos, to be swapped for the pastoral landscape these two
+        readings describe. `fit` so the closing panel below is never pushed
+        out of the frame — the image gives up its height first. */}
+    {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
+    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[calc(48vh/var(--app-zoom))]" />
+
+    <div className="bg-slate-900 rounded-2xl px-7 py-5 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div className="space-y-1.5">
         <p className="text-[19px] font-bold text-white leading-snug">
-          Even a perfect machine, optimally serving conservation —
-          <br className="hidden sm:inline" /> cultural assessment must remain human.
+          Even a perfect machine, optimally serving conservation — cultural assessment must remain human.
+          <br className="hidden sm:inline" /> 
         </p>
         <p className="text-[13px] text-slate-400">Who assesses is part of what is assessed.</p>
       </div>

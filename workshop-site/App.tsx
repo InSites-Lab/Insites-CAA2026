@@ -789,7 +789,16 @@ const App: React.FC = () => {
           getAgentTheme={getAgentTheme}
         />
 
-        <main className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden">
+        {/* The row above sets `md:items-start`, so <main> is not stretched and
+            `flex-1` governs its WIDTH only — its height stays content-sized.
+            The talk view needs a real height to hand down (its photo strips
+            grow into the leftover), so it opts into stretching. Other views
+            keep the existing content-height behaviour. */}
+        <main
+          className={`flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden ${
+            mobileView === "PROGRAM" ? "md:self-stretch" : ""
+          }`}
+        >
           {/* Welcome/About Overlay - Desktop Only */}
           <div className="hidden md:block">
             <WelcomeOverlay
@@ -1637,7 +1646,7 @@ const App: React.FC = () => {
             )}
           </SwitchTransition>
 
-          <footer
+          {/* <footer
             className="flex-row-reverse fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-2 shadow-lg md:bottom-0"
             style={{
               zIndex: 45,
@@ -1661,7 +1670,7 @@ const App: React.FC = () => {
                 © Developed by Dr. Yael Alef and Yuval Shafriri
               </div>
             </div>
-          </footer>
+          </footer> */}
         </main>
       </div>
 
