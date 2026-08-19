@@ -21,6 +21,25 @@ export interface SidebarProps {
 // thicker indigo segment. A filled dot on every connector is the HITL
 // stop — the expert review crossed between one stage and the next.
 
+// ─── Sizing — the only place to tune the sidebar's scale ───────────
+// Every font and icon size in this column comes from here. The values are
+// literal Tailwind classes, so changing one changes every station at once
+// (stages, gates and Extensions & Tools alike). Raising `title`/`role`
+// raises each button's height, which lengthens the whole spine.
+// Spacing between stations is NOT here — it is hand-tuned in the markup
+// (`pt-5`, `min-h-[35px]`, `pt-2`). Leave those alone unless you mean to.
+
+const SIZE = {
+  heading: 'text-[14px]',  // "Assessment Process (CBSA Approach)"
+  title: 'text-[16px]',    // stage name — the main driver of button height
+  role: 'text-[14px]',     // the small line under the stage name
+  bubble: 'w-11 h-8',      // the round icon holder inside each button
+  icon: 19,                // lucide icon size inside the bubble, in px
+  cardPad: 'p-2.5',        // padding inside every button
+  legend: 'text-[12px]',   // the ○ / ● key at the bottom
+  chevron: 15,             // the Extensions & Tools arrow, in px
+} as const;
+
 const isGate = (id: number) => id === 0 || id === 6;
 
 // Line running through a station row (trimmed at the process ends)
@@ -62,8 +81,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="h-full px-2 pt-0 pb-2 text-left flex flex-col">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 text-center pt-5 pb-5">
-            Assessment Process (<span className="text-[12px]">CBSA</span> Approach)
+          <h3 className={`${SIZE.heading} font-black uppercase tracking-widest text-slate-400 text-center pt-5 pb-5`}>
+            Assessment Process (CBSA Approach)
           </h3>
 
           {/* Stations on the spine */}
@@ -85,17 +104,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <div
                       onClick={() => onAgentSelect(agent.id)}
-                      className={`flex-1 relative flex items-center justify-between p-2 rounded-xl border-2 cursor-pointer transition-all duration-300 ${theme.card} ${isGate(agent.id) ? 'border-dashed' : ''}`}
+                      className={`flex-1 relative flex items-center justify-between ${SIZE.cardPad} rounded-xl border-2 cursor-pointer transition-all duration-300 ${theme.card} ${isGate(agent.id) ? 'border-dashed' : ''}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${theme.icon}`}>
-                          {React.cloneElement(agent.icon as React.ReactElement<{ size?: number }>, { size: 16 })}
+                        <div className={`${SIZE.bubble} shrink-0 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${theme.icon}`}>
+                          {React.cloneElement(agent.icon as React.ReactElement<{ size?: number }>, { size: SIZE.icon })}
                         </div>
                         <div>
-                          <h3 className={`font-bold text-[13px] leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
+                          <h3 className={`font-bold ${SIZE.title} leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
                             {agent.name}
                           </h3>
-                          <p className="text-[12px] text-slate-500  uppercase tracking-wide">{agent.role}</p>
+                          <p className={`${SIZE.role} text-slate-500 uppercase tracking-wide`}>{agent.role}</p>
                         </div>
                       </div>
                     </div>
@@ -124,28 +143,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="w-6 shrink-0"></div>
             <div
               onClick={onResearchAidsClick}
-              className={`flex-1 relative flex items-center justify-between p-2 rounded-xl border-2 cursor-pointer transition-all duration-300 ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50/60 border-indigo-200 hover:bg-indigo-100/70 hover:border-indigo-300 hover:shadow-md'}`}
+              className={`flex-1 relative flex items-center justify-between ${SIZE.cardPad} rounded-xl border-2 cursor-pointer transition-all duration-300 ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50/60 border-indigo-200 hover:bg-indigo-100/70 hover:border-indigo-300 hover:shadow-md'}`}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${showResearchAids ? 'bg-indigo-600 text-white shadow-indigo-200' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>
-                  <Zap size={16} />
+                <div className={`${SIZE.bubble} shrink-0 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${showResearchAids ? 'bg-indigo-600 text-white shadow-indigo-200' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>
+                  <Zap size={SIZE.icon} />
                 </div>
                 <div>
-                  <h3 className={`font-bold text-[13px] leading-tight ${showResearchAids ? 'text-white' : 'text-indigo-900'}`}>
+                  <h3 className={`font-bold ${SIZE.title} leading-tight ${showResearchAids ? 'text-white' : 'text-indigo-900'}`}>
                     Extensions &amp; Tools
                   </h3>
-                  <p className={`text-[12px] uppercase tracking-wide ${showResearchAids ? 'text-indigo-100' : 'text-indigo-500/80'}`}>Knowledge graph, dashboard, readings</p>
+                  <p className={`${SIZE.role} uppercase tracking-wide ${showResearchAids ? 'text-indigo-100' : 'text-indigo-500/80'}`}>Knowledge graph, dashboard, readings</p>
                 </div>
               </div>
               <ChevronRight
-                size={14}
+                size={SIZE.chevron}
                 className={`transition-transform duration-300 ${showResearchAids ? 'text-indigo-400 translate-x-1' : 'text-slate-300'}`}
               />
             </div>
           </div>
 
           {/* Legend */}
-          <p className="text-[10px] text-slate-400 text-center pt-2 shrink-0 tracking-wide">
+          <p className={`${SIZE.legend} text-slate-400 text-center pt-2 shrink-0 tracking-wide`}>
             <span className="text-slate-500">○</span> data &amp; QA gate&ensp;·&ensp;<span className="text-indigo-500">●</span> HITL expert review
           </p>
 

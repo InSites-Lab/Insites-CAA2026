@@ -7,6 +7,28 @@ html {
     text-size-adjust: 100%;
 }
 
+/* ── APP SCALE — tune here ────────────────────────────────────────
+   Uniform scale for the whole app, the code equivalent of browser zoom.
+   1 = as authored; 1.1 = what Chrome shows at 110%. It multiplies EVERY
+   length (fonts, padding, icons, the sidebar width), so all proportions
+   are preserved exactly — unlike raising font sizes by hand.
+
+   CAVEAT: `zoom` does NOT divide viewport units. A bare `98vh` inside the
+   zoomed subtree paints at 98 x 1.1 = 108vh and overflows the screen. Any
+   viewport-relative cap must therefore be written as
+   `calc(<n>vh/var(--app-zoom))` — see Modal.tsx, GraphModal.tsx,
+   PromptAdvisorModal.tsx, CollectionDashboardModal.tsx.
+
+   Set --app-zoom back to 1 and every one of those calc()s becomes a no-op,
+   so this is a single reversible knob. */
+:root {
+    --app-zoom: 1.1;
+}
+
+#root {
+    zoom: var(--app-zoom);
+}
+
 body {
     font-family: 'Assistant', sans-serif;
     font-size: 1rem; /* 16px */

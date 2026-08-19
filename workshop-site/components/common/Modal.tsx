@@ -73,7 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
         className={`bg-white w-full h-full shadow-2xl overflow-hidden flex flex-col transition-all duration-400 ease-out
         ${fullscreen
           ? ''
-          : `${maxWidth} md:h-auto md:max-h-[98vh] border-t border-b md:border border-slate-200 md:rounded-3xl`
+          : `${maxWidth} md:h-auto md:max-h-[calc(98vh/var(--app-zoom))] border-t border-b md:border border-slate-200 md:rounded-3xl`
         }
         ${entered ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
       >

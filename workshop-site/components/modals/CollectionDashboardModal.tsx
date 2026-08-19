@@ -98,7 +98,12 @@ export const CollectionDashboardModal: React.FC<CollectionDashboardModalProps> =
             ref={iframeRef}
             src="./collection-dashboard-demo.html"
             className="w-full border-0"
-            style={{ height: isFullscreen ? '100vh' : '75vh', minHeight: '500px' }}
+            style={{
+              height: isFullscreen
+                ? 'calc(100vh / var(--app-zoom))'
+                : 'calc(75vh / var(--app-zoom))',
+              minHeight: '500px',
+            }}
             title="Collection Dashboard — Historic Flour Mills of Israel"
           />
         </div>

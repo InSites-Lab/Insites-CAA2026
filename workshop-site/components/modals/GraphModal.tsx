@@ -35,7 +35,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
         }
       }}
     >
-      <div className="bg-white w-full max-w-7xl h-full md:h-[95vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative border border-slate-800/20">
+      <div className="bg-white w-full max-w-7xl h-full md:h-[calc(95vh/var(--app-zoom))] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative border border-slate-800/20">
         <div className="p-3 md:p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <div className="flex items-center gap-3">
             <Zap size={20} className="text-emerald-600" />

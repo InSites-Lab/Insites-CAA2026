@@ -78,7 +78,7 @@ export const PromptAdvisorModal: React.FC<PromptAdvisorModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Dialogue & Smart Prompts Workshop" maxWidth="max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full max-h-[85vh]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full max-h-[calc(85vh/var(--app-zoom))]">
         <div className="flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-indigo-50 pb-2">
