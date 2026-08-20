@@ -568,7 +568,7 @@ const App: React.FC = () => {
         }}
       />
 
-      <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
+      <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col lg:flex-row lg:items-start">
         <Sidebar
           width={sidebarWidth}
           isResizing={isResizingState}
@@ -591,7 +591,7 @@ const App: React.FC = () => {
             grow into the leftover), so it opts into stretching. Other views
             keep the existing content-height behaviour. */}
         <main
-          className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden md:self-stretch"
+          className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden lg:self-stretch"
         >
 
           {/* THE DECK — always mounted, never replaced. Anything that used to

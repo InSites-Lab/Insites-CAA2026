@@ -15,7 +15,7 @@ import { Cpu } from "lucide-react";
 const SIZE = {
   height: 'h-14',             // the bar itself: h-9=36 h-10=40 h-12=48 h-14=56
   gap: 'gap-3',               // between icon, title, divider and authors
-  padX: 'px-3 md:px-6',       // the bar's horizontal padding
+  padX: 'px-3 lg:px-6',       // the bar's horizontal padding
 
   title: 'text-[20px]',       // "From Report to Inquiry"
   titleWeight: 'font-black',  // font-medium / font-bold / font-black
@@ -125,27 +125,27 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
           {/* A real rule, not a "|" glyph — a dim pipe character reads as noise
               at this size and cannot be sized or coloured independently. */}
           <span
-            className={`hidden md:block shrink-0 rounded-full ${SIZE.divider} ${SIZE.dividerGap} ${COLOR.divider}`}
+            className={`hidden lg:block shrink-0 rounded-full ${SIZE.divider} ${SIZE.dividerGap} ${COLOR.divider}`}
             aria-hidden="true"
           />
-          <span className={`hidden md:inline ${COLOR.authors} ${SIZE.authorsWeight} ${SIZE.authors} whitespace-nowrap`}>Alef, Shafriri & Berger</span>
+          <span className={`hidden lg:inline ${COLOR.authors} ${SIZE.authorsWeight} ${SIZE.authors} whitespace-nowrap`}>Alef, Shafriri & Berger</span>
         </div>
         <div
-          className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"
+          className="flex items-center gap-2 lg:gap-3 shrink-0 whitespace-nowrap justify-end"
           dir="ltr"
         >
           {/* Mobile Technion logo (public/technion-small.png) */}
           <img
             src="./technion-small.png"
             alt="Technion"
-            className={`${SIZE.logo} object-contain inline-block md:hidden`}
+            className={`${SIZE.logo} object-contain inline-block lg:hidden`}
           />
 
           {/* Desktop Technion logo (public/Technion_Logo.png) */}
           <img
             src="./Technion_Logo.png"
             alt="Technion"
-            className={`${SIZE.logo} object-contain hidden md:inline-block mr-1`}
+            className={`${SIZE.logo} object-contain hidden lg:inline-block mr-1`}
           />
 
           <h2 className={`${COLOR.lab} ${SIZE.labWeight} ${SIZE.lab} leading-tight whitespace-nowrap`}>

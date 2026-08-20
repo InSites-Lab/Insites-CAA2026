@@ -28,7 +28,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     <>
       {/* Mobile bottom tabs (< md / 768px) */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200"
         dir="ltr"
         aria-label="Mobile navigation"
       >

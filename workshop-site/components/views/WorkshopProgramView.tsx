@@ -88,7 +88,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   return (
     <div
-      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16 ${
+      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[140px] sm:pb-[90px] lg:pb-16 ${
         fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
       dir="ltr"
@@ -267,7 +267,7 @@ const DualTensionTab: React.FC = () => (
     <div className="space-y-1.5 shrink-0">
       <Eyebrow>The challenge</Eyebrow>
       {/* "hallucinates", not "fabricates" — the paper's own abstract wording. */}
-      <h3 className="font-display text-4xl md:text-[40px] leading-[1.15] text-slate-900">
+      <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         Give it freedom — it hallucinates.
         <br />
         Lock it down — it loses the synthesis we came for.
@@ -275,7 +275,7 @@ const DualTensionTab: React.FC = () => (
       {/* Picks up tab 1's "meaning emerges from context" and turns the two
           risks into one mechanism — which is why suppression cannot be the
           answer, and governance has to be. Delete this line if it crowds. */}
-      <p className="text-lg text-slate-600 pt-1">
+      <p className="text-sm sm:text-base lg:text-lg text-slate-600 pt-1">
         One capability, two faces — meaning emerges from context, in the transformer as in CBSA.
       </p>
     </div>
@@ -283,10 +283,10 @@ const DualTensionTab: React.FC = () => (
     {/* "afford" deliberately echoes "affordances" below, so the two read as one
         question and its research phrasing rather than as two competing ones. */}
     <div className="space-y-2 shrink-0 text-center">
-      <p className="text-2xl font-bold text-slate-900 leading-snug">
+      <p className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
         How can we afford both: accountability and the growth of new insight?
       </p>
-      <p className="text-lg font-bold text-indigo-600">
+      <p className="text-sm sm:text-base lg:text-lg font-bold text-indigo-600">
         Under which affordances — and which human oversight — can AI assess accountably?
       </p>
     </div>
@@ -425,7 +425,7 @@ const EpistemicNotationTab: React.FC<{
   <div className="space-y-5">
     <div className="space-y-1.5">
       <Eyebrow>The core mechanism</Eyebrow>
-      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">
+      <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
       <p className="text-lg font-semibold text-slate-500">Validity remains human judgment.</p>
@@ -454,7 +454,7 @@ const EpistemicNotationTab: React.FC<{
         the three missing from the sum went. No percentage — the paper reports
         none, and one case with one expert does not support one. */}
     <div className="border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
-      <p className="text-xl font-bold text-slate-900 leading-snug">
+      <p className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 leading-snug">
         42 of 45 held. The expert caught the other three — in the session.
       </p>
       <p className="text-sm text-slate-500 mt-1.5">
@@ -508,7 +508,7 @@ const FromReportToInquiryTab: React.FC = () => (
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-4">
     <div className="space-y-1.5 shrink-0">
       {/* <Eyebrow>What it yielded</Eyebrow> */}
-      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">
+      <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         From a final report To an inquiry to be examined. <span className="text-[21px] font-medium text-slate-500">
     (Two new InSites examples)</span>
         {/* <br /> */}
@@ -523,7 +523,7 @@ const FromReportToInquiryTab: React.FC = () => (
       {NEW_READINGS.map((r, i) => (
         <div key={i} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-3">
           {r.icon}
-          <p className="text-xl text-slate-700 leading-snug">{r.text}</p>
+          <p className="text-base sm:text-lg lg:text-xl text-slate-700 leading-snug">{r.text}</p>
         </div>
       ))}
     </div>
@@ -577,7 +577,7 @@ const QaTab: React.FC<{
   <div className="space-y-5">
     <div className="space-y-1.5">
       <Eyebrow>Questions</Eyebrow>
-      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">The material behind the talk.</h3>
+      <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">The material behind the talk.</h3>
       <p className="text-[15px] text-slate-600">
         <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger.
       </p>
