@@ -35,32 +35,31 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
   return (
     <header
       style={headerStyle}
-      className="bg-[#020617] text-white shadow-xl z-50 shrink-0 border-b border-slate-800 px-3 py-1.5 md:py-2 md:px-6"
+      className="bg-[#020617] text-white shadow-xl z-50 shrink-0 border-b border-slate-800 px-3 md:px-6 h-10 flex items-center"
     >
       <div className="w-full flex items-center justify-between gap-2">
          <div className="flex items-center gap-3 min-w-2">
           <div
-            className="p-1 md:p-1.5 rounded-lg shadow-inner cpu-box"
+            className="p-1 rounded-md shadow-inner cpu-box"
             style={{ boxShadow: "inset 0 0 6px rgba(0,0,0,0.25)" }}
           >
-            <Cpu size={20} />
+            <Cpu size={16} />
           </div>
      
          <button
   onClick={onHomeClick}
   title="Back to home"
   aria-label="Back to home"
-  className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded px-0 py-1.5 flex items-center"
+  className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded flex items-center"
 >
-  <h1 className="font-black tracking-tight leading-tight py-0.5 text-indigo-100 group-hover:text-white text-base md:text-lg truncate relative inline-block transition-colors duration-300">
-    <span className="md:hidden">From Report to Inquiry</span>
-    <span className="hidden md:inline">From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</span>
-    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
+  <h1 className="font-medium tracking-tight leading-none text-[13px] text-slate-400 group-hover:text-slate-200 truncate relative inline-block transition-colors duration-300">
+    From Report to Inquiry
+    <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
   </h1>
 </button>
  
-          <span className="hidden md:inline text-slate-500 mx-3">|</span>
-          <span className="hidden md:inline text-indigo-100 font-bold text-xl">Alef &amp; Shafriri</span>
+          <span className="hidden md:inline text-slate-600 mx-2.5">|</span>
+          <span className="hidden md:inline text-slate-400 font-medium text-[13px] whitespace-nowrap">Alef &amp; Shafriri</span>
         </div>
         <div
           className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"
@@ -70,21 +69,20 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
           <img
             src="./technion-small.png"
             alt="Technion"
-            className="h-6 object-contain inline-block md:hidden"
+            className="h-5 object-contain inline-block md:hidden"
           />
 
           {/* Desktop Technion logo (public/Technion_Logo.png) */}
           <img
             src="./Technion_Logo.png"
             alt="Technion"
-            className="h-6 md:h-7 lg:h-8 object-contain hidden md:inline-block mr-1"
+            className="h-5 object-contain hidden md:inline-block mr-1"
           />
 
-          <h3 className="text-slate-200 font-bold text-lg md:text-[1.5rem] leading-none">
+          <h3 className="text-slate-300 font-bold text-[13px] leading-none whitespace-nowrap">
             InSites Lab
           </h3>
 
-          <div className="w-1 h-4 bg-slate-800 rounded-full hidden md:block"></div>
         </div>
       </div>
       <style>{`

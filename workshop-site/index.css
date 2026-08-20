@@ -29,6 +29,22 @@ html {
     zoom: var(--app-zoom);
 }
 
+/* ── DISPLAY FACE ─────────────────────────────────────────────────
+   Marcellus is an inscriptional Roman — the letterform of carved stone,
+   for a talk about 4,500-year-old dolmens. It ships in ONE weight, with
+   no italic and no bold, which is a useful constraint: it keeps the
+   message lines short and declarative.
+
+   USE IT ONLY on the one big message sentence per tab. NOT on tabs, the
+   sidebar, the header, or body copy — and never on the epistemic marks.
+   A hypothesis set in display type reads as celebrated rather than
+   flagged, and the notation has to read as annotation. */
+.font-display {
+    font-family: 'Marcellus', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
 body {
     font-family: 'Assistant', sans-serif;
     font-size: 1rem; /* 16px */

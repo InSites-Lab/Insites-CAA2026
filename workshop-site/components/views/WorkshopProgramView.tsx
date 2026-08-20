@@ -8,14 +8,14 @@ import { DesignPrinciplesView } from './DesignPrinciplesView';
 // ─── Tab Definitions ──────────────────────────────────────────────
 
 const PROGRAM_TABS = [
-  { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={14} /> },
-  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={14} /> },
-  { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={14} /> },
-  { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={14} /> },
+  { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={17} /> },
+  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={17} /> },
+  { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={17} /> },
+  { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={17} /> },
 ] as const;
 
 
-const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={14} /> } as const;
+const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={17} /> } as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
@@ -71,11 +71,15 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   const fitsFrame = activeTab === 'inquiry' || activeTab === 'tension';
   const fillClass = fitsFrame ? 'grow min-h-0' : 'grow shrink-0';
 
+  // The tab bar is the spine of the talk, so it carries the weight the header
+  // gave up. The active tab is a SOLID INDIGO BLOCK, not a white pill with a
+  // shadow: from the back of a hall, under projector washout, a shadow is
+  // invisible and a block of colour is not.
   const tabClass = (id: TabId) =>
-    `flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+    `flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-[17px] font-bold whitespace-nowrap transition-all cursor-pointer ${
       activeTab === id
-        ? 'bg-white text-slate-800 shadow-sm'
-        : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+        : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
     }`;
 
   return (
@@ -95,7 +99,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
       <div className={`max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto w-full px-6 py-4 ${fillClass} flex flex-col gap-5`}>
 
         {/* Tab Bar */}
-        <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
+        <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1.5 bg-slate-100 p-1.5 rounded-xl shrink-0">
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -250,7 +254,7 @@ const DualTensionTab: React.FC = () => (
     <div className="space-y-1.5 shrink-0">
       <Eyebrow>The challenge</Eyebrow>
       {/* "hallucinates", not "fabricates" — the paper's own abstract wording. */}
-      <h3 className="text-3xl md:text-[33px] leading-tight font-extrabold text-slate-900">
+      <h3 className="font-display text-4xl md:text-[40px] leading-[1.15] text-slate-900">
         Give it freedom — it hallucinates.
         <br />
         Lock it down — it loses the synthesis we came for.
@@ -408,7 +412,7 @@ const EpistemicNotationTab: React.FC<{
   <div className="space-y-5">
     <div className="space-y-1.5">
       <Eyebrow>The core mechanism</Eyebrow>
-      <h3 className="text-3xl leading-tight font-extrabold text-slate-900">
+      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
       <p className="text-lg font-semibold text-slate-500">Validity remains human judgment.</p>
@@ -491,7 +495,7 @@ const FromReportToInquiryTab: React.FC = () => (
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-4">
     <div className="space-y-1.5 shrink-0">
       {/* <Eyebrow>What it yielded</Eyebrow> */}
-      <h3 className="text-3xl leading-tight font-extrabold text-slate-900">
+      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">
         From a final report — To an inquiry to be examined. <span className="text-[22px] font-medium text-slate-500">
     &nbsp; &nbsp; &nbsp;( Two LLM InSites examples)</span>
         {/* <br /> */}
@@ -560,7 +564,7 @@ const QaTab: React.FC<{
   <div className="space-y-5">
     <div className="space-y-1.5">
       <Eyebrow>Questions</Eyebrow>
-      <h3 className="text-3xl leading-tight font-extrabold text-slate-900">The material behind the talk.</h3>
+      <h3 className="font-display text-4xl leading-[1.15] text-slate-900">The material behind the talk.</h3>
       <p className="text-[15px] text-slate-600">
         <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger.
       </p>
