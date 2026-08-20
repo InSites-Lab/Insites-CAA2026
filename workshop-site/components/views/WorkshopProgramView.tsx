@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, X } from 'lucide-react';
-import { ExcursionKey, excursionLabel } from './ExcursionOutlet';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown } from 'lucide-react';
+import { ExcursionKey } from './ExcursionOutlet';
 import { Modal } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
@@ -25,8 +25,9 @@ const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
 
 export interface WorkshopProgramViewProps {
   onNavigate?: (route: string) => void;
-  /** Non-null when something outside the deck is open. Renders as a transient
-   *  sixth chip in the tab bar rather than replacing the deck. */
+  /** Non-null when something outside the deck is open. It renders in the tab
+   *  panel WITHOUT adding a tab button — the audience never sees the
+   *  mechanism; clicking any talk tab returns and clears it. */
   excursion?: ExcursionKey | null;
   excursionContent?: React.ReactNode;
   onCloseExcursion?: () => void;
@@ -51,9 +52,12 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
     else setActiveTab((t) => (t === 'excursion' ? lastDeckTab : t));
   }, [excursion, lastDeckTab]);
 
+  // Clicking any talk tab also dismisses whatever excursion is open — the
+  // detour is never something the audience has to close by hand.
   const selectDeckTab = (id: TabId) => {
     setActiveTab(id);
     setLastDeckTab(id);
+    if (excursion) onCloseExcursion?.();
   };
 
   // Tabs that must never scroll: the column is bounded to the frame instead of
@@ -106,31 +110,6 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
             <span>{QA_TAB.label}</span>
           </button>
 
-          {/* Excursion chip — dashed, so it never reads as part of the talk. */}
-          {excursion && (
-            <span
-              className={`shrink-0 flex items-center gap-1.5 pl-3 pr-1.5 py-2 rounded-lg text-xs font-bold whitespace-nowrap border border-dashed max-w-[45vw] transition-all ${
-                activeTab === 'excursion'
-                  ? 'bg-white text-indigo-700 border-indigo-400 shadow-sm'
-                  : 'text-indigo-500/80 border-indigo-300'
-              }`}
-            >
-              <button
-                onClick={() => setActiveTab('excursion')}
-                className="truncate cursor-pointer"
-                title={excursionLabel(excursion)}
-              >
-                {excursionLabel(excursion)}
-              </button>
-              <button
-                onClick={onCloseExcursion}
-                aria-label="Close"
-                className="shrink-0 p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 cursor-pointer"
-              >
-                <X size={13} />
-              </button>
-            </span>
-          )}
         </div>
 
         {/* Tab Content */}
