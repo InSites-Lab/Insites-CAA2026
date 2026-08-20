@@ -8,14 +8,14 @@ import { DesignPrinciplesView } from './DesignPrinciplesView';
 // ─── Tab Definitions ──────────────────────────────────────────────
 
 const PROGRAM_TABS = [
-  { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={15} /> },
-  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={15} /> },
-  { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={15} /> },
-  { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={15} /> },
+  { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={18} /> },
+  { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={18} /> },
+  { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={18} /> },
+  { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={18} /> },
 ] as const;
 
 
-const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={15} /> } as const;
+const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={18} /> } as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
@@ -75,8 +75,12 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   // Full labels therefore wait for xl, and 17px for 2xl. `min-w-0` + truncate
   // is the backstop — flex items will not shrink below min-content otherwise,
   // and the row overflows sideways instead of compressing.
+  // On a phone the tabs stack icon-over-label at the same scale as the bottom
+  // nav, so all five fit one row instead of wrapping. They stay clearly a
+  // SEGMENTED CONTROL rather than navigation: a filled tray, and an active tab
+  // that is a solid block — where the bottom bar is bare icons on the page.
   const tabClass = (id: TabId) =>
-    `flex items-center justify-center gap-1.5 xl:gap-2 px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer ${
+    `flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer ${
       activeTab === id
         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
         : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
@@ -99,12 +103,12 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
       <div className={`max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto w-full px-6 py-4 ${fillClass} flex flex-col gap-5`}>
 
         {/* Tab Bar */}
-        <div className="flex flex-wrap sm:flex-nowrap sm:overflow-x-auto hide-scrollbar gap-1.5 bg-slate-100 p-1.5 rounded-xl shrink-0">
+        <div className="flex flex-nowrap gap-0.5 sm:gap-1.5 bg-slate-100 p-1 sm:p-1.5 rounded-xl shrink-0">
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => selectDeckTab(tab.id)}
-              className={`flex-1 basis-[28%] sm:basis-0 ${tabClass(tab.id)}`}
+              className={`flex-1 basis-0 ${tabClass(tab.id)}`}
             >
               {tab.icon}
               <span className="hidden xl:inline truncate">{tab.label}</span>
@@ -113,7 +117,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
           ))}
           <button
             onClick={() => selectDeckTab(QA_TAB.id)}
-            className={`shrink-0 ${tabClass(QA_TAB.id)} ${activeTab === QA_TAB.id ? '' : 'text-slate-400'}`}
+            className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${tabClass(QA_TAB.id)} ${activeTab === QA_TAB.id ? '' : 'text-slate-400'}`}
           >
             {QA_TAB.icon}
             <span>{QA_TAB.label}</span>
