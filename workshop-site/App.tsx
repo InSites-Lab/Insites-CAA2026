@@ -299,12 +299,22 @@ const App: React.FC = () => {
     "step-6": () => setExcursion("step-6"),
     // #home used to be a separate page. Under "you cannot leave the deck" it
     // means the deck; its old body is now the `resources` excursion.
-    home: () => setExcursion(null),
+    home: () => {
+      setExcursion(null);
+      setChromeHidden(false);
+    },
     resources: () => setExcursion("resources"),
     tools: () => setExcursion("tools"),
     steps: () => setExcursion("steps"),
     welcome: () => setExcursion("about"),
-    program: () => setExcursion(null),
+    // #program is the way OUT of presentation chrome as well as the way back
+    // to the deck — both the corner button and Escape route here. Without the
+    // setChromeHidden(false) nothing ever turned chrome mode off again and the
+    // only escape was a page reload.
+    program: () => {
+      setExcursion(null);
+      setChromeHidden(false);
+    },
   };
 
   // Navigate to hash route
