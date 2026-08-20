@@ -20,9 +20,21 @@ html {
    PromptAdvisorModal.tsx, CollectionDashboardModal.tsx.
 
    Set --app-zoom back to 1 and every one of those calc()s becomes a no-op,
-   so this is a single reversible knob. */
+   so this is a single reversible knob.
+
+   IT IS RESPONSIVE. The 1.1 exists to push type up for a projected talk on
+   a large screen. On a phone it did the opposite of what it was for —
+   inflating everything by a further 10% on a screen that has no room to
+   spare. So phones and tablets run at 1, and only the desktop/hall
+   viewport gets the lift. */
 :root {
-    --app-zoom: 1.1;
+    --app-zoom: 1;
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --app-zoom: 1.1;
+    }
 }
 
 #root {
