@@ -343,16 +343,16 @@ const WhatIsInSitesTab: React.FC = () => (
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
-      <p className="text-center text-base text-slate-500 italic mt-2">
+      <p className="text-center text-sm sm:text-base text-slate-500 italic mt-2">
         "The LLM is a looking glass — more than a wonderland"
       </p>
-      <p className="text-center text-sm text-slate-400 mt-1">
+      <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
         CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
 
     {/* Intro line */}
-    <p className="text-base text-slate-600 leading-relaxed">
+    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
       AI already speaks our language and is becoming an active partner in culture. We examine how it can help with the cultural assessment challenges:
     </p>
 
@@ -363,18 +363,18 @@ const WhatIsInSitesTab: React.FC = () => (
         const isRight = idx % 2 === 0;
         return (
           <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
-            <summary className={`p-4 cursor-pointer flex items-center gap-3 select-none ${isRight ? '' : 'flex-row-reverse text-right'}`}>
+            <summary className={`p-2.5 sm:p-4 cursor-pointer flex items-center gap-2.5 sm:gap-3 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
               <img
                 src={ch.avatar}
                 alt=""
-                className="w-16 h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
+                className="w-11 h-11 sm:w-16 sm:h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-              <span className={`font-bold text-base ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <span className={`font-bold text-sm sm:text-base ${c.quote} flex-1`}>"{ch.quote}"</span>
               <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
-            <div className="px-4 pb-4 pt-1">
-              <p className={`text-base ${c.text} leading-relaxed`}>{ch.response}</p>
+            <div className="px-2.5 sm:px-4 pb-3 sm:pb-4 pt-1">
+              <p className={`text-[13px] sm:text-base ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>
         );
@@ -383,12 +383,12 @@ const WhatIsInSitesTab: React.FC = () => (
 
     {/* Lab intro */}
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
-      <h4 className="font-bold text-base text-slate-800">InSites Knowledge Lab</h4>
+      <h4 className="font-bold text-sm sm:text-base text-slate-800">InSites Knowledge Lab</h4>
       <p className="text-sm text-slate-400">Technion — Israel Institute of Technology</p>
-      <p className="text-base text-slate-700 leading-relaxed">
+      <p className="text-[13px] sm:text-base text-slate-700 leading-relaxed">
         At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
       </p>
-      <p className="text-base text-slate-700 leading-relaxed">
+      <p className="text-[13px] sm:text-base text-slate-700 leading-relaxed">
         InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
@@ -580,7 +580,7 @@ const QaTab: React.FC<{
     <div className="space-y-1.5">
       <Eyebrow>Questions</Eyebrow>
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">The material behind the talk.</h3>
-      <p className="text-[15px] text-slate-600">
+      <p className="text-[13px] sm:text-[15px] text-slate-600">
         <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger.
       </p>
     </div>
@@ -589,17 +589,17 @@ const QaTab: React.FC<{
       href={REPO_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 py-4 transition-colors"
+      className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-3.5 py-3 sm:px-5 sm:py-4 transition-colors"
     >
       <Github size={20} className="shrink-0" />
       <span className="flex-1">
-        <span className="block text-sm font-bold">InSites-Lab / Insites-CAA2026</span>
-        <span className="block text-[13px] text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
+        <span className="block text-[13px] sm:text-sm font-bold">InSites-Lab / Insites-CAA2026</span>
+        <span className="block text-[12px] sm:text-[13px] text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
       </span>
       <ExternalLink size={15} className="text-slate-400 shrink-0" />
     </a>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
       {BACKUP_MATERIAL.map((item) => (
         <button
           key={item.label}
@@ -608,10 +608,10 @@ const QaTab: React.FC<{
             if (item.action === 'design') return onOpenDesign();
             onNavigate?.(item.route!);
           }}
-          className="text-left bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-xl px-4 py-3 transition-colors cursor-pointer"
+          className="text-left bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-xl px-3 py-2 sm:px-4 sm:py-3 transition-colors cursor-pointer"
         >
-          <span className="block text-sm font-bold text-slate-800">{item.label}</span>
-          <span className="block text-[13px] text-slate-500">{item.note}</span>
+          <span className="block text-[13px] sm:text-sm font-bold text-slate-800">{item.label}</span>
+          <span className="hidden sm:block text-[13px] text-slate-500">{item.note}</span>
         </button>
       ))}
     </div>
