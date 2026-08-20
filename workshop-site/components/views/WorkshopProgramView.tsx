@@ -103,7 +103,16 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
       <div className={`max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto w-full px-6 py-4 ${fillClass} flex flex-col gap-5`}>
 
         {/* Tab Bar */}
-        <div className="flex flex-nowrap gap-0.5 sm:gap-1.5 bg-slate-100 p-1 sm:p-1.5 rounded-xl shrink-0">
+        {/* On a phone the tray hides while an excursion is open: reading a CBSA
+            stage is its own task, the talk tabs are not part of it, and the
+            bottom nav's "Talk" button is already the way back. Worth ~50px of
+            vertical space on the screen that has least of it. Desktop keeps it
+            — there the tabs are how you leave the excursion. */}
+        <div
+          className={`flex-nowrap gap-0.5 sm:gap-1.5 bg-slate-100 p-1 sm:p-1.5 rounded-xl shrink-0 ${
+            excursion ? 'hidden sm:flex' : 'flex'
+          }`}
+        >
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
