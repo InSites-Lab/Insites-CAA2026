@@ -7,8 +7,10 @@ import {
 import SwitchTransition from "./components/common/SwitchTransition";
 import { Header, Sidebar, MobileNav } from "./components/layout";
 import { DesignPrinciplesView } from "./components/views/DesignPrinciplesView";
-import { ToolboxView } from "./components/views/ToolboxView";
-import { ResourcesView } from "./components/views/ResourcesView";
+import {
+  ExcursionOutlet,
+  ExcursionKey,
+} from "./components/views/ExcursionOutlet";
 import {
   WelcomeOverlay,
   AboutView,
@@ -158,8 +160,15 @@ const getAgentTheme = (
 };
 
 const App: React.FC = () => {
-  const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
-  const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
+  // ── ONE SURFACE ────────────────────────────────────────────────
+  // The deck is always mounted. Everything that used to REPLACE it is now an
+  // "excursion": a transient sixth chip in the deck's own tab bar. One string
+  // key replaces mobileView + showResearchAids + showDesignView +
+  // selectedAgentId, so the four can no longer drift out of sync.
+  const [excursion, setExcursion] = useState<ExcursionKey | null>(null);
+  const selectedAgentId = excursion?.startsWith("step-")
+    ? Number(excursion.slice(5))
+    : null;
   const [rawData] = useState<string>(DEMO_DATA);
   // ── SIDEBAR WIDTH — tune here ────────────────────────────────────
   // Default width of the process sidebar, in px. Not persisted: dragging the
@@ -170,22 +179,9 @@ const App: React.FC = () => {
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
-  // Mobile View State
-  const [mobileView, setMobileView] = useState<
-    "HOME" | "TOOLS" | "STEPS" | "ABOUT" | "STEP_DETAIL" | "PROGRAM" | "DESIGN"
-  >("HOME");
 
-  // Welcome/About overlay state
-  const [showWelcome, setShowWelcome] = useState<boolean>(false);
 
-  const handleCloseWelcome = () => {
-    setShowWelcome(false);
-  };
 
-  const handleCloseWelcomeAndClearHash = () => {
-    setShowWelcome(false);
-    window.location.hash = "";
-  };
 
   // Dialogue Advisor states
   const [consultationInput, setConsultationInput] = useState<string>("");
@@ -228,19 +224,8 @@ const App: React.FC = () => {
   );
 
   // Design view state
-  const [showDesignView, setShowDesignView] = useState<boolean>(false);
 
-  const openResearchTools = useCallback(() => {
-    setShowResearchAids(true);
-    setShowDesignView(false);
-    setSelectedAgentId(null);
-  }, []);
 
-  const openDesignView = useCallback(() => {
-    setShowDesignView(true);
-    setShowResearchAids(false);
-    setSelectedAgentId(null);
-  }, []);
 
   // Deep linking - hash routes mapping
   const hashRoutes: Record<string, () => void> = {
@@ -262,10 +247,7 @@ const App: React.FC = () => {
     glossary: () => setIsGlossaryModalOpen(true),
     presentation: () => setIsPresentationModalOpen(true),
     opening: () => setIsOpeningSlideOpen(true),
-    design: () => {
-      openDesignView();
-      setMobileView(window.innerWidth < 768 ? "DESIGN" : "HOME");
-    },
+    design: () => setExcursion("design"),
     // Legacy routes — redirect to MA-RA modal with the relevant reading pre-selected
     "q-narratives": () => {
       setReadAssessmentInitialRoute("q-narratives");
@@ -295,77 +277,21 @@ const App: React.FC = () => {
       setReadAssessmentInitialRoute("q-chorus");
       setIsReadAssessmentModalOpen(true);
     },
-    "step-0": () => {
-      setSelectedAgentId(0);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-1": () => {
-      setSelectedAgentId(1);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-2": () => {
-      setSelectedAgentId(2);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-3": () => {
-      setSelectedAgentId(3);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-4": () => {
-      setSelectedAgentId(4);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-5": () => {
-      setSelectedAgentId(5);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    "step-6": () => {
-      setSelectedAgentId(6);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView(window.innerWidth < 768 ? "STEP_DETAIL" : "HOME");
-    },
-    home: () => {
-      setSelectedAgentId(null);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-      setMobileView("HOME");
-    },
-    tools: () => {
-      openResearchTools();
-      setMobileView("TOOLS");
-    },
-    steps: () => {
-      setMobileView("STEPS");
-      setSelectedAgentId(null);
-      setShowResearchAids(false);
-      setShowDesignView(false);
-    },
-    welcome: () => {
-      if (window.innerWidth < 768) {
-        setMobileView("ABOUT");
-        setShowWelcome(false);
-      } else {
-        setShowWelcome(true);
-      }
-    },
-    program: () => {
-      setMobileView("PROGRAM");
-      setSelectedAgentId(null);
-      setShowResearchAids(false);
-    },
+    "step-0": () => setExcursion("step-0"),
+    "step-1": () => setExcursion("step-1"),
+    "step-2": () => setExcursion("step-2"),
+    "step-3": () => setExcursion("step-3"),
+    "step-4": () => setExcursion("step-4"),
+    "step-5": () => setExcursion("step-5"),
+    "step-6": () => setExcursion("step-6"),
+    // #home used to be a separate page. Under "you cannot leave the deck" it
+    // means the deck; its old body is now the `resources` excursion.
+    home: () => setExcursion(null),
+    resources: () => setExcursion("resources"),
+    tools: () => setExcursion("tools"),
+    steps: () => setExcursion("steps"),
+    welcome: () => setExcursion("about"),
+    program: () => setExcursion(null),
   };
 
   // Navigate to hash route
@@ -521,15 +447,13 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!showWelcome && !isGraphModalOpen) return;
+    if (!isGraphModalOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      if (isGraphModalOpen) setIsGraphModalOpen(false);
-      if (showWelcome) handleCloseWelcome();
+      if (e.key === "Escape") setIsGraphModalOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [showWelcome, isGraphModalOpen]);
+  }, [isGraphModalOpen]);
 
   useEffect(() => {
     if (graphData && graphContainerRef.current) {
@@ -596,23 +520,6 @@ const App: React.FC = () => {
     }
   }, [graphData]);
 
-  // mainViewKey determines which view is shown - modals are separate overlays, not part of this
-  const mainViewKey =
-    selectedAgentId !== null && currentAgent
-      ? `step-${selectedAgentId}`
-      : mobileView === "STEPS"
-        ? "steps"
-        : mobileView === "ABOUT"
-          ? "about"
-          : mobileView === "PROGRAM"
-            ? "program"
-            : mobileView === "STEP_DETAIL" && currentAgent
-              ? `step-detail-${selectedAgentId}`
-              : showDesignView
-                ? "design"
-                : showResearchAids || mobileView === "TOOLS"
-                  ? "tools"
-                  : "home";
 
   return (
     <div
@@ -629,16 +536,16 @@ const App: React.FC = () => {
 
       {/* Mobile Horizontal Navigation (Sticky) */}
       <MobileNav
-        currentView={mobileView}
+        active={excursion ?? "deck"}
         selectedAgentId={selectedAgentId}
-        onHomeClick={() => {
-          navigateTo("home");
+        onTalkClick={() => {
+          navigateTo("program");
         }}
         onResearchAidsClick={() => {
           navigateTo("tools");
         }}
-        onProgramClick={() => {
-          navigateTo("program");
+        onResourcesClick={() => {
+          navigateTo("resources");
         }}
         onDesignClick={() => {
           navigateTo("design");
@@ -654,15 +561,13 @@ const App: React.FC = () => {
           isResizing={isResizingState}
           onStartResize={startResizing}
           selectedAgentId={selectedAgentId}
-          showResearchAids={showResearchAids}
+          showResearchAids={excursion === "tools"}
           agents={CORE_AGENTS}
           onAgentSelect={(agentId) => {
             navigateTo(`step-${agentId}`);
-            handleCloseWelcome();
           }}
           onResearchAidsClick={() => {
             navigateTo("tools");
-            handleCloseWelcome();
           }}
           getAgentTheme={getAgentTheme}
         />
@@ -673,111 +578,19 @@ const App: React.FC = () => {
             grow into the leftover), so it opts into stretching. Other views
             keep the existing content-height behaviour. */}
         <main
-          className={`flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden ${
-            mobileView === "PROGRAM" ? "md:self-stretch" : ""
-          }`}
+          className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden md:self-stretch"
         >
-          {/* Welcome/About Overlay - Desktop Only */}
-          <div className="hidden md:block">
-            <WelcomeOverlay
-              isOpen={showWelcome}
-              onClose={handleCloseWelcomeAndClearHash}
-              onNavigate={navigateTo}
-            />
-          </div>
-
-          <SwitchTransition
-            transitionKey={mainViewKey}
-            className="flex-1 min-h-0 flex flex-col"
-            duration={250}
-          >
-            {mobileView === "STEPS" ? (
-              <StepsList
-                agents={CORE_AGENTS}
-                selectedAgentId={selectedAgentId}
-                onAgentSelect={(agentId) => {
-                  navigateTo(`step-${agentId}`);
-                }}
-                getAgentTheme={getAgentTheme}
-              />
-            ) : mobileView === "ABOUT" ? (
-              <div
-                className="flex-1 overflow-y-auto bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"
-                dir="ltr"
-              >
-                <div className="px-6 pt-4">
-                  {/* Breadcrumb Navigation */}
-                  <div className="flex items-center gap-2 text-sm mb-4">
-                    <button
-                      onClick={() => navigateTo("home")}
-                      className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1 transition-colors font-medium"
-                    >
-                      <BookOpen size={16} />
-                      <span>Home</span>
-                    </button>
-                    <ChevronLeft
-                      size={16}
-                      className="text-slate-400 rotate-180"
-                    />
-                    <span className="text-slate-600 font-medium">About</span>
-                  </div>
-                </div>
-                <AboutView onNavigate={navigateTo} />
-              </div>
-            ) : mobileView === "PROGRAM" ? (
-              <div className="relative h-full">
-                <button
-                  onClick={() => navigateTo("presentation")}
-                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-700 shadow-sm border border-slate-200 transition-all"
-                  aria-label="Fullscreen presentation"
-                  title="Fullscreen presentation"
-                >
-                  <Maximize2 size={16} />
-                </button>
-                <WorkshopProgramView onNavigate={navigateTo} />
-              </div>
-            ) : currentAgent ? (
-              <div
-                className="flex-1 flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16"
-                dir="ltr"
-              >
-                <div className="max-w-3xl mx-auto w-full">
-                  <StepDetailView
-                    agent={currentAgent}
-                    onBack={() => navigateTo("steps")}
-                    consultationInput={consultationInput}
-                    setConsultationInput={setConsultationInput}
-                    consultationResult={consultationResult}
-                    setConsultationResult={setConsultationResult}
-                    isConsulting={isConsulting}
-                    onConsult={handleConsult}
-                    promptLang={promptLang}
-                    setPromptLang={setPromptLang}
-                    rawData={rawData}
-                    onNavigate={navigateTo}
-                  />
-                </div>
-              </div>
-            ) : showDesignView ? (
-              /* DESIGN PRINCIPLES VIEW */
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <div className="max-w-4xl mx-auto w-full px-6 py-6 space-y-6">
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-500 mb-2">
-                      Design Principles
-                    </h3>
-                    <p className="text-slate-500">
-                      How transparency, control, and evidence governance work in
-                      InSites-CAA
-                    </p>
-                  </div>
-
-                  <DesignPrinciplesView onNavigate={navigateTo} />
-                </div>
-              </div>
-            ) : showResearchAids || mobileView === "TOOLS" ? (
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <ToolboxView
+          {/* THE DECK — always mounted, never replaced. Anything that used to
+              take over this pane now arrives as an excursion chip inside it. */}
+          <WorkshopProgramView
+            onNavigate={navigateTo}
+            excursion={excursion}
+            onCloseExcursion={() => navigateTo("program")}
+            excursionContent={
+              excursion ? (
+                <ExcursionOutlet
+                  excursion={excursion}
+                  agent={currentAgent}
                   onNavigate={navigateTo}
                   consultationInput={consultationInput}
                   setConsultationInput={setConsultationInput}
@@ -785,14 +598,14 @@ const App: React.FC = () => {
                   setConsultationResult={setConsultationResult}
                   isConsulting={isConsulting}
                   onConsult={handleConsult}
+                  promptLang={promptLang}
+                  setPromptLang={setPromptLang}
+                  rawData={rawData}
+                  getAgentTheme={getAgentTheme}
                 />
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50/30 custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16">
-                <ResourcesView onNavigate={navigateTo} />
-              </div>
-            )}
-          </SwitchTransition>
+              ) : null
+            }
+          />
 
           {/* <footer
             className="flex-row-reverse fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-2 shadow-lg md:bottom-0"

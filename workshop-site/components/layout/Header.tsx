@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import { Cpu, Info } from "lucide-react";
+import { Cpu } from "lucide-react";
 
 export interface HeaderProps {
-  onAboutClick: () => void;
   onHomeClick: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  onAboutClick,
-  onHomeClick,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
   const [brand] = useState<string>(() => {
     try {
       return localStorage.getItem("siteBrandColor") || "#4F46E5";

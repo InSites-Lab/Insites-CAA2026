@@ -1,21 +1,24 @@
 import React from 'react';
-import { Home, ListOrdered, Zap, Eye, Presentation } from 'lucide-react';
+import { ListOrdered, Zap, Eye, Presentation, Library } from 'lucide-react';
 
 export interface MobileNavProps {
-  currentView: 'HOME' | 'TOOLS' | 'STEPS' | 'ABOUT' | 'STEP_DETAIL' | 'PROGRAM' | 'DESIGN';
+  /** The open excursion key, or 'deck' when the talk surface is showing. */
+  active: string;
   selectedAgentId: number | null;
-  onHomeClick: () => void;
-  onProgramClick: () => void;
+  /** Back to the talk deck. */
+  onTalkClick: () => void;
+  /** The old home page — bot platforms, resource links, key terms. */
+  onResourcesClick: () => void;
   onResearchAidsClick: () => void;
   onDesignClick: () => void;
   onStepsClick: () => void;
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({
-  currentView,
+  active,
   selectedAgentId,
-  onHomeClick,
-  onProgramClick,
+  onTalkClick,
+  onResourcesClick,
   onResearchAidsClick,
   onDesignClick,
   onStepsClick,
@@ -31,17 +34,17 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       >
         <div className="grid grid-cols-5 px-1 py-1.5">
           <button
-            onClick={onHomeClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'HOME' && selectedAgentId === null ? 'text-indigo-600' : 'text-slate-600'}`}
-            aria-label="Home"
+            onClick={onTalkClick}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${active === 'deck' ? 'text-indigo-600' : 'text-slate-600'}`}
+            aria-label="Talk"
           >
-            <Home size={18} />
-            <span className="text-[10px] font-bold">Home</span>
+            <Presentation size={18} />
+            <span className="text-[10px] font-bold">Talk</span>
           </button>
 
           <button
             onClick={onStepsClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'STEPS' || currentView === 'STEP_DETAIL' || selectedAgentId !== null ? 'text-indigo-600' : 'text-slate-600'}`}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${active === 'steps' || selectedAgentId !== null ? 'text-indigo-600' : 'text-slate-600'}`}
             aria-label="Stages"
           >
             <ListOrdered size={18} />
@@ -50,7 +53,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
           <button
             onClick={onDesignClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'DESIGN' ? 'text-rose-600' : 'text-slate-600'}`}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${active === 'design' ? 'text-rose-600' : 'text-slate-600'}`}
             aria-label="Design"
           >
             <Eye size={18} />
@@ -59,7 +62,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
           <button
             onClick={onResearchAidsClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'TOOLS' ? 'text-indigo-600' : 'text-slate-600'}`}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${active === 'tools' ? 'text-indigo-600' : 'text-slate-600'}`}
             aria-label="Tools"
           >
             <Zap size={18} />
@@ -67,12 +70,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           </button>
 
           <button
-            onClick={onProgramClick}
-            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${currentView === 'PROGRAM' ? 'text-indigo-600' : 'text-slate-600'}`}
-            aria-label="Program"
+            onClick={onResourcesClick}
+            className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg ${active === 'resources' ? 'text-indigo-600' : 'text-slate-600'}`}
+            aria-label="Resources"
           >
-            <Presentation size={18} />
-            <span className="text-[10px] font-bold">Program</span>
+            <Library size={18} />
+            <span className="text-[10px] font-bold">Resources</span>
           </button>
         </div>
 

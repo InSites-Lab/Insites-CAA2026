@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, X } from 'lucide-react';
+import { ExcursionKey, excursionLabel } from './ExcursionOutlet';
 import { Modal } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
@@ -16,7 +17,7 @@ const PROGRAM_TABS = [
 
 const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={14} /> } as const;
 
-type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa';
+type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
 const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
 
@@ -24,12 +25,36 @@ const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
 
 export interface WorkshopProgramViewProps {
   onNavigate?: (route: string) => void;
+  /** Non-null when something outside the deck is open. Renders as a transient
+   *  sixth chip in the tab bar rather than replacing the deck. */
+  excursion?: ExcursionKey | null;
+  excursionContent?: React.ReactNode;
+  onCloseExcursion?: () => void;
 }
 
-export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavigate }) => {
+export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
+  onNavigate,
+  excursion,
+  excursionContent,
+  onCloseExcursion,
+}) => {
   const [activeTab, setActiveTab] = useState<TabId>(PROGRAM_TABS[0].id);
   const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
   const [isDesignOpen, setIsDesignOpen] = useState(false);
+  // The talk tab to come back to when the chip is dismissed — the speaker
+  // returns to where they were, not to tab 1.
+  const [lastDeckTab, setLastDeckTab] = useState<TabId>(PROGRAM_TABS[0].id);
+
+  // Opening an excursion focuses its chip; closing it restores the talk tab.
+  useEffect(() => {
+    if (excursion) setActiveTab('excursion');
+    else setActiveTab((t) => (t === 'excursion' ? lastDeckTab : t));
+  }, [excursion, lastDeckTab]);
+
+  const selectDeckTab = (id: TabId) => {
+    setActiveTab(id);
+    setLastDeckTab(id);
+  };
 
   // Tabs that must never scroll: the column is bounded to the frame instead of
   // being allowed to grow past it, and the tab yields height from its images.
@@ -61,11 +86,11 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
       <div className={`max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto w-full px-6 py-4 ${fillClass} flex flex-col gap-5`}>
 
         {/* Tab Bar */}
-        <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
+        <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
           {PROGRAM_TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => selectDeckTab(tab.id)}
               className={`flex-1 ${tabClass(tab.id)}`}
             >
               {tab.icon}
@@ -74,12 +99,38 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
             </button>
           ))}
           <button
-            onClick={() => setActiveTab(QA_TAB.id)}
+            onClick={() => selectDeckTab(QA_TAB.id)}
             className={`shrink-0 ${tabClass(QA_TAB.id)} ${activeTab === QA_TAB.id ? '' : 'text-slate-400'}`}
           >
             {QA_TAB.icon}
             <span>{QA_TAB.label}</span>
           </button>
+
+          {/* Excursion chip — dashed, so it never reads as part of the talk. */}
+          {excursion && (
+            <span
+              className={`shrink-0 flex items-center gap-1.5 pl-3 pr-1.5 py-2 rounded-lg text-xs font-bold whitespace-nowrap border border-dashed max-w-[45vw] transition-all ${
+                activeTab === 'excursion'
+                  ? 'bg-white text-indigo-700 border-indigo-400 shadow-sm'
+                  : 'text-indigo-500/80 border-indigo-300'
+              }`}
+            >
+              <button
+                onClick={() => setActiveTab('excursion')}
+                className="truncate cursor-pointer"
+                title={excursionLabel(excursion)}
+              >
+                {excursionLabel(excursion)}
+              </button>
+              <button
+                onClick={onCloseExcursion}
+                aria-label="Close"
+                className="shrink-0 p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X size={13} />
+              </button>
+            </span>
+          )}
         </div>
 
         {/* Tab Content */}
@@ -93,6 +144,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({ onNavi
             />
           )}
           {activeTab === 'inquiry' && <FromReportToInquiryTab />}
+          {activeTab === 'excursion' && excursionContent}
           {activeTab === 'qa' && (
             <QaTab
               onNavigate={onNavigate}
