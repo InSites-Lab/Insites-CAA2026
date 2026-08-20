@@ -88,7 +88,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   return (
     <div
-      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[140px] sm:pb-[90px] lg:pb-16 ${
+      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[86px] lg:pb-16 ${
         fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
       dir="ltr"
@@ -224,8 +224,8 @@ const PhotoStrip: React.FC<{
     return () => window.clearInterval(id);
   }, [photos.length]);
 
-  const panel = (offset: number, panelCaption?: string) => (
-    <div className="relative rounded-2xl overflow-hidden bg-slate-100">
+  const panel = (offset: number, panelCaption?: string, extra = '') => (
+    <div className={`relative rounded-2xl overflow-hidden bg-slate-100 ${extra}`}>
       {photos.map((photo, i) => (
         <img
           key={photo.src}
@@ -257,7 +257,7 @@ const PhotoStrip: React.FC<{
       }`}
     >
       {panel(0, caption)}
-      {columns === 2 && <div className="hidden sm:block">{panel(1)}</div>}
+      {columns === 2 && panel(1, undefined, 'hidden sm:block')}
     </div>
   );
 };
@@ -265,7 +265,7 @@ const PhotoStrip: React.FC<{
 // Like tab 4, this tab never scrolls: bounded to the frame, everything
 // shrink-0 except the photo strip, which takes only what is left over.
 const DualTensionTab: React.FC = () => (
-  <div className="grow min-h-0 overflow-hidden flex flex-col gap-5">
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
     <div className="space-y-1.5 shrink-0">
       <Eyebrow>The challenge</Eyebrow>
       {/* "hallucinates", not "fabricates" — the paper's own abstract wording. */}
@@ -282,14 +282,9 @@ const DualTensionTab: React.FC = () => (
       </p>
     </div>
 
-    {/* "afford" deliberately echoes "affordances" below, so the two read as one
-        question and its research phrasing rather than as two competing ones. */}
-    <div className="space-y-2 shrink-0 text-center">
+    <div className="shrink-0 text-center">
       <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
         How can we afford both: accountability and the growth of new insight?
-      </p>
-      <p className="text-[13px] sm:text-sm md:text-base lg:text-lg font-bold text-indigo-600">
-        Under which affordances — and which human oversight — can AI assess accountably?
       </p>
     </div>
 
@@ -300,7 +295,7 @@ const DualTensionTab: React.FC = () => (
                     /var(--app-zoom) divisor. */}
     <PhotoStrip
       maxWidth="max-w-6xl"
-      maxHeight="max-h-[calc(45vh/var(--app-zoom))]"
+      maxHeight="max-h-[52vh] sm:max-h-[calc(52vh/var(--app-zoom))]"
       caption="One experimental answer, from one site — a dolmen field in northern Israel."
     />
   </div>
@@ -539,7 +534,7 @@ const FromReportToInquiryTab: React.FC = () => (
         readings describe. `fit` so the closing panel below is never pushed
         out of the frame — the image gives up its height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[26vh] sm:max-h-[calc(48vh/var(--app-zoom))]" />
+    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(50vh/var(--app-zoom))]" />
 
     <div className="bg-slate-900 rounded-2xl px-7 py-5 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div className="space-y-1.5">
