@@ -31,6 +31,10 @@ export interface WorkshopProgramViewProps {
   excursion?: ExcursionKey | null;
   excursionContent?: React.ReactNode;
   onCloseExcursion?: () => void;
+  /** True in presentation chrome mode, where MobileNav is unmounted — so the
+   *  padding that reserves room for it must go too, or it is dead space at the
+   *  bottom of a fullscreen deck. */
+  chromeHidden?: boolean;
 }
 
 export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
@@ -38,6 +42,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   excursion,
   excursionContent,
   onCloseExcursion,
+  chromeHidden = false,
 }) => {
   const [activeTab, setActiveTab] = useState<TabId>(PROGRAM_TABS[0].id);
   const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
@@ -75,9 +80,9 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   return (
     <div
-      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[140px] sm:pb-[90px] md:pb-16 ${
-        fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
-      }`}
+      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar ${
+        chromeHidden ? 'pb-4' : 'pb-[140px] sm:pb-[90px] md:pb-16'
+      } ${fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'}`}
       dir="ltr"
     >
       {/* Content column. 4xl (896px) is the width the design canvas was drawn

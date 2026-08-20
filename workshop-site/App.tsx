@@ -3,6 +3,7 @@ import {
   BookOpen,
   ChevronLeft,
   Maximize2,
+  Minimize2,
 } from "lucide-react";
 import SwitchTransition from "./components/common/SwitchTransition";
 import { Header, Sidebar, MobileNav } from "./components/layout";
@@ -32,7 +33,6 @@ import {
   CollectionDashboardModal,
   ReadAssessmentModal,
   GlossaryModal,
-  PresentationModal,
 } from "./components/modals";
 import {
   CORE_AGENTS,
@@ -214,7 +214,10 @@ const App: React.FC = () => {
   const [isReadAssessmentModalOpen, setIsReadAssessmentModalOpen] =
     useState(false);
   const [isGlossaryModalOpen, setIsGlossaryModalOpen] = useState(false);
-  const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
+  // Presentation is a CHROME MODE, not a second deck. It hides the header,
+  // sidebar and mobile nav around the one deck instance — so the active tab
+  // survives entering and leaving it, which a second mounted copy could not do.
+  const [chromeHidden, setChromeHidden] = useState(false);
   const [isOpeningSlideOpen, setIsOpeningSlideOpen] = useState(false);
   const [readAssessmentInitialRoute, setReadAssessmentInitialRoute] = useState<
     string | null
@@ -245,7 +248,7 @@ const App: React.FC = () => {
       setIsReadAssessmentModalOpen(true);
     },
     glossary: () => setIsGlossaryModalOpen(true),
-    presentation: () => setIsPresentationModalOpen(true),
+    presentation: () => setChromeHidden(true),
     opening: () => setIsOpeningSlideOpen(true),
     design: () => setExcursion("design"),
     // Legacy routes — redirect to MA-RA modal with the relevant reading pre-selected
@@ -447,6 +450,15 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!chromeHidden) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") navigateTo("program");
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [chromeHidden]);
+
+  useEffect(() => {
     if (!isGraphModalOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsGraphModalOpen(false);
@@ -530,11 +542,12 @@ const App: React.FC = () => {
 
       {/**/}
 
-      <Header
-        onHomeClick={() => navigateTo("home")}
-      />
+      {!chromeHidden && (
+        <Header onHomeClick={() => navigateTo("home")} />
+      )}
 
       {/* Mobile Horizontal Navigation (Sticky) */}
+      {!chromeHidden && (
       <MobileNav
         active={excursion ?? "deck"}
         selectedAgentId={selectedAgentId}
@@ -554,8 +567,10 @@ const App: React.FC = () => {
           navigateTo("steps");
         }}
       />
+      )}
 
       <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
+        {!chromeHidden && (
         <Sidebar
           width={sidebarWidth}
           isResizing={isResizingState}
@@ -571,6 +586,7 @@ const App: React.FC = () => {
           }}
           getAgentTheme={getAgentTheme}
         />
+        )}
 
         {/* The row above sets `md:items-start`, so <main> is not stretched and
             `flex-1` governs its WIDTH only — its height stays content-sized.
@@ -580,10 +596,24 @@ const App: React.FC = () => {
         <main
           className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden md:self-stretch"
         >
+          {/* Enter / leave presentation chrome. In chrome mode the header and
+              nav are unmounted, so without this button Escape would be the only
+              way back — a presenter on a clicker or a touch screen would be
+              stuck mid-talk. Quiet by default, full opacity on hover/focus. */}
+          <button
+            onClick={() => navigateTo(chromeHidden ? "program" : "presentation")}
+            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-800 shadow-sm border border-slate-200 opacity-30 hover:opacity-100 focus:opacity-100 transition-all"
+            aria-label={chromeHidden ? "Leave presentation mode" : "Presentation mode"}
+            title={chromeHidden ? "Leave presentation mode (Esc)" : "Presentation mode"}
+          >
+            {chromeHidden ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+
           {/* THE DECK — always mounted, never replaced. Anything that used to
               take over this pane now arrives as an excursion chip inside it. */}
           <WorkshopProgramView
             onNavigate={navigateTo}
+            chromeHidden={chromeHidden}
             excursion={excursion}
             onCloseExcursion={() => navigateTo("program")}
             excursionContent={
@@ -635,16 +665,6 @@ const App: React.FC = () => {
         </main>
       </div>
 
-      {/* Rendered first so the content modals below it (notation, graph, dashboards)
-          paint ABOVE the fullscreen presentation — they share the same z-index. */}
-      <PresentationModal
-        isOpen={isPresentationModalOpen}
-        onClose={() => {
-          setIsPresentationModalOpen(false);
-          navigateTo("program");
-        }}
-        onNavigate={navigateTo}
-      />
 
       <InventoryModal
         isOpen={isInventoryModalOpen}
