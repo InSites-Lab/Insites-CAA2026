@@ -501,8 +501,8 @@ const FromReportToInquiryTab: React.FC = () => (
     <div className="space-y-1.5 shrink-0">
       {/* <Eyebrow>What it yielded</Eyebrow> */}
       <h3 className="font-display text-4xl leading-[1.15] text-slate-900">
-        From a final report — To an inquiry to be examined. <span className="text-[22px] font-medium text-slate-500">
-    &nbsp; &nbsp; &nbsp;( Two LLM InSites examples)</span>
+        From a final report To an inquiry to be examined. <span className="text-[21px] font-medium text-slate-500">
+    (Two new InSites examples)</span>
         {/* <br /> */}
         
       </h3>

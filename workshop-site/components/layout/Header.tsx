@@ -13,14 +13,14 @@ import { Cpu } from "lucide-react";
 // here paints as 44px. Judge the size on screen, not from the number.
 
 const SIZE = {
-  height: 'h-10',            // the bar itself: h-9=36 h-10=40 h-11=44 h-12=48
-  title: 'text-[13px]',      // "From Report to Inquiry"
-  titleWeight: 'font-medium',// font-medium / font-bold / font-black
-  authors: 'text-[13px]',    // "Alef & Shafriri"
-  lab: 'text-[13px]',        // "InSites Lab"
-  logo: 'h-5',               // both Technion logos
-  icon: 16,                  // the Cpu glyph, in px
-  iconPad: 'p-1',            // padding of the box around it
+  height: 'h-14',            // the bar itself: h-9=36 h-10=40 h-11=44 h-12=48
+  title: 'text-[20px]',      // "From Report to Inquiry"
+  titleWeight: 'font-black',// font-medium / font-bold / font-black
+  authors: 'text-[20px]',    // "Alef & Shafriri"
+  lab: 'text-[24px]',        // "InSites Lab"
+  logo: 'h-10',               // both Technion logos
+  icon: 18,                  // the Cpu glyph, in px
+  iconPad: 'p-2',            // padding of the box around it
 } as const;
 
 export interface HeaderProps {
@@ -74,14 +74,18 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
   aria-label="Back to home"
   className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded flex items-center"
 >
-  <h1 className={`${SIZE.titleWeight} ${SIZE.title} tracking-tight leading-none text-slate-400 group-hover:text-slate-200 truncate relative inline-block transition-colors duration-300`}>
-    From Report to Inquiry
+  {/* leading-TIGHT, not leading-none: `truncate` brings overflow:hidden with
+      it, and leading-none makes the line box exactly the font size — which
+      clips every descender, so "Governing" lost the tail of its g. Same fix as
+      88858bb; it came back with a paste. */}
+  <h1 className={`${SIZE.titleWeight} ${SIZE.title} tracking-tight leading-tight text-slate-300 group-hover:text-slate-100 truncate relative inline-block transition-colors duration-300`}>
+    From Report to Inquiry <span className="text-slate-500">— Governing Generative AI Insights in Heritage Significance Assessment</span>
     <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
   </h1>
 </button>
  
           <span className="hidden md:inline text-slate-600 mx-2.5">|</span>
-          <span className={`hidden md:inline text-slate-400 font-medium ${SIZE.authors} whitespace-nowrap`}>Alef &amp; Shafriri</span>
+          <span className={`hidden md:inline text-slate-400 font-medium ${SIZE.authors} whitespace-nowrap`}>Alef, Shafriri & Berger</span>
         </div>
         <div
           className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"
@@ -101,9 +105,9 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
             className={`${SIZE.logo} object-contain hidden md:inline-block mr-1`}
           />
 
-          <h3 className={`text-slate-300 font-bold ${SIZE.lab} leading-none whitespace-nowrap`}>
+          <h2 className={`text-slate-200 font-bold ${SIZE.lab} leading-none whitespace-nowrap`}>
             InSites Lab
-          </h3>
+          </h2>
 
         </div>
       </div>
