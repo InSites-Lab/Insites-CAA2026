@@ -1,6 +1,28 @@
 import React, { useState } from "react";
 import { Cpu } from "lucide-react";
 
+// ─── Sizing — the only place to tune the header ────────────────────
+// Same idea as `SIZE` in Sidebar.tsx: every dimension in this bar comes from
+// here, so one edit moves the whole row instead of five scattered literals.
+//
+// The header deliberately gives weight to the tab bar below it — that bar is
+// the spine of the talk and this is a colophon. If you raise `height`, raise
+// `title` and `logo` with it or the row will look empty.
+//
+// NOTE: the app is scaled by `--app-zoom` (index.css), currently 1.1 — so 40px
+// here paints as 44px. Judge the size on screen, not from the number.
+
+const SIZE = {
+  height: 'h-10',            // the bar itself: h-9=36 h-10=40 h-11=44 h-12=48
+  title: 'text-[13px]',      // "From Report to Inquiry"
+  titleWeight: 'font-medium',// font-medium / font-bold / font-black
+  authors: 'text-[13px]',    // "Alef & Shafriri"
+  lab: 'text-[13px]',        // "InSites Lab"
+  logo: 'h-5',               // both Technion logos
+  icon: 16,                  // the Cpu glyph, in px
+  iconPad: 'p-1',            // padding of the box around it
+} as const;
+
 export interface HeaderProps {
   onHomeClick: () => void;
 }
@@ -35,15 +57,15 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
   return (
     <header
       style={headerStyle}
-      className="bg-[#020617] text-white shadow-xl z-50 shrink-0 border-b border-slate-800 px-3 md:px-6 h-10 flex items-center"
+      className={`bg-[#020617] text-white shadow-xl z-50 shrink-0 border-b border-slate-800 px-3 md:px-6 ${SIZE.height} flex items-center`}
     >
       <div className="w-full flex items-center justify-between gap-2">
          <div className="flex items-center gap-3 min-w-2">
           <div
-            className="p-1 rounded-md shadow-inner cpu-box"
+            className={`${SIZE.iconPad} rounded-md shadow-inner cpu-box`}
             style={{ boxShadow: "inset 0 0 6px rgba(0,0,0,0.25)" }}
           >
-            <Cpu size={16} />
+            <Cpu size={SIZE.icon} />
           </div>
      
          <button
@@ -52,14 +74,14 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
   aria-label="Back to home"
   className="group min-w-0 flex-1 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded flex items-center"
 >
-  <h1 className="font-medium tracking-tight leading-none text-[13px] text-slate-400 group-hover:text-slate-200 truncate relative inline-block transition-colors duration-300">
+  <h1 className={`${SIZE.titleWeight} ${SIZE.title} tracking-tight leading-none text-slate-400 group-hover:text-slate-200 truncate relative inline-block transition-colors duration-300`}>
     From Report to Inquiry
     <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-indigo-400 transition-all duration-300 group-hover:w-full"></span>
   </h1>
 </button>
  
           <span className="hidden md:inline text-slate-600 mx-2.5">|</span>
-          <span className="hidden md:inline text-slate-400 font-medium text-[13px] whitespace-nowrap">Alef &amp; Shafriri</span>
+          <span className={`hidden md:inline text-slate-400 font-medium ${SIZE.authors} whitespace-nowrap`}>Alef &amp; Shafriri</span>
         </div>
         <div
           className="flex items-center gap-2 md:gap-3 shrink-0 whitespace-nowrap justify-end"
@@ -69,17 +91,17 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
           <img
             src="./technion-small.png"
             alt="Technion"
-            className="h-5 object-contain inline-block md:hidden"
+            className={`${SIZE.logo} object-contain inline-block md:hidden`}
           />
 
           {/* Desktop Technion logo (public/Technion_Logo.png) */}
           <img
             src="./Technion_Logo.png"
             alt="Technion"
-            className="h-5 object-contain hidden md:inline-block mr-1"
+            className={`${SIZE.logo} object-contain hidden md:inline-block mr-1`}
           />
 
-          <h3 className="text-slate-300 font-bold text-[13px] leading-none whitespace-nowrap">
+          <h3 className={`text-slate-300 font-bold ${SIZE.lab} leading-none whitespace-nowrap`}>
             InSites Lab
           </h3>
 
