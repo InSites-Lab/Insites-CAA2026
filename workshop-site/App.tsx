@@ -233,7 +233,17 @@ const App: React.FC = () => {
   // Deep linking - hash routes mapping
   const hashRoutes: Record<string, () => void> = {
     graph: () => setIsGraphInputModalOpen(true),
-    "graph-view": () => setIsGraphModalOpen(true),
+    // constants.tsx:385 and the README both point at #graph-create.
+    "graph-create": () => setIsGraphInputModalOpen(true),
+    // The Q&A tab jumps straight here. The vis-network instance is built by
+    // generateKnowledgeGraph, reached via #graph — so without this the button
+    // opened an EMPTY graph unless one had been generated earlier in the
+    // session. It is a backup button for audience questions: it would have
+    // failed exactly when it was needed.
+    "graph-view": () => {
+      if (graphDataRef.current) setIsGraphModalOpen(true);
+      else void generateKnowledgeGraph();
+    },
     visual: () => setIsDemoModalOpen(true),
     prompts: () => setIsPromptModalOpen(true),
     principles: () => setIsPrinciplesModalOpen(true),
@@ -317,20 +327,28 @@ const App: React.FC = () => {
     setIsCollectionDashboardOpen(false);
     setIsReadAssessmentModalOpen(false);
     setIsGlossaryModalOpen(false);
-    // Note: presentation modal is NOT closed here — it persists across hash navigation
+    // The opening slide is a bare fixed inset-0 overlay, not a Modal. Leaving
+    // it out of here meant #opening followed by any navigation left a white
+    // sheet over the whole app whose only exit was its own x.
+    setIsOpeningSlideOpen(false);
+    // Presentation is no longer a modal — it is chrome state, untouched here.
   }, []);
 
   // Handle hash change
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1); // Remove #
+      closeAllModals();
       if (hash && hashRoutes[hash]) {
-        closeAllModals();
         hashRoutes[hash]();
-      } else if (!hash) {
-        closeAllModals();
-        hashRoutes['program']();
+      } else if (hash) {
+        // Unknown hash used to hit neither branch and leave the app sitting on
+        // a dead route with no handler run at all. Normalise to the deck.
+        window.location.hash = "";
       }
+      // Empty hash: every modal's onClose sets it, so this fires on each modal
+      // close. Deliberately does NOT clear the excursion — closing a glossary
+      // opened from a CBSA stage should return to that stage.
     };
 
     // Handle initial hash on mount
@@ -343,6 +361,9 @@ const App: React.FC = () => {
 
   // Knowledge Graph states
   const [graphData, setGraphData] = useState<any | null>(null);
+  // hashRoutes is captured once (the hash effect has [] deps), so it would read
+  // a permanently-null graphData. A ref survives that closure.
+  const graphDataRef = useRef<any | null>(null);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
   const [selectedNodeDetails, setSelectedNodeDetails] = useState<any | null>(
     null,
@@ -530,6 +551,7 @@ const App: React.FC = () => {
         network.destroy();
       };
     }
+    graphDataRef.current = graphData;
   }, [graphData]);
 
 
