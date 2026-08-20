@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { AgentConfig, StepDetails } from '../../types';
-import { X, Lightbulb, Layers, ListChecks, Code, ChevronLeft, Loader2, Sparkles, Copy } from 'lucide-react';
+import React from 'react';
+import { AgentConfig } from '../../types';
+import { Lightbulb, Layers, ListChecks, Code, ChevronLeft, Loader2, Sparkles, Copy } from 'lucide-react';
 import MarkdownRenderer from '../MarkdownRenderer';
-import { STEP_DETAILS, PROMPT_TRANSLATIONS, PROMPT_PREVIEWS_EN, PROMPT_TEMPLATES, CORE_AGENTS } from '../../constants';
+import { STEP_DETAILS, PROMPT_TRANSLATIONS, PROMPT_PREVIEWS_EN, PROMPT_TEMPLATES } from '../../constants';
 import { copyToClipboard } from '../../utils';
 
 interface StepDetailViewProps {
     agent: AgentConfig;
-    onBack: () => void;
+    /** Omit to hide the header — the excursion chip already names the stage. */
+    onBack?: () => void;
     onConsult?: () => void;
     consultationInput: string;
     setConsultationInput: (input: string) => void;
@@ -17,6 +18,8 @@ interface StepDetailViewProps {
     promptLang: 'he' | 'en';
     setPromptLang: (lang: 'he' | 'en') => void;
     rawData: string;
+    /** Stage 5's extension tracks need to route out of the view. */
+    onNavigate?: (route: string) => void;
 }
 
 export const StepDetailView: React.FC<StepDetailViewProps> = ({
@@ -30,7 +33,8 @@ export const StepDetailView: React.FC<StepDetailViewProps> = ({
     isConsulting,
     promptLang,
     setPromptLang,
-    rawData
+    rawData,
+    onNavigate
 }) => {
     const selectedStepDetails = STEP_DETAILS[agent.id];
 
@@ -50,8 +54,10 @@ export const StepDetailView: React.FC<StepDetailViewProps> = ({
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50" dir="ltr">
-            {/* Sticky Header */}
+        <div className="flex flex-col bg-slate-50" dir="ltr">
+            {/* Sticky header — only when the caller supplies a way back. Inside
+                the deck the excursion chip names the stage and carries the ×. */}
+            {onBack && (
             <div className="p-3 border-b border-slate-200 flex justify-between items-center bg-white shadow-sm z-30 px-4 shrink-0 h-[60px] sticky top-0">
                 <div className="flex items-center gap-3 min-w-0">
                     <div className={`p-1.5 rounded-lg ${getAgentChipTheme(agent.color)} shrink-0`}>
@@ -70,12 +76,15 @@ export const StepDetailView: React.FC<StepDetailViewProps> = ({
                     <ChevronLeft size={24} />
                 </button>
             </div>
+            )}
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pt-5 pb-24 space-y-5">
+            {/* Content. No scroller of its own — the deck column already
+                scrolls; a nested one produced a scroll trap. */}
+            <div className="px-4 pt-5 pb-8 space-y-5">
 
-                {/* Why Important & Cognitive Link */}
-                <div className="space-y-3">
+                {/* Why Important & Cognitive Link — stacked on mobile,
+                    side by side from md, as the desktop view had them. */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5">
                         <div className="flex items-center gap-2 mb-2">
                             <Lightbulb size={16} className="text-amber-600" />
@@ -119,6 +128,34 @@ export const StepDetailView: React.FC<StepDetailViewProps> = ({
                             </li>
                         ))}
                     </ul>
+
+                    {/* Stage 5 only — the extension tracks, ported from the
+                        desktop view that this component now replaces. */}
+                    {agent.id === 5 && selectedStepDetails?.extensions && onNavigate && (
+                        <div className="mt-3 pt-3 border-t border-slate-200">
+                            <div className="text-[13.5px] text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <span className="font-bold text-slate-700">Extension tracks:</span>
+                                {selectedStepDetails.extensions
+                                    .filter((ext) => ext.url !== 'q-jester')
+                                    .map((ext) => (
+                                        <button
+                                            key={ext.url}
+                                            onClick={() => onNavigate(ext.url)}
+                                            title={ext.description}
+                                            className="cursor-pointer text-indigo-600 hover:text-indigo-800 underline underline-offset-2"
+                                        >
+                                            {ext.name}
+                                        </button>
+                                    ))}
+                                <button
+                                    onClick={() => onNavigate('tools')}
+                                    className="cursor-pointer text-slate-500 hover:text-slate-700 underline underline-offset-2"
+                                >
+                                    All tools
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Prompt Section */}
