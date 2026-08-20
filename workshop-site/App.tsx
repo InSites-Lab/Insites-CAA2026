@@ -1,57 +1,33 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  X,
-  FileText,
   Loader2,
   Sparkles,
   Copy,
-  Check,
   Code,
   Zap,
-  MessageSquare,
-  ExternalLink,
   Github,
   Bot,
-  Globe,
-  Trash2,
   BookOpen,
   Lightbulb,
   Send,
-  Activity,
-  Target,
-  UserCheck,
   ListChecks,
-  Type,
-  ShieldCheck,
-  Puzzle,
-  Scale,
   Scroll,
-  SearchCheck,
   Box,
   Layout,
   LayoutDashboard,
-  BarChart3,
   ChevronLeft,
-  Gauge,
-  Eye,
-  GraduationCap,
   Layers,
   PieChart,
-  Workflow,
-  TerminalSquare,
   Share2,
   Library,
-  Mail,
   ChevronDown,
   BookText,
   Maximize2,
 } from "lucide-react";
 import MarkdownRenderer from "./components/MarkdownRenderer";
 import {
-  Modal,
   ResourceLink,
   ResourceGroup,
-  SectionDivider,
 } from "./components/common";
 import SwitchTransition from "./components/common/SwitchTransition";
 import { Header, Sidebar, MobileNav } from "./components/layout";
@@ -62,9 +38,6 @@ import {
   StepsList,
   StepDetailView,
   WorkshopProgramView,
-  WorkshopOpeningView,
-  WorkshopOpeningViewV2,
-  WorkshopOpeningViewV3,
 } from "./components/views";
 import {
   PrinciplesModal,
@@ -72,7 +45,6 @@ import {
   InventoryModal,
   PromptAdvisorModal,
   GraphInputModal,
-  ResearchQueryModal,
   GraphModal,
   EpistemicNotationModal,
   GovernanceModal,
@@ -93,10 +65,7 @@ import {
   PROMPT_PREVIEWS_EN,
   PROMPT_TEMPLATES,
   STEP_DETAILS,
-  RESEARCH_QUERIES,
   getNodeColor,
-  ResearchQuerySelection,
-  LOOKING_GLASS_CARDS,
 } from "./constants";
 import { callGemini } from "./services/geminiService";
 import { PREBUILT_GRAPHS } from "./config/prebuiltGraphs";
@@ -216,26 +185,6 @@ const getAgentTheme = (
   };
 };
 
-const getMobileStageTheme = (colorName: string, isSelected: boolean) => {
-  const style = getAgentColorStyle(colorName);
-  return {
-    pill: isSelected
-      ? style.mobileSelected
-      : "bg-white border-slate-200 text-slate-600",
-    badge: isSelected
-      ? style.mobileBadgeSelected
-      : "bg-slate-100 text-slate-500",
-  };
-};
-
-const getAgentChipTheme = (colorName: string) => {
-  const style = getAgentColorStyle(colorName);
-  return style.chip;
-};
-
-// Toggle: true = slide-style opening + program, false = compact program only
-const USE_OPENING_VIEW = false;
-
 const App: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
   const [showResearchAids, setShowResearchAids] = useState<boolean>(false);
@@ -305,8 +254,6 @@ const App: React.FC = () => {
   const [inventoryModalLang, setInventoryModalLang] = useState<"he" | "en">(
     "en",
   );
-  const [selectedQuery, setSelectedQuery] =
-    useState<ResearchQuerySelection | null>(null);
 
   // Design view state
   const [showDesignView, setShowDesignView] = useState<boolean>(false);
@@ -315,42 +262,13 @@ const App: React.FC = () => {
     setShowResearchAids(true);
     setShowDesignView(false);
     setSelectedAgentId(null);
-    setSelectedQuery(null);
   }, []);
 
   const openDesignView = useCallback(() => {
     setShowDesignView(true);
     setShowResearchAids(false);
     setSelectedAgentId(null);
-    setSelectedQuery(null);
   }, []);
-
-  const openResearchQueryByRoute = useCallback(
-    (route: string) => {
-      const main = RESEARCH_QUERIES.find((q: any) => q.route === route);
-      if (main) {
-        openResearchTools();
-        setSelectedQuery(main);
-        return;
-      }
-
-      for (const q of RESEARCH_QUERIES as any[]) {
-        const subs = q.subQueries;
-        if (Array.isArray(subs)) {
-          const sub = subs.find((s: any) => s.route === route);
-          if (sub) {
-            openResearchTools();
-            setSelectedQuery(sub);
-            return;
-          }
-        }
-      }
-
-      // Fallback: open tools if route not found
-      openResearchTools();
-    },
-    [openResearchTools],
-  );
 
   // Deep linking - hash routes mapping
   const hashRoutes: Record<string, () => void> = {
@@ -736,7 +654,6 @@ const App: React.FC = () => {
       {/**/}
 
       <Header
-        onAboutClick={() => navigateTo("welcome")}
         onHomeClick={() => navigateTo("home")}
       />
 
@@ -744,12 +661,8 @@ const App: React.FC = () => {
       <MobileNav
         currentView={mobileView}
         selectedAgentId={selectedAgentId}
-        agents={CORE_AGENTS}
         onHomeClick={() => {
           navigateTo("home");
-        }}
-        onAboutClick={() => {
-          navigateTo("welcome");
         }}
         onResearchAidsClick={() => {
           navigateTo("tools");
@@ -763,11 +676,6 @@ const App: React.FC = () => {
         onStepsClick={() => {
           navigateTo("steps");
         }}
-        onAgentSelect={(agentId) => {
-          navigateTo(`step-${agentId}`);
-        }}
-        getMobileStageTheme={getMobileStageTheme}
-        getAgentTheme={getAgentTheme}
       />
 
       <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
@@ -1734,15 +1642,6 @@ const App: React.FC = () => {
         selectedNodeDetails={selectedNodeDetails}
         isLoading={isGraphLoading}
         graphContainerRef={graphContainerRef}
-      />
-
-      <ResearchQueryModal
-        query={selectedQuery}
-        onClose={() => {
-          setSelectedQuery(null);
-          window.location.hash = "";
-        }}
-        onNavigate={navigateTo}
       />
 
       <GraphInputModal

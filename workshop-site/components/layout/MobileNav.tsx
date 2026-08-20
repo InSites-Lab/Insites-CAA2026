@@ -1,43 +1,25 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Home, ListOrdered, Zap, Eye, Presentation } from 'lucide-react';
-import { AgentConfig } from '../../types';
 
 export interface MobileNavProps {
   currentView: 'HOME' | 'TOOLS' | 'STEPS' | 'ABOUT' | 'STEP_DETAIL' | 'PROGRAM' | 'DESIGN';
   selectedAgentId: number | null;
-  agents: AgentConfig[];
   onHomeClick: () => void;
-  onAboutClick: () => void;
   onProgramClick: () => void;
   onResearchAidsClick: () => void;
   onDesignClick: () => void;
   onStepsClick: () => void;
-  onAgentSelect: (agentId: number) => void;
-  getMobileStageTheme: (colorName: string, isSelected: boolean) => { pill: string; badge: string };
-  getAgentTheme: (agentId: number, colorName: string, isSelected: boolean) => { card: string; icon: string };
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({
   currentView,
   selectedAgentId,
-  agents,
   onHomeClick,
-  onAboutClick,
   onProgramClick,
   onResearchAidsClick,
   onDesignClick,
   onStepsClick,
 }) => {
-
-  const currentLabel = useMemo(() => {
-    if (currentView === 'TOOLS') return 'More Tools';
-    if (currentView === 'STEPS') return 'Assessment Process';
-    if (currentView === 'ABOUT') return 'About';
-    if (currentView === 'DESIGN') return 'Design';
-    if (selectedAgentId === null) return 'Home';
-    const agent = agents.find((a) => a.id === selectedAgentId);
-    return agent ? agent.name.replace(/^\d+ - /, '') : 'Stage';
-  }, [agents, selectedAgentId, currentView]);
 
   return (
     <>
