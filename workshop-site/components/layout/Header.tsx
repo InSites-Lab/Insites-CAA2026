@@ -12,29 +12,33 @@ import { Cpu } from "lucide-react";
 // NOTE: the app is scaled by `--app-zoom` (index.css), currently 1.1 — so 40px
 // here paints as 44px. Judge the size on screen, not from the number.
 
+// Each value is "phone lg:desktop". The header is a colophon on a large
+// screen and pure overhead on a small one, where every pixel it takes comes
+// out of the slide — so it shrinks hard below lg.
 const SIZE = {
-  height: 'h-14',             // the bar itself: h-9=36 h-10=40 h-12=48 h-14=56
-  gap: 'gap-3',               // between icon, title, divider and authors
-  padX: 'px-3 lg:px-6',       // the bar's horizontal padding
+  height: 'h-11 lg:h-14',
+  gap: 'gap-2 lg:gap-3',
+  padX: 'px-3 lg:px-6',
 
-  title: 'text-[20px]',       // "From Report to Inquiry"
-  titleWeight: 'font-black',  // font-medium / font-bold / font-black
+  title: 'text-[13px] lg:text-[20px]',
+  titleWeight: 'font-bold lg:font-black',
 
-  subtitle: 'text-[20px]',    // "— Governing Generative AI Insights in…"
+  subtitle: 'text-[20px]',    // desktop only — hidden below lg
   subtitleWeight: 'font-bold',
 
-  divider: 'w-px h-6',        // the rule between title and authors
-  dividerGap: 'mx-3',         // space either side of it
+  divider: 'w-px h-6',
+  dividerGap: 'mx-3',
 
-  authors: 'text-[20px]',     // "Alef, Shafriri & Berger"
+  authors: 'text-[20px]',     // desktop only
   authorsWeight: 'font-medium',
 
-  lab: 'text-[24px]',         // "InSites Lab"
+  lab: 'text-[13px] lg:text-[24px]',
   labWeight: 'font-bold',
-  logo: 'h-10',               // both Technion logos
+  logo: 'h-6 lg:h-10',
 
-  icon: 18,                   // the Cpu glyph, in px
-  iconPad: 'p-2',             // padding of the box around it
+  icon: 14,                   // the Cpu glyph on a phone, in px
+  iconLg: 18,                 // ...and from lg
+  iconPad: 'p-1 lg:p-2',
   iconRadius: 'rounded-md',
 } as const;
 
@@ -103,7 +107,8 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
             className={`${SIZE.iconPad} ${SIZE.iconRadius} shadow-inner cpu-box shrink-0`}
             style={{ boxShadow: "inset 0 0 6px rgba(0,0,0,0.25)" }}
           >
-            <Cpu size={SIZE.icon} />
+            <Cpu size={SIZE.icon} className="lg:hidden" />
+            <Cpu size={SIZE.iconLg} className="hidden lg:block" />
           </div>
      
          <button
@@ -117,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
       clips every descender, so "Governing" lost the tail of its g. Same fix as
       88858bb; it came back with a paste. */}
   <h1 className={`${SIZE.titleWeight} ${SIZE.title} tracking-tight leading-tight ${COLOR.title} ${COLOR.titleHover} truncate relative inline-block transition-colors duration-300`}>
-    From Report to Inquiry <span className={`${COLOR.subtitle} ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— Governing Generative AI Insights in Heritage Significance Assessment</span>
+    From Report to Inquiry <span className={`hidden lg:inline ${COLOR.subtitle} ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— Governing Generative AI Insights in Heritage Significance Assessment</span>
     <span className={`absolute -bottom-0.5 left-0 w-0 h-px ${COLOR.underline} transition-all duration-300 group-hover:w-full`}></span>
   </h1>
 </button>

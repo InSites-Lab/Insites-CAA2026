@@ -250,12 +250,14 @@ const PhotoStrip: React.FC<{
       // viewport cap. The cap is what actually bounds it — the app root is
       // `min-h-screen`, so the frame handed down here can be taller than the
       // window and `grow` alone would over-allocate.
-      className={`grid gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto ${maxWidth} ${maxHeight} ${
-        columns === 1 ? 'grid-cols-1' : 'grid-cols-2'
+      // Two panels side by side on a phone are tall narrow slabs; below sm the
+      // strip drops to a single full-width frame and the second panel hides.
+      className={`grid gap-2 sm:gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto ${maxWidth} ${maxHeight} ${
+        columns === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
       }`}
     >
       {panel(0, caption)}
-      {columns === 2 && panel(1)}
+      {columns === 2 && <div className="hidden sm:block">{panel(1)}</div>}
     </div>
   );
 };
@@ -431,21 +433,26 @@ const EpistemicNotationTab: React.FC<{
       <p className="text-sm sm:text-base lg:text-lg font-semibold text-slate-500">Validity remains human judgment.</p>
     </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+    {/* A phone stacks these three, so as tall blocks they pushed the tab's
+        conclusion below the fold. One compact row each below sm. */}
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3.5">
       {NOTATION_TIERS.map((tier) => (
-        <div key={tier.title} className="bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 shadow-sm space-y-1.5">
-          <div className="flex">{tier.mark}</div>
-          <p className={`text-[13px] sm:text-[15px] font-extrabold ${tier.titleColor}`}>{tier.title}</p>
-          <p className="text-[13px] text-slate-500">{tier.body}</p>
+        <div
+          key={tier.title}
+          className="bg-white border-2 border-slate-300 rounded-xl px-3 py-2 sm:px-4 sm:py-3.5 shadow-sm flex items-center gap-2.5 sm:block sm:space-y-1.5"
+        >
+          <div className="flex shrink-0">{tier.mark}</div>
+          <p className={`text-[13px] sm:text-[15px] font-extrabold shrink-0 ${tier.titleColor}`}>{tier.title}</p>
+          <p className="text-[12px] sm:text-[13px] text-slate-500 truncate sm:whitespace-normal">{tier.body}</p>
         </div>
       ))}
     </div>
 
-    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3.5">
+    <div className="grid grid-cols-5 gap-1.5 sm:gap-3.5">
       {CLAIM_COUNTS.map((c) => (
-        <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5">
+        <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
           <p className={`text-xl sm:text-2xl lg:text-[26px] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
-          <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-slate-400">{c.label}</p>
+          <p className="text-[9px] sm:text-[11px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">{c.label}</p>
         </div>
       ))}
     </div>
@@ -532,7 +539,7 @@ const FromReportToInquiryTab: React.FC = () => (
         readings describe. `fit` so the closing panel below is never pushed
         out of the frame — the image gives up its height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[calc(48vh/var(--app-zoom))]" />
+    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[26vh] sm:max-h-[calc(48vh/var(--app-zoom))]" />
 
     <div className="bg-slate-900 rounded-2xl px-7 py-5 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div className="space-y-1.5">
