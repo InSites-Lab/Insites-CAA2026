@@ -1,24 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  BookOpen,
-  ChevronLeft,
-  Maximize2,
-  Minimize2,
-} from "lucide-react";
-import SwitchTransition from "./components/common/SwitchTransition";
 import { Header, Sidebar, MobileNav } from "./components/layout";
-import { DesignPrinciplesView } from "./components/views/DesignPrinciplesView";
 import {
   ExcursionOutlet,
   ExcursionKey,
 } from "./components/views/ExcursionOutlet";
-import {
-  WelcomeOverlay,
-  AboutView,
-  StepsList,
-  StepDetailView,
-  WorkshopProgramView,
-} from "./components/views";
+import { WorkshopProgramView } from "./components/views";
 import {
   PrinciplesModal,
   DemoModal,
@@ -214,10 +200,6 @@ const App: React.FC = () => {
   const [isReadAssessmentModalOpen, setIsReadAssessmentModalOpen] =
     useState(false);
   const [isGlossaryModalOpen, setIsGlossaryModalOpen] = useState(false);
-  // Presentation is a CHROME MODE, not a second deck. It hides the header,
-  // sidebar and mobile nav around the one deck instance — so the active tab
-  // survives entering and leaving it, which a second mounted copy could not do.
-  const [chromeHidden, setChromeHidden] = useState(false);
   const [isOpeningSlideOpen, setIsOpeningSlideOpen] = useState(false);
   const [readAssessmentInitialRoute, setReadAssessmentInitialRoute] = useState<
     string | null
@@ -258,7 +240,10 @@ const App: React.FC = () => {
       setIsReadAssessmentModalOpen(true);
     },
     glossary: () => setIsGlossaryModalOpen(true),
-    presentation: () => setChromeHidden(true),
+    // Presentation chrome mode is gone — F11 removes the browser's chrome, and
+    // the site's own header and sidebar should stay: the sidebar is part of the
+    // argument. The hash is kept as a deck alias so old links still resolve.
+    presentation: () => setExcursion(null),
     opening: () => setIsOpeningSlideOpen(true),
     design: () => setExcursion("design"),
     // Legacy routes — redirect to MA-RA modal with the relevant reading pre-selected
@@ -299,10 +284,7 @@ const App: React.FC = () => {
     "step-6": () => setExcursion("step-6"),
     // #home used to be a separate page. Under "you cannot leave the deck" it
     // means the deck; its old body is now the `resources` excursion.
-    home: () => {
-      setExcursion(null);
-      setChromeHidden(false);
-    },
+    home: () => setExcursion(null),
     resources: () => setExcursion("resources"),
     tools: () => setExcursion("tools"),
     steps: () => setExcursion("steps"),
@@ -311,10 +293,7 @@ const App: React.FC = () => {
     // to the deck — both the corner button and Escape route here. Without the
     // setChromeHidden(false) nothing ever turned chrome mode off again and the
     // only escape was a page reload.
-    program: () => {
-      setExcursion(null);
-      setChromeHidden(false);
-    },
+    program: () => setExcursion(null),
   };
 
   // Navigate to hash route
@@ -480,14 +459,6 @@ const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!chromeHidden) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") navigateTo("program");
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [chromeHidden]);
 
   useEffect(() => {
     if (!isGraphModalOpen) return;
@@ -574,12 +545,9 @@ const App: React.FC = () => {
 
       {/**/}
 
-      {!chromeHidden && (
-        <Header onHomeClick={() => navigateTo("home")} />
-      )}
+      <Header onHomeClick={() => navigateTo("home")} />
 
       {/* Mobile Horizontal Navigation (Sticky) */}
-      {!chromeHidden && (
       <MobileNav
         active={excursion ?? "deck"}
         selectedAgentId={selectedAgentId}
@@ -599,10 +567,8 @@ const App: React.FC = () => {
           navigateTo("steps");
         }}
       />
-      )}
 
       <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col md:flex-row md:items-start">
-        {!chromeHidden && (
         <Sidebar
           width={sidebarWidth}
           isResizing={isResizingState}
@@ -618,7 +584,6 @@ const App: React.FC = () => {
           }}
           getAgentTheme={getAgentTheme}
         />
-        )}
 
         {/* The row above sets `md:items-start`, so <main> is not stretched and
             `flex-1` governs its WIDTH only — its height stays content-sized.
@@ -628,24 +593,11 @@ const App: React.FC = () => {
         <main
           className="flex-1 min-h-0 flex flex-col bg-white shadow-inner relative transition-all overflow-hidden md:self-stretch"
         >
-          {/* Enter / leave presentation chrome. In chrome mode the header and
-              nav are unmounted, so without this button Escape would be the only
-              way back — a presenter on a clicker or a touch screen would be
-              stuck mid-talk. Quiet by default, full opacity on hover/focus. */}
-          <button
-            onClick={() => navigateTo(chromeHidden ? "program" : "presentation")}
-            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-800 shadow-sm border border-slate-200 opacity-30 hover:opacity-100 focus:opacity-100 transition-all"
-            aria-label={chromeHidden ? "Leave presentation mode" : "Presentation mode"}
-            title={chromeHidden ? "Leave presentation mode (Esc)" : "Presentation mode"}
-          >
-            {chromeHidden ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
 
           {/* THE DECK — always mounted, never replaced. Anything that used to
               take over this pane now arrives as an excursion chip inside it. */}
           <WorkshopProgramView
             onNavigate={navigateTo}
-            chromeHidden={chromeHidden}
             excursion={excursion}
             onCloseExcursion={() => navigateTo("program")}
             excursionContent={
