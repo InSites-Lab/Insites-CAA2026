@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
-import { Modal } from '../common';
+import { Modal, SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
 import { DesignPrinciplesView } from './DesignPrinciplesView';
 
@@ -66,7 +66,8 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   // Tabs that must never scroll: the column is bounded to the frame instead of
   // being allowed to grow past it, and the tab yields height from its images.
   // Every other tab keeps `shrink-0`, so tall content scrolls as before.
-  const fitsFrame = activeTab === 'inquiry' || activeTab === 'tension';
+  const fitsFrame =
+    activeTab === 'inquiry' || activeTab === 'tension' || activeTab === 'notation';
   const fillClass = fitsFrame ? 'grow min-h-0' : 'grow shrink-0';
 
   // The tab bar is the spine of the talk, so it carries the weight the header
@@ -334,14 +335,18 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
 // speaker never leaves the slide. (The HTML file stays — it is the printable
 // standalone copy.)
 
+// The marks are the subject of the talk, so they are set LARGER than the words
+// around them, not smaller. Inline in prose is the one place with a ceiling —
+// past ~20px they start breaking the line rhythm of the paragraph they annotate.
+
 /** Inferred — synthesized across sources. */
 const Inf = () => (
-  <span className="inline-block align-middle rounded bg-amber-100 px-1.5 text-[15px] font-semibold">〰️</span>
+  <span className="inline-block align-middle rounded bg-amber-100 px-1.5 text-[19px] font-semibold">〰️</span>
 );
 
 /** Hypothesis — reading between the lines. */
 const Hyp = () => (
-  <span className="inline-block align-middle rounded bg-purple-100 px-1.5 text-[15px] font-semibold">💭</span>
+  <span className="inline-block align-middle rounded bg-purple-100 px-1.5 text-[19px] font-semibold">💭</span>
 );
 
 const Cite: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -361,6 +366,23 @@ const WorkedExample: React.FC = () => (
       <p className="text-[13px] sm:text-sm text-slate-500">
         Tuba-Zangariyye Dolmen Field · Korazim Plateau · March 31, 2026
       </p>
+    </div>
+
+    {/* The key itself lives on tab 3 now, where it is quoted as the bot's
+        instruction. This strip is what the example needs to read on its own. */}
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 rounded-xl bg-slate-100 px-4 py-2 text-[13px] sm:text-sm text-slate-600">
+      <span className="flex items-center gap-1.5">
+        <span className="rounded bg-amber-100 px-1.5 text-[20px] font-semibold leading-none">〰️</span>
+        inferred
+      </span>
+      <span className="flex items-center gap-1.5">
+        <span className="rounded bg-purple-100 px-1.5 text-[20px] font-semibold leading-none">💭</span>
+        hypothesis
+      </span>
+      <span className="flex items-center gap-1.5">
+        <Cite>[C:pp.46–48]</Cite>
+        source
+      </span>
     </div>
 
     <img
@@ -423,51 +445,6 @@ const WorkedExample: React.FC = () => (
           <Hyp /> — the association is plausible given proximity but not site-specific.
         </p>
       </div>
-    </section>
-
-    <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
-      <h5 className="text-base sm:text-lg font-bold text-slate-900 mb-3">Global notation key</h5>
-      <table className="w-full text-sm sm:text-[15px]">
-        <thead>
-          <tr>
-            <th className="text-left font-bold text-[12px] uppercase tracking-[0.06em] text-slate-500 border-b-2 border-slate-200 py-2 px-2 w-24">
-              Notation
-            </th>
-            <th className="text-left font-bold text-[12px] uppercase tracking-[0.06em] text-slate-500 border-b-2 border-slate-200 py-2 px-2">
-              Meaning
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="border-b border-slate-200 py-2 px-2 text-center text-slate-400">(none)</td>
-            <td className="border-b border-slate-200 py-2 px-2">Explicit in source</td>
-          </tr>
-          <tr>
-            <td className="border-b border-slate-200 py-2 px-2 text-center">
-              <Inf />
-            </td>
-            <td className="border-b border-slate-200 py-2 px-2">
-              Inferred from 2+ pieces of evidence (cite the evidence)
-            </td>
-          </tr>
-          <tr>
-            <td className="border-b border-slate-200 py-2 px-2 text-center">
-              <Hyp />
-            </td>
-            <td className="border-b border-slate-200 py-2 px-2">
-              Uncertainty / interpretation — a claim that is neither explicit nor confidently
-              inferred
-            </td>
-          </tr>
-          <tr>
-            <td className="py-2 px-2 text-center">
-              <Cite>[file:page]</Cite>
-            </td>
-            <td className="py-2 px-2">Source</td>
-          </tr>
-        </tbody>
-      </table>
     </section>
 
     <p className="border-t-2 border-slate-200 pt-4 text-center text-[13px] sm:text-sm text-slate-500">
@@ -610,19 +587,46 @@ const WhatIsInSitesTab: React.FC = () => (
 
 // ─── 3 · Epistemic Notation ───────────────────────────────────────
 
-const NOTATION_TIERS = [
-  { mark: <span className="border border-dashed border-slate-300 text-slate-400 rounded px-2 text-xs font-semibold">no mark</span>, title: 'Explicit', titleColor: 'text-emerald-800', body: 'Stated in the sources' },
-  { mark: <span className="bg-amber-100 rounded px-2 text-[15px] font-semibold">〰️</span>, title: 'Inferred', titleColor: 'text-amber-800', body: 'Synthesized across sources' },
-  { mark: <span className="bg-purple-100 rounded px-2 text-[15px] font-semibold">💭</span>, title: 'Hypothesis', titleColor: 'text-purple-800', body: 'Reading between the lines' },
+// The bot's instruction, verbatim. InSites-CAA-claude.md v10, lines 187-198 —
+// Part 1, Global Controls, "Global Notation Key (Mandatory)". Every string in
+// this table is the prompt's own; do not improve the wording. If the prompt is
+// edited, re-copy it here and re-check the line numbers in the caption.
+const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }[] = [
+  {
+    mark: <span className="text-slate-400 text-[15px]">(none)</span>,
+    meaning: 'Explicit in source',
+    rowClass: '',
+  },
+  {
+    // The glyphs are the subject of the talk: biggest thing in the row.
+    mark: <span className="inline-block rounded-lg bg-amber-100 px-3 py-1 text-[30px] lg:text-[36px] leading-none">〰️</span>,
+    meaning: 'Inferred from 2+ pieces of evidence (cite the evidence)',
+    rowClass: 'bg-amber-50/50',
+  },
+  {
+    mark: <span className="inline-block rounded-lg bg-purple-100 px-3 py-1 text-[30px] lg:text-[36px] leading-none">💭</span>,
+    meaning: 'Uncertainty / interpretation — a claim that is neither explicit nor confidently inferred',
+    rowClass: 'bg-purple-50/50',
+  },
+  {
+    // The fourth row is the one the gloss below the card picks up: this is the
+    // mark the first row actually carries.
+    mark: <span className="font-mono text-[15px] lg:text-[17px] text-slate-500">[file:page]</span>,
+    meaning: 'Source',
+    rowClass: '',
+  },
 ];
 
 // 24 + 14 + 4 + 3 = 45. The fifth tile is what used to be missing from the
 // sum: three claims counted apart because they are the ones that failed.
-const CLAIM_COUNTS = [
+// The second tile does NOT say "unmarked": in those 24 cases the model did
+// something — it pinned the claim to a page — and the word for that is the
+// citation, not the absence of a glyph.
+const CLAIM_COUNTS: { n: string; label: string; token?: string; color: string }[] = [
   { n: '45', label: 'claims', color: 'text-slate-900' },
-  { n: '24', label: 'unmarked', color: 'text-slate-900' },
-  { n: '14', label: 'inferred 〰️', color: 'text-amber-800' },
-  { n: '4', label: 'hypotheses 💭', color: 'text-purple-800' },
+  { n: '24', label: 'explicit', token: '[file:page]', color: 'text-slate-900' },
+  { n: '14', label: 'inferred', token: '〰️', color: 'text-amber-800' },
+  { n: '4', label: 'hypotheses', token: '💭', color: 'text-purple-800' },
   // Same verb as the bottom line below ("the expert caught the other three"),
   // so the tile and the sentence read as one statement.
   { n: '3', label: 'caught', color: 'text-slate-900' },
@@ -631,8 +635,12 @@ const CLAIM_COUNTS = [
 const EpistemicNotationTab: React.FC<{
   onNavigate?: (route: string) => void;
 }> = ({ onNavigate }) => (
-  <div className="space-y-5">
-    <div className="space-y-1.5">
+  // Frame-fit, like tabs 2 and 4: the 42-of-45 panel is this slide's payoff and
+  // must not sit below the fold when the speaker lands the sentence. Everything
+  // is shrink-0 except the quoted key card, which is the one element allowed to
+  // give up height (and scroll inside itself) on a short screen.
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
+    <div className="space-y-1.5 shrink-0">
       <Eyebrow>The core mechanism</Eyebrow>
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
@@ -640,26 +648,74 @@ const EpistemicNotationTab: React.FC<{
       <p className="text-[15px] sm:text-[17px] lg:text-xl font-semibold text-slate-500">Validity remains human judgment.</p>
     </div>
 
-    {/* A phone stacks these three, so as tall blocks they pushed the tab's
-        conclusion below the fold. One compact row each below sm. */}
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3.5">
-      {NOTATION_TIERS.map((tier) => (
-        <div
-          key={tier.title}
-          className="bg-white border-2 border-slate-300 rounded-xl px-3 py-2 sm:px-4 sm:py-3.5 shadow-sm flex items-center gap-2.5 sm:block sm:space-y-1.5"
-        >
-          <div className="flex shrink-0">{tier.mark}</div>
-          <p className={`text-sm sm:text-base font-extrabold shrink-0 ${tier.titleColor}`}>{tier.title}</p>
-          <p className="text-[13px] sm:text-sm text-slate-500 truncate sm:whitespace-normal">{tier.body}</p>
-        </div>
-      ))}
+    {/* ── Act one: the instruction ──────────────────────────────────
+        The audience sees the rule before it sees any number measured with
+        it. The three tier cards that used to stand here were a paraphrase of
+        the same three rows, in a second visual grammar — cut, so the quote is
+        the only authority on the slide. */}
+    <div className="shrink-0">
+      <SectionDivider label="The instruction — quoted from the system prompt" />
     </div>
 
-    <div className="grid grid-cols-5 gap-1.5 sm:gap-3.5">
+    {/* min-h-0 (not grow) — the card keeps its content height when there is
+        room and is the only block that gives way when there is not. */}
+    <div className="border-2 border-slate-300 rounded-xl min-h-0 overflow-y-auto custom-scrollbar">
+      <table className="w-full text-[15px] sm:text-base lg:text-lg">
+        <thead>
+          <tr className="bg-slate-50">
+            <th className="text-left font-bold text-[11px] uppercase tracking-[0.08em] text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4 w-[110px] lg:w-[150px]">
+              Notation
+            </th>
+            <th className="text-left font-bold text-[11px] uppercase tracking-[0.08em] text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4">
+              Meaning
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {NOTATION_KEY.map((row) => (
+            <tr key={row.meaning} className={row.rowClass}>
+              <td className="border-b border-slate-200 py-2 px-3 sm:px-4 text-center align-middle">{row.mark}</td>
+              <td className="border-b border-slate-200 py-2 px-3 sm:px-4 text-slate-700 leading-snug">{row.meaning}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {/* The Rule line is prompt text too, so it stays inside the border. The
+          attribution rides the same line — provenance at no height cost. */}
+      <p className="px-3 sm:px-4 py-2.5 text-[13px] sm:text-sm text-slate-500 italic leading-snug">
+        "When in doubt — mark it. Better an unnecessary notation than an unmarked claim that appears factual."
+        <span className="not-italic text-slate-400"> — Global Notation Key (Mandatory), InSites v10</span>
+      </p>
+    </div>
+
+    {/* Inside the border is what the machine was told; this line is us reading
+        it. It is also where "no mark" is answered — the first tier is not
+        silence, it is a citation. */}
+    <p className="shrink-0 text-[13px] sm:text-[15px] text-slate-600 leading-snug">
+      The first tier's mark <strong className="font-bold">is</strong> the citation — the claim pinned to an
+      exact place in its source: <Cite>[C:pp.46–48]</Cite> · <Cite>[C:p.50 note 4; B]</Cite>
+    </p>
+
+    {/* ── Act two: the test ─────────────────────────────────────────── */}
+    <div className="shrink-0">
+      <SectionDivider
+        label="The test — one site, one expert, assessed twice"
+        sublabel="Once by hand, once with InSites — what the marks caught, and what only the expert could."
+      />
+    </div>
+
+    <div className="shrink-0 grid grid-cols-5 gap-1.5 sm:gap-3.5">
       {CLAIM_COUNTS.map((c) => (
         <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
           <p className={`text-xl sm:text-2xl lg:text-[26px] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
-          <p className="text-[10px] sm:text-[12px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">{c.label}</p>
+          <p className="text-[10px] sm:text-[12px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">
+            {c.label}
+            {c.token && (
+              // normal-case so the uppercase label does not eat the token, and
+              // a size up so the mark leads the tile rather than trailing it.
+              <span className="font-mono normal-case align-middle text-[12px] sm:text-[15px] text-slate-500"> {c.token}</span>
+            )}
+          </p>
         </div>
       ))}
     </div>
@@ -667,7 +723,7 @@ const EpistemicNotationTab: React.FC<{
     {/* The bottom line on performance: what the marking was worth, and where
         the three missing from the sum went. No percentage — the paper reports
         none, and one case with one expert does not support one. */}
-    <div className="border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
+    <div className="shrink-0 border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
       <p className="text-[15px] sm:text-base md:text-lg lg:text-xl font-bold text-slate-900 leading-snug">
         42 of 45 held. The expert caught the other three — in the session.
       </p>
@@ -679,12 +735,12 @@ const EpistemicNotationTab: React.FC<{
     {/* The worked example used to sit here as a second button opening a
         fullscreen modal. It is now the fold-out card at the foot of tab 2,
         where the question it answers is asked. */}
-    <div className="flex flex-wrap gap-3">
+    <div className="shrink-0 flex flex-wrap gap-3">
       <button
         onClick={() => onNavigate?.('notation')}
         className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-[10px] px-[22px] py-2.5 text-[15px] font-bold shadow-lg shadow-indigo-600/25 transition-colors cursor-pointer"
       >
-        The notation
+        The notation in depth
       </button>
     </div>
   </div>
