@@ -20,13 +20,16 @@ export const SectionDivider: React.FC<SectionDividerProps> = ({
   // sublabel there is no single line to sit on, so the rule goes above the
   // stack — trying to thread it through two centred lines only looks broken.
   sublabel ? (
-    <div className="pt-2">
-      <div className="border-t border-slate-200 mb-2.5" aria-hidden="true"></div>
-      <div className="flex flex-col items-center gap-1">
-        <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${colorClass} text-center leading-tight`}>
+    // The sublabel form is a SECTION TITLE, not a marker: it has to read as the
+    // start of something from the back of a hall, so the label is set at
+    // heading scale in near-black rather than as a grey whisper on a rule.
+    <div className="pt-1">
+      <div className="border-t border-slate-200 mb-3" aria-hidden="true"></div>
+      <div className="flex flex-col items-center gap-1.5">
+        <span className={`text-[15px] sm:text-[17px] lg:text-xl font-extrabold uppercase tracking-[0.1em] ${colorClass} text-center leading-tight`}>
           {label}
         </span>
-        <span className="text-[13px] sm:text-[15px] text-slate-500 text-center leading-snug max-w-2xl">
+        <span className="text-[15px] sm:text-[17px] text-slate-600 text-center leading-snug max-w-3xl">
           {sublabel}
         </span>
       </div>

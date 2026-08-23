@@ -593,8 +593,12 @@ const WhatIsInSitesTab: React.FC = () => (
 // edited, re-copy it here and re-check the line numbers in the caption.
 const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }[] = [
   {
-    mark: <span className="text-slate-400 text-[15px]">(none)</span>,
-    meaning: 'Explicit in source',
+    // The prompt lists this as two rows — "(none) | Explicit in source" and
+    // "[file:page] | Source". They are one thing: an explicit claim carries no
+    // glyph BECAUSE it carries the citation. Merged here, which is why the
+    // divider says "from" the system prompt and not "verbatim".
+    mark: <span className="font-mono text-[13px] lg:text-[15px] text-slate-500">[file:page]</span>,
+    meaning: 'Explicit in source — cited to the place it was read',
     rowClass: '',
   },
   {
@@ -608,13 +612,6 @@ const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }
     meaning: 'Uncertainty / interpretation — a claim that is neither explicit nor confidently inferred',
     rowClass: 'bg-purple-50/50',
   },
-  {
-    // The fourth row is the one the gloss below the card picks up: this is the
-    // mark the first row actually carries.
-    mark: <span className="font-mono text-[15px] lg:text-[17px] text-slate-500">[file:page]</span>,
-    meaning: 'Source',
-    rowClass: '',
-  },
 ];
 
 // 24 + 14 + 4 + 3 = 45. The fifth tile is what used to be missing from the
@@ -622,11 +619,13 @@ const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }
 // The second tile does NOT say "unmarked": in those 24 cases the model did
 // something — it pinned the claim to a page — and the word for that is the
 // citation, not the absence of a glyph.
-const CLAIM_COUNTS: { n: string; label: string; token?: string; color: string }[] = [
+const CLAIM_COUNTS: { n: string; label: string; token?: string; tokenClass?: string; color: string }[] = [
   { n: '45', label: 'claims', color: 'text-slate-900' },
-  { n: '24', label: 'explicit', token: '[file:page]', color: 'text-slate-900' },
-  { n: '14', label: 'inferred', token: '〰️', color: 'text-amber-800' },
-  { n: '4', label: 'hypotheses', token: '💭', color: 'text-purple-800' },
+  // The citation format is a footnote on the tile; the glyphs are the point of
+  // it — so they are sized in opposite directions.
+  { n: '24', label: 'explicit', token: '[file:page]', tokenClass: 'font-mono text-[8px] sm:text-[10px] text-slate-400', color: 'text-slate-900' },
+  { n: '14', label: 'inferred', token: '〰️', tokenClass: 'text-[15px] sm:text-[19px]', color: 'text-amber-800' },
+  { n: '4', label: 'hypotheses', token: '💭', tokenClass: 'text-[15px] sm:text-[19px]', color: 'text-purple-800' },
   // Same verb as the bottom line below ("the expert caught the other three"),
   // so the tile and the sentence read as one statement.
   { n: '3', label: 'caught', color: 'text-slate-900' },
@@ -654,7 +653,7 @@ const EpistemicNotationTab: React.FC<{
         the same three rows, in a second visual grammar — cut, so the quote is
         the only authority on the slide. */}
     <div className="shrink-0">
-      <SectionDivider label="The instruction — quoted from the system prompt" />
+      <SectionDivider label="The instruction — from the bot's system prompt" />
     </div>
 
     {/* min-h-0 (not grow) — the card keeps its content height when there is
@@ -688,19 +687,15 @@ const EpistemicNotationTab: React.FC<{
       </p>
     </div>
 
-    {/* Inside the border is what the machine was told; this line is us reading
-        it. It is also where "no mark" is answered — the first tier is not
-        silence, it is a citation. */}
-    <p className="shrink-0 text-[13px] sm:text-[15px] text-slate-600 leading-snug">
-      The first tier's mark <strong className="font-bold">is</strong> the citation — the claim pinned to an
-      exact place in its source: <Cite>[C:pp.46–48]</Cite> · <Cite>[C:p.50 note 4; B]</Cite>
-    </p>
+    {/* The line that used to sit here — "the first tier's mark IS the citation"
+        — is now spoken, not printed. The merged first row says it. */}
 
     {/* ── Act two: the test ─────────────────────────────────────────── */}
     <div className="shrink-0">
       <SectionDivider
         label="The test — one site, one expert, assessed twice"
         sublabel="Once by hand, once with InSites — what the marks caught, and what only the expert could."
+        colorClass="text-slate-800"
       />
     </div>
 
@@ -711,9 +706,8 @@ const EpistemicNotationTab: React.FC<{
           <p className="text-[10px] sm:text-[12px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">
             {c.label}
             {c.token && (
-              // normal-case so the uppercase label does not eat the token, and
-              // a size up so the mark leads the tile rather than trailing it.
-              <span className="font-mono normal-case align-middle text-[12px] sm:text-[15px] text-slate-500"> {c.token}</span>
+              // normal-case so the label's uppercase does not eat the token.
+              <span className={`normal-case align-middle ${c.tokenClass}`}> {c.token}</span>
             )}
           </p>
         </div>
