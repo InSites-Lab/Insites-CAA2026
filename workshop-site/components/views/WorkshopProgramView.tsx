@@ -302,52 +302,59 @@ const EraSwitch: React.FC<{
   const [index, setIndex] = useState(0);
   const era = ERAS[index];
 
+  const next = ERAS[(index + 1) % ERAS.length];
+  const shift = () => setIndex((i) => (i + 1) % ERAS.length);
+
   return (
-    <button
-      type="button"
-      onClick={() => setIndex((i) => (i + 1) % ERAS.length)}
-      aria-label={`Showing ${era.label}. Activate to shift to the other era.`}
-      // basis-0 + grow: claims no height of its own, takes only what the tab
-      // has left — the same contract PhotoStrip has, so the closing panel
-      // below is never pushed out of the frame.
-      className={`group relative grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl bg-stone-100 cursor-pointer text-left ${maxWidth} ${maxHeight}`}
-    >
-      {ERAS.map((e, i) => (
-        <img
-          key={e.src}
-          src={e.src}
-          alt={i === index ? e.alt : ''}
-          // object-contain, not cover: these are plates with a printed border,
-          // and cropping it would throw away the thing that makes them read as
-          // one engraved series.
-          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1100ms] ease-in-out motion-reduce:transition-none ${
-            i === index ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      ))}
+    // basis-0 + grow: the block claims no height of its own and takes only what
+    // the tab has left — PhotoStrip's contract, so the closing lines below are
+    // never pushed out of the frame.
+    <div className={`grow min-h-0 basis-0 flex flex-col gap-2 w-full mx-auto ${maxWidth}`}>
+      <button
+        type="button"
+        onClick={shift}
+        aria-label={`Showing ${era.label}. Activate to shift to ${next.label}.`}
+        // The plate carries no text of its own: a caption laid over an
+        // engraving competes with the engraving, and this one is dense to the
+        // edges. Everything that describes it lives on the line below.
+        className={`group relative grow min-h-0 overflow-hidden rounded-2xl border border-stone-200 bg-[#ece3d2] cursor-pointer ${maxHeight}`}
+      >
+        {ERAS.map((e, i) => (
+          <img
+            key={e.src}
+            src={e.src}
+            alt={i === index ? e.alt : ''}
+            // object-contain, not cover: these are plates with a printed
+            // border, and cropping it would throw away the thing that makes
+            // them read as one engraved series. The ground is matched to the
+            // paper so the letterboxing reads as a mount, not as a gap.
+            className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1100ms] ease-in-out motion-reduce:transition-none ${
+              i === index ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        ))}
+      </button>
 
-      {/* The affordance. Without it the swap is a secret only the speaker knows. */}
-      <span className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-slate-900/70 px-3 py-1.5 text-[12px] font-bold text-white/90 group-hover:bg-slate-900/85 transition-colors">
-        <ArrowLeftRight size={13} />
-        Shift era
-      </span>
-
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-4 pt-8 pb-2.5 bg-gradient-to-t from-slate-900/80 to-transparent">
-        <span className="text-white text-[13px] sm:text-sm leading-snug">
-          <span className="font-bold">{era.label}</span> — {era.note}
-        </span>
-        <span className="shrink-0 flex items-center gap-1.5">
-          {ERAS.map((e, i) => (
-            <span
-              key={e.src}
-              className={`block h-1.5 w-1.5 rounded-full transition-colors ${
-                i === index ? 'bg-white' : 'bg-white/40'
-              }`}
-            />
-          ))}
-        </span>
+      {/* Caption line — figure caption position, and the control beside it.
+          min-h holds the row steady so the plate does not jump when the two
+          captions differ in length. */}
+      <div className="shrink-0 flex items-center justify-between gap-4 min-h-[38px]">
+        <p className="text-[13px] sm:text-sm lg:text-[15px] text-slate-600 leading-snug">
+          <span className="font-bold text-slate-900">{era.label}</span> — {era.note}
+        </p>
+        {/* The button NAMES where it goes. A generic "next" teaches nothing;
+            this one tells the room what is about to appear. */}
+        <button
+          type="button"
+          onClick={shift}
+          className="shrink-0 flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3.5 py-1.5 text-[12px] sm:text-[13px] font-bold text-slate-600 hover:border-indigo-300 hover:text-indigo-700 transition-colors cursor-pointer"
+        >
+          <ArrowLeftRight size={13} />
+          <span className="hidden sm:inline">{next.label}</span>
+          <span className="sm:hidden">Shift era</span>
+        </button>
       </div>
-    </button>
+    </div>
   );
 };
 
@@ -844,7 +851,7 @@ const FromReportToInquiryTab: React.FC = () => (
   // `overflow-hidden`), everything except the photo is `shrink-0`, and the photo
   // flexes — so the closing panel is always on screen and the image is what
   // gives way when the viewport is short.
-  <div className="grow min-h-0 overflow-hidden flex flex-col gap-4">
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 lg:gap-3.5">
     <div className="space-y-1.5 shrink-0">
       {/* <Eyebrow>What it yielded</Eyebrow> */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
@@ -855,14 +862,14 @@ const FromReportToInquiryTab: React.FC = () => (
       </h3>
     </div>
 
-    <div className="space-y-2.5 shrink-0">
-      {/* <p className="text-sm font-extrabold tracking-[0.1em] uppercase text-slate-500">
-        Two examples from readings the manual assessment had not reached
-      </p> */}
+    {/* Side by side from lg. Stacked, these two ate a whole row of a 16:9
+        screen and the plate paid for it; a wide projector has the width to
+        spare and the plate is what the tab is now about. */}
+    <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-3">
       {NEW_READINGS.map((r, i) => (
-        <div key={i} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-3">
+        <div key={i} className="flex items-center gap-3.5 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
           {r.icon}
-          <p className="text-base sm:text-[17px] md:text-[19px] lg:text-xl text-slate-700 leading-snug">{r.text}</p>
+          <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-700 leading-snug">{r.text}</p>
         </div>
       ))}
     </div>
@@ -872,25 +879,30 @@ const FromReportToInquiryTab: React.FC = () => (
         see EraSwitch. `fit` so the closing panel below is never pushed out of
         the frame; the image gives up its height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <EraSwitch maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(50vh/var(--app-zoom))]" />
+    <EraSwitch maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
 
-    <div className="bg-slate-900 rounded-2xl px-7 py-5 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-      <div className="space-y-1.5">
-        <p className="text-[15px] sm:text-[17px] lg:text-[19px] font-bold text-white leading-snug">
+    {/* The last thing said in the talk. It was a black slab, which on this tab
+        competed with the plate for weight and boxed the closing line in like
+        one more card. A rule and a size step do the same work more quietly:
+        separated from what came before, set on the page's own ground, and the
+        only large type below the headline. The repository link demotes to a
+        ghost pill — it is a footnote to the sentence, not its equal. */}
+    <div className="shrink-0 border-t-2 border-slate-200 pt-3 lg:pt-4 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 sm:gap-6">
+      <div className="space-y-1">
+        <p className="text-[17px] sm:text-[19px] lg:text-[22px] font-bold text-slate-900 leading-snug">
           Even a perfect machine, optimally serving conservation — cultural assessment must remain human.
-          <br className="hidden sm:inline" /> 
         </p>
-        <p className="text-sm text-slate-400">Who assesses is part of what is assessed.</p>
+        <p className="text-sm lg:text-[15px] text-slate-500">Who assesses is part of what is assessed.</p>
       </div>
       <a
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="shrink-0 flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl px-4 py-3 text-sm font-bold transition-colors"
+        className="shrink-0 flex items-center gap-2 rounded-xl border border-slate-300 px-3.5 py-2 text-[13px] font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-400 transition-colors"
       >
-        <Github size={16} />
+        <Github size={15} />
         <span>GitHub repository</span>
-        <ExternalLink size={13} className="text-slate-400" />
+        <ExternalLink size={12} className="text-slate-400" />
       </a>
     </div>
   </div>
