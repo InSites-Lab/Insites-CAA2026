@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, ArrowLeftRight } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal, SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -270,6 +270,84 @@ const PhotoStrip: React.FC<{
       {panel(0, caption)}
       {columns === 2 && panel(1, undefined, 'hidden sm:block')}
     </div>
+  );
+};
+
+// ─── The era switch (tab 4) ───────────────────────────────────────
+// The same viewpoint over the same dolmen, four millennia apart. The swap is
+// the point — it is what "a four-millennia pastoral arc" looks like — so it is
+// SPEAKER-DRIVEN, not on a timer: the plate changes when the speaker clicks it,
+// never behind their back mid-sentence. The crossfade is deliberately slow, so
+// the eye reads it as one scene changing rather than two pictures alternating.
+const ERAS = [
+  {
+    src: './h40-era-builders.jpg',
+    label: 'The builders',
+    note: 'Semi-nomadic pastoralists, Intermediate Bronze Age — the cairn still whole',
+    alt: 'Engraving: three figures in Bronze Age dress beside a dolmen, cattle grazing, a stone cairn behind them',
+  },
+  {
+    src: './h40-era-bedouin.jpg',
+    label: 'The Tuba-Zangariyye Bedouin',
+    note: 'The same ground, four millennia on — the chamber now shade for the flock',
+    alt: 'Engraving: a Bedouin family and their tent beside the same dolmen, sheep and goats grazing, sheep sheltering under the capstone',
+  },
+];
+
+const EraSwitch: React.FC<{
+  /** Same two knobs as PhotoStrip, so the tab tunes them the same way. */
+  maxWidth?: string;
+  maxHeight?: string;
+}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => {
+  const [index, setIndex] = useState(0);
+  const era = ERAS[index];
+
+  return (
+    <button
+      type="button"
+      onClick={() => setIndex((i) => (i + 1) % ERAS.length)}
+      aria-label={`Showing ${era.label}. Activate to shift to the other era.`}
+      // basis-0 + grow: claims no height of its own, takes only what the tab
+      // has left — the same contract PhotoStrip has, so the closing panel
+      // below is never pushed out of the frame.
+      className={`group relative grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl bg-stone-100 cursor-pointer text-left ${maxWidth} ${maxHeight}`}
+    >
+      {ERAS.map((e, i) => (
+        <img
+          key={e.src}
+          src={e.src}
+          alt={i === index ? e.alt : ''}
+          // object-contain, not cover: these are plates with a printed border,
+          // and cropping it would throw away the thing that makes them read as
+          // one engraved series.
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1100ms] ease-in-out motion-reduce:transition-none ${
+            i === index ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      ))}
+
+      {/* The affordance. Without it the swap is a secret only the speaker knows. */}
+      <span className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-slate-900/70 px-3 py-1.5 text-[12px] font-bold text-white/90 group-hover:bg-slate-900/85 transition-colors">
+        <ArrowLeftRight size={13} />
+        Shift era
+      </span>
+
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-4 pt-8 pb-2.5 bg-gradient-to-t from-slate-900/80 to-transparent">
+        <span className="text-white text-[13px] sm:text-sm leading-snug">
+          <span className="font-bold">{era.label}</span> — {era.note}
+        </span>
+        <span className="shrink-0 flex items-center gap-1.5">
+          {ERAS.map((e, i) => (
+            <span
+              key={e.src}
+              className={`block h-1.5 w-1.5 rounded-full transition-colors ${
+                i === index ? 'bg-white' : 'bg-white/40'
+              }`}
+            />
+          ))}
+        </span>
+      </div>
+    </button>
   );
 };
 
@@ -789,11 +867,12 @@ const FromReportToInquiryTab: React.FC = () => (
       ))}
     </div>
 
-    {/* Placeholder photos, to be swapped for the pastoral landscape these two
-        readings describe. `fit` so the closing panel below is never pushed
-        out of the frame — the image gives up its height first. */}
+    {/* The pastoral arc, shown rather than described: click the plate and the
+        same view shifts from the builders to the Bedouin. Speaker-driven —
+        see EraSwitch. `fit` so the closing panel below is never pushed out of
+        the frame; the image gives up its height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PhotoStrip columns={1} maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(50vh/var(--app-zoom))]" />
+    <EraSwitch maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(50vh/var(--app-zoom))]" />
 
     <div className="bg-slate-900 rounded-2xl px-7 py-5 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div className="space-y-1.5">
