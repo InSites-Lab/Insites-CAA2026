@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, ArrowLeftRight } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal, SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -273,90 +273,32 @@ const PhotoStrip: React.FC<{
   );
 };
 
-// ─── The era switch (tab 4) ───────────────────────────────────────
-// The same viewpoint over the same dolmen, four millennia apart. The swap is
-// the point — it is what "a four-millennia pastoral arc" looks like — so it is
-// SPEAKER-DRIVEN, not on a timer: the plate changes when the speaker clicks it,
-// never behind their back mid-sentence. The crossfade is deliberately slow, so
-// the eye reads it as one scene changing rather than two pictures alternating.
-const ERAS = [
-  {
-    src: './h40-era-builders.jpg',
-    label: 'The builders',
-    note: 'Semi-nomadic pastoralists, Intermediate Bronze Age — the cairn still whole',
-    alt: 'Engraving: three figures in Bronze Age dress beside a dolmen, cattle grazing, a stone cairn behind them',
-  },
-  {
-    src: './h40-era-bedouin.jpg',
-    label: 'The Tuba-Zangariyye Bedouin',
-    note: 'The same ground, four millennia on — the chamber now shade for the flock',
-    alt: 'Engraving: a Bedouin family and their tent beside the same dolmen, sheep and goats grazing, sheep sheltering under the capstone',
-  },
-];
-
-const EraSwitch: React.FC<{
+// ─── The plate (tab 4) ────────────────────────────────────────────
+// One drawing, two panels, four millennia — and the two eras named inside the
+// engraving itself, so nothing is written over it and nothing under it repeats
+// it. It began as a click-to-shift crossfade between two separate plates (git
+// history at 1e1beb7); a single diptych says the same thing without asking the
+// speaker to operate anything mid-sentence.
+const PlateFigure: React.FC<{
   /** Same two knobs as PhotoStrip, so the tab tunes them the same way. */
   maxWidth?: string;
   maxHeight?: string;
-}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => {
-  const [index, setIndex] = useState(0);
-  const era = ERAS[index];
-
-  const next = ERAS[(index + 1) % ERAS.length];
-  const shift = () => setIndex((i) => (i + 1) % ERAS.length);
-
-  return (
-    // basis-0 + grow: the block claims no height of its own and takes only what
-    // the tab has left — PhotoStrip's contract, so the closing lines below are
-    // never pushed out of the frame.
-    <div className={`grow min-h-0 basis-0 flex flex-col gap-2 w-full mx-auto ${maxWidth}`}>
-      <button
-        type="button"
-        onClick={shift}
-        aria-label={`Showing ${era.label}. Activate to shift to ${next.label}.`}
-        // The plate carries no text of its own: a caption laid over an
-        // engraving competes with the engraving, and this one is dense to the
-        // edges. Everything that describes it lives on the line below.
-        className={`group relative grow min-h-0 overflow-hidden rounded-2xl border border-stone-200 bg-[#ece3d2] cursor-pointer ${maxHeight}`}
-      >
-        {ERAS.map((e, i) => (
-          <img
-            key={e.src}
-            src={e.src}
-            alt={i === index ? e.alt : ''}
-            // object-contain, not cover: these are plates with a printed
-            // border, and cropping it would throw away the thing that makes
-            // them read as one engraved series. The ground is matched to the
-            // paper so the letterboxing reads as a mount, not as a gap.
-            className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1100ms] ease-in-out motion-reduce:transition-none ${
-              i === index ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-        ))}
-      </button>
-
-      {/* Caption line — figure caption position, and the control beside it.
-          min-h holds the row steady so the plate does not jump when the two
-          captions differ in length. */}
-      <div className="shrink-0 flex items-center justify-between gap-4 min-h-[38px]">
-        <p className="text-[13px] sm:text-sm lg:text-[15px] text-slate-600 leading-snug">
-          <span className="font-bold text-slate-900">{era.label}</span> — {era.note}
-        </p>
-        {/* The button NAMES where it goes. A generic "next" teaches nothing;
-            this one tells the room what is about to appear. */}
-        <button
-          type="button"
-          onClick={shift}
-          className="shrink-0 flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3.5 py-1.5 text-[12px] sm:text-[13px] font-bold text-slate-600 hover:border-indigo-300 hover:text-indigo-700 transition-colors cursor-pointer"
-        >
-          <ArrowLeftRight size={13} />
-          <span className="hidden sm:inline">{next.label}</span>
-          <span className="sm:hidden">Shift era</span>
-        </button>
-      </div>
-    </div>
-  );
-};
+}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => (
+  // basis-0 + grow: claims no height of its own, takes only what the tab has
+  // left, so the closing panel below is never pushed out of the frame.
+  // object-contain on a ground matched to the paper — the plate has a printed
+  // border, and cropping it would throw the frame away.
+  // SWAP THE FILE HERE when the drawing is re-cut.
+  <div
+    className={`grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl border border-stone-200 bg-[#f3ead8] ${maxWidth} ${maxHeight}`}
+  >
+    <img
+      src="./tab4-gemini.jpg"
+      alt="Two engraved panels of the same dolmen field. Left, PASTORALISTS: Bronze Age herders and their families beside the dolmen and its cairn. Right, BEDOUIN ENCAMPMENT: tents, a coffee hearth, and sheep sheltering under the capstone."
+      className="w-full h-full object-contain"
+    />
+  </div>
+);
 
 // Like tab 4, this tab never scrolls: bounded to the frame, everything
 // shrink-0 except the photo strip, which takes only what is left over.
@@ -874,35 +816,36 @@ const FromReportToInquiryTab: React.FC = () => (
       ))}
     </div>
 
-    {/* The pastoral arc, shown rather than described: click the plate and the
-        same view shifts from the builders to the Bedouin. Speaker-driven —
-        see EraSwitch. `fit` so the closing panel below is never pushed out of
-        the frame; the image gives up its height first. */}
+    {/* The pastoral arc, shown rather than described. `fit` so the closing
+        panel below is never pushed out of the frame; the plate gives up its
+        height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <EraSwitch maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
+    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
 
-    {/* The last thing said in the talk. It was a black slab, which on this tab
-        competed with the plate for weight and boxed the closing line in like
-        one more card. A rule and a size step do the same work more quietly:
-        separated from what came before, set on the page's own ground, and the
-        only large type below the headline. The repository link demotes to a
-        ghost pill — it is a footnote to the sentence, not its equal. */}
-    <div className="shrink-0 border-t-2 border-slate-200 pt-3 lg:pt-4 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 sm:gap-6">
-      <div className="space-y-1">
-        <p className="text-[17px] sm:text-[19px] lg:text-[22px] font-bold text-slate-900 leading-snug">
-          Even a perfect machine, optimally serving conservation — cultural assessment must remain human.
+    {/* The last thing said in the talk, so it gets a ground of its own — but
+        the deck's indigo, not a black slab: under a pale engraving a black box
+        reads as a hole, and it was competing with the plate for weight rather
+        than closing the sequence. The claim carries the size; the clause the
+        whole talk is FOR carries the colour; the aphorism sits under it as the
+        quiet last word. The repository link is a footnote to the sentence, not
+        its equal, so it stays a ghost pill. */}
+    <div className="shrink-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-3.5 lg:px-7 lg:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
+      <div className="space-y-1.5">
+        <p className="text-[18px] sm:text-[21px] lg:text-[25px] font-bold text-slate-900 leading-snug">
+          Even a perfect machine, optimally serving conservation —{' '}
+          <span className="text-indigo-700">cultural assessment must remain human.</span>
         </p>
-        <p className="text-sm lg:text-[15px] text-slate-500">Who assesses is part of what is assessed.</p>
+        <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
       </div>
       <a
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="shrink-0 flex items-center gap-2 rounded-xl border border-slate-300 px-3.5 py-2 text-[13px] font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-400 transition-colors"
+        className="shrink-0 flex items-center gap-2 rounded-xl border border-indigo-200 bg-white/70 px-3.5 py-2 text-[13px] font-bold text-indigo-700 hover:bg-white hover:border-indigo-300 transition-colors"
       >
         <Github size={15} />
         <span>GitHub repository</span>
-        <ExternalLink size={12} className="text-slate-400" />
+        <ExternalLink size={12} className="text-indigo-400" />
       </a>
     </div>
   </div>
