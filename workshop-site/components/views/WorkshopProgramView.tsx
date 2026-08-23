@@ -278,13 +278,17 @@ const DualTensionTab: React.FC = () => (
           risks into one mechanism — which is why suppression cannot be the
           answer, and governance has to be. Delete this line if it crowds. */}
       <p className="text-[13px] sm:text-sm md:text-base lg:text-lg text-slate-600 pt-1">
-        One capability, two faces — meaning emerges from context, in the transformer as in CBSA.
+        CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
-
+<PhotoStrip
+      maxWidth="max-w-6xl"
+      maxHeight="max-h-[52vh] sm:max-h-[calc(52vh/var(--app-zoom))]"
+      caption="One experimental answer, from one site — a dolmen field in northern Israel."
+    />
     <div className="shrink-0 text-center">
       <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
-        How can we afford both: accountability and the growth of new insight?
+        How can we afford both: accountability and the emergence of new insight?
       </p>
     </div>
 
@@ -293,11 +297,7 @@ const DualTensionTab: React.FC = () => (
                     4xl / 3xl narrow and centre it.
         maxHeight — lower the vh number for a shorter strip. Keep the
                     /var(--app-zoom) divisor. */}
-    <PhotoStrip
-      maxWidth="max-w-6xl"
-      maxHeight="max-h-[52vh] sm:max-h-[calc(52vh/var(--app-zoom))]"
-      caption="One experimental answer, from one site — a dolmen field in northern Israel."
-    />
+    
   </div>
 );
 
@@ -346,9 +346,9 @@ const WhatIsInSitesTab: React.FC = () => (
       <p className="text-center text-sm sm:text-base text-slate-500 italic mt-2">
         "The LLM is a looking glass — more than a wonderland"
       </p>
-      <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
+      {/* <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
         CBSA and the transformer share a core idea: meaning emerges from context.
-      </p>
+      </p> */}
     </div>
 
     {/* Intro line */}
