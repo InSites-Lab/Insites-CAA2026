@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -40,6 +40,9 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   onCloseExcursion,
 }) => {
   const [activeTab, setActiveTab] = useState<TabId>(PROGRAM_TABS[0].id);
+  // Tab 2's fold-out. The state lives here, not in the tab, so it survives
+  // switching away and back — the speaker returns to the card as they left it.
+  const [isTensionExampleOpen, setIsTensionExampleOpen] = useState(false);
   const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
   const [isDesignOpen, setIsDesignOpen] = useState(false);
   // The talk tab to come back to when the chip is dismissed — the speaker
@@ -136,14 +139,14 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
         {/* Tab Content */}
         <SwitchTransition transitionKey={activeTab} className={`${fillClass} flex flex-col`}>
-          {activeTab === 'tension' && <DualTensionTab />}
-          {activeTab === 'insites' && <WhatIsInSitesTab />}
-          {activeTab === 'notation' && (
-            <EpistemicNotationTab
-              onNavigate={onNavigate}
-              onOpenWorkedExample={() => setIsWorkedExampleOpen(true)}
+          {activeTab === 'tension' && (
+            <DualTensionTab
+              isExampleOpen={isTensionExampleOpen}
+              onToggleExample={() => setIsTensionExampleOpen((v) => !v)}
             />
           )}
+          {activeTab === 'insites' && <WhatIsInSitesTab />}
+          {activeTab === 'notation' && <EpistemicNotationTab onNavigate={onNavigate} />}
           {activeTab === 'inquiry' && <FromReportToInquiryTab />}
           {activeTab === 'excursion' && excursionContent}
           {activeTab === 'qa' && (
@@ -162,7 +165,11 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
         title="Worked example — Tuba-Zangariyye, claim by claim"
         fullscreen
       >
-        <iframe src="./notation.html" className="w-full h-full border-0" title="Worked example" />
+        {/* The Q&A copy of the example. Tab 2 shows the same component in a
+            fold-out card; this one is only the backup route from Q&A. */}
+        <div className="px-5 py-6">
+          <WorkedExample />
+        </div>
       </Modal>
 
       <Modal
@@ -180,7 +187,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 // ─── Shared bits ──────────────────────────────────────────────────
 
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="text-[11px] font-extrabold tracking-[0.12em] uppercase text-slate-400">{children}</p>
+  <p className="text-[12px] font-extrabold tracking-[0.12em] uppercase text-slate-400">{children}</p>
 );
 
 // ─── 1 · The Dual Tension ─────────────────────────────────────────
@@ -252,7 +259,10 @@ const PhotoStrip: React.FC<{
       // window and `grow` alone would over-allocate.
       // Two panels side by side on a phone are tall narrow slabs; below sm the
       // strip drops to a single full-width frame and the second panel hides.
-      className={`grid gap-2 sm:gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto ${maxWidth} ${maxHeight} ${
+      // `transition-all` so a tab can collapse the strip to `max-h-0` and get
+      // its height back smoothly — tab 2 does exactly that when its fold-out
+      // card opens.
+      className={`grid gap-2 sm:gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto transition-all duration-300 motion-reduce:transition-none ${maxWidth} ${maxHeight} ${
         columns === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
       }`}
     >
@@ -264,7 +274,17 @@ const PhotoStrip: React.FC<{
 
 // Like tab 4, this tab never scrolls: bounded to the frame, everything
 // shrink-0 except the photo strip, which takes only what is left over.
-const DualTensionTab: React.FC = () => (
+//
+// The tab is read in two moves. Closed, it is the challenge and the question
+// it opens — the speaker talks over the photographs and stops on "how can we
+// afford both". Then the card at the foot unfolds and the answer, the
+// assessment claim by claim, takes the frame: the strip collapses to nothing
+// and hands its height to the card, which scrolls inside itself. Nothing
+// scrolls the slide away, and closing the card puts the photographs back.
+const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => void }> = ({
+  isExampleOpen,
+  onToggleExample,
+}) => (
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
     <div className="space-y-1.5 shrink-0">
       <Eyebrow>The challenge</Eyebrow>
@@ -277,18 +297,8 @@ const DualTensionTab: React.FC = () => (
       {/* Picks up tab 1's "meaning emerges from context" and turns the two
           risks into one mechanism — which is why suppression cannot be the
           answer, and governance has to be. Delete this line if it crowds. */}
-      <p className="text-[13px] sm:text-sm md:text-base lg:text-lg text-slate-600 pt-1">
+      <p className="text-sm sm:text-[15px] md:text-[17px] lg:text-[19px] text-slate-600 pt-1">
         CBSA and the transformer share a core idea: meaning emerges from context.
-      </p>
-    </div>
-<PhotoStrip
-      maxWidth="max-w-6xl"
-      maxHeight="max-h-[52vh] sm:max-h-[calc(52vh/var(--app-zoom))]"
-      caption="One experimental answer, from one site — a dolmen field in northern Israel."
-    />
-    <div className="shrink-0 text-center">
-      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
-        How can we afford both: accountability and the emergence of new insight?
       </p>
     </div>
 
@@ -296,8 +306,211 @@ const DualTensionTab: React.FC = () => (
         maxWidth  — max-w-full is the whole content column; max-w-5xl /
                     4xl / 3xl narrow and centre it.
         maxHeight — lower the vh number for a shorter strip. Keep the
-                    /var(--app-zoom) divisor. */}
-    
+                    /var(--app-zoom) divisor. The open card overrides it. */}
+    <PhotoStrip
+      maxWidth="max-w-6xl"
+      maxHeight={
+        isExampleOpen
+          ? 'max-h-0 opacity-0'
+          : 'max-h-[52vh] sm:max-h-[calc(52vh/var(--app-zoom))]'
+      }
+      caption="One experimental answer, from one site — a dolmen field in northern Israel."
+    />
+
+    <div className="shrink-0 text-center">
+      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
+        How can we afford both: accountability and the emergence of new insight?
+      </p>
+    </div>
+
+    <WorkedExampleCard open={isExampleOpen} onToggle={onToggleExample} />
+  </div>
+);
+
+// ─── The worked example — the answer, claim by claim ───────────────
+// It used to be tab 3's button, opening public/notation.html in a fullscreen
+// modal. Here it is the body of tab 2's fold-out: same content as JSX, so it
+// takes the deck's own type and colours instead of the iframe's, and the
+// speaker never leaves the slide. (The HTML file stays — it is the printable
+// standalone copy.)
+
+/** Inferred — synthesized across sources. */
+const Inf = () => (
+  <span className="inline-block align-middle rounded bg-amber-100 px-1.5 text-[15px] font-semibold">〰️</span>
+);
+
+/** Hypothesis — reading between the lines. */
+const Hyp = () => (
+  <span className="inline-block align-middle rounded bg-purple-100 px-1.5 text-[15px] font-semibold">💭</span>
+);
+
+const Cite: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span className="font-mono text-[12px] sm:text-[13px] text-slate-400">{children}</span>
+);
+
+const EvidenceLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <p className="mt-3.5 mb-1 text-[12px] font-bold uppercase tracking-[0.06em] text-slate-500">
+    {children}
+  </p>
+);
+
+const WorkedExample: React.FC = () => (
+  <div className="max-w-3xl mx-auto space-y-5 text-slate-700">
+    <div className="border-b-2 border-slate-200 pb-3">
+      <h4 className="text-lg sm:text-xl font-bold text-slate-900">CBSA session — notation update</h4>
+      <p className="text-[13px] sm:text-sm text-slate-500">
+        Tuba-Zangariyye Dolmen Field · Korazim Plateau · March 31, 2026
+      </p>
+    </div>
+
+    <img
+      src="./dolmen.jpg"
+      alt="An IAA archaeologist surveying a dolmen in the Tuba-Zangariyye field, the village behind"
+      className="w-full rounded-xl border border-slate-200"
+    />
+
+    <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
+      <h5 className="text-base sm:text-lg font-bold text-slate-900">Values — notation update</h5>
+      <p className="text-[13px] sm:text-sm text-slate-500 mt-1 mb-5">
+        Values 5–6 reformatted from the previous session's notation style to the current InSites
+        notation key.
+      </p>
+
+      <div className="border-b border-slate-200 pb-5 mb-5">
+        <p className="text-[15px] sm:text-base font-bold text-slate-900">
+          5. Social — "Pastoralist Continuity and Community Presence" <Inf />
+        </p>
+
+        <EvidenceLabel>Evidence</EvidenceLabel>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
+          Stepansky links the dolmen builders to semi-nomadic pastoralists of the IB–MBIIA period,
+          based on Horbat Berekh's material culture. <Cite>[C:pp.46–48]</Cite> The Korazim Plateau
+          has sustained pastoral communities through historical periods, and the Zangariyye and
+          El-Heib Bedouin tribes have inhabited it since at least the 18th century.{' '}
+          <Cite>[C:p.50 note 4; B]</Cite> The dolmen field sits immediately adjacent to the present
+          village.
+        </p>
+
+        <EvidenceLabel>Broader meaning</EvidenceLabel>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
+          This long arc of pastoral presence — ancient builders, Ottoman-era cultivators, modern
+          Bedouin — suggests a social value rooted in continuity of landscape use, though the
+          connection between the Bronze Age population and later inhabitants is cultural-geographic
+          rather than demonstrated lineage. <Inf /> The critical gap noted in Stage 1 applies here:
+          no community voice has been recorded, and the social value therefore rests on
+          archaeological inference rather than living testimony.
+        </p>
+      </div>
+
+      <div>
+        <p className="text-[15px] sm:text-base font-bold text-slate-900">
+          6. Intangible Heritage — "Layers of Narrative Across Traditions" <Inf />
+        </p>
+
+        <EvidenceLabel>Evidence</EvidenceLabel>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
+          Biblical references to Rephaim giants in Transjordan, the New Testament "tombs" near
+          Korazim, Talmudic references to dolmens as "Merkolis" (pagan entities), and the Bedouin
+          term "Dan" (shelter) for dolmens collectively suggest that these structures have generated
+          cultural meaning across at least four distinct traditions. <Cite>[C:p.50 note 2; B]</Cite>
+        </p>
+
+        <EvidenceLabel>Broader meaning</EvidenceLabel>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
+          The intangible context (Stage 1) frames the dolmens as persistent stimuli for narrative
+          production. However, the evidence linking these specific textual traditions to the
+          Tuba-Zangariyye field (rather than to Korazim Plateau dolmens generally) is indirect{' '}
+          <Hyp /> — the association is plausible given proximity but not site-specific.
+        </p>
+      </div>
+    </section>
+
+    <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
+      <h5 className="text-base sm:text-lg font-bold text-slate-900 mb-3">Global notation key</h5>
+      <table className="w-full text-sm sm:text-[15px]">
+        <thead>
+          <tr>
+            <th className="text-left font-bold text-[12px] uppercase tracking-[0.06em] text-slate-500 border-b-2 border-slate-200 py-2 px-2 w-24">
+              Notation
+            </th>
+            <th className="text-left font-bold text-[12px] uppercase tracking-[0.06em] text-slate-500 border-b-2 border-slate-200 py-2 px-2">
+              Meaning
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="border-b border-slate-200 py-2 px-2 text-center text-slate-400">(none)</td>
+            <td className="border-b border-slate-200 py-2 px-2">Explicit in source</td>
+          </tr>
+          <tr>
+            <td className="border-b border-slate-200 py-2 px-2 text-center">
+              <Inf />
+            </td>
+            <td className="border-b border-slate-200 py-2 px-2">
+              Inferred from 2+ pieces of evidence (cite the evidence)
+            </td>
+          </tr>
+          <tr>
+            <td className="border-b border-slate-200 py-2 px-2 text-center">
+              <Hyp />
+            </td>
+            <td className="border-b border-slate-200 py-2 px-2">
+              Uncertainty / interpretation — a claim that is neither explicit nor confidently
+              inferred
+            </td>
+          </tr>
+          <tr>
+            <td className="py-2 px-2 text-center">
+              <Cite>[file:page]</Cite>
+            </td>
+            <td className="py-2 px-2">Source</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p className="border-t-2 border-slate-200 pt-4 text-center text-[13px] sm:text-sm text-slate-500">
+      ───── End of 2️⃣ Values Analysis <em>(notation update)</em>
+    </p>
+  </div>
+);
+
+// The fold-out itself. Closed it is one strip at the foot of the tab; open it
+// takes every pixel the tab has left (`grow min-h-0`) and scrolls inside.
+const WorkedExampleCard: React.FC<{ open: boolean; onToggle: () => void }> = ({ open, onToggle }) => (
+  <div
+    className={`rounded-2xl border-2 border-indigo-200 bg-white overflow-hidden ${
+      open ? 'grow min-h-0 flex flex-col' : 'shrink-0'
+    }`}
+  >
+    <button
+      onClick={onToggle}
+      aria-expanded={open}
+      className="w-full shrink-0 flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 text-left bg-indigo-50/70 hover:bg-indigo-100/70 transition-colors cursor-pointer"
+    >
+      <FileSearch size={20} className="text-indigo-600 shrink-0" />
+      <span className="flex-1 min-w-0">
+        <span className="block text-sm sm:text-[15px] font-bold text-indigo-900">
+          Worked example — Tuba-Zangariyye, claim by claim
+        </span>
+        <span className="hidden sm:block text-[13px] sm:text-sm text-indigo-500/80">
+          Two values re-marked: what was read, what was inferred, what is hypothesis
+        </span>
+      </span>
+      <ChevronDown
+        size={18}
+        className={`text-indigo-400 shrink-0 transition-transform duration-300 motion-reduce:transition-none ${
+          open ? 'rotate-180' : ''
+        }`}
+      />
+    </button>
+
+    {open && (
+      <div className="grow min-h-0 overflow-y-auto custom-scrollbar border-t border-slate-200 bg-slate-50 px-4 sm:px-6 py-5 animate-fade-in">
+        <WorkedExample />
+      </div>
+    )}
   </div>
 );
 
@@ -343,7 +556,7 @@ const WhatIsInSitesTab: React.FC = () => (
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
-      <p className="text-center text-sm sm:text-base text-slate-500 italic mt-2">
+      <p className="text-center text-[15px] sm:text-[17px] text-slate-500 italic mt-2">
         "The LLM is a looking glass — more than a wonderland"
       </p>
       {/* <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
@@ -352,7 +565,7 @@ const WhatIsInSitesTab: React.FC = () => (
     </div>
 
     {/* Intro line */}
-    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+    <p className="text-[15px] sm:text-[17px] text-slate-600 leading-relaxed">
       AI already speaks our language and is becoming an active partner in culture. We examine how it can help with the cultural assessment challenges:
     </p>
 
@@ -370,11 +583,11 @@ const WhatIsInSitesTab: React.FC = () => (
                 className="w-11 h-11 sm:w-16 sm:h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-              <span className={`font-bold text-sm sm:text-base ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <span className={`font-bold text-[15px] sm:text-[17px] ${c.quote} flex-1`}>"{ch.quote}"</span>
               <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
             <div className="px-2.5 sm:px-4 pb-3 sm:pb-4 pt-1">
-              <p className={`text-[13px] sm:text-base ${c.text} leading-relaxed`}>{ch.response}</p>
+              <p className={`text-sm sm:text-[17px] ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>
         );
@@ -383,12 +596,12 @@ const WhatIsInSitesTab: React.FC = () => (
 
     {/* Lab intro */}
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
-      <h4 className="font-bold text-sm sm:text-base text-slate-800">InSites Knowledge Lab</h4>
-      <p className="text-sm text-slate-400">Technion — Israel Institute of Technology</p>
-      <p className="text-[13px] sm:text-base text-slate-700 leading-relaxed">
+      <h4 className="font-bold text-[15px] sm:text-[17px] text-slate-800">InSites Knowledge Lab</h4>
+      <p className="text-[15px] text-slate-400">Technion — Israel Institute of Technology</p>
+      <p className="text-sm sm:text-[17px] text-slate-700 leading-relaxed">
         At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
       </p>
-      <p className="text-[13px] sm:text-base text-slate-700 leading-relaxed">
+      <p className="text-sm sm:text-[17px] text-slate-700 leading-relaxed">
         InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
@@ -417,15 +630,14 @@ const CLAIM_COUNTS = [
 
 const EpistemicNotationTab: React.FC<{
   onNavigate?: (route: string) => void;
-  onOpenWorkedExample: () => void;
-}> = ({ onNavigate, onOpenWorkedExample }) => (
+}> = ({ onNavigate }) => (
   <div className="space-y-5">
     <div className="space-y-1.5">
       <Eyebrow>The core mechanism</Eyebrow>
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
-      <p className="text-sm sm:text-base lg:text-lg font-semibold text-slate-500">Validity remains human judgment.</p>
+      <p className="text-[15px] sm:text-[17px] lg:text-xl font-semibold text-slate-500">Validity remains human judgment.</p>
     </div>
 
     {/* A phone stacks these three, so as tall blocks they pushed the tab's
@@ -437,8 +649,8 @@ const EpistemicNotationTab: React.FC<{
           className="bg-white border-2 border-slate-300 rounded-xl px-3 py-2 sm:px-4 sm:py-3.5 shadow-sm flex items-center gap-2.5 sm:block sm:space-y-1.5"
         >
           <div className="flex shrink-0">{tier.mark}</div>
-          <p className={`text-[13px] sm:text-[15px] font-extrabold shrink-0 ${tier.titleColor}`}>{tier.title}</p>
-          <p className="text-[12px] sm:text-[13px] text-slate-500 truncate sm:whitespace-normal">{tier.body}</p>
+          <p className={`text-sm sm:text-base font-extrabold shrink-0 ${tier.titleColor}`}>{tier.title}</p>
+          <p className="text-[13px] sm:text-sm text-slate-500 truncate sm:whitespace-normal">{tier.body}</p>
         </div>
       ))}
     </div>
@@ -447,7 +659,7 @@ const EpistemicNotationTab: React.FC<{
       {CLAIM_COUNTS.map((c) => (
         <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
           <p className={`text-xl sm:text-2xl lg:text-[26px] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
-          <p className="text-[9px] sm:text-[11px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">{c.label}</p>
+          <p className="text-[10px] sm:text-[12px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">{c.label}</p>
         </div>
       ))}
     </div>
@@ -459,23 +671,20 @@ const EpistemicNotationTab: React.FC<{
       <p className="text-[15px] sm:text-base md:text-lg lg:text-xl font-bold text-slate-900 leading-snug">
         42 of 45 held. The expert caught the other three — in the session.
       </p>
-      <p className="text-sm text-slate-500 mt-1.5">
+      <p className="text-[15px] text-slate-500 mt-1.5">
         One claim was wrong · one did not belong · one inference went unmarked.
       </p>
     </div>
 
+    {/* The worked example used to sit here as a second button opening a
+        fullscreen modal. It is now the fold-out card at the foot of tab 2,
+        where the question it answers is asked. */}
     <div className="flex flex-wrap gap-3">
       <button
         onClick={() => onNavigate?.('notation')}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-[10px] px-[22px] py-2.5 text-sm font-bold shadow-lg shadow-indigo-600/25 transition-colors cursor-pointer"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-[10px] px-[22px] py-2.5 text-[15px] font-bold shadow-lg shadow-indigo-600/25 transition-colors cursor-pointer"
       >
         The notation
-      </button>
-      <button
-        onClick={onOpenWorkedExample}
-        className="bg-white hover:bg-indigo-50 text-indigo-600 border-2 border-indigo-200 rounded-[10px] px-[22px] py-2.5 text-sm font-bold transition-colors cursor-pointer"
-      >
-        Worked example
       </button>
     </div>
   </div>
@@ -525,7 +734,7 @@ const FromReportToInquiryTab: React.FC = () => (
       {NEW_READINGS.map((r, i) => (
         <div key={i} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-3">
           {r.icon}
-          <p className="text-[15px] sm:text-base md:text-lg lg:text-xl text-slate-700 leading-snug">{r.text}</p>
+          <p className="text-base sm:text-[17px] md:text-[19px] lg:text-xl text-slate-700 leading-snug">{r.text}</p>
         </div>
       ))}
     </div>
@@ -542,13 +751,13 @@ const FromReportToInquiryTab: React.FC = () => (
           Even a perfect machine, optimally serving conservation — cultural assessment must remain human.
           <br className="hidden sm:inline" /> 
         </p>
-        <p className="text-[13px] text-slate-400">Who assesses is part of what is assessed.</p>
+        <p className="text-sm text-slate-400">Who assesses is part of what is assessed.</p>
       </div>
       <a
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="shrink-0 flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl px-4 py-3 text-[13px] font-bold transition-colors"
+        className="shrink-0 flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl px-4 py-3 text-sm font-bold transition-colors"
       >
         <Github size={16} />
         <span>GitHub repository</span>
@@ -580,7 +789,7 @@ const QaTab: React.FC<{
     <div className="space-y-1.5">
       <Eyebrow>Questions</Eyebrow>
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">The material behind the talk.</h3>
-      <p className="text-[13px] sm:text-[15px] text-slate-600">
+      <p className="text-sm sm:text-base text-slate-600">
         <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger.
       </p>
     </div>
@@ -593,8 +802,8 @@ const QaTab: React.FC<{
     >
       <Github size={20} className="shrink-0" />
       <span className="flex-1">
-        <span className="block text-[13px] sm:text-sm font-bold">InSites-Lab / Insites-CAA2026</span>
-        <span className="block text-[12px] sm:text-[13px] text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
+        <span className="block text-sm sm:text-[15px] font-bold">InSites-Lab / Insites-CAA2026</span>
+        <span className="block text-[13px] sm:text-sm text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
       </span>
       <ExternalLink size={15} className="text-slate-400 shrink-0" />
     </a>
@@ -610,8 +819,8 @@ const QaTab: React.FC<{
           }}
           className="text-left bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-xl px-3 py-2 sm:px-4 sm:py-3 transition-colors cursor-pointer"
         >
-          <span className="block text-[13px] sm:text-sm font-bold text-slate-800">{item.label}</span>
-          <span className="hidden sm:block text-[13px] text-slate-500">{item.note}</span>
+          <span className="block text-sm sm:text-[15px] font-bold text-slate-800">{item.label}</span>
+          <span className="hidden sm:block text-sm text-slate-500">{item.note}</span>
         </button>
       ))}
     </div>

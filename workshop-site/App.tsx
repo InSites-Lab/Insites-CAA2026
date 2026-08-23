@@ -471,6 +471,11 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (graphData && graphContainerRef.current) {
+      // The graph paints onto a canvas, so it cannot inherit the page font.
+      // It reads the same --font-body knob instead (see index.css).
+      const graphFace =
+        getComputedStyle(document.documentElement).getPropertyValue('--font-body').trim() ||
+        'sans-serif';
       const nodes = new DataSet(
         graphData.nodes.map((n: any) => ({
           ...n,
@@ -478,7 +483,7 @@ const App: React.FC = () => {
           color: getNodeColor(n.type),
           font: {
             color: "#000000",
-            face: "Assistant",
+            face: graphFace,
             size: 14,
             weight: "bold",
           },
@@ -494,7 +499,7 @@ const App: React.FC = () => {
           arrows: "to",
           color: { color: "#cbd5e1", highlight: "#6366f1" },
           width: 1,
-          font: { align: "middle", size: 10, face: "Assistant" },
+          font: { align: "middle", size: 10, face: graphFace },
           smooth: { type: "continuous" },
         })),
       );

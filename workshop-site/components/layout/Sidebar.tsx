@@ -30,14 +30,14 @@ export interface SidebarProps {
 // (`pt-5`, `min-h-[35px]`, `pt-2`). Leave those alone unless you mean to.
 
 const SIZE = {
-  heading: 'text-[14px]',  // "Assessment Process (CBSA Approach)"
-  title: 'text-[16px]',    // stage name — the main driver of button height
-  role: 'text-[14px]',     // the small line under the stage name
+  heading: 'text-[15px]',  // "Assessment Process (CBSA Approach)"
+  title: 'text-[17px]',    // stage name — the main driver of button height
+  role: 'text-[15px]',     // the small line under the stage name
   bubble: 'w-11 h-8',      // the round icon holder inside each button
-  icon: 19,                // lucide icon size inside the bubble, in px
+  icon: 20,                // lucide icon size inside the bubble, in px
   cardPad: 'p-2.5',        // padding inside every button
-  legend: 'text-[12px]',   // the ○ / ● key at the bottom
-  chevron: 15,             // the Extensions & Tools arrow, in px
+  legend: 'text-[13px]',   // the ○ / ● key at the bottom
+  chevron: 16,             // the Extensions & Tools arrow, in px
 } as const;
 
 const isGate = (id: number) => id === 0 || id === 6;

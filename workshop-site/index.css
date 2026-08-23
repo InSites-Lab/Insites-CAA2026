@@ -41,26 +41,67 @@ html {
     zoom: var(--app-zoom);
 }
 
-/* ── DISPLAY FACE ─────────────────────────────────────────────────
-   Marcellus is an inscriptional Roman — the letterform of carved stone,
-   for a talk about 4,500-year-old dolmens. It ships in ONE weight, with
-   no italic and no bold, which is a useful constraint: it keeps the
-   message lines short and declarative.
+/* ── TYPEFACE — the only place the site's faces are chosen ─────────
+   Two knobs. `--font-body` is everything: sidebar, tabs, body copy,
+   buttons. `--font-display` is the one big message sentence per tab
+   (the .font-display class below). To try another family, change the
+   FIRST name in the stack — nothing else in the codebase names a font.
 
-   USE IT ONLY on the one big message sentence per tab. NOT on tabs, the
-   sidebar, the header, or body copy — and never on the epistemic marks.
-   A hypothesis set in display type reads as celebrated rather than
-   flagged, and the notation has to read as annotation. */
+   Every candidate is already linked in index.html; only the family
+   these variables name is actually downloaded.
+
+   CANDIDATES ─────────────────────────────────────────────────────
+     'Alef'              CURRENT DEFAULT. Two weights only (400/700),
+                         open and plain, Hebrew + Latin.
+     'Assistant'         the previous default — narrower, eight weights,
+                         the safest choice if 700 is not enough contrast.
+     'Heebo'             a touch more geometric, nine weights.
+     'Rubik'             rounded terminals, warmer, reads larger.
+     'Frank Ruhl Libre'  serif. Good as --font-display alone, against a
+                         sans body.
+     'Marcellus'         LATIN ONLY, one weight — the inscriptional
+                         Roman the display face used to be. Display only;
+                         it has no Hebrew and no bold.
+
+   --font-display-weight exists because the families differ: Alef and
+   Marcellus have no middle weights, so a heading is either 400 or 700. */
+:root {
+    --font-body: 'Alef', 'Assistant', system-ui, sans-serif;
+    --font-display: 'Alef', 'Assistant', system-ui, sans-serif;
+    --font-display-weight: 700;
+}
+
+/* USE .font-display ONLY on the one big message sentence per tab. NOT on
+   tabs, the sidebar, the header, or body copy — and never on the
+   epistemic marks. A hypothesis set in display type reads as celebrated
+   rather than flagged, and the notation has to read as annotation. */
 .font-display {
-    font-family: 'Marcellus', Georgia, serif;
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-weight: var(--font-display-weight);
     letter-spacing: 0.01em;
 }
 
 body {
-    font-family: 'Assistant', sans-serif;
+    font-family: var(--font-body);
     font-size: 1rem; /* 16px */
     line-height: 1.5;
+}
+
+/* Standing transition for anything that appears in place — a panel that
+   unfolds, a card body that opens. Pure opacity, no vertical settle. */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: fade-in 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in {
+        animation: none;
+    }
 }
 
 ::-webkit-scrollbar {
