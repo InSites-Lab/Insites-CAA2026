@@ -1029,7 +1029,7 @@ const QaTab: React.FC<{
           <p>Let me end with the thought experiment the paper ends with.</p>
           <p>
             Imagine a system so capable that full automation looks fluent, complete, efficient — a
-            perfect assessment machine.  Could heritage afford it?
+            perfect assessment machine. Could heritage 4.0 — or 10.0 — afford it?
           </p>
           <p>
             Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
@@ -1041,7 +1041,7 @@ const QaTab: React.FC<{
 
         <p className="text-[22px] sm:text-[26px] lg:text-[34px] font-bold text-slate-900 leading-snug pr-8">
           Imagine a perfect assessment machine —{' '}<br/>
-          <span className="text-indigo-700">could heritage afford it?</span>
+          <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
         </p>
         {/* Subordinate on purpose, and by a clear step — this is the lens the
             question is answered through, not a second headline. At 26px it was

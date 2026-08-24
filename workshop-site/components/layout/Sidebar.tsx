@@ -29,19 +29,20 @@ export interface SidebarProps {
 // Spacing between stations is NOT here — it is hand-tuned in the markup
 // (`pt-5`, `min-h-[35px]`, `pt-2`). Leave those alone unless you mean to.
 
-// The stage name has to win against the line under it. It lost when the role
-// was set at 15px UPPERCASE with letter-spacing: capitals of a given size read
-// wider and taller than lower case, so 15px caps stood level with a 17px name
-// and then wrapped to a second line. The role is now plain sentence case, two
-// steps down — one line each, and the name reads first.
+// The four TEXT sizes are not here — they are CSS variables in index.css
+// (--sb-heading, --sb-title, --sb-role, --sb-legend), so they can be tried out
+// live in DevTools without a rebuild and only written down once you like them.
+// See the block above ":root" in index.css for the how-to and three preset
+// sets. Everything that cannot be a CSS variable — icon sizes are numeric
+// props to lucide, not styles — stays here.
 const SIZE = {
-  heading: 'text-[15px]',  // "Assessment Process (CBSA Approach)"
-  title: 'text-[18px]',    // stage name — the main driver of button height
-  role: 'text-[13px]',     // the small line under the stage name
+  heading: 'text-[length:var(--sb-heading)]',  // "Assessment Process (CBSA Approach)"
+  title: 'text-[length:var(--sb-title)]',      // stage name — drives button height
+  role: 'text-[length:var(--sb-role)]',        // the line under the stage name
+  legend: 'text-[length:var(--sb-legend)]',    // the ○ / ● key at the bottom
   bubble: 'w-11 h-8',      // the round icon holder inside each button
   icon: 20,                // lucide icon size inside the bubble, in px
   cardPad: 'p-2.5',        // padding inside every button
-  legend: 'text-[13px]',   // the ○ / ● key at the bottom
   chevron: 16,             // the Extensions & Tools arrow, in px
 } as const;
 

@@ -41,6 +41,38 @@ html {
     zoom: var(--app-zoom);
 }
 
+/* ── SIDEBAR TYPE — four numbers, tunable without a rebuild ───────
+   Every piece of text in the process column reads its size from here.
+   Two ways to change them:
+
+   1. LIVE, to try options — open DevTools, Elements, select the <html>
+      element, find this `:root` rule in the Styles pane and drag or type
+      a new value. It repaints as you type. Nothing is saved; when you
+      like a set, copy the numbers down here.
+   2. PERMANENTLY — edit the numbers below and save. Vite hot-reloads.
+
+   Remember --app-zoom: on a desktop (lg and up) everything is painted
+   1.1x, so 18px here lands as ~20px on screen. Judge it on the screen.
+
+   The stage NAME must clearly beat the line under it. That is a matter
+   of the gap between --sb-title and --sb-role, not of their absolute
+   values: below about 4px of difference the two lines read as one
+   block. Note also that capitals read wider and taller than lower case,
+   which is why the role line is no longer uppercase — at 15px caps it
+   stood level with a 17px name and wrapped to a second line.
+
+   THREE SETS TO TRY
+     compact   heading 14  title 17  role 12  legend 12
+     current   heading 15  title 18  role 13  legend 13
+     hall      heading 16  title 20  role 14  legend 13   (biggest that
+               still keeps every role line unwrapped at a 430px sidebar) */
+:root {
+    --sb-heading: 15px;  /* "Assessment Process (CBSA Approach)" */
+    --sb-title: 18px;    /* stage name — the main driver of button height */
+    --sb-role: 13px;     /* the line under the stage name */
+    --sb-legend: 13px;   /* the ○ / ● key at the bottom */
+}
+
 /* ── TYPEFACE — the only place the site's faces are chosen ─────────
    Two knobs. `--font-body` is everything: sidebar, tabs, body copy,
    buttons. `--font-display` is the one big message sentence per tab
