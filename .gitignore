@@ -74,6 +74,10 @@ InSites-Brain/MANIFEST.md
 InSites-Brain/Heritage4.0/
 InSites-Brain/CN-Paper/
 InSites-Brain/Papers/
+# Paper manuscripts dropped into research/ — that folder is tracked for the
+# lab's method notes, but the papers themselves stay local like the rest.
+InSites-Brain/research/*.docx
+InSites-Brain/research/*.pdf
 
 # === Internal workshop proposals (logistics, not for students) ===
 shimur-workshop/
