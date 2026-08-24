@@ -122,13 +122,12 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
       clips every descender, so "Governing" lost the tail of its g. Same fix as
       88858bb; it came back with a paste. */}
   <h1 className={`${SIZE.titleWeight} ${SIZE.title} tracking-tight leading-tight ${COLOR.title} ${COLOR.titleHover} truncate relative inline-block transition-colors duration-300`}>
-    {/* The TALK's title, which is a claim: the conference says Heritage 4.0,
-        and this names what 4.0 means for one practice inside it. The paper's
-        proceedings title — "From Report to Inquiry: Governing Generative AI
-        Insights in Heritage Significance Assessment" — is not repeated here;
-        it is cited in full on the closing tab, which is the slide that is up
-        during questions, i.e. exactly when someone wants to find the paper. */}
-    Significance Assessment 4.0 <span className={`hidden lg:inline ${COLOR.subtitle} ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— from a final report to an open inquiry</span>
+    {/* The PROCEEDINGS title, verbatim. Whoever is matching this screen to the
+        conference programme is matching this string, so it does not get
+        improved. The talk's own claim — "Significance Assessment 4.0 — from a
+        final report to an open inquiry" — is the headline of the closing tab,
+        not of this bar. */}
+    From Report to Inquiry <span className={`hidden lg:inline ${COLOR.subtitle} ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— Governing Generative AI Insights in Heritage Significance Assessment</span>
     <span className={`absolute -bottom-0.5 left-0 w-0 h-px ${COLOR.underline} transition-all duration-300 group-hover:w-full`}></span>
   </h1>
 </button>

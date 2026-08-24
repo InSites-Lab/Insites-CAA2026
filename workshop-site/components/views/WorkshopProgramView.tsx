@@ -919,13 +919,16 @@ const QaTab: React.FC<{
     <div className="min-h-[calc(66vh/var(--app-zoom))] flex flex-col justify-center gap-5">
       <div className="space-y-1.5">
         <Eyebrow>Closing</Eyebrow>
-        {/* The abstract's last sentence, tightened. Over a Q&A it does double
-            duty: the talk itself is now the inquiry being examined. */}
+        {/* The talk's own title, and the only place it appears. The conference
+            says Heritage 4.0; this names what 4.0 means for one practice
+            inside it, and final/open + report/inquiry is a double antithesis.
+            It stands alone — the paper's proceedings title is in the header,
+            and repeating it under here would only blunt this line. */}
         <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-          An inquiry to be examined — not a report to be accepted.
+          Significance Assessment 4.0 — from a final report to an open inquiry
         </h3>
         <p className="text-sm sm:text-base text-slate-500 pt-1">
-          <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026
+          Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026
         </p>
       </div>
 
