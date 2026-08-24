@@ -28,9 +28,15 @@ type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 // The repository the PAPER links to, published before the conference — not the
 // workshop repo this site lives in. Anyone who read the paper is looking for
 // this one, so the slide and the paper must name the same place.
+//
+// Two constants, not one, because they say different things and must not drift
+// apart: LINK is where the click goes (deep into the /system folder), LABEL is
+// what a person reads and types from a photograph of the slide. The label is
+// deliberately the plain repository address — a URL you could key into a
+// browser — and the folder is named in words underneath rather than glued on,
+// because "InSites-Lab / insites /system" is not an address anyone recognises.
 const REPO_URL = 'https://github.com/InSites-Lab/insites/tree/main/system';
-const REPO_NAME = 'InSites-Lab / insites';
-const REPO_PATH = '/system';
+const REPO_LABEL = 'github.com/InSites-Lab/insites';
 
 // ─── Component ────────────────────────────────────────────────────
 
@@ -978,12 +984,14 @@ const QaTab: React.FC<{
   onOpenDesign: () => void;
 }> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
   <div className="space-y-5">
-    {/* ── Above the fold: the closing, and only the closing ───────────
-        min-h is the knob that decides where the projected screen ENDS. At
-        80vh the title and the question fill it and everything else — the
-        repository, the material — begins below. Lower it and the repo bar
-        creeps back onto the slide. Keep the /var(--app-zoom) divisor. */}
-    <div className="min-h-[calc(80vh/var(--app-zoom))] flex flex-col justify-center gap-6 lg:gap-8">
+    {/* ── The closing ─────────────────────────────────────────────────
+        min-h decides how much of the projected screen the closing claims. At
+        30vh it is smaller than the content, so the block simply hugs the
+        title and the question and the repository shares the screen with them
+        — which is the current, deliberate setting. Raise it towards 80vh and
+        the closing floats in the middle of the frame with the repository
+        pushed below the fold. Keep the /var(--app-zoom) divisor either way. */}
+    <div className="min-h-[calc(30vh/var(--app-zoom))] flex flex-col justify-center gap-6 lg:gap-8">
       <div className="space-y-1.5">
         <Eyebrow>Closing</Eyebrow>
         {/* The talk's own title, and the only place it appears. The conference
@@ -992,10 +1000,18 @@ const QaTab: React.FC<{
             It stands alone — the paper's proceedings title is in the header,
             and repeating it under here would only blunt this line. */}
         <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-          Significance Assessment 4.0 — from a final report to an open inquiry
+          Significance Assessment 4.0 — <br/>from a final report to an open inquiry
         </h3>
-        <p className="text-sm sm:text-base text-slate-500 pt-1">
-          Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026
+        {/* The credit line, which is also the contact line — a closing slide
+            is photographed, and the first author is who people write to. */}
+        <p className="text-sm sm:text-base lg:text-[17px] text-slate-500 pt-1">
+          Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026 ·{' '}
+          <a
+            href="mailto:yaelalef@technion.ac.il"
+            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
+          >
+            yaelalef@technion.ac.il
+          </a>
         </p>
       </div>
 
@@ -1013,7 +1029,7 @@ const QaTab: React.FC<{
           <p>Let me end with the thought experiment the paper ends with.</p>
           <p>
             Imagine a system so capable that full automation looks fluent, complete, efficient — a
-            perfect assessment machine. Could heritage afford it?
+            perfect assessment machine.  Could heritage afford it?
           </p>
           <p>
             Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
@@ -1023,19 +1039,23 @@ const QaTab: React.FC<{
           <p>I'll leave the question on the screen.</p>
         </SpeakerNote>
 
-        <p className="text-[19px] sm:text-[23px] lg:text-[28px] font-bold text-slate-900 leading-snug pr-8">
-          Imagine a perfect assessment machine —{' '}
+        <p className="text-[22px] sm:text-[26px] lg:text-[34px] font-bold text-slate-900 leading-snug pr-8">
+          Imagine a perfect assessment machine —{' '}<br/>
           <span className="text-indigo-700">could heritage afford it?</span>
         </p>
-        <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
+        {/* Subordinate on purpose, and by a clear step — this is the lens the
+            question is answered through, not a second headline. At 26px it was
+            standing level with the question and the slide had two voices. */}
+        <p className="text-[15px] sm:text-[17px] lg:text-[21px] text-indigo-950/55">
+          Who assesses is part of what is assessed.
+        </p>
       </div>
     </div>
 
-    {/* ── Below the fold ──────────────────────────────────────────────
-        The question is left alone on the projected screen. The repository is
-        the first thing a scroll reveals — it is what people want after the
-        talk, not during its last sentence. */}
-    <div>
+    {/* ── After the question ──────────────────────────────────────────
+        The repository comes next, with air above it so it reads as a separate
+        beat rather than as part of the closing panel. */}
+    <div className="pt-4 lg:pt-6">
       {/* The link the paper carries, so it has to be findable and
           photographable: bigger mark, the repo name at headline weight, the
           path beside it. */}
@@ -1045,19 +1065,27 @@ const QaTab: React.FC<{
         rel="noopener noreferrer"
         className="flex items-center gap-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-3.5 sm:px-6 sm:py-4 transition-colors"
       >
-        <Github size={32} className="shrink-0" />
+        <Github size={34} className="shrink-0" />
         <span className="flex-1 min-w-0">
-          <span className="block text-[17px] sm:text-[20px] lg:text-[22px] font-bold leading-tight">
-            {REPO_NAME}
-            <span className="text-slate-400 font-mono text-[15px] sm:text-[17px]"> {REPO_PATH}</span>
+          {/* Mono, because this is a string you TYPE. It is the one line on
+              the slide that has to survive being photographed from row 20. */}
+          <span className="block font-mono text-[17px] sm:text-[21px] lg:text-[25px] font-bold leading-tight">
+            {REPO_LABEL}
           </span>
-          <span className="block text-[13px] sm:text-sm text-slate-400 mt-0.5">
-            The system prompt, the specs, and the claim-level evidence behind this talk
+          <span className="block text-[13px] sm:text-[15px] lg:text-[17px] text-slate-400 mt-1">
+            The <span className="font-mono text-slate-300">/system</span> folder — the workflow, the
+            specs, and the claim-level evidence behind this talk
           </span>
         </span>
-        <ExternalLink size={18} className="text-slate-400 shrink-0" />
+        <ExternalLink size={20} className="text-slate-400 shrink-0" />
       </a>
+  
     </div>
+    {/* The gap that puts the toolbox below the fold. It was an <hr> inside a
+        <p>, which browsers un-nest — the paragraph closes before the rule and
+        the padding lands somewhere other than where it reads in the source. A
+        plain spacer does exactly what it says. */}
+    <div className="h-16 lg:h-28" aria-hidden="true"></div>
 
     {/* ── Below the fold: the toolbox ─────────────────────────────── */}
     <SectionDivider
