@@ -290,11 +290,14 @@ const PlateFigure: React.FC<{
   // border, and cropping it would throw the frame away.
   // SWAP THE FILE HERE when the drawing is re-cut.
   <div
-    className={`grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl border border-stone-200 bg-[#f3ead8] ${maxWidth} ${maxHeight}`}
+    // The ground is sampled from the plate's own paper (#DCD6D2), so the bars
+    // beside a contained image read as the mount the drawing is pasted on.
+    // Re-sample it if the drawing is redrawn on different stock.
+    className={`grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl border border-stone-300 bg-[#dcd6d2] ${maxWidth} ${maxHeight}`}
   >
     <img
-      src="./tab4-gemini.jpg"
-      alt="Two engraved panels of the same dolmen field. Left, PASTORALISTS: Bronze Age herders and their families beside the dolmen and its cairn. Right, BEDOUIN ENCAMPMENT: tents, a coffee hearth, and sheep sheltering under the capstone."
+      src="./tab4-gpt.jpg"
+      alt="Two drawn panels of the same dolmen field. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone."
       className="w-full h-full object-contain"
     />
   </div>
