@@ -68,9 +68,36 @@ html {
                still keeps every role line unwrapped at a 430px sidebar) */
 :root {
     --sb-heading: 15px;  /* "Assessment Process (CBSA Approach)" */
-    --sb-title: 18px;    /* stage name — the main driver of button height */
-    --sb-role: 13px;     /* the line under the stage name */
+    --sb-title: 22px;    /* stage name — the main driver of button height */
+    --sb-role: 20px;     /* the line under the stage name */
     --sb-legend: 13px;   /* the ○ / ● key at the bottom */
+}
+
+/* ── TAB 1 TYPE ("What is InSites") — same idea as the sidebar ────
+   The poster caption, the intro line, and the three challenge cards read
+   their sizes from here. Tune them live in DevTools exactly as above:
+   select <html>, edit the value, watch the tab repaint.
+
+   Responsive, so there are two blocks: the first is the PHONE size, the
+   second raises it from sm (640px) up. Change both if you want the step
+   to move together; change only the second to affect the projector.
+
+   --t1-quote is the character's question, --t1-answer the reply inside
+   the fold-out. Keep the answer at or below the question: the card is a
+   dialogue, and an answer set larger than its question reads as the
+   speaker interrupting. */
+:root {
+    --t1-lead: 15px;    /* poster caption + the intro line above the cards */
+    --t1-quote: 15px;   /* the question on each challenge card */
+    --t1-answer: 14px;  /* the reply inside a card, and the lab paragraphs */
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --t1-lead: 20px;
+        --t1-quote: 17px;
+        --t1-answer: 17px;
+    }
 }
 
 /* ── TYPEFACE — the only place the site's faces are chosen ─────────

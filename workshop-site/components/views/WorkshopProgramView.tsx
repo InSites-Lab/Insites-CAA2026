@@ -631,7 +631,9 @@ const WhatIsInSitesTab: React.FC = () => (
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
-      <p className="text-center text-[15px] sm:text-[17px] text-slate-500 italic mt-2">
+      {/* Sizes on this tab come from --t1-* in index.css, so they can be
+          tried out live in DevTools. See the block there. */}
+      <p className="text-center text-[length:var(--t1-lead)] text-slate-500 italic mt-2">
         "The LLM is a looking glass — more than a wonderland"
       </p>
       {/* <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
@@ -640,7 +642,7 @@ const WhatIsInSitesTab: React.FC = () => (
     </div>
 
     {/* Intro line */}
-    <p className="text-[15px] sm:text-[17px] text-slate-600 leading-relaxed">
+    <p className="text-[length:var(--t1-lead)] text-slate-600 leading-relaxed">
       AI already speaks our language and is becoming an active partner in culture. We examine how it can help with the cultural assessment challenges:
     </p>
 
@@ -658,11 +660,11 @@ const WhatIsInSitesTab: React.FC = () => (
                 className="w-11 h-11 sm:w-16 sm:h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-              <span className={`font-bold text-[15px] sm:text-[17px] ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <span className={`font-bold text-[length:var(--t1-quote)] ${c.quote} flex-1`}>"{ch.quote}"</span>
               <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
             <div className="px-2.5 sm:px-4 pb-3 sm:pb-4 pt-1">
-              <p className={`text-sm sm:text-[17px] ${c.text} leading-relaxed`}>{ch.response}</p>
+              <p className={`text-[length:var(--t1-answer)] ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>
         );
@@ -671,12 +673,12 @@ const WhatIsInSitesTab: React.FC = () => (
 
     {/* Lab intro */}
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
-      <h4 className="font-bold text-[15px] sm:text-[17px] text-slate-800">InSites Knowledge Lab</h4>
-      <p className="text-[15px] text-slate-400">Technion — Israel Institute of Technology</p>
-      <p className="text-sm sm:text-[17px] text-slate-700 leading-relaxed">
+      <h4 className="font-bold text-[length:var(--t1-quote)] text-slate-800">InSites Knowledge Lab</h4>
+      <p className="text-[length:var(--t1-answer)] text-slate-400">Technion — Israel Institute of Technology</p>
+      <p className="text-[length:var(--t1-answer)] text-slate-700 leading-relaxed">
         At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
       </p>
-      <p className="text-sm sm:text-[17px] text-slate-700 leading-relaxed">
+      <p className="text-[length:var(--t1-answer)] text-slate-700 leading-relaxed">
         InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
