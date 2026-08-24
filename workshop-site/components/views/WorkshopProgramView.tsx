@@ -647,7 +647,7 @@ const WhatIsInSitesTab: React.FC = () => (
     </p>
 
     {/* 3 Challenge cards with character avatars */}
-    <div className="space-y-3">
+    <div className="flex flex-col gap-[var(--t1-card-gap)]">
       {CHALLENGES.map((ch, idx) => {
         const c = challengeColors[ch.color] || challengeColors.amber;
         const isRight = idx % 2 === 0;
@@ -655,8 +655,10 @@ const WhatIsInSitesTab: React.FC = () => (
           <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
             {/* The card grows as a piece: avatar, padding and chevron step
                 with the type in index.css (--t1-*), so a bigger question does
-                not end up rattling around inside a small box. */}
-            <summary className={`p-2.5 sm:p-4 lg:p-5 cursor-pointer flex items-center gap-2.5 sm:gap-3 lg:gap-4 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
+                not end up rattling around inside a small box.
+                HEIGHT lives in --t1-card-pad-y: a closed card is the avatar
+                plus twice that padding, and the avatar below is the floor. */}
+            <summary className={`px-2.5 sm:px-4 lg:px-5 py-[var(--t1-card-pad-y)] cursor-pointer flex items-center gap-2.5 sm:gap-3 lg:gap-4 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
               <img
                 src={ch.avatar}
                 alt=""
@@ -667,7 +669,7 @@ const WhatIsInSitesTab: React.FC = () => (
               <ChevronDown size={16} className="lg:hidden text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
               <ChevronDown size={20} className="hidden lg:block text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
-            <div className="px-2.5 sm:px-4 lg:px-5 pb-3 sm:pb-4 lg:pb-5 pt-1">
+            <div className="px-2.5 sm:px-4 lg:px-5 pb-[var(--t1-card-pad-y)] pt-1">
               <p className={`text-[length:var(--t1-answer)] ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>

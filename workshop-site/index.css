@@ -89,13 +89,19 @@ html {
    dialogue, and an answer set larger than its question reads as the
    speaker interrupting.
 
-   The card's own proportions — avatar and padding — step with these in
-   WorkshopProgramView (the `details` block), so the cards grow as a
-   piece rather than as text inside a fixed box. */
+   CARD HEIGHT is the other two variables. A closed card is exactly
+   (avatar + 2 x --t1-card-pad-y), so the PADDING is the height knob and
+   the avatar is the floor beneath it — 44px on a phone, 64 at sm, 80 at
+   lg, set in WorkshopProgramView because it is a width and a height at
+   once, not a spacing. Take the padding to 0 and the cards still cannot
+   be shorter than the circles. --t1-card-gap is the air between the
+   three of them. */
 :root {
     --t1-lead: 18px;    /* poster caption + the intro line above the cards */
     --t1-quote: 18px;   /* the question on each challenge card */
     --t1-answer: 16px;  /* the reply inside a card, and the lab paragraphs */
+    --t1-card-pad-y: 8px;   /* card height: avatar + twice this */
+    --t1-card-gap: 8px;     /* between the three cards */
 }
 
 @media (min-width: 40rem) {
@@ -103,6 +109,8 @@ html {
         --t1-lead: 21px;
         --t1-quote: 21px;
         --t1-answer: 19px;
+        --t1-card-pad-y: 10px;
+        --t1-card-gap: 10px;
     }
 }
 
@@ -111,6 +119,8 @@ html {
         --t1-lead: 23px;
         --t1-quote: 23px;
         --t1-answer: 21px;
+        --t1-card-pad-y: 12px;
+        --t1-card-gap: 12px;
     }
 }
 
