@@ -781,63 +781,54 @@ const EpistemicNotationTab: React.FC<{
 
 // ─── 4 · The Landscape ────────────────────────────────────────────
 
-// One landscape, read twice. Both readings are still here — what went is the
-// pair of cards that held them, which gave two findings equal weight when only
-// one of them is in the drawing, and which stated them in OUR words.
+// The deck's arc is medium → message. Tab 2 is FORM: what a marked
+// conversation looks like — and the paragraph headings of its worked example
+// (Values 5 and 6) are, word for word, this tab's message. Tab 3 is LOGIC:
+// what the mark is. Tab 4 is MEANING: what the marking enabled in the domain —
+// the new insight about the landscape of imagination.
 //
-// Reading one is now the SYSTEM's own sentence, marked and cited, in the same
-// grammar the audience learned on tab 3 and watched in the fold-out on tab 2
-// (where these two readings are Values 5 and 6, both 〰️). That is what makes
-// this the last slide of an argument rather than a list of results: what the
-// notation marked as inference is what the expert took as new insight.
-//
-// Reading two sits BELOW the plate, because what stands above an image has to
-// explain the image, and this one is not drawn. Its provenance line — the
-// phrase is the expert's, not the machine's — is the hinge into tab 5.
+// So this slide does not explain; it points. The two value headings return
+// verbatim from the example the audience has already read, and the slide says
+// only: this is what came of it. Projected format: few words, large sizes,
+// one thought per line — anything sayable aloud is not printed.
 const FromReportToInquiryTab: React.FC = () => (
   // Never scrolls: bounded to the frame, everything shrink-0 except the plate,
   // which takes only what is left over.
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-2.5 lg:gap-3">
     <div className="space-y-1 shrink-0">
-      <Eyebrow>One landscape, read twice</Eyebrow>
-      {/* Near-verbatim from the paper ("No source joins the three. Stage 1
-          joined them."). It names the ACT, which is the thing the drawing
-          cannot draw — and "them" resolves downward onto the two panels, so
-          the headline creates the look at the plate instead of competing with
-          the lettering already printed on it. */}
+      <Eyebrow>The LLM insight</Eyebrow>
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-        No source joins them. The session did.
+        A Landscape of Imagination.
       </h3>
+      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-500 pt-0.5">
+        Two values the manual assessment had not reached.
+      </p>
     </div>
 
-    {/* The line that explains the picture, and under it the claim itself. */}
-    <div className="shrink-0 space-y-1.5">
-      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-600 leading-snug">
-        Left, the dolmen builders' herds beside the cairn. Right, the Tuba-Zangariyye Bedouin who
-        graze the same field today.
-      </p>
-      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-800 leading-snug">
-        <Inf /> "pastoralist populations using the same landscape over four millennia"{' '}
-        <Cite>[C:pp.46–48]</Cite> <Cite>[C:p.50 note 4; B]</Cite>
-      </p>
+    {/* The two value headings, verbatim from the worked example on tab 2 —
+        same words, presentation sizes. No cites, no gloss: the citations live
+        in the example's body, and the audience has already seen these lines. */}
+    <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
+      <div className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
+        <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
+          Social — "Pastoralist Continuity and Community Presence"
+        </p>
+        <Inf />
+      </div>
+      <div className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
+        <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
+          Intangible Heritage — "Layers of Narrative Across Traditions"
+        </p>
+        <Inf />
+      </div>
     </div>
 
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(66vh/var(--app-zoom))]" />
+    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(70vh/var(--app-zoom))]" />
 
-    {/* The second reading, and the hinge. Quiet by design — it is a coda, not
-        a second headline, and it must not take height from the plate. */}
-    <div className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2.5 lg:px-5 lg:py-3">
-      <p className="text-[14px] sm:text-[15px] lg:text-base text-slate-700 leading-snug">
-        The session read the field a second way — biblical, gospel, Talmudic and Bedouin references
-        to giants, outcasts and pagan spirits, scattered across a single footnote, gathered into a
-        heritage value <Inf /> "a persistent landscape for imagination."
-      </p>
-      <p className="text-[12px] sm:text-[13px] text-slate-400 mt-1 leading-snug">
-        The phrase is the expert's, not the machine's — she re-worded the system's coinage, and the
-        record kept hers.
-      </p>
-    </div>
+    {/* Nothing after the plate. The imagination reading rose into the
+        headline; its provenance — "the phrase is the expert's, not the
+        machine's" — is spoken, and is the hinge into tab 5. */}
   </div>
 );
 
