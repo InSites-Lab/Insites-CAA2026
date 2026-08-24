@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal, SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -850,17 +850,56 @@ const BACKUP_MATERIAL: BackupItem[] = [
   { label: 'Glossary', note: 'CBSA terms used in the talk', route: 'glossary' },
 ];
 
-// What the speaker says over the closing panel — the answer the slide
-// deliberately does not print. It rides on the panel's `title`, so it is one
-// hover away at the lectern and invisible to the hall. Keep it speakable:
-// this is a script, not a caption.
-const SPEAKER_CLOSING = [
-  'Let me end with the thought experiment the paper ends with.',
-  'Imagine a system so capable that full automation looks fluent, complete, efficient — a perfect assessment machine. Could heritage afford it?',
-  'Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural assessment that is not human cannot count as good.',
-  'So the system that least needs the experts, most needs to keep them in.',
-  "I'll leave the question on the screen.",
-].join('\n\n');
+// ─── Speaker note ─────────────────────────────────────────────────
+// A note only the presenter reads. The browser's own `title` tooltip was the
+// wrong instrument: it appears after a delay, at whatever size the OS decides,
+// and it cannot be pinned open while you glance at it — useless at a lectern.
+// This is a real panel: click the mark to pin it, click again or press Escape
+// to dismiss. The mark itself sits at 30% opacity, invisible from a hall.
+const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> = ({
+  className = '',
+  children,
+}) => {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  return (
+    <span className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-label="Speaker note"
+        className={`flex items-center justify-center rounded-lg p-1.5 text-slate-500 transition-opacity cursor-pointer ${
+          open ? 'opacity-100 bg-white/70' : 'opacity-30 hover:opacity-100'
+        }`}
+      >
+        <NotebookPen size={16} />
+      </button>
+
+      {open && (
+        // Anchored to the right because the mark sits at the panel's right
+        // edge — it opens INWARD, away from the frame, and never clips.
+        <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
+          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400 mb-2.5">
+            Speaker note
+          </p>
+          <div className="space-y-2.5 text-[15px] lg:text-base leading-relaxed text-slate-700">
+            {children}
+          </div>
+        </div>
+      )}
+    </span>
+  );
+};
 
 // The last slide, and the one that stays up for the whole question period.
 // It is deliberately NOT frame-fit: the closing block is given the height of
@@ -899,11 +938,22 @@ const QaTab: React.FC<{
           both", and this closes it on the same verb.
           The speaker's script rides on `title` — invisible to the hall, one
           hover away for whoever is presenting. */}
-      <div
-        title={SPEAKER_CLOSING}
-        className="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 space-y-2 cursor-help"
-      >
-        <p className="text-[19px] sm:text-[23px] lg:text-[28px] font-bold text-slate-900 leading-snug">
+      <div className="relative rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 space-y-2">
+        <SpeakerNote className="absolute top-2.5 right-2.5">
+          <p>Let me end with the thought experiment the paper ends with.</p>
+          <p>
+            Imagine a system so capable that full automation looks fluent, complete, efficient — a
+            perfect assessment machine. Could heritage afford it?
+          </p>
+          <p>
+            Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
+            assessment that is not human cannot count as good.
+          </p>
+          <p>So the system that least needs the experts, most needs to keep them in.</p>
+          <p>I'll leave the question on the screen.</p>
+        </SpeakerNote>
+
+        <p className="text-[19px] sm:text-[23px] lg:text-[28px] font-bold text-slate-900 leading-snug pr-8">
           Imagine a perfect assessment machine —{' '}
           <span className="text-indigo-700">could heritage afford it?</span>
         </p>
