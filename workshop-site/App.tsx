@@ -223,6 +223,21 @@ const App: React.FC = () => {
 
   // Deep linking - hash routes mapping
   const hashRoutes: Record<string, () => void> = {
+    // ── The five talk tabs ────────────────────────────────────────
+    // #tab-insites · #tab-tension · #tab-notation · #tab-landscape ·
+    // #tab-closing. Which tab is the deck's own business — it reads the same
+    // hash (see TAB_HASH in WorkshopProgramView). They are listed here for one
+    // reason: the handler below normalises any hash it does not recognise back
+    // to "", so an unregistered tab link would be erased the moment it loaded.
+    //
+    // All five mean the same thing to App: the deck, with nothing over it.
+    // They are prefixed because the bare names are taken — #notation is the
+    // notation MODAL, three lines down, and that link is published.
+    "tab-insites": () => setExcursion(null),
+    "tab-tension": () => setExcursion(null),
+    "tab-notation": () => setExcursion(null),
+    "tab-landscape": () => setExcursion(null),
+    "tab-closing": () => setExcursion(null),
     graph: () => setIsGraphInputModalOpen(true),
     // constants.tsx:385 and the README both point at #graph-create.
     "graph-create": () => setIsGraphInputModalOpen(true),

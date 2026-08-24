@@ -25,6 +25,40 @@ const QA_TAB = { id: 'qa', label: 'Closing', icon: <MessageSquare size={18} /> }
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
+// ─── Tabs in the URL ──────────────────────────────────────────────
+// Every tab is addressable: #tab-notation opens the deck on Epistemic
+// Notation. Two things follow — a reload returns to the slide you were on
+// instead of to tab 1, and a single slide can be linked and sent.
+//
+// The names are the ones the TAB BAR SHOWS, not the internal ids: 'inquiry'
+// is Landscape and 'qa' is Closing. A URL that someone types from a
+// photograph, or reads down a phone, should match the word on the screen.
+//
+// The `tab-` prefix is not decoration. The bare names collide with routes
+// that already exist in App.tsx — #notation opens the notation MODAL, and
+// that link is published. Both have to keep working.
+//
+// App.tsx must know these five: its hash handler normalises any hash it does
+// not recognise back to "", which would erase a tab link on arrival.
+const TAB_HASH: Record<string, TabId> = {
+  'tab-insites': 'insites',
+  'tab-tension': 'tension',
+  'tab-notation': 'notation',
+  'tab-landscape': 'inquiry',
+  'tab-closing': 'qa',
+};
+
+const HASH_FOR_TAB = Object.fromEntries(
+  Object.entries(TAB_HASH).map(([hash, tab]) => [tab, hash]),
+) as Record<TabId, string>;
+
+// Hashes that mean "the deck, with nothing over it". Empty is one of them:
+// every modal's onClose sets it. When the URL says one of these it is not
+// saying anything a link needs, so the deck replaces it with its own tab.
+const DECK_ALIASES = new Set(['', 'program', 'home', 'presentation']);
+
+const tabFromHash = (): TabId | undefined => TAB_HASH[window.location.hash.slice(1)];
+
 // The repository the PAPER links to, published before the conference — not the
 // workshop repo this site lives in. Anyone who read the paper is looking for
 // this one, so the slide and the paper must name the same place.
@@ -56,7 +90,10 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   excursionContent,
   onCloseExcursion,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabId>(PROGRAM_TABS[0].id);
+  // The URL decides where the deck opens, so a reload and a sent link both
+  // land on the same slide. No hash, or a hash that names something else —
+  // the deck starts at tab 1, as it always did.
+  const [activeTab, setActiveTab] = useState<TabId>(() => tabFromHash() ?? PROGRAM_TABS[0].id);
   // Tab 2's fold-out. The state lives here, not in the tab, so it survives
   // switching away and back — the speaker returns to the card as they left it.
   const [isTensionExampleOpen, setIsTensionExampleOpen] = useState(false);
@@ -64,7 +101,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   const [isDesignOpen, setIsDesignOpen] = useState(false);
   // The talk tab to come back to when the chip is dismissed — the speaker
   // returns to where they were, not to tab 1.
-  const [lastDeckTab, setLastDeckTab] = useState<TabId>(PROGRAM_TABS[0].id);
+  const [lastDeckTab, setLastDeckTab] = useState<TabId>(() => tabFromHash() ?? PROGRAM_TABS[0].id);
 
   // Opening an excursion focuses its chip; closing it restores the talk tab.
   useEffect(() => {
@@ -74,11 +111,48 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   // Clicking any talk tab also dismisses whatever excursion is open — the
   // detour is never something the audience has to close by hand.
+  //
+  // The hash is written as a real navigation (not replaceState): the browser's
+  // back button should walk back through the talk, which is what a speaker
+  // reaches for when they want the previous slide. That write re-enters App's
+  // hash handler, which closes any open modal — wanted, and the reason the
+  // excursion is dismissed here too.
   const selectDeckTab = (id: TabId) => {
     setActiveTab(id);
     setLastDeckTab(id);
     if (excursion) onCloseExcursion?.();
+    if (HASH_FOR_TAB[id]) window.location.hash = HASH_FOR_TAB[id];
   };
+
+  // The other direction: back, forward, or a hash typed into the bar.
+  useEffect(() => {
+    const onHashChange = () => {
+      const tab = tabFromHash();
+      if (!tab) return;
+      setActiveTab(tab);
+      setLastDeckTab(tab);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  // Keep the URL honest whenever nothing is over the deck — on a fresh visit,
+  // after a modal closes (its onClose sets the hash to ""), after an excursion
+  // is dismissed (that sets #program). All of those are the deck, and the deck
+  // is always on some tab, so the URL should name it: copy the address bar at
+  // any moment and you get a link to what is on the screen.
+  //
+  // replaceState, not location.hash — this is a correction, not a navigation.
+  // It adds no history entry and does not re-enter the hash handler.
+  //
+  // Deliberately narrow. A hash that names a modal or a CBSA stage is left
+  // exactly as it is: those links are published, and while the glossary is
+  // open #glossary is the truth about the screen.
+  useEffect(() => {
+    if (excursion || !HASH_FOR_TAB[activeTab]) return;
+    if (!DECK_ALIASES.has(window.location.hash.slice(1))) return;
+    window.history.replaceState(null, '', `#${HASH_FOR_TAB[activeTab]}`);
+  }, [activeTab, excursion]);
 
   // Tabs that must never scroll: the column is bounded to the frame instead of
   // being allowed to grow past it, and the tab yields height from its images.
