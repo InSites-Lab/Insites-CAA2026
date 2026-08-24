@@ -73,6 +73,49 @@ html {
     --sb-legend: 13px;   /* the ○ / ● key at the bottom */
 }
 
+/* ── THE LABEL — one uppercase device for the whole deck ───────────
+   Every small caps label on the talk tabs is this class: the eyebrow above
+   each headline, EVIDENCE / BROADER MEANING in the worked example, the two
+   column heads of the notation key, the five count-tile labels, the short
+   form of SectionDivider, and SPEAKER NOTE.
+
+   They used to be seven separate declarations at 11-15px, in weights 700,
+   800 and 900, with five different letter-spacings. Six of those numbers
+   were doing nothing: Alef ships 400 and 700 only, so 700/800/900 all paint
+   as the same bold — the "hierarchy" between them existed in the source and
+   never on the screen. What was left was one device wearing five costumes.
+
+   The only large uppercase line on the deck is a SectionDivider section
+   title, and it stays separate on purpose — see --divider-label. Two
+   uppercase devices total: this one for a label, that one for a title.
+
+   Colour stays with the caller (slate-400 for a whisper, slate-500 when it
+   labels something being read), because that is the one difference between
+   these uses that a room can actually see. */
+:root {
+    --label: 12px;
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --label: 13px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --label: 14px;
+    }
+}
+
+.label {
+    font-size: var(--label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.25;
+}
+
 /* ── TAB 1 TYPE ("What is InSites") — same idea as the sidebar ────
    The poster caption, the intro line, and the three challenge cards read
    their sizes from here. Tune them live in DevTools exactly as above:
@@ -121,6 +164,208 @@ html {
         --t1-answer: 21px;
         --t1-card-pad-y: 12px;
         --t1-card-gap: 12px;
+    }
+}
+
+/* ── TAB 2 TYPE ("The Dual Tension") — the question and the example ─
+   The headline above is not here: it is .font-display, sized with the other
+   tab headlines. What IS here is everything under it — the question the
+   speaker stops on, the fold-out strip, and the whole worked example inside
+   it. Tune them live in DevTools the same way: select <html>, edit a value.
+
+   Nine knobs, in reading order down the tab:
+
+     --t2-lead       the line under the headline ("CBSA and the transformer…")
+     --t2-question   "How can we afford both…" — the line the tab rests on
+     --t2-card-title the fold-out strip's title
+     --t2-card-sub   its second line (hidden on a phone)
+     --t2-ex-title   the example's own title, "CBSA session — notation update"
+     --t2-ex-head    "Values — notation update" AND the two numbered value
+                     names. One knob deliberately: they are the same level of
+                     the document seen twice, and splitting them only ever
+                     produced two sizes 2px apart that read as a mistake.
+     --t2-ex-body    the evidence and broader-meaning paragraphs
+     --t2-ex-small   the date line, the key strip, the citations, and the
+                     EVIDENCE / BROADER MEANING labels
+     --mark-size     the epistemic marks themselves — see below
+
+   These were all Tailwind steps (text-sm, text-lg…) capped at what reads on
+   a laptop. Projected, the example is a DOCUMENT the room has to read off a
+   wall, so every step here is roughly a quarter larger than the class it
+   replaced, and the title more.
+
+   Responsive, three blocks like tab 1: phone, sm (640), lg (1024 = the
+   projector). Never let a value go DOWN at a wider breakpoint.
+
+   The example scrolls INSIDE its own card, so making these bigger costs
+   scrolling, never layout — nothing here can push the slide out of frame. */
+:root {
+    --t2-lead: 17px;       /* the line under the headline */
+    --t2-question: 20px;   /* the question the tab rests on */
+    --t2-card-title: 15px; /* fold-out strip — title */
+    --t2-card-sub: 13px;   /* fold-out strip — second line */
+    --t2-ex-title: 20px;   /* the example's document title */
+    --t2-ex-head: 17px;    /* section head + the numbered value names */
+    --t2-ex-body: 16px;    /* the evidence paragraphs */
+    --t2-ex-small: 13px;   /* dates, citations, EVIDENCE labels */
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --t2-lead: 20px;
+        --t2-question: 24px;
+        --t2-card-title: 17px;
+        --t2-card-sub: 15px;
+        --t2-ex-title: 23px;
+        --t2-ex-head: 19px;
+        --t2-ex-body: 17px;
+        --t2-ex-small: 14px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --t2-lead: 26px;
+        --t2-question: 29px;
+        --t2-card-title: 24px;
+        --t2-card-sub: 22px;
+        --t2-ex-title: 26px;
+        --t2-ex-head: 21px;
+        --t2-ex-body: 18px;
+        --t2-ex-small: 15px;
+    }
+}
+
+/* ── THE MARKS — one size, wherever a mark appears ─────────────────
+   〰️ and 💭 in tab 2's prose, the two on tab 4's value headings, and the
+   pair in the example's key. They are the SUBJECT of the talk, so they are
+   set larger than the words they annotate — but inline in a paragraph there
+   is a ceiling: past about a quarter above the body size they stop reading
+   as annotation and start breaking the line rhythm of the sentence they sit
+   in. So raise this WITH --t2-ex-body, not on its own. */
+:root {
+    --mark-size: 19px;
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --mark-size: 20px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --mark-size: 22px;
+    }
+}
+
+/* ── TAB 3 TYPE ("Epistemic Notation") — the rule, then the test ───
+   The headline is not here, same as tab 2: it is .font-display. Everything
+   under it is, in reading order down the tab:
+
+     --t3-lead      "Validity remains human judgment."
+     --t3-key-body  the Meaning column of the quoted key — the sentence the
+                    room actually has to read off the wall
+     --t3-key-mark  the two big 〰️ 💭 specimens in that table. NOT --mark-size:
+                    those are marks doing their job inline in a sentence,
+                    these are the same glyphs held up to be looked at.
+     --t3-key-cite  the [file:page] token in the key's first row
+     --t3-rule      the "When in doubt — mark it" line and its attribution
+     --t3-tile-n    the five counts (45 · 24 · 14 · 4 · 3)
+     --t3-payoff    "42 of 45 held…" — the sentence the slide is built to land
+     --t3-payoff-sub the line under it
+
+   WATCH THE FRAME HERE. Unlike tab 2, whose example scrolls inside its own
+   card, this tab is frame-fit and its content is real layout: raising these
+   pushes the payoff panel down. The one element that gives way is the quoted
+   key card — it is min-h-0 and scrolls inside itself, so it absorbs the
+   pressure first. Check on the projector that the key still shows all three
+   rows without scrolling; when it stops, you have taken more than there is.
+
+   Left deliberately alone: the "The notation in depth" button (a control,
+   not a text) and the glyph tokens on the count tiles (footnotes on a
+   number — enlarge them and the tiles wrap on a phone).
+
+   NOT here: the table's column heads and the five tile labels. They are the
+   deck-wide `.label` device and are sized with every other small caps label
+   on the talk, not with this tab. */
+:root {
+    --t3-lead: 16px;
+    --t3-key-body: 16px;
+    --t3-key-mark: 30px;
+    --t3-key-cite: 14px;
+    --t3-rule: 14px;
+    --t3-tile-n: 22px;
+    --t3-payoff: 16px;
+    --t3-payoff-sub: 15px;
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --t3-lead: 19px;
+        --t3-key-body: 18px;
+        --t3-key-mark: 32px;
+        --t3-key-cite: 15px;
+        --t3-rule: 15px;
+        --t3-tile-n: 26px;
+        --t3-payoff: 19px;
+        --t3-payoff-sub: 16px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --t3-lead: 30px;
+        --t3-key-body: 22px;
+        --t3-key-mark: 40px;
+        --t3-key-cite: 18px;
+        --t3-rule: 20px;
+        --t3-tile-n: 30px;
+        --t3-payoff: 24px;
+        --t3-payoff-sub: 18px;
+    }
+}
+
+/* ── SECTION DIVIDERS — a shared component, so its own knobs ───────
+   SectionDivider has two shapes. The bare one — a rule with a small label
+   threaded through it — is not sized here at all any more: it is the deck's
+   `.label`, like every other small caps line on the talk. What is left here
+   is the shape that also carries a sublabel, which is a section TITLE and the
+   one large uppercase line the deck allows:
+
+     --divider-label  the title
+     --divider-sub    its second line
+
+   These are NOT --t3-*: the component appears twice on tab 3 and once in Q&A,
+   and tuning tab 3 must not silently resize a divider on another tab.
+
+   The title is set in SENTENCE CASE. Capitals on this deck belong to the
+   `.label` device and nowhere else: uppercase flattened "InSites" to INSITES
+   and took the internal capital with it. Lower case also reads smaller than
+   capitals at the same number, which is why the title gained 3px when it lost
+   them — the size changed so that the presence would not.
+
+   The sublabel is written to hold ONE line and is no longer boxed to 3xl —
+   it now runs the full content column, so the only thing that can wrap it is
+   the sentence being too long. At the projector that is about 105 characters.
+   Write to the line; do not shrink the type to fit a sentence that wants to
+   be shorter. */
+:root {
+    --divider-label: 19px;
+    --divider-sub: 16px;
+}
+
+@media (min-width: 40rem) {
+    :root {
+        --divider-label: 22px;
+        --divider-sub: 19px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --divider-label: 26px;
+        --divider-sub: 22px;
     }
 }
 

@@ -208,8 +208,9 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
 // ─── Shared bits ──────────────────────────────────────────────────
 
+// One device, defined once in index.css as `.label` — see the block there.
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="text-[12px] font-extrabold tracking-[0.12em] uppercase text-slate-400">{children}</p>
+  <p className="label text-slate-400">{children}</p>
 );
 
 // ─── 1 · The Dual Tension ─────────────────────────────────────────
@@ -396,7 +397,7 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
       {/* Picks up tab 1's "meaning emerges from context" and turns the two
           risks into one mechanism — which is why suppression cannot be the
           answer, and governance has to be. Delete this line if it crowds. */}
-      <p className="text-sm sm:text-[15px] md:text-[17px] lg:text-[19px] text-slate-600 pt-1">
+      <p className="text-[length:var(--t2-lead)] text-slate-600 pt-1">
         CBSA and the transformer share a core idea: meaning emerges from context.
       </p>
     </div>
@@ -417,7 +418,7 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
     />
 
     <div className="shrink-0 text-center">
-      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-900 leading-snug">
+      <p className="text-[length:var(--t2-question)] font-bold text-slate-900 leading-snug">
         How can we afford both: accountability and the emergence of new insight?
       </p>
     </div>
@@ -434,25 +435,26 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
 // standalone copy.)
 
 // The marks are the subject of the talk, so they are set LARGER than the words
-// around them, not smaller. Inline in prose is the one place with a ceiling —
-// past ~20px they start breaking the line rhythm of the paragraph they annotate.
+// around them, not smaller — one size for every mark on the deck, --mark-size
+// in index.css. Inline in prose is the one place with a ceiling; the reasoning
+// and the ceiling are written out beside the variable.
 
 /** Inferred — synthesized across sources. */
 const Inf = () => (
-  <span className="inline-block align-middle rounded bg-amber-100 px-1.5 text-[19px] font-semibold">〰️</span>
+  <span className="inline-block align-middle rounded bg-amber-100 px-1.5 text-[length:var(--mark-size)] font-semibold">〰️</span>
 );
 
 /** Hypothesis — reading between the lines. */
 const Hyp = () => (
-  <span className="inline-block align-middle rounded bg-purple-100 px-1.5 text-[19px] font-semibold">💭</span>
+  <span className="inline-block align-middle rounded bg-purple-100 px-1.5 text-[length:var(--mark-size)] font-semibold">💭</span>
 );
 
 const Cite: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="font-mono text-[12px] sm:text-[13px] text-slate-400">{children}</span>
+  <span className="font-mono text-[length:var(--t2-ex-small)] text-slate-400">{children}</span>
 );
 
 const EvidenceLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="mt-3.5 mb-1 text-[12px] font-bold uppercase tracking-[0.06em] text-slate-500">
+  <p className="label mt-3.5 mb-1 text-slate-500">
     {children}
   </p>
 );
@@ -460,21 +462,23 @@ const EvidenceLabel: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 const WorkedExample: React.FC = () => (
   <div className="max-w-3xl mx-auto space-y-5 text-slate-700">
     <div className="border-b-2 border-slate-200 pb-3">
-      <h4 className="text-lg sm:text-xl font-bold text-slate-900">CBSA session — notation update</h4>
-      <p className="text-[13px] sm:text-sm text-slate-500">
+      <h4 className="text-[length:var(--t2-ex-title)] font-bold text-slate-900">
+        CBSA session — notation update
+      </h4>
+      <p className="text-[length:var(--t2-ex-small)] text-slate-500">
         Tuba-Zangariyye Dolmen Field · Korazim Plateau · March 31, 2026
       </p>
     </div>
 
     {/* The key itself lives on tab 3 now, where it is quoted as the bot's
         instruction. This strip is what the example needs to read on its own. */}
-    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 rounded-xl bg-slate-100 px-4 py-2 text-[13px] sm:text-sm text-slate-600">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 rounded-xl bg-slate-100 px-4 py-2 text-[length:var(--t2-ex-small)] text-slate-600">
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-amber-100 px-1.5 text-[20px] font-semibold leading-none">〰️</span>
+        <span className="rounded bg-amber-100 px-1.5 text-[length:var(--mark-size)] font-semibold leading-none">〰️</span>
         inferred
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-purple-100 px-1.5 text-[20px] font-semibold leading-none">💭</span>
+        <span className="rounded bg-purple-100 px-1.5 text-[length:var(--mark-size)] font-semibold leading-none">💭</span>
         hypothesis
       </span>
       <span className="flex items-center gap-1.5">
@@ -490,19 +494,19 @@ const WorkedExample: React.FC = () => (
     />
 
     <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
-      <h5 className="text-base sm:text-lg font-bold text-slate-900">Values — notation update</h5>
-      <p className="text-[13px] sm:text-sm text-slate-500 mt-1 mb-5">
+      <h5 className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">Values — notation update</h5>
+      <p className="text-[length:var(--t2-ex-small)] text-slate-500 mt-1 mb-5">
         Values 5–6 reformatted from the previous session's notation style to the current InSites
         notation key.
       </p>
 
       <div className="border-b border-slate-200 pb-5 mb-5">
-        <p className="text-[15px] sm:text-base font-bold text-slate-900">
+        <p className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">
           5. Social — "Pastoralist Continuity and Community Presence" <Inf />
         </p>
 
         <EvidenceLabel>Evidence</EvidenceLabel>
-        <p className="text-sm sm:text-[15px] leading-relaxed">
+        <p className="text-[length:var(--t2-ex-body)] leading-relaxed">
           Stepansky links the dolmen builders to semi-nomadic pastoralists of the IB–MBIIA period,
           based on Horbat Berekh's material culture. <Cite>[C:pp.46–48]</Cite> The Korazim Plateau
           has sustained pastoral communities through historical periods, and the Zangariyye and
@@ -512,7 +516,7 @@ const WorkedExample: React.FC = () => (
         </p>
 
         <EvidenceLabel>Broader meaning</EvidenceLabel>
-        <p className="text-sm sm:text-[15px] leading-relaxed">
+        <p className="text-[length:var(--t2-ex-body)] leading-relaxed">
           This long arc of pastoral presence — ancient builders, Ottoman-era cultivators, modern
           Bedouin — suggests a social value rooted in continuity of landscape use, though the
           connection between the Bronze Age population and later inhabitants is cultural-geographic
@@ -523,12 +527,12 @@ const WorkedExample: React.FC = () => (
       </div>
 
       <div>
-        <p className="text-[15px] sm:text-base font-bold text-slate-900">
+        <p className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">
           6. Intangible Heritage — "Layers of Narrative Across Traditions" <Inf />
         </p>
 
         <EvidenceLabel>Evidence</EvidenceLabel>
-        <p className="text-sm sm:text-[15px] leading-relaxed">
+        <p className="text-[length:var(--t2-ex-body)] leading-relaxed">
           Biblical references to Rephaim giants in Transjordan, the New Testament "tombs" near
           Korazim, Talmudic references to dolmens as "Merkolis" (pagan entities), and the Bedouin
           term "Dan" (shelter) for dolmens collectively suggest that these structures have generated
@@ -536,7 +540,7 @@ const WorkedExample: React.FC = () => (
         </p>
 
         <EvidenceLabel>Broader meaning</EvidenceLabel>
-        <p className="text-sm sm:text-[15px] leading-relaxed">
+        <p className="text-[length:var(--t2-ex-body)] leading-relaxed">
           The intangible context (Stage 1) frames the dolmens as persistent stimuli for narrative
           production. However, the evidence linking these specific textual traditions to the
           Tuba-Zangariyye field (rather than to Korazim Plateau dolmens generally) is indirect{' '}
@@ -545,7 +549,7 @@ const WorkedExample: React.FC = () => (
       </div>
     </section>
 
-    <p className="border-t-2 border-slate-200 pt-4 text-center text-[13px] sm:text-sm text-slate-500">
+    <p className="border-t-2 border-slate-200 pt-4 text-center text-[length:var(--t2-ex-small)] text-slate-500">
       ───── End of 2️⃣ Values Analysis <em>(notation update)</em>
     </p>
   </div>
@@ -566,10 +570,10 @@ const WorkedExampleCard: React.FC<{ open: boolean; onToggle: () => void }> = ({ 
     >
       <FileSearch size={20} className="text-indigo-600 shrink-0" />
       <span className="flex-1 min-w-0">
-        <span className="block text-sm sm:text-[15px] font-bold text-indigo-900">
+        <span className="block text-[length:var(--t2-card-title)] font-bold text-indigo-900">
           Worked example — Tuba-Zangariyye, claim by claim
         </span>
-        <span className="hidden sm:block text-[13px] sm:text-sm text-indigo-500/80">
+        <span className="hidden sm:block text-[length:var(--t2-card-sub)] text-indigo-500/80">
           Two values re-marked: what was read, what was inferred, what is hypothesis
         </span>
       </span>
@@ -703,18 +707,18 @@ const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }
     // "[file:page] | Source". They are one thing: an explicit claim carries no
     // glyph BECAUSE it carries the citation. Merged here, which is why the
     // divider says "from" the system prompt and not "verbatim".
-    mark: <span className="font-mono text-[13px] lg:text-[15px] text-slate-500">[file:page]</span>,
+    mark: <span className="font-mono text-[length:var(--t3-key-cite)] text-slate-500">[file:page]</span>,
     meaning: 'Explicit in source — cited to the place it was read',
     rowClass: '',
   },
   {
     // The glyphs are the subject of the talk: biggest thing in the row.
-    mark: <span className="inline-block rounded-lg bg-amber-100 px-3 py-1 text-[30px] lg:text-[36px] leading-none">〰️</span>,
+    mark: <span className="inline-block rounded-lg bg-amber-100 px-3 py-1 text-[length:var(--t3-key-mark)] leading-none">〰️</span>,
     meaning: 'Inferred from 2+ pieces of evidence (cite the evidence)',
     rowClass: 'bg-amber-50/50',
   },
   {
-    mark: <span className="inline-block rounded-lg bg-purple-100 px-3 py-1 text-[30px] lg:text-[36px] leading-none">💭</span>,
+    mark: <span className="inline-block rounded-lg bg-purple-100 px-3 py-1 text-[length:var(--t3-key-mark)] leading-none">💭</span>,
     meaning: 'Uncertainty / interpretation — a claim that is neither explicit nor confidently inferred',
     rowClass: 'bg-purple-50/50',
   },
@@ -747,10 +751,10 @@ const EpistemicNotationTab: React.FC<{
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
     <div className="space-y-1.5 shrink-0">
       <Eyebrow>The core mechanism</Eyebrow>
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
+      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[41px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
-      <p className="text-[15px] sm:text-[17px] lg:text-xl font-semibold text-slate-500">Validity remains human judgment.</p>
+      <p className="text-[length:var(--t3-lead)] font-semibold text-slate-500">Validity remains human judgment.</p>
     </div>
 
     {/* ── Act one: the instruction ──────────────────────────────────
@@ -765,13 +769,13 @@ const EpistemicNotationTab: React.FC<{
     {/* min-h-0 (not grow) — the card keeps its content height when there is
         room and is the only block that gives way when there is not. */}
     <div className="border-2 border-slate-300 rounded-xl min-h-0 overflow-y-auto custom-scrollbar">
-      <table className="w-full text-[15px] sm:text-base lg:text-lg">
+      <table className="w-full text-[length:var(--t3-key-body)]">
         <thead>
           <tr className="bg-slate-50">
-            <th className="text-left font-bold text-[11px] uppercase tracking-[0.08em] text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4 w-[110px] lg:w-[150px]">
+            <th className="label text-left text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4 w-[110px] lg:w-[150px]">
               Notation
             </th>
-            <th className="text-left font-bold text-[11px] uppercase tracking-[0.08em] text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4">
+            <th className="label text-left text-slate-500 border-b border-slate-200 py-2 px-3 sm:px-4">
               Meaning
             </th>
           </tr>
@@ -787,7 +791,7 @@ const EpistemicNotationTab: React.FC<{
       </table>
       {/* The Rule line is prompt text too, so it stays inside the border. The
           attribution rides the same line — provenance at no height cost. */}
-      <p className="px-3 sm:px-4 py-2.5 text-[13px] sm:text-sm text-slate-500 italic leading-snug">
+      <p className="px-3 sm:px-4 py-2.5 text-[length:var(--t3-rule)] text-slate-500 italic leading-snug">
         "When in doubt — mark it. Better an unnecessary notation than an unmarked claim that appears factual."
         <span className="not-italic text-slate-400"> — Global Notation Key (Mandatory), InSites v10</span>
       </p>
@@ -798,9 +802,32 @@ const EpistemicNotationTab: React.FC<{
 
     {/* ── Act two: the test ─────────────────────────────────────────── */}
     <div className="shrink-0">
+      {/* The title carries the SCOPE — one site, one expert, and the two
+          routes set against each other — because that is what the room has to
+          hold while it reads the counts below. The old title said "assessed
+          twice" without ever saying what the second route was, so the thing
+          under test (the same expert working with the assistant, against the
+          same expert working alone) was never printed anywhere.
+
+          "vs." and not "by hand and with": a test is a comparison, and the
+          conjunction described two activities instead of standing them
+          against each other. No "(HITL)" after the name — an acronym in a
+          projected title has to be decoded aloud, which costs the second the
+          slide exists to save, and the line below already says the mechanism
+          in full words. The name is never italicised, here or anywhere: Alef
+          ships 400 and 700 only, so italic is a synthesised slant — passable
+          in small prose, visibly broken in tracked capitals.
+
+          The second line is the mechanism, not a repeat: on the assisted run
+          the expert approved every stage. That is the method's core, and the
+          reason the counts below are a finding rather than a demo. It stays
+          short on purpose — see the sublabel note in index.css: past about
+          105 characters it wraps at the projector, and it wraps EARLIER on a
+          1600-wide screen, so 70 is the safe neighbourhood. */}
+         <p style={{ padding: "10px" }}></p> 
       <SectionDivider
-        label="The test — one site, one expert, assessed twice"
-        sublabel="Once by hand, once with InSites — what the marks caught, and what only the expert could."
+        label="The Test:One site, one expert — hand vs. InSites assisted"
+        sublabel="On the assisted route, the expert reviewed and approved every stage."
         colorClass="text-slate-800"
       />
     </div>
@@ -808,8 +835,8 @@ const EpistemicNotationTab: React.FC<{
     <div className="shrink-0 grid grid-cols-5 gap-1.5 sm:gap-3.5">
       {CLAIM_COUNTS.map((c) => (
         <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
-          <p className={`text-xl sm:text-2xl lg:text-[26px] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
-          <p className="text-[10px] sm:text-[12px] font-bold tracking-tight sm:tracking-[0.08em] uppercase text-slate-400 leading-tight">
+          <p className={`text-[length:var(--t3-tile-n)] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
+          <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
             {c.label}
             {c.token && (
               // normal-case so the label's uppercase does not eat the token.
@@ -824,10 +851,10 @@ const EpistemicNotationTab: React.FC<{
         the three missing from the sum went. No percentage — the paper reports
         none, and one case with one expert does not support one. */}
     <div className="shrink-0 border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
-      <p className="text-[15px] sm:text-base md:text-lg lg:text-xl font-bold text-slate-900 leading-snug">
+      <p className="text-[length:var(--t3-payoff)] font-bold text-slate-900 leading-snug">
         42 of 45 held. The expert caught the other three — in the session.
       </p>
-      <p className="text-[15px] text-slate-500 mt-1.5">
+      <p className="text-[length:var(--t3-payoff-sub)] text-slate-500 mt-1.5">
         One claim was wrong · one did not belong · one inference went unmarked.
       </p>
     </div>
@@ -835,14 +862,14 @@ const EpistemicNotationTab: React.FC<{
     {/* The worked example used to sit here as a second button opening a
         fullscreen modal. It is now the fold-out card at the foot of tab 2,
         where the question it answers is asked. */}
-    <div className="shrink-0 flex flex-wrap gap-3">
+    {/* <div className="shrink-0 flex flex-wrap gap-3">
       <button
         onClick={() => onNavigate?.('notation')}
         className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-[10px] px-[22px] py-2.5 text-[15px] font-bold shadow-lg shadow-indigo-600/25 transition-colors cursor-pointer"
       >
         The notation in depth
       </button>
-    </div>
+    </div> */}
   </div>
 );
 
@@ -874,24 +901,44 @@ const FromReportToInquiryTab: React.FC = () => (
 
     {/* The two value headings, verbatim from the worked example on tab 2 —
         same words, presentation sizes. No cites, no gloss: the citations live
-        in the example's body, and the audience has already seen these lines. */}
+        in the example's body, and the audience has already seen these lines.
+
+        The mark sits INSIDE the sentence, after the closing quote, exactly as
+        it does in the example's prose. Held at the card's right edge by a
+        justify-between it read as a status badge on a box — a property OF THE
+        CARD — when what it says is that this claim is inferred. It is
+        annotation, so it belongs on the line it annotates, at its end. The
+        nbsp before it keeps it married to the last word: without it a wrap can
+        leave the mark alone on a line of its own. */}
     <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
-      <div className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
+      <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
         <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
-          Social — "Pastoralist Continuity and Community Presence"
+          Social — "Pastoralist Continuity and Community Presence"{' '}
+          <Inf />
         </p>
-        <Inf />
       </div>
-      <div className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
+      <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
         <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
-          Intangible Heritage — "Layers of Narrative Across Traditions"
+          Intangible Heritage — "Layers of Narrative Across Traditions"{' '}
+          <Inf />
         </p>
-        <Inf />
       </div>
     </div>
 
-    {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(70vh/var(--app-zoom))]" />
+    {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ────
+        maxHeight is the one number to touch. Everything above the plate —
+        the tab bar, the headline block, the two value cards, and the page's
+        own padding — costs roughly 30vh of a 1080 screen, and MORE when the
+        two headings wrap to a second line, which they do at this width. So
+        70vh here asked for a plate the frame could not seat: the photograph
+        ran to the bottom edge and its dots went off-screen. 58 leaves the
+        image whole with air under it.
+
+        Raise it only while watching the dots under the plate: the moment
+        they touch the bottom edge you have taken back more than there is.
+        Keep the /var(--app-zoom) divisor — a bare vh is painted 1.1x and
+        overflows by exactly that 10%. */}
+    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
 
     {/* Nothing after the plate. The imagination reading rose into the
         headline; its provenance — "the phrase is the expert's, not the
@@ -967,9 +1014,7 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
           // Anchored to the right because the mark sits at the panel's right
           // edge — it opens INWARD, away from the frame, and never clips.
           <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
-            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400 mb-2.5">
-              Speaker note
-            </p>
+            <p className="label text-slate-400 mb-2.5">Speaker note</p>
             <div className="space-y-2.5 text-[15px] lg:text-base leading-relaxed text-slate-700">
               {children}
             </div>
