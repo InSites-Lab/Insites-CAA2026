@@ -29,10 +29,15 @@ export interface SidebarProps {
 // Spacing between stations is NOT here — it is hand-tuned in the markup
 // (`pt-5`, `min-h-[35px]`, `pt-2`). Leave those alone unless you mean to.
 
+// The stage name has to win against the line under it. It lost when the role
+// was set at 15px UPPERCASE with letter-spacing: capitals of a given size read
+// wider and taller than lower case, so 15px caps stood level with a 17px name
+// and then wrapped to a second line. The role is now plain sentence case, two
+// steps down — one line each, and the name reads first.
 const SIZE = {
   heading: 'text-[15px]',  // "Assessment Process (CBSA Approach)"
-  title: 'text-[17px]',    // stage name — the main driver of button height
-  role: 'text-[15px]',     // the small line under the stage name
+  title: 'text-[18px]',    // stage name — the main driver of button height
+  role: 'text-[13px]',     // the small line under the stage name
   bubble: 'w-11 h-8',      // the round icon holder inside each button
   icon: 20,                // lucide icon size inside the bubble, in px
   cardPad: 'p-2.5',        // padding inside every button
@@ -114,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <h3 className={`font-bold ${SIZE.title} leading-tight ${selectedAgentId === agent.id ? 'text-slate-900' : 'text-slate-600'}`}>
                             {agent.name}
                           </h3>
-                          <p className={`${SIZE.role} text-slate-500 uppercase tracking-wide`}>{agent.role}</p>
+                          <p className={`${SIZE.role} text-slate-500 leading-tight mt-0.5`}>{agent.role}</p>
                         </div>
                       </div>
                     </div>
@@ -153,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <h3 className={`font-bold ${SIZE.title} leading-tight ${showResearchAids ? 'text-white' : 'text-indigo-900'}`}>
                     Extensions &amp; Tools
                   </h3>
-                  <p className={`${SIZE.role} uppercase tracking-wide ${showResearchAids ? 'text-indigo-100' : 'text-indigo-500/80'}`}>Knowledge graph, dashboard, readings</p>
+                  <p className={`${SIZE.role} leading-tight mt-0.5 ${showResearchAids ? 'text-indigo-100' : 'text-indigo-500/80'}`}>Knowledge graph, dashboard, readings</p>
                 </div>
               </div>
               <ChevronRight

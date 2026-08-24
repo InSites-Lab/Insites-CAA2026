@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal, SectionDivider } from '../common';
@@ -288,34 +288,82 @@ const PhotoStrip: React.FC<{
   );
 };
 
-// ─── The plate (tab 4) ────────────────────────────────────────────
-// One drawing, two panels, four millennia — and the two eras named inside the
-// engraving itself, so nothing is written over it and nothing under it repeats
-// it. It began as a click-to-shift crossfade between two separate plates (git
-// history at 1e1beb7); a single diptych says the same thing without asking the
-// speaker to operate anything mid-sentence.
+// ─── The plates (tab 4) ───────────────────────────────────────────
+// The set the speaker steps through, in this order: the site first, our
+// reading of it last. Advancing is MANUAL, never a timer — a plate that
+// changes behind your back mid-sentence is worse than no plate. Click the
+// image, or a dot, to advance.
+//
+// ADD OR REORDER HERE. The drawing stays last: the photographs are what
+// anyone can go and see, and the diptych is what the session made of them.
+const PLATES = [
+  {
+    src: './h40-dolmen-archive.jpg',
+    alt: 'A dolmen standing in open grassland, capstone intact, hills behind — archival photograph',
+  },
+  {
+    src: './h40-tuba-field.jpg',
+    alt: 'A dolmen and its collapsed tumulus at Tuba-Zangariyye, an Antiquities Authority marker among the stones and the village immediately behind',
+  },
+  {
+    src: './h40-tuba-aerial.jpg',
+    alt: 'The dolmen field from the air: cairns scattered across the basalt plateau, cultivated fields and a reservoir beyond',
+  },
+  {
+    src: './tab4-gpt.jpg',
+    alt: "Two drawn panels of the same dolmen field, four millennia apart — the reading no source in the file had made. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone.",
+  },
+];
+
 const PlateFigure: React.FC<{
   /** Same two knobs as PhotoStrip, so the tab tunes them the same way. */
   maxWidth?: string;
   maxHeight?: string;
-}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => (
-  // basis-0 + grow: claims no height of its own, takes only what the tab has
-  // left, so the closing panel below is never pushed out of the frame.
-  // object-contain on a ground matched to the paper — the plate has a printed
-  // border, and cropping it would throw the frame away.
-  // SWAP THE FILE HERE when the drawing is re-cut.
-  // No mount: no card, no border, no rounding, no ground of its own. The
-  // drawing already carries its own printed frame and its own paper, and a
-  // second frame around it only made the plate look smaller than it is. The
-  // box here is pure layout — it exists to hold the flex contract.
-  <div className={`grow min-h-0 basis-0 w-full mx-auto ${maxWidth} ${maxHeight}`}>
-    <img
-      src="./tab4-gpt.jpg"
-      alt="Two drawn panels of the same dolmen field, four millennia apart — the reading no source in the file had made. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone."
-      className="w-full h-full object-contain"
-    />
-  </div>
-);
+}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => {
+  const [index, setIndex] = useState(0);
+
+  return (
+    // basis-0 + grow: claims no height of its own, takes only what the tab has
+    // left. No mount — every plate carries its own ground, and a frame around
+    // them only made them look smaller than they are.
+    <div className={`grow min-h-0 basis-0 w-full mx-auto flex flex-col gap-1.5 ${maxWidth}`}>
+      <button
+        type="button"
+        onClick={() => setIndex((i) => (i + 1) % PLATES.length)}
+        aria-label={`Image ${index + 1} of ${PLATES.length}. Activate for the next one.`}
+        className={`relative grow min-h-0 w-full cursor-pointer ${maxHeight}`}
+      >
+        {PLATES.map((p, i) => (
+          <img
+            key={p.src}
+            src={p.src}
+            alt={i === index ? p.alt : ''}
+            className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[900ms] ease-in-out motion-reduce:transition-none ${
+              i === index ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        ))}
+      </button>
+
+      {/* Under the plate, never on it: on a photograph a corner overlay lands
+          on whatever that photograph happens to have in the corner. */}
+      <div className="shrink-0 flex items-center justify-center gap-2">
+        {PLATES.map((p, i) => (
+          <button
+            key={p.src}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`Show image ${i + 1}`}
+            aria-current={i === index}
+            className={`h-2 w-2 rounded-full transition-colors cursor-pointer ${
+              i === index ? 'bg-slate-600' : 'bg-slate-300 hover:bg-slate-400'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // Like tab 4, this tab never scrolls: bounded to the frame, everything
 // shrink-0 except the photo strip, which takes only what is left over.
@@ -861,42 +909,59 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
   children,
 }) => {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
     };
+    // Click anywhere outside closes it — the behaviour anyone expects from a
+    // note, and the reason this used to feel stuck open.
+    const onPointerDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    document.addEventListener('mousedown', onPointerDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mousedown', onPointerDown);
+    };
   }, [open]);
 
+  // TWO elements on purpose. The caller positions the outer one; the inner one
+  // is the anchor. Putting both on one element meant `relative` and `absolute`
+  // landed in the same class list, where Tailwind's source order decides the
+  // winner rather than the order written — so the mark sat in the flow and the
+  // note opened somewhere nobody expected.
   return (
-    <span className={`relative ${className}`}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-label="Speaker note"
-        className={`flex items-center justify-center rounded-lg p-1.5 text-slate-500 transition-opacity cursor-pointer ${
-          open ? 'opacity-100 bg-white/70' : 'opacity-30 hover:opacity-100'
-        }`}
-      >
-        <NotebookPen size={16} />
-      </button>
+    <span className={className}>
+      <span ref={ref} className="relative block">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-label="Speaker note"
+          className={`flex items-center justify-center rounded-lg p-1.5 text-slate-500 transition-opacity cursor-pointer ${
+            open ? 'opacity-100 bg-white/70' : 'opacity-30 hover:opacity-100'
+          }`}
+        >
+          <NotebookPen size={16} />
+        </button>
 
-      {open && (
-        // Anchored to the right because the mark sits at the panel's right
-        // edge — it opens INWARD, away from the frame, and never clips.
-        <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400 mb-2.5">
-            Speaker note
-          </p>
-          <div className="space-y-2.5 text-[15px] lg:text-base leading-relaxed text-slate-700">
-            {children}
+        {open && (
+          // Anchored to the right because the mark sits at the panel's right
+          // edge — it opens INWARD, away from the frame, and never clips.
+          <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400 mb-2.5">
+              Speaker note
+            </p>
+            <div className="space-y-2.5 text-[15px] lg:text-base leading-relaxed text-slate-700">
+              {children}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </span>
     </span>
   );
 };
@@ -913,10 +978,12 @@ const QaTab: React.FC<{
   onOpenDesign: () => void;
 }> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
   <div className="space-y-5">
-    {/* ── Above the fold: the closing ─────────────────────────────────
-        min-h is what holds the material off the projected screen. Lower the
-        vh number if the closing floats too high; keep the /var(--app-zoom). */}
-    <div className="min-h-[calc(66vh/var(--app-zoom))] flex flex-col justify-center gap-5">
+    {/* ── Above the fold: the closing, and only the closing ───────────
+        min-h is the knob that decides where the projected screen ENDS. At
+        80vh the title and the question fill it and everything else — the
+        repository, the material — begins below. Lower it and the repo bar
+        creeps back onto the slide. Keep the /var(--app-zoom) divisor. */}
+    <div className="min-h-[calc(80vh/var(--app-zoom))] flex flex-col justify-center gap-6 lg:gap-8">
       <div className="space-y-1.5">
         <Eyebrow>Closing</Eyebrow>
         {/* The talk's own title, and the only place it appears. The conference
@@ -939,8 +1006,8 @@ const QaTab: React.FC<{
           needs to keep them in"), which is now spoken.
           "Afford" is deliberate: tab 2 opens the talk on "how can we afford
           both", and this closes it on the same verb.
-          The speaker's script rides on `title` — invisible to the hall, one
-          hover away for whoever is presenting. */}
+          The speaker's script is one click away in the corner — see
+          SpeakerNote; invisible to the hall. */}
       <div className="relative rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 space-y-2">
         <SpeakerNote className="absolute top-2.5 right-2.5">
           <p>Let me end with the thought experiment the paper ends with.</p>
@@ -962,10 +1029,16 @@ const QaTab: React.FC<{
         </p>
         <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
       </div>
+    </div>
 
-      {/* The link the paper carries, so it has to be findable from the back of
-          the hall and photographable: bigger mark, the repo name at headline
-          weight, the path beside it. */}
+    {/* ── Below the fold ──────────────────────────────────────────────
+        The question is left alone on the projected screen. The repository is
+        the first thing a scroll reveals — it is what people want after the
+        talk, not during its last sentence. */}
+    <div>
+      {/* The link the paper carries, so it has to be findable and
+          photographable: bigger mark, the repo name at headline weight, the
+          path beside it. */}
       <a
         href={REPO_URL}
         target="_blank"
