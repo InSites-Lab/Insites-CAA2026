@@ -25,7 +25,12 @@ const QA_TAB = { id: 'qa', label: 'Closing', icon: <MessageSquare size={18} /> }
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
-const REPO_URL = 'https://github.com/InSites-Lab/Insites-CAA2026';
+// The repository the PAPER links to, published before the conference — not the
+// workshop repo this site lives in. Anyone who read the paper is looking for
+// this one, so the slide and the paper must name the same place.
+const REPO_URL = 'https://github.com/InSites-Lab/insites/tree/main/system';
+const REPO_NAME = 'InSites-Lab / insites';
+const REPO_PATH = '/system';
 
 // ─── Component ────────────────────────────────────────────────────
 
@@ -845,6 +850,18 @@ const BACKUP_MATERIAL: BackupItem[] = [
   { label: 'Glossary', note: 'CBSA terms used in the talk', route: 'glossary' },
 ];
 
+// What the speaker says over the closing panel — the answer the slide
+// deliberately does not print. It rides on the panel's `title`, so it is one
+// hover away at the lectern and invisible to the hall. Keep it speakable:
+// this is a script, not a caption.
+const SPEAKER_CLOSING = [
+  'Let me end with the thought experiment the paper ends with.',
+  'Imagine a system so capable that full automation looks fluent, complete, efficient — a perfect assessment machine. Could heritage afford it?',
+  'Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural assessment that is not human cannot count as good.',
+  'So the system that least needs the experts, most needs to keep them in.',
+  "I'll leave the question on the screen.",
+].join('\n\n');
+
 // The last slide, and the one that stays up for the whole question period.
 // It is deliberately NOT frame-fit: the closing block is given the height of
 // the projected screen, and the backup material begins BELOW THE FOLD. The
@@ -873,30 +890,46 @@ const QaTab: React.FC<{
         </p>
       </div>
 
-      {/* Both sentences are the paper's, verbatim (Conclusions). The deck
-          quotes exactly everywhere else; its own last word should not be the
-          one place it paraphrases. The heavier line — "every gain in autonomy
-          is a loss in humanity" — is spoken, not printed. */}
-      <div className="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-5 space-y-1.5">
-        <p className="text-[18px] sm:text-[21px] lg:text-[25px] font-bold text-slate-900 leading-snug">
-          The system that least needs the experts{' '}
-          <span className="text-indigo-700">most needs to keep them in.</span>
+      {/* The talk ENDS ON A QUESTION, and the answer stays in the speaker's
+          mouth. What is printed is the thought experiment the paper's own
+          conclusion opens with, plus the lens you answer it through — not the
+          conclusion itself ("the system that least needs the experts most
+          needs to keep them in"), which is now spoken.
+          "Afford" is deliberate: tab 2 opens the talk on "how can we afford
+          both", and this closes it on the same verb.
+          The speaker's script rides on `title` — invisible to the hall, one
+          hover away for whoever is presenting. */}
+      <div
+        title={SPEAKER_CLOSING}
+        className="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 space-y-2 cursor-help"
+      >
+        <p className="text-[19px] sm:text-[23px] lg:text-[28px] font-bold text-slate-900 leading-snug">
+          Imagine a perfect assessment machine —{' '}
+          <span className="text-indigo-700">could heritage afford it?</span>
         </p>
         <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
       </div>
 
+      {/* The link the paper carries, so it has to be findable from the back of
+          the hall and photographable: bigger mark, the repo name at headline
+          weight, the path beside it. */}
       <a
         href={REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-3.5 py-3 sm:px-5 sm:py-4 transition-colors"
+        className="flex items-center gap-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-3.5 sm:px-6 sm:py-4 transition-colors"
       >
-        <Github size={20} className="shrink-0" />
-        <span className="flex-1">
-          <span className="block text-sm sm:text-[15px] font-bold">InSites-Lab / Insites-CAA2026</span>
-          <span className="block text-[13px] sm:text-sm text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
+        <Github size={32} className="shrink-0" />
+        <span className="flex-1 min-w-0">
+          <span className="block text-[17px] sm:text-[20px] lg:text-[22px] font-bold leading-tight">
+            {REPO_NAME}
+            <span className="text-slate-400 font-mono text-[15px] sm:text-[17px]"> {REPO_PATH}</span>
+          </span>
+          <span className="block text-[13px] sm:text-sm text-slate-400 mt-0.5">
+            The system prompt, the specs, and the claim-level evidence behind this talk
+          </span>
         </span>
-        <ExternalLink size={15} className="text-slate-400 shrink-0" />
+        <ExternalLink size={18} className="text-slate-400 shrink-0" />
       </a>
     </div>
 
