@@ -78,25 +78,39 @@ html {
    their sizes from here. Tune them live in DevTools exactly as above:
    select <html>, edit the value, watch the tab repaint.
 
-   Responsive, so there are two blocks: the first is the PHONE size, the
-   second raises it from sm (640px) up. Change both if you want the step
-   to move together; change only the second to affect the projector.
+   Responsive, so there are THREE blocks: the phone, then sm (640px), then
+   lg (1024px) which is the projector. Each step must be larger than the
+   one before it — a value that goes DOWN at a wider breakpoint makes the
+   text shrink as the window grows, which is how "17px at sm" undid an
+   "18px on a phone" here before.
 
    --t1-quote is the character's question, --t1-answer the reply inside
    the fold-out. Keep the answer at or below the question: the card is a
    dialogue, and an answer set larger than its question reads as the
-   speaker interrupting. */
+   speaker interrupting.
+
+   The card's own proportions — avatar and padding — step with these in
+   WorkshopProgramView (the `details` block), so the cards grow as a
+   piece rather than as text inside a fixed box. */
 :root {
-    --t1-lead: 15px;    /* poster caption + the intro line above the cards */
-    --t1-quote: 15px;   /* the question on each challenge card */
-    --t1-answer: 14px;  /* the reply inside a card, and the lab paragraphs */
+    --t1-lead: 18px;    /* poster caption + the intro line above the cards */
+    --t1-quote: 18px;   /* the question on each challenge card */
+    --t1-answer: 16px;  /* the reply inside a card, and the lab paragraphs */
 }
 
 @media (min-width: 40rem) {
     :root {
-        --t1-lead: 20px;
-        --t1-quote: 17px;
-        --t1-answer: 17px;
+        --t1-lead: 21px;
+        --t1-quote: 21px;
+        --t1-answer: 19px;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --t1-lead: 23px;
+        --t1-quote: 23px;
+        --t1-answer: 21px;
     }
 }
 

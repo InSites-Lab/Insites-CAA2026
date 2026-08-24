@@ -653,17 +653,21 @@ const WhatIsInSitesTab: React.FC = () => (
         const isRight = idx % 2 === 0;
         return (
           <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
-            <summary className={`p-2.5 sm:p-4 cursor-pointer flex items-center gap-2.5 sm:gap-3 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
+            {/* The card grows as a piece: avatar, padding and chevron step
+                with the type in index.css (--t1-*), so a bigger question does
+                not end up rattling around inside a small box. */}
+            <summary className={`p-2.5 sm:p-4 lg:p-5 cursor-pointer flex items-center gap-2.5 sm:gap-3 lg:gap-4 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
               <img
                 src={ch.avatar}
                 alt=""
-                className="w-11 h-11 sm:w-16 sm:h-16 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
+                className="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-2 border-white shadow-md shrink-0 object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
-              <span className={`font-bold text-[length:var(--t1-quote)] ${c.quote} flex-1`}>"{ch.quote}"</span>
-              <ChevronDown size={16} className="text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+              <span className={`font-bold text-[length:var(--t1-quote)] leading-snug ${c.quote} flex-1`}>"{ch.quote}"</span>
+              <ChevronDown size={16} className="lg:hidden text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+              <ChevronDown size={20} className="hidden lg:block text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
-            <div className="px-2.5 sm:px-4 pb-3 sm:pb-4 pt-1">
+            <div className="px-2.5 sm:px-4 lg:px-5 pb-3 sm:pb-4 lg:pb-5 pt-1">
               <p className={`text-[length:var(--t1-answer)] ${c.text} leading-relaxed`}>{ch.response}</p>
             </div>
           </details>
@@ -672,7 +676,7 @@ const WhatIsInSitesTab: React.FC = () => (
     </div>
 
     {/* Lab intro */}
-    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 lg:p-5 space-y-2">
       <h4 className="font-bold text-[length:var(--t1-quote)] text-slate-800">InSites Knowledge Lab</h4>
       <p className="text-[length:var(--t1-answer)] text-slate-400">Technion — Israel Institute of Technology</p>
       <p className="text-[length:var(--t1-answer)] text-slate-700 leading-relaxed">

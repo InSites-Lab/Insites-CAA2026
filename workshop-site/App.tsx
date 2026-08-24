@@ -160,8 +160,16 @@ const App: React.FC = () => {
   // Default width of the process sidebar, in px. Not persisted: dragging the
   // handle changes it for the session only, every reload comes back here.
   // Drag limits are 220–700 (see `resize` below) — keep this inside them.
-  // Font/icon sizes are a separate knob: `SIZE` in components/layout/Sidebar.tsx
-  const [sidebarWidth, setSidebarWidth] = useState<number>(430);
+  //
+  // It is painted 1.1x on a desktop by --app-zoom, so 470 lands at ~517, and
+  // whatever it takes comes out of the slide beside it.
+  //
+  // This number and --sb-role in index.css are one decision, not two: the
+  // width left for text is roughly (this - 100), and a role line wraps when it
+  // no longer fits. At 470 the longest one ("Description, timeline & context
+  // analysis") fits on one line up to about 18px; above that, widen further or
+  // step the role back down.
+  const [sidebarWidth, setSidebarWidth] = useState<number>(470);
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
