@@ -92,7 +92,11 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   return (
     <div
-      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[86px] lg:pb-16 ${
+      // The phone padding clears the fixed bottom nav. The desktop one used to
+      // clear a footer that is commented out in App.tsx, so it was holding 64px
+      // of nothing — which every frame-fit tab was paying for out of its image.
+      // If that footer is ever restored, put lg:pb-16 back.
+      className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[86px] lg:pb-6 ${
         fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
       dir="ltr"
@@ -289,12 +293,11 @@ const PlateFigure: React.FC<{
   // object-contain on a ground matched to the paper — the plate has a printed
   // border, and cropping it would throw the frame away.
   // SWAP THE FILE HERE when the drawing is re-cut.
-  <div
-    // The ground is sampled from the plate's own paper (#DCD6D2), so the bars
-    // beside a contained image read as the mount the drawing is pasted on.
-    // Re-sample it if the drawing is redrawn on different stock.
-    className={`grow min-h-0 basis-0 w-full mx-auto overflow-hidden rounded-2xl border border-stone-300 bg-[#dcd6d2] ${maxWidth} ${maxHeight}`}
-  >
+  // No mount: no card, no border, no rounding, no ground of its own. The
+  // drawing already carries its own printed frame and its own paper, and a
+  // second frame around it only made the plate look smaller than it is. The
+  // box here is pure layout — it exists to hold the flex contract.
+  <div className={`grow min-h-0 basis-0 w-full mx-auto ${maxWidth} ${maxHeight}`}>
     <img
       src="./tab4-gpt.jpg"
       alt="Two drawn panels of the same dolmen field. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone."
@@ -823,7 +826,7 @@ const FromReportToInquiryTab: React.FC = () => (
         panel below is never pushed out of the frame; the plate gives up its
         height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
-    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
+    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(66vh/var(--app-zoom))]" />
 
     {/* The last thing said in the talk, so it gets a ground of its own — but
         the deck's indigo, not a black slab: under a pale engraving a black box
@@ -832,7 +835,7 @@ const FromReportToInquiryTab: React.FC = () => (
         whole talk is FOR carries the colour; the aphorism sits under it as the
         quiet last word. The repository link is a footnote to the sentence, not
         its equal, so it stays a ghost pill. */}
-    <div className="shrink-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-3.5 lg:px-7 lg:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
+    <div className="shrink-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-3 lg:px-7 lg:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
       <div className="space-y-1.5">
         <p className="text-[18px] sm:text-[21px] lg:text-[25px] font-bold text-slate-900 leading-snug">
           Even a perfect machine, optimally serving conservation —{' '}
