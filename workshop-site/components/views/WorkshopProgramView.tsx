@@ -11,11 +11,17 @@ const PROGRAM_TABS = [
   { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={18} /> },
   { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={18} /> },
   { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={18} /> },
-  { id: 'inquiry', label: 'From Report to Inquiry', short: 'Inquiry', icon: <SearchCheck size={18} /> },
+  // The bar names the topic; the slide makes the claim. This tab used to carry
+  // the paper's title, which is a thesis — it now closes the talk on tab 5,
+  // and the bar reads InSites · Tension · Notation · Landscape · Closing, an
+  // agenda you can see the shape of.
+  { id: 'inquiry', label: 'The Landscape', short: 'Landscape', icon: <SearchCheck size={18} /> },
 ] as const;
 
 
-const QA_TAB = { id: 'qa', label: 'Q&A', icon: <MessageSquare size={18} /> } as const;
+// Still where the questions happen — but the slide behind them is the closing,
+// so the audience can see the talk has an ending and not just a question period.
+const QA_TAB = { id: 'qa', label: 'Closing', icon: <MessageSquare size={18} /> } as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
@@ -300,7 +306,7 @@ const PlateFigure: React.FC<{
   <div className={`grow min-h-0 basis-0 w-full mx-auto ${maxWidth} ${maxHeight}`}>
     <img
       src="./tab4-gpt.jpg"
-      alt="Two drawn panels of the same dolmen field. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone."
+      alt="Two drawn panels of the same dolmen field, four millennia apart — the reading no source in the file had made. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone."
       className="w-full h-full object-contain"
     />
   </div>
@@ -773,86 +779,64 @@ const EpistemicNotationTab: React.FC<{
   </div>
 );
 
-// ─── 4 · From Report to Inquiry ───────────────────────────────────
+// ─── 4 · The Landscape ────────────────────────────────────────────
 
-const readingIcon = (paths: React.ReactNode) => (
-  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-    {paths}
-  </svg>
-);
-
-// Two of the five, chosen as the ones that carry the talk: the long arc and
-// the landscape of imagination. The other three are in git history at aecd58b.
-const NEW_READINGS: { icon: React.ReactNode; text: React.ReactNode }[] = [
-  {
-    icon: readingIcon(<><path d="M3 17c2.5-9 15.5-9 18 0" /><circle cx="3" cy="17" r="1.5" /><circle cx="21" cy="17" r="1.5" /></>),
-    text: 'A four-millennia pastoral arc — the dolmen builders to the Tuba-Zangariyye Bedouin',
-  },
-  {
-    icon: readingIcon(<><path d="M17.5 19a4.5 4.5 0 1 0-1.7-8.7 6 6 0 1 0-9.8 5.4" /><path d="M6 19h11.5" /></>),
-    text: 'A persistent landscape for imagination — gathered from a single footnote',
-  },
-];
-
+// One landscape, read twice. Both readings are still here — what went is the
+// pair of cards that held them, which gave two findings equal weight when only
+// one of them is in the drawing, and which stated them in OUR words.
+//
+// Reading one is now the SYSTEM's own sentence, marked and cited, in the same
+// grammar the audience learned on tab 3 and watched in the fold-out on tab 2
+// (where these two readings are Values 5 and 6, both 〰️). That is what makes
+// this the last slide of an argument rather than a list of results: what the
+// notation marked as inference is what the expert took as new insight.
+//
+// Reading two sits BELOW the plate, because what stands above an image has to
+// explain the image, and this one is not drawn. Its provenance line — the
+// phrase is the expert's, not the machine's — is the hinge into tab 5.
 const FromReportToInquiryTab: React.FC = () => (
-  // This tab never scrolls. It is bounded to the frame (`min-h-0` +
-  // `overflow-hidden`), everything except the photo is `shrink-0`, and the photo
-  // flexes — so the closing panel is always on screen and the image is what
-  // gives way when the viewport is short.
-  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 lg:gap-3.5">
-    <div className="space-y-1.5 shrink-0">
-      {/* <Eyebrow>What it yielded</Eyebrow> */}
+  // Never scrolls: bounded to the frame, everything shrink-0 except the plate,
+  // which takes only what is left over.
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-2.5 lg:gap-3">
+    <div className="space-y-1 shrink-0">
+      <Eyebrow>One landscape, read twice</Eyebrow>
+      {/* Near-verbatim from the paper ("No source joins the three. Stage 1
+          joined them."). It names the ACT, which is the thing the drawing
+          cannot draw — and "them" resolves downward onto the two panels, so
+          the headline creates the look at the plate instead of competing with
+          the lettering already printed on it. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-        From a final report To an inquiry to be examined. <span className="text-[21px] font-medium text-slate-500">
-    (Two new InSites examples)</span>
-        {/* <br /> */}
-        
+        No source joins them. The session did.
       </h3>
     </div>
 
-    {/* Side by side from lg. Stacked, these two ate a whole row of a 16:9
-        screen and the plate paid for it; a wide projector has the width to
-        spare and the plate is what the tab is now about. */}
-    <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-3">
-      {NEW_READINGS.map((r, i) => (
-        <div key={i} className="flex items-center gap-3.5 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
-          {r.icon}
-          <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-700 leading-snug">{r.text}</p>
-        </div>
-      ))}
+    {/* The line that explains the picture, and under it the claim itself. */}
+    <div className="shrink-0 space-y-1.5">
+      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-600 leading-snug">
+        Left, the dolmen builders' herds beside the cairn. Right, the Tuba-Zangariyye Bedouin who
+        graze the same field today.
+      </p>
+      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-800 leading-snug">
+        <Inf /> "pastoralist populations using the same landscape over four millennia"{' '}
+        <Cite>[C:pp.46–48]</Cite> <Cite>[C:p.50 note 4; B]</Cite>
+      </p>
     </div>
 
-    {/* The pastoral arc, shown rather than described. `fit` so the closing
-        panel below is never pushed out of the frame; the plate gives up its
-        height first. */}
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ──── */}
     <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(66vh/var(--app-zoom))]" />
 
-    {/* The last thing said in the talk, so it gets a ground of its own — but
-        the deck's indigo, not a black slab: under a pale engraving a black box
-        reads as a hole, and it was competing with the plate for weight rather
-        than closing the sequence. The claim carries the size; the clause the
-        whole talk is FOR carries the colour; the aphorism sits under it as the
-        quiet last word. The repository link is a footnote to the sentence, not
-        its equal, so it stays a ghost pill. */}
-    <div className="shrink-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-3 lg:px-7 lg:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
-      <div className="space-y-1.5">
-        <p className="text-[18px] sm:text-[21px] lg:text-[25px] font-bold text-slate-900 leading-snug">
-          Even a perfect machine, optimally serving conservation —{' '}
-          <span className="text-indigo-700">cultural assessment must remain human.</span>
-        </p>
-        <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
-      </div>
-      <a
-        href={REPO_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="shrink-0 flex items-center gap-2 rounded-xl border border-indigo-200 bg-white/70 px-3.5 py-2 text-[13px] font-bold text-indigo-700 hover:bg-white hover:border-indigo-300 transition-colors"
-      >
-        <Github size={15} />
-        <span>GitHub repository</span>
-        <ExternalLink size={12} className="text-indigo-400" />
-      </a>
+    {/* The second reading, and the hinge. Quiet by design — it is a coda, not
+        a second headline, and it must not take height from the plate. */}
+    <div className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2.5 lg:px-5 lg:py-3">
+      <p className="text-[14px] sm:text-[15px] lg:text-base text-slate-700 leading-snug">
+        The session read the field a second way — biblical, gospel, Talmudic and Bedouin references
+        to giants, outcasts and pagan spirits, scattered across a single footnote, gathered into a
+        heritage value <Inf /> "a persistent landscape for imagination."
+      </p>
+      <p className="text-[12px] sm:text-[13px] text-slate-400 mt-1 leading-snug">
+        The phrase is the expert's, not the machine's — she re-worded the system's coinage, and the
+        record kept hers.
+      </p>
     </div>
   </div>
 );
@@ -870,35 +854,69 @@ const BACKUP_MATERIAL: BackupItem[] = [
   { label: 'Glossary', note: 'CBSA terms used in the talk', route: 'glossary' },
 ];
 
+// The last slide, and the one that stays up for the whole question period.
+// It is deliberately NOT frame-fit: the closing block is given the height of
+// the projected screen, and the backup material begins BELOW THE FOLD. The
+// grid is a duplicate of the sidebar's Extensions & Tools, so on the slide it
+// would only compete with the talk's last sentence — one scroll away is the
+// right distance for it.
 const QaTab: React.FC<{
   onNavigate?: (route: string) => void;
   onOpenWorkedExample: () => void;
   onOpenDesign: () => void;
 }> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
   <div className="space-y-5">
-    <div className="space-y-1.5">
-      <Eyebrow>Questions</Eyebrow>
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">The material behind the talk.</h3>
-      <p className="text-sm sm:text-base text-slate-600">
-        <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger.
-      </p>
+    {/* ── Above the fold: the closing ─────────────────────────────────
+        min-h is what holds the material off the projected screen. Lower the
+        vh number if the closing floats too high; keep the /var(--app-zoom). */}
+    <div className="min-h-[calc(66vh/var(--app-zoom))] flex flex-col justify-center gap-5">
+      <div className="space-y-1.5">
+        <Eyebrow>Closing</Eyebrow>
+        {/* The abstract's last sentence, tightened. Over a Q&A it does double
+            duty: the talk itself is now the inquiry being examined. */}
+        <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
+          An inquiry to be examined — not a report to be accepted.
+        </h3>
+        <p className="text-sm sm:text-base text-slate-500 pt-1">
+          <em>From Report to Inquiry: Governing Generative AI Insights in Heritage Significance Assessment</em> — Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026
+        </p>
+      </div>
+
+      {/* Both sentences are the paper's, verbatim (Conclusions). The deck
+          quotes exactly everywhere else; its own last word should not be the
+          one place it paraphrases. The heavier line — "every gain in autonomy
+          is a loss in humanity" — is spoken, not printed. */}
+      <div className="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-5 space-y-1.5">
+        <p className="text-[18px] sm:text-[21px] lg:text-[25px] font-bold text-slate-900 leading-snug">
+          The system that least needs the experts{' '}
+          <span className="text-indigo-700">most needs to keep them in.</span>
+        </p>
+        <p className="text-sm lg:text-[16px] text-indigo-950/55">Who assesses is part of what is assessed.</p>
+      </div>
+
+      <a
+        href={REPO_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-3.5 py-3 sm:px-5 sm:py-4 transition-colors"
+      >
+        <Github size={20} className="shrink-0" />
+        <span className="flex-1">
+          <span className="block text-sm sm:text-[15px] font-bold">InSites-Lab / Insites-CAA2026</span>
+          <span className="block text-[13px] sm:text-sm text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
+        </span>
+        <ExternalLink size={15} className="text-slate-400 shrink-0" />
+      </a>
     </div>
 
-    <a
-      href={REPO_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-3.5 py-3 sm:px-5 sm:py-4 transition-colors"
-    >
-      <Github size={20} className="shrink-0" />
-      <span className="flex-1">
-        <span className="block text-sm sm:text-[15px] font-bold">InSites-Lab / Insites-CAA2026</span>
-        <span className="block text-[13px] sm:text-sm text-slate-400">Prompts, specs, the assessment runs and the claim-level evidence</span>
-      </span>
-      <ExternalLink size={15} className="text-slate-400 shrink-0" />
-    </a>
+    {/* ── Below the fold: the toolbox ─────────────────────────────── */}
+    <SectionDivider
+      label="During questions"
+      sublabel="The material behind the talk — every card opens live, in this deck."
+      colorClass="text-slate-800"
+    />
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
       {BACKUP_MATERIAL.map((item) => (
         <button
           key={item.label}
