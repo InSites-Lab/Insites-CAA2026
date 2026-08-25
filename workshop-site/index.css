@@ -369,6 +369,95 @@ html {
     }
 }
 
+/* ── TAB 5 — the two closings, side by side for a decision ─────────
+   The closing slide exists in two builds at once so they can be judged on a
+   projector rather than argued about. #tab-closing is C, #tab-closing-b is B.
+   WHEN ONE WINS, DELETE THE OTHER — the loser's tab button, its component,
+   its hash route, and whichever of these two knobs belonged to it.
+
+   C — THE UNDERCUT (the live closing). The pale question panel survives, but
+   the poster slides underneath its right edge and the PANEL dissolves on top
+   of the picture: its last --t5-veil pixels thin out to nothing, so the
+   Hatter's rocks and columns surface as the tint evaporates. Indigo over
+   ochre in that strip mutes the warm palette toward grey-mauve, which is why
+   the clash reads as atmosphere instead of an accident.
+
+   Tune --t5-veil against ONE test: the strip must contain a recognisable
+   painted form, not just texture. Too wide and a weak projector renders it as
+   low-contrast mush that reads as a rendering fault; too narrow and there is
+   no dissolve, only a seam. 80-140px is the useful range.
+
+   No text ever enters the strip. That is not the knob's job to protect — the
+   panel carries a hard right padding for it, in the component.
+
+   B — THE INK PLATE (the dummy tab). The question and the repository merge
+   into a single deep plate, and the picture is that plate's right-hand side:
+   full colour, filling its height, its left edge dissolving into the ink.
+
+   --t5b-plate is the ground, and it is NOT black. Near-black read as a hole
+   in the slide rather than as a colour; this is the deck's own indigo taken
+   to its darkest, so the plate is deliberately a colour that the painting's
+   warm ochre stands against. Try #0f172a for colder and greyer, #1e1b4b for
+   the current ink, #24215c for a plate that reads as blue in a bright hall.
+
+   --t5b-poster is the picture's strength. It began at 0.35 as a ghost and a
+   ghost does not close a loop with the opening slide, which is the only
+   reason the poster is here — so it now runs at full. Take it down towards
+   0.85 only if the painting starts competing with the question for the eye,
+   and judge that from the back of the room, not from a desk.
+
+   HOW MUCH OF THE PAINTING YOU SEE is three more knobs, and --t5b-scale is
+   the one that matters. The picture is sized by HEIGHT and its width follows
+   the aspect, x1.75 — so a taller picture is a WIDER one, and at 100% it is
+   wider than the space left beside the question. Its left third then lands
+   inside the text's ink and is eaten, which is why the Hatter goes missing.
+   Around 85% the whole painting fits beside the question at full strength.
+   Below about 70% it starts to read as a picture placed on a plate again,
+   which is the thing this build exists to avoid.
+
+     --t5b-scale   picture height as a share of the plate. THE knob.
+     --t5b-fade    where its left edge reaches full strength. Smaller = a
+                   shorter, harder dissolve and more painting; larger = a
+                   longer, softer one. Under about 25% it reads as a cut.
+     --t5b-scrim   how far the ink washes over it. This one protects the
+                   text, so treat it as a floor: it may move right to reveal
+                   more picture, never left past the text's own 48% edge.
+
+   Raise scale and lower fade together and you get more picture; do it far
+   enough and the question ends up sitting on paint, which is the one thing
+   that must not happen. Check the LAST line of the question, not the first —
+   it is the one that reaches furthest right.
+
+   --t5b-accent is the second line of the question, "could heritage 4.0 (or
+   10.0) afford it?". It was amber for a reason that has since expired: on a
+   near-black plate with a grey ghost, that line was the slide's only warm
+   note, and it repatriated the painting's ochre. Now the painting itself is
+   there at full colour, so the accent no longer has that job — it only has
+   to mark the punch.
+
+     #fcd34d  amber, as built — warm, loud, and the furthest from the plate
+     #fde68a  the same warmth at half the shout
+     #ffffff  no accent at all. The two lines then separate by the line break
+              and nothing else, which is the LEAST equipment for the job and
+              gives the punch line the best contrast the room can produce.
+              Try this one first.
+     #a5b4fc  the deck's indigo, lifted to read on a dark ground — ties the
+              line to the accent used on every other tab
+     #f5d8a8  sand, picked out of the painting rather than out of a palette
+
+   Whatever you pick, the muted line under it stays cooler and dimmer than
+   this one. It is the lens the question is answered through, not a third
+   voice. */
+:root {
+    --t5-veil: 110px;
+    --t5b-plate: #48484d;
+    --t5b-poster: 1;
+    --t5b-scale: 100%;
+    --t5b-fade: 60%;
+    --t5b-scrim: 50%;
+    --t5b-accent: #fcd34d;
+}
+
 /* ── TYPEFACE — the only place the site's faces are chosen ─────────
    Two knobs. `--font-body` is everything: sidebar, tabs, body copy,
    buttons. `--font-display` is the one big message sentence per tab

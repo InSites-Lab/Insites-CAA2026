@@ -238,6 +238,9 @@ const App: React.FC = () => {
     "tab-notation": () => setExcursion(null),
     "tab-landscape": () => setExcursion(null),
     "tab-closing": () => setExcursion(null),
+    // TEMPORARY — the second build of the closing, up for comparison. Delete
+    // with QA_B_TAB in WorkshopProgramView.
+    "tab-closing-b": () => setExcursion(null),
     graph: () => setIsGraphInputModalOpen(true),
     // constants.tsx:385 and the README both point at #graph-create.
     "graph-create": () => setIsGraphInputModalOpen(true),
