@@ -67,8 +67,8 @@ html {
      hall      heading 16  title 20  role 14  legend 13   (biggest that
                still keeps every role line unwrapped at a 430px sidebar) */
 :root {
-    --sb-heading: 15px;  /* "Assessment Process (CBSA Approach)" */
-    --sb-title: 22px;    /* stage name — the main driver of button height */
+    --sb-heading: 20px;  /* "Assessment Process (CBSA Approach)" */
+    --sb-title: 20px;    /* stage name — the main driver of button height */
     --sb-role: 20px;     /* the line under the stage name */
     --sb-legend: 13px;   /* the ○ / ● key at the bottom */
 }

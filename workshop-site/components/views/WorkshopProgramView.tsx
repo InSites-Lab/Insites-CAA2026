@@ -498,7 +498,7 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         Give it freedom — it hallucinates.
         <br />
-        Lock it down — it loses the synthesis we came for.
+        Lock it down — it loses the AI power to synthesize
       </h3>
       {/* Picks up tab 1's "meaning emerges from context" and turns the two
           risks into one mechanism — which is why suppression cannot be the

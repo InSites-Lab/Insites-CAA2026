@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="h-full px-2 pt-0 pb-2 text-left flex flex-col">
           <h3 className={`${SIZE.heading} font-black uppercase tracking-widest text-slate-400 text-center pt-5 pb-5`}>
-            Assessment Process (CBSA Approach)
+              InSites CBSA Framework 
           </h3>
 
           {/* Stations on the spine */}
