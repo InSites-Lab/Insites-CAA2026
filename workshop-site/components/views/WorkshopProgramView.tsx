@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
-import { Modal, SectionDivider } from '../common';
+import { SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
-import { DesignPrinciplesView } from './DesignPrinciplesView';
 
 // ─── Tab Definitions ──────────────────────────────────────────────
 
@@ -11,10 +10,9 @@ const PROGRAM_TABS = [
   { id: 'insites', label: 'What is InSites', short: 'InSites', icon: <Layers size={18} /> },
   { id: 'tension', label: 'The Dual Tension', short: 'Tension', icon: <Scale size={18} /> },
   { id: 'notation', label: 'Epistemic Notation', short: 'Notation', icon: <Activity size={18} /> },
-  // The bar names the topic; the slide makes the claim. This tab used to carry
-  // the paper's title, which is a thesis — it now closes the talk on tab 5,
-  // and the bar reads InSites · Tension · Notation · Landscape · Closing, an
-  // agenda you can see the shape of.
+  // The bar names topics, never claims — a claim belongs to the slide. So the
+  // row reads InSites · Tension · Notation · Landscape · Closing: an agenda you
+  // can see the shape of.
   { id: 'inquiry', label: 'The Landscape', short: 'Landscape', icon: <SearchCheck size={18} /> },
 ] as const;
 
@@ -23,28 +21,11 @@ const PROGRAM_TABS = [
 // so the audience can see the talk has an ending and not just a question period.
 const QA_TAB = { id: 'qa', label: 'Closing', icon: <MessageSquare size={18} /> } as const;
 
-// The second build of the closing — the dark one. It was a sixth button in the
-// bar while the two were being compared on a projector; the light `Closing`
-// won, so it is now OFF.
-//
-// OFF means gone from the room, not gone from the repo: no button, and no way
-// to arrive on it — #tab-closing-b stops resolving, so a stale link or a back
-// button cannot drop the dark closing onto the screen mid-talk. The component,
-// its branch in the switch, and its --t5b-* knobs in index.css all stay exactly
-// where they are.
-//
-// Flip this to true and the comparison is back, whole, in one keystroke. That
-// is the point of leaving it: the decision can be revisited on a different
-// projector without rebuilding anything.
-const SHOW_CLOSING_B = false;
-
-const QA_B_TAB = { id: 'qa-b', label: 'Closing B', icon: <MessageSquare size={18} /> } as const;
-
-type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'qa-b' | 'excursion';
+type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'excursion';
 
 // ─── The sidebar's mode, per tab — set it here ─────────────────────
 // The process column beside the deck has two builds: `full` (500px, 20px
-// type, a role line under every stage) and `compact` (360px, 16px, stage
+// type, a role line under every stage) and `compact` (300px, 16px, stage
 // names only). Tab 1 is the tab that TALKS about the framework, so there it
 // is the subject and gets the full build. Everywhere else it is context, not
 // subject: it stays visible so the room can see where in the process we are,
@@ -60,7 +41,6 @@ const SIDEBAR_MODE: Record<string, SidebarMode> = {
   notation: 'compact',
   inquiry: 'compact',
   qa: 'compact',
-  'qa-b': 'compact',   // dies with QA_B_TAB
 };
 
 // ─── Tabs in the URL ──────────────────────────────────────────────
@@ -84,9 +64,6 @@ const TAB_HASH: Record<string, TabId> = {
   'tab-notation': 'notation',
   'tab-landscape': 'inquiry',
   'tab-closing': 'qa',
-  // Only while the dark closing is switched on. Left out otherwise, so the
-  // hash simply does not resolve and the deck stays on the slide it is on.
-  ...(SHOW_CLOSING_B ? { 'tab-closing-b': 'qa-b' as TabId } : {}),
 };
 
 const HASH_FOR_TAB = Object.fromEntries(
@@ -143,8 +120,6 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   // Tab 2's fold-out. The state lives here, not in the tab, so it survives
   // switching away and back — the speaker returns to the card as they left it.
   const [isTensionExampleOpen, setIsTensionExampleOpen] = useState(false);
-  const [isWorkedExampleOpen, setIsWorkedExampleOpen] = useState(false);
-  const [isDesignOpen, setIsDesignOpen] = useState(false);
   // The talk tab to come back to when the chip is dismissed — the speaker
   // returns to where they were, not to tab 1.
   const [lastDeckTab, setLastDeckTab] = useState<TabId>(() => tabFromHash() ?? PROGRAM_TABS[0].id);
@@ -246,10 +221,9 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
 
   return (
     <div
-      // The phone padding clears the fixed bottom nav. The desktop one used to
-      // clear a footer that is commented out in App.tsx, so it was holding 64px
-      // of nothing — which every frame-fit tab was paying for out of its image.
-      // If that footer is ever restored, put lg:pb-16 back.
+      // The phone padding clears the fixed bottom nav; the desktop one is small
+      // because there is no footer to clear. Every frame-fit tab pays for this
+      // out of its image, so if a footer is ever added, raise it deliberately.
       className={`flex-1 flex flex-col h-full bg-white custom-scrollbar pb-[86px] lg:pb-6 ${
         fitsFrame ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
@@ -293,23 +267,6 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
             {QA_TAB.icon}
             <span>{QA_TAB.label}</span>
           </button>
-
-          {/* The dark closing, off since the light one won — see SHOW_CLOSING_B.
-              Amber while it is showing, so there is never a moment where you
-              cannot tell which of the two you are looking at. */}
-          {SHOW_CLOSING_B && (
-            <button
-              onClick={() => selectDeckTab(QA_B_TAB.id)}
-              className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${
-                activeTab === QA_B_TAB.id
-                  ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                  : 'text-amber-600/70 hover:text-amber-700 hover:bg-white/60'
-              } flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer`}
-            >
-              {QA_B_TAB.icon}
-              <span>{QA_B_TAB.label}</span>
-            </button>
-          )}
         </div>
 
         {/* Tab Content */}
@@ -324,58 +281,13 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
           {activeTab === 'notation' && <EpistemicNotationTab onNavigate={onNavigate} />}
           {activeTab === 'inquiry' && <FromReportToInquiryTab />}
           {activeTab === 'excursion' && excursionContent}
-          {activeTab === 'qa' && (
-            <QaTab
-              onNavigate={onNavigate}
-              onOpenWorkedExample={() => setIsWorkedExampleOpen(true)}
-              onOpenDesign={() => setIsDesignOpen(true)}
-            />
-          )}
-          {/* Stays wired even while SHOW_CLOSING_B is false — with no button and
-              no hash to reach it, activeTab never becomes 'qa-b', so this branch
-              simply waits. It is what makes turning the comparison back on a
-              one-line change. */}
-          {activeTab === 'qa-b' && (
-            <QaTabDark
-              onNavigate={onNavigate}
-              onOpenWorkedExample={() => setIsWorkedExampleOpen(true)}
-              onOpenDesign={() => setIsDesignOpen(true)}
-            />
-          )}
+          {activeTab === 'qa' && <QaTab />}
         </SwitchTransition>
       </div>
 
-      <Modal
-        isOpen={isWorkedExampleOpen}
-        onClose={() => setIsWorkedExampleOpen(false)}
-        title="Worked example — Tuba-Zangariyye, claim by claim"
-        fullscreen
-      >
-        {/* The Q&A copy of the example. Tab 2 shows the same component in a
-            fold-out card; this one is only the backup route from Q&A. */}
-        <div className="px-5 py-6">
-          <WorkedExample />
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={isDesignOpen}
-        onClose={() => setIsDesignOpen(false)}
-        title="Design principles"
-        maxWidth="max-w-4xl"
-      >
-        <DesignPrinciplesView onNavigate={onNavigate} />
-      </Modal>
     </div>
   );
 };
-
-// ─── Shared bits ──────────────────────────────────────────────────
-
-// One device, defined once in index.css as `.label` — see the block there.
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="label text-slate-400">{children}</p>
-);
 
 // ─── 1 · The Dual Tension ─────────────────────────────────────────
 
@@ -411,12 +323,11 @@ const SITE_PHOTOS = [
 /**
  * Panels crossfading quietly through a photo set.
  *
- * With two panels the strip turns PAGES: the pair advances by two, so the
- * images that stand together are the ones the array pairs up. It used to slide
- * by one, which meant every picture appeared twice — once on the right, then
- * again on the left — and no pair could be composed, because each state shared
- * a photograph with the one before it. Pairing is the whole argument of the
- * tab-2 sequence (see SITE_PHOTOS), so paging is what it needs.
+ * With two panels the strip turns PAGES: it advances by two, so the images
+ * that stand together are the ones the array pairs up. Sliding by one instead
+ * makes consecutive states share a photograph, and then no pair can be composed
+ * at all — pairing is the whole argument of the tab-2 sequence (see
+ * SITE_PHOTOS), so paging is what it needs.
  *
  * Below sm the second panel is hidden, so there the step drops back to one and
  * every photograph is seen in turn — otherwise a phone would show only the
@@ -666,10 +577,10 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
 }) => (
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
     <div className="space-y-1.5 shrink-0">
-      {/* The eyebrow rides the first line instead of standing above it — the
-          same move as tab 4, and it buys the strip below a line of height.
-          Here it reads as a lead-in rather than a label, so it keeps the colon
-          and comes FIRST: "The challenge: Give it freedom — it hallucinates."
+      {/* The lead-in rides the first line rather than standing above it, which
+          buys the strip below a line of height. It comes FIRST here, unlike
+          tab 4's, because it reads as a lead-in and not as an attribution:
+          "The challenge: Give it freedom — it hallucinates."
           "hallucinates", not "fabricates" — the paper's own abstract wording. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         <span className="label text-slate-400 align-middle me-2.5 whitespace-nowrap">The challenge</span>
@@ -711,11 +622,10 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
 );
 
 // ─── The worked example — the answer, claim by claim ───────────────
-// It used to be tab 3's button, opening public/notation.html in a fullscreen
-// modal. Here it is the body of tab 2's fold-out: same content as JSX, so it
-// takes the deck's own type and colours instead of the iframe's, and the
-// speaker never leaves the slide. (The HTML file stays — it is the printable
-// standalone copy.)
+// The body of tab 2's fold-out, as JSX rather than an iframe: it takes the
+// deck's own type and colours, and the speaker never leaves the slide.
+// public/notation.html is the same content as a printable standalone copy —
+// keep the two in step when either changes.
 
 // The marks are the subject of the talk, so they are set LARGER than the words
 // around them, not smaller — one size for every mark on the deck, --mark-size
@@ -1126,9 +1036,9 @@ const EpistemicNotationTab: React.FC<{
   // frame and sitting under it.
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-3.5">
     <div className="space-y-1.5 shrink-0">
-      {/* No eyebrow. "The core mechanism" was a label for a headline that
-          already announces itself, and this is the tab with least room to
-          spare — the line it took is now the payoff's. */}
+      {/* No lead-in over this headline: it announces itself, and this is the
+          tab with least room to spare — every line here comes off the
+          payoff at the bottom. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[41px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
@@ -1137,9 +1047,8 @@ const EpistemicNotationTab: React.FC<{
 
     {/* ── Act one: the instruction ──────────────────────────────────
         The audience sees the rule before it sees any number measured with
-        it. The three tier cards that used to stand here were a paraphrase of
-        the same three rows, in a second visual grammar — cut, so the quote is
-        the only authority on the slide. */}
+        it, and the quoted key is the only authority on the slide — resist
+        restating those three rows beside themselves in a second grammar. */}
     <div className="shrink-0">
       <SectionDivider label="The instruction — from the bot's system prompt" />
     </div>
@@ -1172,9 +1081,6 @@ const EpistemicNotationTab: React.FC<{
       <NotationRule />
     </div>
 
-    {/* The line that used to sit here — "the first tier's mark IS the citation"
-        — is now spoken, not printed. The merged first row says it. */}
-
     {/* ── Act two: the test ─────────────────────────────────────────── */}
     <div className="shrink-0">
       {/* The title carries the SCOPE — one site, one expert, and the two
@@ -1199,9 +1105,6 @@ const EpistemicNotationTab: React.FC<{
           short on purpose — see the sublabel note in index.css: past about
           105 characters it wraps at the projector, and it wraps EARLIER on a
           1600-wide screen, so 70 is the safe neighbourhood. */}
-      {/* This used to be an empty <p> with 10px of padding — 20px of nothing,
-          which is exactly what the enlarged type needed back. The air above the
-          Test divider now comes from the column's own gap. */}
       <SectionDivider
         label="The Test:One site, one expert — hand vs. InSites assisted"
         sublabel="On the assisted route, the expert reviewed and approved every stage."
@@ -1275,17 +1178,6 @@ const EpistemicNotationTab: React.FC<{
       </p>
     </div>
 
-    {/* The worked example used to sit here as a second button opening a
-        fullscreen modal. It is now the fold-out card at the foot of tab 2,
-        where the question it answers is asked. */}
-    {/* <div className="shrink-0 flex flex-wrap gap-3">
-      <button
-        onClick={() => onNavigate?.('notation')}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-[10px] px-[22px] py-2.5 text-[15px] font-bold shadow-lg shadow-indigo-600/25 transition-colors cursor-pointer"
-      >
-        The notation in depth
-      </button>
-    </div> */}
   </div>
 );
 
@@ -1306,12 +1198,11 @@ const FromReportToInquiryTab: React.FC = () => (
   // which takes only what is left over.
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-2.5 lg:gap-3">
     <div className="space-y-1 shrink-0">
-      {/* The eyebrow rides the headline instead of standing on its own line.
-          It is a four-word attribution, not a section name, and a line of its
-          own gave it the weight of one — while costing the plate below the
-          height that line took. Same `.label` device as every other eyebrow on
-          the deck, just set inline; whitespace-nowrap so it breaks away from
-          the title as a unit rather than mid-phrase. */}
+      {/* "The LLM insight" trails the headline rather than standing over it:
+          it is a four-word attribution, not a section name, and a line of its
+          own would give it the weight of one — and cost the plate below that
+          line. The `.label` device set inline; whitespace-nowrap so it breaks
+          away from the title as a unit rather than mid-phrase. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         A Landscape of Imagination.
         <span className="label text-slate-400 align-middle ms-2.5 whitespace-nowrap">The LLM insight</span>
@@ -1355,14 +1246,11 @@ const FromReportToInquiryTab: React.FC = () => (
         70vh here asked for a plate the frame could not seat: the photograph
         ran to the bottom edge and its dots went off-screen.
 
-        It is now 62, up from 58: folding the eyebrow into the headline gave
-        the block back a line, and this is where that line went — the plate
-        is the slide's whole payload, so spare height belongs to it.
-
-        Raise it only while watching the dots under the plate: the moment
-        they touch the bottom edge you have taken back more than there is.
-        Keep the /var(--app-zoom) divisor — a bare vh is painted 1.1x and
-        overflows by exactly that 10%. */}
+        The plate is this slide's whole payload, so spare height belongs to
+        it — but raise this only while watching the dots underneath: the
+        moment they touch the bottom edge you have taken more than there is.
+        Keep the /var(--app-zoom) divisor; it is a no-op while the zoom is 1
+        and the difference between fitting and overflowing when it is not. */}
     <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(62vh/var(--app-zoom))]" />
 
     {/* Nothing after the plate. The imagination reading rose into the
@@ -1392,7 +1280,7 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
       if (e.key === 'Escape') setOpen(false);
     };
     // Click anywhere outside closes it — the behaviour anyone expects from a
-    // note, and the reason this used to feel stuck open.
+    // note, and what keeps it from feeling stuck open at a lectern.
     const onPointerDown = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
@@ -1445,29 +1333,16 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
 // grid is a duplicate of the sidebar's Extensions & Tools, so on the slide it
 // would only compete with the talk's last sentence — one scroll away is the
 // right distance for it.
-const QaTab: React.FC<{
-  onNavigate?: (route: string) => void;
-  onOpenWorkedExample: () => void;
-  onOpenDesign: () => void;
-}> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
+const QaTab: React.FC = () => (
   <div className="space-y-5">
     {/* ── The closing ─────────────────────────────────────────────────
         THREE BANDS, not six stacked blocks.
 
-          1  a full-width header — eyebrow and title
+          1  a full-width header — the title alone
           2  a row: the question on the left, the poster on the right
           3  the credit line and the repository, full width, tight underneath
 
-        The old arrangement put all six in one column, which cost it three
-        things. The poster was centred while everything else was flush left,
-        so its edges lined up with nothing. It was height-capped to keep the
-        repository on the first screen, which left it a small picture floating
-        in a wide empty row. And the question panel and the repository bar
-        were both full-width rectangles, so the slide read as equal slabs and
-        the question — which has to dominate, it is what the room looks at for
-        the whole question period — did not.
-
-        Now every element shares an edge with another: the header, the row and
+        EVERY element shares an edge with another: the header, the row and
         the repository all start at the column's left edge; the poster's right
         edge and the repository's right edge are the column's right edge; and
         the poster sets the row's height, so the question panel and the
@@ -1480,9 +1355,9 @@ const QaTab: React.FC<{
         thing that line cannot do. */}
     <div className="space-y-4 lg:space-y-5">
       <div className="space-y-1.5">
-        {/* No eyebrow. The tab is called Closing and it is the last one lit in
-            the bar — labelling the slide "Closing" as well told the room what
-            it could already see, above the one line it should be reading. */}
+        {/* No label over the title: the tab is called Closing and it is the
+            last one lit in the bar, so the slide saying it too would only
+            tell the room what it can already see. */}
         {/* The talk's own title, and the only place it appears. The conference
             says Heritage 4.0; this names what 4.0 means for one practice
             inside it, and final/open + report/inquiry is a double antithesis.
@@ -1499,12 +1374,10 @@ const QaTab: React.FC<{
         </h3>
       </div>
 
-      {/* Bands 2 and 3, still ONE unit — the picture, the names and the address
-          are what you look at and what you photograph, and they belong to each
-          other. But 8px was not "one unit", it was stacked: four full-width
-          strips touching, with no air to tell the room where one ends. 12px on
-          a laptop and 20px at the projector keeps them a group and lets them
-          breathe. */}
+      {/* Bands 2 and 3 are ONE unit — the picture, the names and the address
+          are what you look at and what you photograph. But four full-width
+          strips need air between them or they read as stacked rather than
+          grouped, and below about 12px there is none. */}
       <div className="space-y-3 lg:space-y-5">
         {/* THE ROW — variant C, the undercut. Two boxes side by side read as a
             picture pasted next to a panel, however well aligned. So they now
@@ -1554,9 +1427,8 @@ const QaTab: React.FC<{
               <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
             </p>
             {/* Subordinate on purpose, and by a clear step — this is the lens
-                the question is answered through, not a second headline. At 26px
-                it was standing level with the question and the slide had two
-                voices. */}
+                the question is answered through, not a second headline. Set it
+                level with the question and the slide has two voices. */}
             <p className="text-[17px] sm:text-[19px] lg:text-[23px] text-indigo-950/55">
               Who assesses is part of what is assessed.
             </p>
@@ -1604,18 +1476,15 @@ const QaTab: React.FC<{
           </span>
           <ExternalLink size={20} className="text-slate-400 shrink-0" />
         </a>
- {/* Two addresses, and nothing else. It was a full credit line — names,
-            conference, city, year — and every word of that is already known to
-            the room: the names are in the header, the conference is the room
-            they are sitting in. What a closing slide is photographed FOR is the
-            way to reach someone afterwards, so the line was cut down to exactly
-            that, and the addresses are what got bigger when the rest went.
+        {/* Two addresses, and nothing else: names, conference and year are all
+            already known to the room, and what a closing slide is photographed
+            FOR is the way to reach someone afterwards.
 
-            It sits HERE, under the row and immediately above the repository,
-            rather than under the title where a credit conventionally goes. The
-            headline is a claim and a question, and a credit directly beneath it
-            interrupted the talk's last sentence; and this is the other line
-            people photograph, so it belongs beside the address they type. */}
+            It sits under the row and above the repository, not under the title
+            where a credit conventionally goes — a credit directly beneath the
+            headline interrupts the talk's last sentence, and this is the other
+            line people photograph, so it belongs beside the address they
+            type. */}
         <p className="text-lg sm:text-xl lg:text-[23px] tracking-wide text-slate-500 mt-1">
           <a
             href="mailto:yaelalef@technion.ac.il"
@@ -1631,11 +1500,10 @@ const QaTab: React.FC<{
             yuval.shafriri@gmail.com
           </a>
         </p>
-        {/* The lab, last and quietest — it came up from tab 1, where it was
-            explaining who we are on a slide about what the tool is. Here it
-            has the right neighbours: the names above it and the repository
-            beside it are the same question ("who made this, and where does
-            it live"), and this answers the half the other two cannot. */}
+        {/* The lab, last and quietest. Its neighbours are the reason it is
+            here rather than on tab 1: the addresses above it and the
+            repository beside it answer "who made this, and where does it
+            live" — this answers the half neither of them can. */}
         <p className="text-base sm:text-lg lg:text-[21px] text-slate-500 leading-relaxed">
           <span className="font-bold text-slate-600">InSites Knowledge Lab</span> · Technion — at the
           intersection of <strong className="font-semibold text-slate-600">assessment methods</strong>,{' '}
@@ -1648,163 +1516,9 @@ const QaTab: React.FC<{
   </div>
 );
 
-// There is nothing below the closing any more. A "During questions" toolbox of
-// six buttons used to live here — the notation, the worked example, the design
-// principles, the graph, the dashboard, the glossary — one scroll under the
-// fold. It was removed on 2026-08-26: every one of those is still reachable
-// while the closing is up (the tab bar, the deck's own hashes, the fold-out on
-// tab 2), so the grid was a second door to rooms that already had one, sitting
-// under the slide that has to be the last thing on the screen.
-//
-// If the toolbox is ever wanted back, it was: a `h-16 lg:h-28` spacer to make
-// the fold, a SectionDivider labelled "During questions", and a 3-column grid
-// over a BACKUP_MATERIAL array of {label, note, route|action}.
-
-// ─── 5b · The closing, dark ───────────────────────────────────────
-// A SECOND BUILD OF THE SAME SLIDE, to be judged against the live one on a
-// projector and then deleted. #tab-closing-b. Everything that makes it a
-// variant is here; the header band and everything below the fold are the
-// same objects as in QaTab.
-//
-// The bet: the question and the repository stop being two strips and become
-// ONE deep plate, and the poster stops being a picture placed ON the slide and
-// becomes the plate's own right-hand side, dissolving leftward into the ink.
-//
-// Three things follow, and they are the argument for it. Light type on a deep
-// ground is the best contrast a hall can produce, so the question is at its
-// most legible here. The plate reads as a closing chord, where three
-// light-dark-light strips read as a page. And the second line goes AMBER, not
-// indigo: it keeps its job of marking the punch, and it repatriates the
-// painting's ochre as the slide's one warm accent — which settles the palette
-// clash by deciding it instead of hiding it.
-//
-// TWO CORRECTIONS TO THE FIRST BUILD, both from seeing it on screen. The plate
-// was near-black and read as a hole rather than as a colour — it is now a deep
-// indigo ink, --t5b-plate. And the picture was a grayscale ghost at a third
-// opacity, which is not enough: it is on this slide to close a loop with the
-// opening one, and a hint does not close a loop. It now runs at full colour
-// and full height.
-const QaTabDark: React.FC<{
-  onNavigate?: (route: string) => void;
-  onOpenWorkedExample: () => void;
-  onOpenDesign: () => void;
-}> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
-  <div className="space-y-5">
-    <div className="space-y-1.5">
-      <Eyebrow>Closing</Eyebrow>
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-        Significance Assessment 4.0 —
-        <br />
-        <span className="text-[0.8em]">from a final report to an open inquiry</span>
-      </h3>
-      <p className="text-sm sm:text-base lg:text-[17px] text-slate-500 pt-1">
-        Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026 ·{' '}
-        <a
-          href="mailto:yaelalef@technion.ac.il"
-          className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
-        >
-          yaelalef@technion.ac.il
-        </a>
-      </p>
-    </div>
-
-    {/* THE PLATE. overflow-hidden is what lets the picture bleed off the top,
-        right and bottom edges instead of sitting inside a frame — it is the
-        plate's own right-hand side, not a photograph placed on it.
-
-        NOT BLACK. The first build used near-black and the plate read as a hole
-        rather than as a colour; --t5b-plate is a deep indigo ink, which is the
-        deck's own accent taken to its darkest, and which stands against the
-        painting's warm ochre as a complementary rather than as an absence. */}
-    <div className="relative overflow-hidden rounded-2xl bg-[var(--t5b-plate)] lg:min-h-[420px] flex flex-col justify-between">
-      {/* THE PICTURE, at full strength — no grayscale, no screen blend, no
-          third-opacity ghost. The first build hinted at it, and a hint does not
-          close the loop with the opening slide, which is the only reason the
-          poster is on this slide at all.
-
-          Height-driven: --t5b-scale is its height as a share of the plate, and
-          the width follows the aspect (x1.75). That single number decides HOW
-          MUCH OF THE PAINTING YOU SEE, and it is not obvious which way. At
-          100% the picture is taller than it needs to be, therefore wider than
-          the clear zone, so its left third falls inside the text's ink and is
-          eaten — the Hatter goes missing. Take it down towards 85% and the
-          whole painting fits beside the question at full strength.
-
-          Its left edge dissolves through a mask rather than ending: nothing at
-          all for the first 10%, full strength by --t5b-fade. What shows through
-          is the ink, so the picture fades into the plate instead of stopping at
-          a line. */}
-      <img
-        src="./poster-light.jpg"
-        alt=""
-        aria-hidden="true"
-        className="hidden lg:block pointer-events-none select-none absolute right-0 top-1/2 -translate-y-1/2 h-[var(--t5b-scale)] w-auto max-w-none opacity-[var(--t5b-poster)] [mask-image:linear-gradient(to_right,transparent_0%,transparent_10%,black_var(--t5b-fade))] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,transparent_10%,black_var(--t5b-fade))]"
-      />
-      {/* The scrim, over the picture and under the text: the plate's own ink at
-          full opacity across the left 45%, gone by 78%. The mask above already
-          clears that zone; this is the second guarantee, and it is the one rule
-          a painting this busy cannot be trusted with — the text zone must be
-          SOLID, never translucent. */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--t5b-plate)_0%,var(--t5b-plate)_45%,transparent_var(--t5b-scrim))]"
-        aria-hidden="true"
-      />
-
-      {/* The text's safe zone. The scrim is solid to 45% of the plate and the
-          picture's mask keeps it invisible past that for a while yet, so 48%
-          is comfortably inside solid ink. Widen this and the question starts
-          to sit on paint, which is the one thing that must not happen.
-          Full width below lg, where the picture is not drawn at all. */}
-      <div className="relative px-6 py-7 lg:px-10 lg:py-10 lg:max-w-[48%]">
-        <SpeakerNote className="absolute top-3 right-3">
-          <p>Let me end with the thought experiment the paper ends with.</p>
-          <p>
-            Imagine a system so capable that full automation looks fluent, complete, efficient — a
-            perfect assessment machine. Could heritage 4.0 — or 10.0 — afford it?
-          </p>
-          <p>
-            Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
-            assessment that is not human cannot count as good.
-          </p>
-          <p>So the system that least needs the experts, most needs to keep them in.</p>
-          <p>I'll leave the question on the screen.</p>
-        </SpeakerNote>
-
-        <p className="text-[22px] sm:text-[26px] lg:text-[34px] font-bold text-white leading-snug">
-          Imagine a perfect assessment machine —{' '}<br />
-          {/* The punch line's colour — --t5b-accent, tunable live. Set it to
-              white and the two lines are separated by nothing but the line
-              break, which is a real option and not a failure: see the note at
-              the knob. */}
-          <span className="text-[var(--t5b-accent)]">could heritage 4.0 (or 10.0) afford it?</span>
-        </p>
-        <p className="text-[15px] sm:text-[17px] lg:text-[21px] text-indigo-200/70 mt-3">
-          Who assesses is part of what is assessed.
-        </p>
-      </div>
-
-      {/* The repository, now a citizen of the plate rather than a third strip.
-          A hairline instead of an edge — there is no second object here. */}
-      <a
-        href={REPO_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative flex items-center gap-4 border-t border-white/10 text-white px-6 py-4 lg:px-10 lg:py-5 hover:bg-white/5 transition-colors"
-      >
-        <Github size={44} className="shrink-0" />
-        <span className="flex-1 min-w-0">
-          <span className="block font-mono text-[17px] sm:text-[21px] lg:text-[25px] font-bold leading-tight">
-            {REPO_LABEL}
-          </span>
-          <span className="block text-[13px] sm:text-[15px] lg:text-[17px] text-slate-400 mt-1">
-            The <span className="font-mono text-slate-300">/system</span> folder — the workflow, the
-            specs, and the claim-level evidence behind this talk
-          </span>
-        </span>
-        <ExternalLink size={20} className="text-slate-400 shrink-0" />
-      </a>
-    </div>
-  </div>
-);
+// Nothing follows the closing, deliberately: everything a question might call
+// for is reachable while it is up — the tab bar, the deck's own hashes, the
+// fold-out on tab 2 — so a second door under the last slide would only compete
+// with it.
 
 export default WorkshopProgramView;

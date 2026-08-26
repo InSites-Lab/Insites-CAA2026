@@ -51,12 +51,12 @@ const SIZE = {
 // NOT here: the Cpu box, whose colour comes from localStorage
 // ('siteBrandColor', default #4F46E5) through the --brand variable below.
 
-// ONE colour for every word in the bar. It used to run 200 / 300 / 300 / 200
-// across title, subtitle, authors and lab — a hierarchy that exists in the
-// source and not in the room: two steps on the slate ramp, on a near-black bar,
-// at 20px, from the back of a hall, is a smudge rather than a distinction. What
-// separates these four is already weight, size and a rule between them, all of
-// which survive a projector. Change this one value and the whole bar moves.
+// ONE colour for every word in the bar — title, subtitle, authors and lab.
+// Splitting them across the slate ramp writes a hierarchy that exists in the
+// source and not in the room: two steps, on a near-black bar, at 20px, from the
+// back of a hall, is a smudge rather than a distinction. What separates these
+// four is already weight, size and a rule between them, all of which survive a
+// projector. Change this one value and the whole bar moves.
 const TEXT = 'text-slate-200';
 
 const COLOR = {

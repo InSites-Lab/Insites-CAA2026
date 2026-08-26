@@ -43,11 +43,13 @@ type AgentColor =
   | "purple"
   | "rose";
 
-// `hoverCard` is what the ROOM sees. The sidebar is pointed at from a lectern
-// during the talk, and the only hover a stage card used to carry was
-// `hover:shadow-md` — a shadow, which a projector does not reproduce at all.
-// Each stage already owns a colour, in its icon; hovering now spreads that
-// colour to the whole card, which is legible from the back of a hall.
+// Three states per stage, and `hoverCard` is the one the ROOM sees: the
+// sidebar is pointed at from a lectern, and a shadow is not something a
+// projector reproduces. Each stage already owns a colour, in its icon;
+// hovering spreads that colour to the whole card.
+//
+// Consumed by getAgentTheme below, and through it by the sidebar and by
+// StepsList — so a change here reaches both.
 const AGENT_STYLE: Record<
   AgentColor,
   {
@@ -55,9 +57,6 @@ const AGENT_STYLE: Record<
     selectedIcon: string;
     unselectedIcon: string;
     hoverCard: string;
-    chip: string;
-    mobileSelected: string;
-    mobileBadgeSelected: string;
   }
 > = {
   slate: {
@@ -66,10 +65,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-slate-900 text-white shadow-slate-200",
     unselectedIcon: "bg-slate-50 text-slate-700 border-slate-200",
     hoverCard: "hover:bg-slate-100 hover:border-slate-400",
-    chip: "bg-slate-100 text-slate-700",
-    mobileSelected:
-      "bg-slate-50 border-slate-300 ring-1 ring-slate-200 text-slate-800",
-    mobileBadgeSelected: "bg-slate-900 text-white",
   },
   blue: {
     selectedCard:
@@ -77,10 +72,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-blue-600 text-white shadow-blue-200",
     unselectedIcon: "bg-blue-50 text-blue-700 border-blue-100",
     hoverCard: "hover:bg-blue-50 hover:border-blue-400",
-    chip: "bg-blue-100 text-blue-700",
-    mobileSelected:
-      "bg-blue-50 border-blue-200 ring-1 ring-blue-200 text-blue-800",
-    mobileBadgeSelected: "bg-blue-600 text-white",
   },
   amber: {
     selectedCard:
@@ -88,10 +79,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-amber-600 text-white shadow-amber-200",
     unselectedIcon: "bg-amber-50 text-amber-700 border-amber-100",
     hoverCard: "hover:bg-amber-50 hover:border-amber-400",
-    chip: "bg-amber-100 text-amber-800",
-    mobileSelected:
-      "bg-amber-50 border-amber-200 ring-1 ring-amber-200 text-amber-900",
-    mobileBadgeSelected: "bg-amber-600 text-white",
   },
   emerald: {
     selectedCard:
@@ -99,10 +86,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-emerald-600 text-white shadow-emerald-200",
     unselectedIcon: "bg-emerald-50 text-emerald-700 border-emerald-100",
     hoverCard: "hover:bg-emerald-50 hover:border-emerald-400",
-    chip: "bg-emerald-100 text-emerald-700",
-    mobileSelected:
-      "bg-emerald-50 border-emerald-200 ring-1 ring-emerald-200 text-emerald-800",
-    mobileBadgeSelected: "bg-emerald-600 text-white",
   },
   indigo: {
     selectedCard:
@@ -110,10 +93,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-indigo-600 text-white shadow-indigo-200",
     unselectedIcon: "bg-indigo-50 text-indigo-700 border-indigo-100",
     hoverCard: "hover:bg-indigo-50 hover:border-indigo-400",
-    chip: "bg-indigo-100 text-indigo-700",
-    mobileSelected:
-      "bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 text-indigo-800",
-    mobileBadgeSelected: "bg-indigo-600 text-white",
   },
   purple: {
     selectedCard:
@@ -121,10 +100,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-purple-600 text-white shadow-purple-200",
     unselectedIcon: "bg-purple-50 text-purple-700 border-purple-100",
     hoverCard: "hover:bg-purple-50 hover:border-purple-400",
-    chip: "bg-purple-100 text-purple-700",
-    mobileSelected:
-      "bg-purple-50 border-purple-200 ring-1 ring-purple-200 text-purple-800",
-    mobileBadgeSelected: "bg-purple-600 text-white",
   },
   rose: {
     selectedCard:
@@ -132,10 +107,6 @@ const AGENT_STYLE: Record<
     selectedIcon: "bg-rose-600 text-white shadow-rose-200",
     unselectedIcon: "bg-rose-50 text-rose-700 border-rose-100",
     hoverCard: "hover:bg-rose-50 hover:border-rose-400",
-    chip: "bg-rose-100 text-rose-700",
-    mobileSelected:
-      "bg-rose-50 border-rose-200 ring-1 ring-rose-200 text-rose-800",
-    mobileBadgeSelected: "bg-rose-600 text-white",
   },
 };
 
@@ -183,10 +154,8 @@ const App: React.FC = () => {
   //
   // Not persisted: dragging the handle changes the CURRENT mode for the session
   // only, every reload comes back to these. Drag limits are 220–700 (see
-  // `resize` below) — keep both numbers inside them.
-  //
-  // Both are painted 1.1x on a desktop by --app-zoom, and whatever they take
-  // comes out of the slide beside them.
+  // `resize` below) — keep both numbers inside them. Whatever they take comes
+  // out of the slide beside them.
   //
   // Each width and its mode's type size are one decision, not two — the space
   // left for text is roughly (width - 100), and a line wraps when it no longer
@@ -196,8 +165,10 @@ const App: React.FC = () => {
   //           here carries the 20px role. Above that, widen or step the role down.
   //   compact no role line on the stages, so the STAGE NAME is the long one —
   //           "0 - Pre-check & Data Inventory", 30 characters at ~0.52 x
-  //           --sb-title. 360 carries the 16px title with a little to spare;
-  //           below ~340 it breaks to two lines.
+  //           --sb-title, which needs about 250px of the 200 that 300 leaves.
+  //           So the longest names DO wrap to two lines here, and that was
+  //           accepted: a narrower rail was worth more than an unbroken name.
+  //           Want them on one line again — 360 here, or 14px on --sb-title.
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('full');
   const [sidebarWidths, setSidebarWidths] = useState<Record<SidebarMode, number>>({
     full: 500,
@@ -271,9 +242,6 @@ const App: React.FC = () => {
     "tab-notation": () => setExcursion(null),
     "tab-landscape": () => setExcursion(null),
     "tab-closing": () => setExcursion(null),
-    // TEMPORARY — the second build of the closing, up for comparison. Delete
-    // with QA_B_TAB in WorkshopProgramView.
-    "tab-closing-b": () => setExcursion(null),
     graph: () => setIsGraphInputModalOpen(true),
     // constants.tsx:385 and the README both point at #graph-create.
     "graph-create": () => setIsGraphInputModalOpen(true),
@@ -342,8 +310,8 @@ const App: React.FC = () => {
     "step-4": () => setExcursion("step-4"),
     "step-5": () => setExcursion("step-5"),
     "step-6": () => setExcursion("step-6"),
-    // #home used to be a separate page. Under "you cannot leave the deck" it
-    // means the deck; its old body is now the `resources` excursion.
+    // A published link. Under "you cannot leave the deck" #home means the deck
+    // itself; what it used to show is the `resources` excursion below.
     home: () => setExcursion(null),
     resources: () => setExcursion("resources"),
     tools: () => setExcursion("tools"),
@@ -697,31 +665,6 @@ const App: React.FC = () => {
             }
           />
 
-          {/* <footer
-            className="flex-row-reverse fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-2 shadow-lg md:bottom-0"
-            style={{
-              zIndex: 45,
-              bottom: window.innerWidth < 768 ? "70px" : "0",
-            }}
-            dir="ltr"
-          >
-            <div className=" mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
-              <a
-                href="mailto:yuval.shafriri@gmail.com?subject=Contact%20from%20InSites-CAA%20-%20CAA%20Workshop&body=Hello,%0D%0A%0D%0A"
-                className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-300 text-black px-2 py-2 sm:px-1.5 sm:py-1 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 text-xs sm:text-sm font-bold shrink-0"
-                dir="ltr"
-                aria-label="Send email to site creators"
-              >
-                <Mail size={14} />
-                <span className="hidden xs:inline">Contact</span>
-              </a>
-
-              <div className=" text-xs sm:text-[13px] text-slate-400 opacity-100 truncate flex-1 text-center sm:text-left">
-                Companion site for InSites-CAA significance assessment workshops
-                © Developed by Dr. Yael Alef and Yuval Shafriri
-              </div>
-            </div>
-          </footer> */}
         </main>
       </div>
 

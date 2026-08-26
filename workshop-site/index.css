@@ -13,27 +13,29 @@ html {
    length (fonts, padding, icons, the sidebar width), so all proportions
    are preserved exactly — unlike raising font sizes by hand.
 
-   CAVEAT: `zoom` does NOT divide viewport units. A bare `98vh` inside the
-   zoomed subtree paints at 98 x 1.1 = 108vh and overflows the screen. Any
-   viewport-relative cap must therefore be written as
+   IT IS CURRENTLY OFF — 1 at every width. The type was raised by hand
+   instead, which is why the sizes in the blocks below are the sizes you
+   see. Raise the desktop value to 1.1 and everything on a projector grows
+   by a tenth in one edit; then re-check the frame-fit tabs (2, 3 and 4),
+   because they are tuned to sit exactly in the screen at 1.
+
+   CAVEAT for when it IS raised: `zoom` does not divide viewport units. A
+   bare `98vh` inside the zoomed subtree paints at 98 x 1.1 = 108vh and
+   overflows. Every viewport-relative cap is therefore already written as
    `calc(<n>vh/var(--app-zoom))` — see Modal.tsx, GraphModal.tsx,
-   PromptAdvisorModal.tsx, CollectionDashboardModal.tsx.
+   PromptAdvisorModal.tsx, CollectionDashboardModal.tsx, and the image
+   knobs on tabs 2 and 4. At 1 those divisions are no-ops; leave them in
+   place, they are what makes this knob reversible.
 
-   Set --app-zoom back to 1 and every one of those calc()s becomes a no-op,
-   so this is a single reversible knob.
-
-   IT IS RESPONSIVE. The 1.1 exists to push type up for a projected talk on
-   a large screen. On a phone it did the opposite of what it was for —
-   inflating everything by a further 10% on a screen that has no room to
-   spare. So phones and tablets run at 1, and only the desktop/hall
-   viewport gets the lift. */
+   The breakpoint block below is kept, and set to 1, so that the desktop
+   value has somewhere to go. */
 :root {
     --app-zoom: 1;
 }
 
 @media (min-width: 64rem) {
     :root {
-        --app-zoom: 1.0;
+        --app-zoom: 1;
     }
 }
 
@@ -56,8 +58,8 @@ html {
       like a set, copy the numbers down here.
    2. PERMANENTLY — edit the numbers below and save. Vite hot-reloads.
 
-   Remember --app-zoom: on a desktop (lg and up) everything is painted
-   1.1x, so 18px here lands as ~20px on screen. Judge it on the screen.
+   These are the sizes as painted: --app-zoom is 1. If it is ever raised,
+   every number here grows with it — judge it on the screen, not here.
 
    The stage NAME must clearly beat the line under it. That is a matter
    of the gap between --sb-title and --sb-role, not of their absolute
@@ -72,7 +74,7 @@ html {
      hall      heading 16  title 20  role 14  legend 13   (biggest that
                still keeps every role line unwrapped at a 430px sidebar) */
 :root {
-    --sb-heading: 20px;  /* "Assessment Process (CBSA Approach)" */
+    --sb-heading: 20px;  /* "InSites CBSA Framework", at the top of the rail */
     --sb-title: 20px;    /* stage name — the main driver of button height */
     --sb-role: 20px;     /* the line under the stage name */
     --sb-legend: 15px;   /* the ○ / ● key at the bottom */
@@ -99,8 +101,11 @@ html {
      white     #ffffff   #94a3b8   #e2e8f0
      slate-50  #f8fafc   #94a3b8   #e2e8f0
      shell     #f1f5f9   #94a3b8   #cbd5e1   (the app's own background)
-     tinted    #e9eef5   #7c8899   #cbd5e1   <- current
+     tinted    #e9eef5   #7c8899   #cbd5e1
      slate-200 #e2e8f0   #64748b   #cbd5e1
+
+   The values below are a hand-tuned point between `shell` and `tinted`;
+   the table is where to jump from, not a list of the only legal stops.
      dusk      #334155   #cbd5e1   #475569
      dark      #1e293b   #cbd5e1   #334155
      ink       #0f172a   #94a3b8   #1e293b
@@ -125,8 +130,8 @@ html {
 /* ── SIDEBAR TYPE, COMPACT BUILD (tabs 2-5) — the same four ───────
    The same four numbers, quieter. On tabs 2-5 the process column is not the
    subject, it is the reminder of where in the process we are, so it steps back
-   to 360px and this type. The stage DESCRIPTIONS are dropped there too (that
-   is markup, in Sidebar.tsx, not a size) — what is left is a list of names.
+   to 300px (App.tsx) and this type. The stage DESCRIPTIONS are dropped there
+   too (that is markup, in Sidebar.tsx, not a size) — a list of names is left.
 
    Scoped to [data-sb="compact"] rather than to a media query: the trigger is
    which slide is up, not how wide the window is. The <aside> carries the
@@ -134,19 +139,19 @@ html {
    in one go. Tune these in DevTools exactly like the block above — select the
    <aside data-sb="compact"> element instead of <html>.
 
-   WHAT BREAKS FIRST if you raise --sb-title: with no role line under it, the
-   longest STAGE NAME is now the line that governs — "0 - Pre-check & Data
-   Inventory", 30 characters at roughly 0.52 x --sb-title each. It has about
-   (360 - 100) = 260px, so 16px fits with a little to spare and 18px does not:
-   it wraps to two lines and the whole spine grows. Raise the compact width in
-   App.tsx with it, or leave it here.
+   WHAT GOVERNS --sb-title: with no role line under it, the longest STAGE NAME
+   is the line that decides — "0 - Pre-check & Data Inventory", 30 characters
+   at roughly 0.52 x --sb-title each, which wants ~250px. A 300px rail leaves
+   about 200, so the longest two names already wrap, and raising this only
+   makes more of them do it. That trade was taken deliberately — see the
+   compact note in App.tsx, which is also where to widen the rail if you want
+   them back on one line.
 
    --sb-role survives with a value because ONE card still uses it: Extensions &
    Tools, which is off the spine and keeps its description in both builds. Keep
    it well under --sb-title or the two lines read as one block.
 
-   Remember --app-zoom again: on a projector these are painted 1.1x, so 16px
-   lands as ~17.6px. Judge it on the screen. */
+   As above, these are the sizes as painted — --app-zoom is 1. */
 [data-sb="compact"] {
     --sb-heading: 15px;
     --sb-title: 16px;
@@ -155,16 +160,15 @@ html {
 }
 
 /* ── THE LABEL — one uppercase device for the whole deck ───────────
-   Every small caps label on the talk tabs is this class: the eyebrow above
-   each headline, EVIDENCE / BROADER MEANING in the worked example, the two
-   column heads of the notation key, the five count-tile labels, the short
-   form of SectionDivider, and SPEAKER NOTE.
+   Every small caps label on the talk is this class: the lead-in riding the
+   headline on tabs 2 and 4, EVIDENCE / BROADER MEANING in the worked
+   example, the two column heads of the notation key, the count-tile labels,
+   THE RULE button under the key, the short form of SectionDivider, and
+   SPEAKER NOTE.
 
-   They used to be seven separate declarations at 11-15px, in weights 700,
-   800 and 900, with five different letter-spacings. Six of those numbers
-   were doing nothing: Alef ships 400 and 700 only, so 700/800/900 all paint
-   as the same bold — the "hierarchy" between them existed in the source and
-   never on the screen. What was left was one device wearing five costumes.
+   ONE device, one size. Weight is not a variable here: Alef ships 400 and
+   700 only, so 700/800/900 all paint as the same bold, and a "hierarchy"
+   written in those numbers exists in the source and never on the screen.
 
    The only large uppercase line on the deck is a SectionDivider section
    title, and it stays separate on purpose — see --divider-label. Two
@@ -174,8 +178,7 @@ html {
    labels something being read), because that is the one difference between
    these uses that a room can actually see.
 
-   Raised one step across the board (12/13/14 -> 13/15/16) in the 2026-08-26
-   pass over every small size on the deck: uppercase at 14px is legible on a
+   Do not take these below 13/15/16: uppercase at 14px is legible on a
    laptop and gone from row 15, and a label that cannot be read is not a
    quiet label, it is a decoration. */
 :root {
@@ -228,13 +231,13 @@ html {
 
    The padding is deliberately close to that floor: 8px at lg against an
    80px avatar means the card is 96px and reads as a portrait with a
-   question beside it, which is what it is. Earlier values (8/10/12) left
-   a visible margin of ground above and below each circle, and three
-   cards' worth of it pushed the lab card down the tab. Going below ~5px
-   buys almost nothing — the avatar is already the height — and starts to
-   crowd the question's descenders against the card edge. */
+   question beside it, which is what it is. Raise it and a visible margin
+   of ground appears above and below each circle — three cards' worth of
+   it pushes the lab card down the tab. Below ~5px buys almost nothing,
+   the avatar being the height already, and starts to crowd the
+   question's descenders against the card edge. */
 :root {
-    --t1-lead: 18px;    /* poster caption + the intro line above the cards */
+    --t1-lead: 18px;    /* the line over the poster + the intro above the cards */
     --t1-quote: 18px;   /* the question on each challenge card */
     --t1-answer: 16px;  /* the reply inside a card, and the lab paragraphs */
     --t1-card-pad-y: 5px;   /* card height: avatar + twice this */
@@ -364,9 +367,12 @@ html {
                     those are marks doing their job inline in a sentence,
                     these are the same glyphs held up to be looked at.
      --t3-key-cite  the [file:page] token in the key's first row
-     --t3-rule      the "When in doubt — mark it" line and its attribution
-     --t3-tile-n    the five counts (45 · 24 · 14 · 4 · 3)
-     --t3-payoff    "42 of 45 held…" — the sentence the slide is built to land
+     --t3-rule      the "When in doubt — mark it" line and its attribution,
+                    which is behind the THE RULE button under the key
+     --t3-tile-n    every number in the count row: 45 · 24 · the framed pair
+                    (14/16 and 4) · 1
+     --t3-payoff    "One false negative in 45." — the sentence the slide is
+                    built to land
      --t3-payoff-sub the line under it
 
    WATCH THE FRAME HERE. Unlike tab 2, whose example scrolls inside its own
@@ -463,93 +469,23 @@ html {
     }
 }
 
-/* ── TAB 5 — the two closings, side by side for a decision ─────────
-   The  slide exists in two builds at once so they can be judged on a
-   projector rather than argued about. #tab-closing is C, #tab-closing-b is B.
-   WHEN ONE WINS, DELETE THE OTHER — the loser's tab button, its component,
-   its hash route, and whichever of these two knobs belonged to it.
+/* ── TAB 5 — the closing's one knob ────────────────────────────────
+   THE UNDERCUT. The pale question panel and the poster do not sit side by
+   side: the poster slides underneath the panel's right edge, and the PANEL
+   dissolves on top of the picture — its last --t5-veil pixels thin out to
+   nothing, so the Hatter's rocks and columns surface as the tint evaporates.
+   Indigo over ochre in that strip mutes the warm palette toward grey-mauve,
+   which is why the clash reads as atmosphere rather than as an accident.
 
-   C — THE UNDERCUT (the live closing). The pale question panel survives, but
-   the poster slides underneath its right edge and the PANEL dissolves on top
-   of the picture: its last --t5-veil pixels thin out to nothing, so the
-   Hatter's rocks and columns surface as the tint evaporates. Indigo over
-   ochre in that strip mutes the warm palette toward grey-mauve, which is why
-   the clash reads as atmosphere instead of an accident.
-
-   Tune --t5-veil against ONE test: the strip must contain a recognisable
-   painted form, not just texture. Too wide and a weak projector renders it as
+   Tune it against ONE test: the strip must contain a recognisable painted
+   form, not just texture. Too wide and a weak projector renders it as
    low-contrast mush that reads as a rendering fault; too narrow and there is
    no dissolve, only a seam. 80-140px is the useful range.
 
-   No text ever enters the strip. That is not the knob's job to protect — the
-   panel carries a hard right padding for it, in the component.
-
-   B — THE INK PLATE (the dummy tab). The question and the repository merge
-   into a single deep plate, and the picture is that plate's right-hand side:
-   full colour, filling its height, its left edge dissolving into the ink.
-
-   --t5b-plate is the ground, and it is NOT black. Near-black read as a hole
-   in the slide rather than as a colour; this is the deck's own indigo taken
-   to its darkest, so the plate is deliberately a colour that the painting's
-   warm ochre stands against. Try #0f172a for colder and greyer, #1e1b4b for
-   the current ink, #24215c for a plate that reads as blue in a bright hall.
-
-   --t5b-poster is the picture's strength. It began at 0.35 as a ghost and a
-   ghost does not close a loop with the opening slide, which is the only
-   reason the poster is here — so it now runs at full. Take it down towards
-   0.85 only if the painting starts competing with the question for the eye,
-   and judge that from the back of the room, not from a desk.
-
-   HOW MUCH OF THE PAINTING YOU SEE is three more knobs, and --t5b-scale is
-   the one that matters. The picture is sized by HEIGHT and its width follows
-   the aspect, x1.75 — so a taller picture is a WIDER one, and at 100% it is
-   wider than the space left beside the question. Its left third then lands
-   inside the text's ink and is eaten, which is why the Hatter goes missing.
-   Around 85% the whole painting fits beside the question at full strength.
-   Below about 70% it starts to read as a picture placed on a plate again,
-   which is the thing this build exists to avoid.
-
-     --t5b-scale   picture height as a share of the plate. THE knob.
-     --t5b-fade    where its left edge reaches full strength. Smaller = a
-                   shorter, harder dissolve and more painting; larger = a
-                   longer, softer one. Under about 25% it reads as a cut.
-     --t5b-scrim   how far the ink washes over it. This one protects the
-                   text, so treat it as a floor: it may move right to reveal
-                   more picture, never left past the text's own 48% edge.
-
-   Raise scale and lower fade together and you get more picture; do it far
-   enough and the question ends up sitting on paint, which is the one thing
-   that must not happen. Check the LAST line of the question, not the first —
-   it is the one that reaches furthest right.
-
-   --t5b-accent is the second line of the question, "could heritage 4.0 (or
-   10.0) afford it?". It was amber for a reason that has since expired: on a
-   near-black plate with a grey ghost, that line was the slide's only warm
-   note, and it repatriated the painting's ochre. Now the painting itself is
-   there at full colour, so the accent no longer has that job — it only has
-   to mark the punch.
-
-     #fcd34d  amber, as built — warm, loud, and the furthest from the plate
-     #fde68a  the same warmth at half the shout
-     #ffffff  no accent at all. The two lines then separate by the line break
-              and nothing else, which is the LEAST equipment for the job and
-              gives the punch line the best contrast the room can produce.
-              Try this one first.
-     #a5b4fc  the deck's indigo, lifted to read on a dark ground — ties the
-              line to the accent used on every other tab
-     #f5d8a8  sand, picked out of the painting rather than out of a palette
-
-   Whatever you pick, the muted line under it stays cooler and dimmer than
-   this one. It is the lens the question is answered through, not a third
-   voice. */
+   No text ever enters the strip. That is not this knob's job to protect —
+   the panel carries a hard right padding for it, in the component. */
 :root {
     --t5-veil: 110px;
-    --t5b-plate: #48484d;
-    --t5b-poster: 1;
-    --t5b-scale: 100%;
-    --t5b-fade: 60%;
-    --t5b-scrim: 50%;
-    --t5b-accent: #fcd34d;
 }
 
 /* ── TYPEFACE — the only place the site's faces are chosen ─────────
@@ -558,21 +494,22 @@ html {
    (the .font-display class below). To try another family, change the
    FIRST name in the stack — nothing else in the codebase names a font.
 
-   Every candidate is already linked in index.html; only the family
-   these variables name is actually downloaded.
+   Both currently name Alef, so the body/display distinction is inert —
+   set --font-display to something else and it wakes up. Every candidate
+   is already linked in index.html; only the family these variables name
+   is actually downloaded.
 
    CANDIDATES ─────────────────────────────────────────────────────
-     'Alef'              CURRENT DEFAULT. Two weights only (400/700),
+     'Alef'              current, both knobs. Two weights (400/700),
                          open and plain, Hebrew + Latin.
-     'Assistant'         the previous default — narrower, eight weights,
-                         the safest choice if 700 is not enough contrast.
+     'Assistant'         narrower, eight weights — the safest choice if
+                         700 is not enough contrast.
      'Heebo'             a touch more geometric, nine weights.
      'Rubik'             rounded terminals, warmer, reads larger.
      'Frank Ruhl Libre'  serif. Good as --font-display alone, against a
                          sans body.
-     'Marcellus'         LATIN ONLY, one weight — the inscriptional
-                         Roman the display face used to be. Display only;
-                         it has no Hebrew and no bold.
+     'Marcellus'         LATIN ONLY, one weight, inscriptional Roman.
+                         Display only — no Hebrew and no bold.
 
    --font-display-weight exists because the families differ: Alef and
    Marcellus have no middle weights, so a heading is either 400 or 700. */
