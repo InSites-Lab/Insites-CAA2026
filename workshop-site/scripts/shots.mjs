@@ -10,7 +10,11 @@ const DEVICES = [
 ];
 
 // Deck tabs are clicked by their visible label; excursions by the bottom nav.
-const TABS = ['InSites', 'Tension', 'Notation', 'Inquiry', 'Q&A'];
+// These are the SHORT labels, which is what renders below xl — both of these
+// viewports are below it. Keep this list in step with PROGRAM_TABS + QA_TAB in
+// WorkshopProgramView: a name that no longer exists falls into the catch below
+// and silently shoots the previous tab a second time.
+const TABS = ['InSites', 'Tension', 'Notation', 'Landscape', 'Closing'];
 
 const browser = await chromium.launch();
 

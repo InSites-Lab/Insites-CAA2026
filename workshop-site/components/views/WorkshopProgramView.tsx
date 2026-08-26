@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X, Mail } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -204,19 +204,31 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   // shadow: from the back of a hall, under projector washout, a shadow is
   // invisible and a block of colour is not.
   // Size steps with the width that is actually LEFT, not the viewport: the
-  // sidebar takes 430px, so at a 1024 viewport only ~594px reaches this bar.
-  // Full labels therefore wait for xl, and 17px for 2xl. `min-w-0` + truncate
-  // is the backstop — flex items will not shrink below min-content otherwise,
-  // and the row overflows sideways instead of compressing.
+  // sidebar takes 300px there, so a 1600 viewport leaves this bar about 1250.
+  // Full labels therefore wait for xl, and 17px for 2xl.
+  //
+  // THE HORIZONTAL PADDING IS A FIT PROBLEM, not a taste one. Five labels at
+  // 17px need roughly 1120px of text; at 24px of padding a side the row asked
+  // for more than it had and "Epistemic Notation" — the term the whole talk
+  // rests on — truncated to "Epistemic Notati…". 16px a side buys back ~80px,
+  // which is the margin. Raise it and measure the longest label again, do not
+  // eyeball it: `min-w-0` + truncate mean the row never overflows, it just
+  // quietly eats a word.
+  //
   // On a phone the tabs stack icon-over-label at the same scale as the bottom
   // nav, so all five fit one row instead of wrapping. They stay clearly a
   // SEGMENTED CONTROL rather than navigation: a filled tray, and an active tab
   // that is a solid block — where the bottom bar is bare icons on the page.
-  const tabClass = (id: TabId) =>
-    `flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer ${
+  //
+  // `restColor` is a parameter and not part of the string because Tailwind
+  // classes from one group do not override by source order — a second
+  // `text-*` appended by a caller loses to whichever the stylesheet emits
+  // last, which is how the Closing tab's quieter grey silently never painted.
+  const tabClass = (id: TabId, restColor = 'text-slate-500') =>
+    `flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-3 2xl:px-4 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer ${
       activeTab === id
         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-        : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
+        : `${restColor} hover:text-slate-800 hover:bg-white/60`
     }`;
 
   return (
@@ -262,7 +274,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
           ))}
           <button
             onClick={() => selectDeckTab(QA_TAB.id)}
-            className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${tabClass(QA_TAB.id)} ${activeTab === QA_TAB.id ? '' : 'text-slate-400'}`}
+            className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${tabClass(QA_TAB.id, 'text-slate-400')}`}
           >
             {QA_TAB.icon}
             <span>{QA_TAB.label}</span>
@@ -467,8 +479,8 @@ const PhotoStrip: React.FC<{
             }}
             aria-label={`Show ${step === 2 ? 'pair' : 'photograph'} ${p + 1}`}
             aria-current={p === Math.floor(index / step)}
-            className={`h-2 w-2 rounded-full transition-colors cursor-pointer ${
-              p === Math.floor(index / step) ? 'bg-slate-600' : 'bg-slate-300 hover:bg-slate-400'
+            className={`h-3 w-3 rounded-full transition-colors cursor-pointer ${
+              p === Math.floor(index / step) ? 'bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'
             }`}
           />
         ))}
@@ -552,8 +564,8 @@ const PlateFigure: React.FC<{
             onClick={() => setIndex(i)}
             aria-label={`Show image ${i + 1}`}
             aria-current={i === index}
-            className={`h-2 w-2 rounded-full transition-colors cursor-pointer ${
-              i === index ? 'bg-slate-600' : 'bg-slate-300 hover:bg-slate-400'
+            className={`h-3 w-3 rounded-full transition-colors cursor-pointer ${
+              i === index ? 'bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'
             }`}
           />
         ))}
@@ -814,10 +826,15 @@ const CHALLENGES = [
   },
 ];
 
+// WHO IS SPEAKING is carried by the accent border, the tint and the avatar —
+// three signals, all of which a projector reproduces. The TEXT does not carry
+// it: a question set in amber-900 on amber-50 is a muddy brown, and the answer
+// under it at 70% opacity of that same brown is worse. Both are near-black
+// now, on the tint that already names the speaker.
 const challengeColors: Record<string, { border: string; bg: string; text: string; quote: string }> = {
-  amber: { border: 'border-l-amber-400', bg: 'bg-amber-50', text: 'text-amber-900/70', quote: 'text-amber-900' },
-  indigo: { border: 'border-l-indigo-400', bg: 'bg-indigo-50', text: 'text-indigo-900/70', quote: 'text-indigo-900' },
-  emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-900/70', quote: 'text-emerald-900' },
+  amber: { border: 'border-l-amber-400', bg: 'bg-amber-50', text: 'text-slate-700', quote: 'text-slate-900' },
+  indigo: { border: 'border-l-indigo-400', bg: 'bg-indigo-50', text: 'text-slate-700', quote: 'text-slate-900' },
+  emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50', text: 'text-slate-700', quote: 'text-slate-900' },
 };
 
 // The tab scrolls, so its vertical budget is not a hard frame — but everything
@@ -836,9 +853,9 @@ const WhatIsInSitesTab: React.FC = () => (
         an image you did not draw for the purpose. rounded-t-2xl so the scrim
         keeps the picture's own corners.
 
-        SIZE KNOB — max-w below. The picture is centred, so this is the one
-        number that grows it; 52rem is a step up from the 48rem it had. Sizes on
-        this tab come from --t1-* in index.css, tunable live in DevTools. */}
+        SIZE KNOB — max-w below, currently 48rem. The picture is centred, so
+        this is the one number that grows it. Sizes on this tab come from
+        --t1-* in index.css, tunable live in DevTools. */}
     <div className="max-w-[48rem] mx-auto relative">
       <img
         src="./poster-light.jpg"
@@ -859,15 +876,20 @@ const WhatIsInSitesTab: React.FC = () => (
     <div className="flex flex-col gap-[var(--t1-card-gap)]">
       {CHALLENGES.map((ch, idx) => {
         const c = challengeColors[ch.color] || challengeColors.amber;
-        const isRight = idx % 2 === 0;
         return (
           <details key={idx} className={`${c.bg} border border-slate-200 ${c.border} border-l-4 rounded-xl overflow-hidden group`}>
-            {/* The card grows as a piece: avatar, padding and chevron step
+            {/* ONE pattern for all three: avatar, question, chevron. The middle
+                card used to mirror, which is charming at a desk and reads as an
+                inconsistency from a hall — three cards in one alignment read as
+                a set, and the speaker is quoting three voices, not staging a
+                conversation between them.
+
+                The card grows as a piece: avatar, padding and chevron step
                 with the type in index.css (--t1-*), so a bigger question does
                 not end up rattling around inside a small box.
                 HEIGHT lives in --t1-card-pad-y: a closed card is the avatar
                 plus twice that padding, and the avatar below is the floor. */}
-            <summary className={`px-2.5 sm:px-4 lg:px-5 py-[var(--t1-card-pad-y)] cursor-pointer flex items-center gap-2.5 sm:gap-3 lg:gap-4 select-none ${isRight ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
+            <summary className="px-2.5 sm:px-4 lg:px-5 py-[var(--t1-card-pad-y)] cursor-pointer flex items-center gap-2.5 sm:gap-3 lg:gap-4 select-none">
               <img
                 src={ch.avatar}
                 alt=""
@@ -875,8 +897,8 @@ const WhatIsInSitesTab: React.FC = () => (
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
               <span className={`font-bold text-[length:var(--t1-quote)] leading-snug ${c.quote} flex-1`}>"{ch.quote}"</span>
-              <ChevronDown size={16} className="lg:hidden text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
-              <ChevronDown size={20} className="hidden lg:block text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+              <ChevronDown size={16} className="lg:hidden text-slate-500 group-open:rotate-180 transition-transform shrink-0" />
+              <ChevronDown size={20} className="hidden lg:block text-slate-500 group-open:rotate-180 transition-transform shrink-0" />
             </summary>
             <div className="px-2.5 sm:px-4 lg:px-5 pb-[var(--t1-card-pad-y)] pt-1">
               <p className={`text-[length:var(--t1-answer)] ${c.text} leading-relaxed`}>{ch.response}</p>
@@ -1238,6 +1260,17 @@ const FromReportToInquiryTab: React.FC = () => (
       </div>
     </div>
 
+    {/* The mark needs a key HERE. Tab 3 is where the notation is taught, and
+        tab 3 comes before this one in the bar but not necessarily in the room:
+        anyone arriving on #tab-landscape, or looking up mid-question, meets two
+        marks with nothing on screen that decodes them. One line, at label size,
+        so it explains without competing with the two values it annotates. */}
+    <p className="shrink-0 flex items-center gap-2 text-[length:var(--label)] text-slate-500">
+      <Inf />
+      <span className="label">inferred</span>
+      <span>— a claim built from two or more pieces of evidence</span>
+    </p>
+
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ────
         maxHeight is the one number to touch. Everything above the plate —
         the tab bar, the headline block, the two value cards, and the page's
@@ -1428,8 +1461,13 @@ const QaTab: React.FC = () => (
             </p>
             {/* Subordinate on purpose, and by a clear step — this is the lens
                 the question is answered through, not a second headline. Set it
-                level with the question and the slide has two voices. */}
-            <p className="text-[17px] sm:text-[19px] lg:text-[23px] text-indigo-950/55">
+                level with the question and the slide has two voices.
+
+                A step under, though, not a whisper: at 55% opacity it rendered
+                lighter than slate-400, and this is the sentence the talk turns
+                on. 26px at 80% keeps the step down from 34px and still reaches
+                the back of the room. */}
+            <p className="text-[18px] sm:text-[21px] lg:text-[26px] text-indigo-950/80">
               Who assesses is part of what is assessed.
             </p>
           </div>
@@ -1453,9 +1491,9 @@ const QaTab: React.FC = () => (
        
 
         {/* The link the paper carries, so it has to be findable and
-            photographable: bigger mark, the repo name at headline weight, the
-            path beside it. Full width under the row — see the band note above
-            for why it does not sit in the right column. */}
+            photographable TWICE OVER: the address to type on the left, the
+            code to photograph on the right. Full width under the row — see
+            the band note above for why it does not sit in the right column. */}
         <a
           href={REPO_URL}
           target="_blank"
@@ -1469,46 +1507,60 @@ const QaTab: React.FC = () => (
             <span className="block font-mono text-[17px] sm:text-[21px] lg:text-[25px] font-bold leading-tight">
               {REPO_LABEL}
             </span>
-            <span className="block text-[15px] sm:text-[17px] lg:text-[19px] text-slate-400 mt-1.5">
-              The <span className="font-mono text-slate-300">/system</span> folder — the workflow,
+            <span className="block text-[15px] sm:text-[17px] lg:text-[19px] text-slate-300 mt-1.5">
+              The <span className="font-mono text-white">/system</span> folder — the workflow,
               the specs, and the claim-level evidence behind this talk
             </span>
           </span>
-          <ExternalLink size={20} className="text-slate-400 shrink-0" />
+          {/* The QR earns the right-hand end of the card because a room reaches
+              for a phone before it reaches for a keyboard. It is a committed
+              static asset (scripts/make-qr.mjs) — white on transparent, so the
+              card's own ground shows through and no white plate appears.
+              Hidden below sm: on a phone the whole card is already a tap. */}
+          <img
+            src="./tab5/qr-repo.svg"
+            alt=""
+            aria-hidden="true"
+            className="hidden sm:block shrink-0 w-[104px] lg:w-[120px] h-auto"
+          />
+          <ExternalLink size={20} className="text-slate-300 shrink-0" />
         </a>
-        {/* Two addresses, and nothing else: names, conference and year are all
-            already known to the room, and what a closing slide is photographed
-            FOR is the way to reach someone afterwards.
 
-            It sits under the row and above the repository, not under the title
-            where a credit conventionally goes — a credit directly beneath the
-            headline interrupts the talk's last sentence, and this is the other
-            line people photograph, so it belongs beside the address they
-            type. */}
-        <p className="text-lg sm:text-xl lg:text-[23px] tracking-wide text-slate-500 mt-1">
-          <a
-            href="mailto:yaelalef@technion.ac.il"
-            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
-          >
-            yaelalef@technion.ac.il
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href="mailto:yuval.shafriri@gmail.com"
-            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
-          >
-            yuval.shafriri@gmail.com
-          </a>
-        </p>
+        {/* Below the repository, the two ways to reach a person: the addresses
+            and then the lab. Both answer "who is behind this", so they sit
+            together under the dark bar rather than being split by it.
+
+            Chips, not underlined links: a chip reads as something you may act
+            on even in a photograph, where an underline just reads as emphasis.
+            The envelope says which kind of action without a word. */}
+        <div className="flex flex-wrap items-center gap-3 mt-1">
+          {[
+            'yaelalef@technion.ac.il',
+            'yuval.shafriri@gmail.com',
+          ].map((address) => (
+            <a
+              key={address}
+              href={`mailto:${address}`}
+              className="inline-flex items-center gap-2.5 rounded-lg border border-slate-300 px-3.5 py-2 lg:px-4 lg:py-2.5 text-lg sm:text-xl lg:text-[23px] tracking-wide text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+            >
+              <Mail size={20} className="shrink-0 text-slate-400" />
+              {address}
+            </a>
+          ))}
+        </div>
+
         {/* The lab, last and quietest. Its neighbours are the reason it is
             here rather than on tab 1: the addresses above it and the
-            repository beside it answer "who made this, and where does it
-            live" — this answers the half neither of them can. */}
-        <p className="text-base sm:text-lg lg:text-[21px] text-slate-500 leading-relaxed">
-          <span className="font-bold text-slate-600">InSites Knowledge Lab</span> · Technion — at the
-          intersection of <strong className="font-semibold text-slate-600">assessment methods</strong>,{' '}
-          <strong className="font-semibold text-slate-600">novel technologies</strong>, and{' '}
-          <strong className="font-semibold text-slate-600">built-heritage data</strong>, we develop
+            repository above them answer "who made this, and where does it
+            live" — this answers the half neither of them can.
+
+            ONE bolded phrase. Four of them in a single sentence is not
+            emphasis, it is texture, and the eye stops resolving which of the
+            four was the point. 60ch so the line breaks where a reader expects
+            rather than at the column edge. */}
+        <p className="max-w-[60ch] text-base sm:text-lg lg:text-[21px] text-slate-600 leading-relaxed">
+          <span className="font-bold text-slate-800">InSites Knowledge Lab</span> · Technion — at the
+          intersection of assessment methods, novel technologies, and built-heritage data, we develop
           computational methods for evidence-based heritage assessment.
         </p>
       </div>
