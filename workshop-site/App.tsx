@@ -5,6 +5,7 @@ import {
   ExcursionKey,
 } from "./components/views/ExcursionOutlet";
 import { WorkshopProgramView } from "./components/views";
+import type { SidebarMode } from "./components/views";
 import {
   PrinciplesModal,
   DemoModal,
@@ -42,12 +43,18 @@ type AgentColor =
   | "purple"
   | "rose";
 
+// `hoverCard` is what the ROOM sees. The sidebar is pointed at from a lectern
+// during the talk, and the only hover a stage card used to carry was
+// `hover:shadow-md` — a shadow, which a projector does not reproduce at all.
+// Each stage already owns a colour, in its icon; hovering now spreads that
+// colour to the whole card, which is legible from the back of a hall.
 const AGENT_STYLE: Record<
   AgentColor,
   {
     selectedCard: string;
     selectedIcon: string;
     unselectedIcon: string;
+    hoverCard: string;
     chip: string;
     mobileSelected: string;
     mobileBadgeSelected: string;
@@ -58,6 +65,7 @@ const AGENT_STYLE: Record<
       "bg-white border-slate-300 ring-1 ring-slate-200 shadow-md z-10",
     selectedIcon: "bg-slate-900 text-white shadow-slate-200",
     unselectedIcon: "bg-slate-50 text-slate-700 border-slate-200",
+    hoverCard: "hover:bg-slate-100 hover:border-slate-400",
     chip: "bg-slate-100 text-slate-700",
     mobileSelected:
       "bg-slate-50 border-slate-300 ring-1 ring-slate-200 text-slate-800",
@@ -68,6 +76,7 @@ const AGENT_STYLE: Record<
       "bg-white border-blue-200 ring-1 ring-blue-200 shadow-md z-10",
     selectedIcon: "bg-blue-600 text-white shadow-blue-200",
     unselectedIcon: "bg-blue-50 text-blue-700 border-blue-100",
+    hoverCard: "hover:bg-blue-50 hover:border-blue-400",
     chip: "bg-blue-100 text-blue-700",
     mobileSelected:
       "bg-blue-50 border-blue-200 ring-1 ring-blue-200 text-blue-800",
@@ -78,6 +87,7 @@ const AGENT_STYLE: Record<
       "bg-white border-amber-200 ring-1 ring-amber-200 shadow-md z-10",
     selectedIcon: "bg-amber-600 text-white shadow-amber-200",
     unselectedIcon: "bg-amber-50 text-amber-700 border-amber-100",
+    hoverCard: "hover:bg-amber-50 hover:border-amber-400",
     chip: "bg-amber-100 text-amber-800",
     mobileSelected:
       "bg-amber-50 border-amber-200 ring-1 ring-amber-200 text-amber-900",
@@ -88,6 +98,7 @@ const AGENT_STYLE: Record<
       "bg-white border-emerald-200 ring-1 ring-emerald-200 shadow-md z-10",
     selectedIcon: "bg-emerald-600 text-white shadow-emerald-200",
     unselectedIcon: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    hoverCard: "hover:bg-emerald-50 hover:border-emerald-400",
     chip: "bg-emerald-100 text-emerald-700",
     mobileSelected:
       "bg-emerald-50 border-emerald-200 ring-1 ring-emerald-200 text-emerald-800",
@@ -98,6 +109,7 @@ const AGENT_STYLE: Record<
       "bg-white border-indigo-200 ring-1 ring-indigo-200 shadow-md z-10",
     selectedIcon: "bg-indigo-600 text-white shadow-indigo-200",
     unselectedIcon: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    hoverCard: "hover:bg-indigo-50 hover:border-indigo-400",
     chip: "bg-indigo-100 text-indigo-700",
     mobileSelected:
       "bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 text-indigo-800",
@@ -108,6 +120,7 @@ const AGENT_STYLE: Record<
       "bg-white border-purple-200 ring-1 ring-purple-200 shadow-md z-10",
     selectedIcon: "bg-purple-600 text-white shadow-purple-200",
     unselectedIcon: "bg-purple-50 text-purple-700 border-purple-100",
+    hoverCard: "hover:bg-purple-50 hover:border-purple-400",
     chip: "bg-purple-100 text-purple-700",
     mobileSelected:
       "bg-purple-50 border-purple-200 ring-1 ring-purple-200 text-purple-800",
@@ -118,6 +131,7 @@ const AGENT_STYLE: Record<
       "bg-white border-rose-200 ring-1 ring-rose-200 shadow-md z-10",
     selectedIcon: "bg-rose-600 text-white shadow-rose-200",
     unselectedIcon: "bg-rose-50 text-rose-700 border-rose-100",
+    hoverCard: "hover:bg-rose-50 hover:border-rose-400",
     chip: "bg-rose-100 text-rose-700",
     mobileSelected:
       "bg-rose-50 border-rose-200 ring-1 ring-rose-200 text-rose-800",
@@ -139,8 +153,12 @@ const getAgentTheme = (
   if (isSelected) {
     return { card: style.selectedCard, icon: style.selectedIcon };
   }
+  // The resting card is the same white for every stage — the colour is carried
+  // by the icon, and seven tinted cards in a column would be a rainbow rather
+  // than a process. It arrives on hover, where it means "this one", and leaves
+  // again. The shadow stays for the pointer; the colour is for the room.
   return {
-    card: "bg-white shadow-sm hover:shadow-md border-slate-300",
+    card: `bg-white shadow-sm hover:shadow-md border-slate-300 ${style.hoverCard}`,
     icon: style.unselectedIcon,
   };
 };
@@ -157,20 +175,35 @@ const App: React.FC = () => {
     : null;
   const [rawData] = useState<string>(DEMO_DATA);
   // ── SIDEBAR WIDTH — tune here ────────────────────────────────────
-  // Default width of the process sidebar, in px. Not persisted: dragging the
-  // handle changes it for the session only, every reload comes back here.
-  // Drag limits are 220–700 (see `resize` below) — keep this inside them.
+  // Two widths, because the process sidebar has two builds. Which one is on
+  // screen is the deck's call (SIDEBAR_MODE in WorkshopProgramView): tab 1
+  // talks about the framework and gets `full`; tabs 2-5 get `compact`, where
+  // the column is context rather than subject. The type sizes for each build
+  // are in index.css (:root and [data-sb="compact"]) — only the widths are here.
   //
-  // It is painted 1.1x on a desktop by --app-zoom, and whatever it takes comes
-  // out of the slide beside it.
+  // Not persisted: dragging the handle changes the CURRENT mode for the session
+  // only, every reload comes back to these. Drag limits are 220–700 (see
+  // `resize` below) — keep both numbers inside them.
   //
-  // This number and --sb-role in index.css are one decision, not two: the width
-  // left for text is roughly (this - 100), and a role line wraps when it no
-  // longer fits. The longest one is "Description, timeline & context analysis",
-  // about 40 characters — reckon ~0.48 x the role size per character, so 500
-  // here carries a role of about 20px. Above that, widen further or step the
-  // role back down.
-  const [sidebarWidth, setSidebarWidth] = useState<number>(500);
+  // Both are painted 1.1x on a desktop by --app-zoom, and whatever they take
+  // comes out of the slide beside them.
+  //
+  // Each width and its mode's type size are one decision, not two — the space
+  // left for text is roughly (width - 100), and a line wraps when it no longer
+  // fits:
+  //   full    the role line is the long one, "Description, timeline & context
+  //           analysis", ~40 characters at ~0.48 x --sb-role per character. 500
+  //           here carries the 20px role. Above that, widen or step the role down.
+  //   compact no role line on the stages, so the STAGE NAME is the long one —
+  //           "0 - Pre-check & Data Inventory", 30 characters at ~0.52 x
+  //           --sb-title. 360 carries the 16px title with a little to spare;
+  //           below ~340 it breaks to two lines.
+  const [sidebarMode, setSidebarMode] = useState<SidebarMode>('full');
+  const [sidebarWidths, setSidebarWidths] = useState<Record<SidebarMode, number>>({
+    full: 500,
+    compact: 300,
+  });
+  const sidebarWidth = sidebarWidths[sidebarMode];
   const [isResizingState, setIsResizingState] = useState<boolean>(false);
   const [promptLang, setPromptLang] = useState<"he" | "en">("en");
 
@@ -419,14 +452,23 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const resize = useCallback((e: MouseEvent) => {
-    if (!isResizing.current) return;
-    // The sidebar is docked LEFT — dragging right widens it. Clamp rather
-    // than ignore out-of-range values, so the edge follows the cursor to the
-    // limit instead of freezing the drag.
-    const next = resizeStart.current.width + (e.clientX - resizeStart.current.x);
-    setSidebarWidth(Math.min(700, Math.max(220, next)));
-  }, []);
+  const resize = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing.current) return;
+      // The sidebar is docked LEFT — dragging right widens it. Clamp rather
+      // than ignore out-of-range values, so the edge follows the cursor to the
+      // limit instead of freezing the drag.
+      const next = resizeStart.current.width + (e.clientX - resizeStart.current.x);
+      // The drag tunes the mode that is on screen, and only that one: widening
+      // the compact column on tab 3 must not silently move the full one on
+      // tab 1. Each build keeps its own number for the session.
+      setSidebarWidths((w) => ({
+        ...w,
+        [sidebarMode]: Math.min(700, Math.max(220, next)),
+      }));
+    },
+    [sidebarMode],
+  );
 
   useEffect(() => {
     window.addEventListener("mousemove", resize);
@@ -603,6 +645,7 @@ const App: React.FC = () => {
       <div className="flex-1 min-h-0 overflow-y-auto relative flex flex-col lg:flex-row lg:items-start">
         <Sidebar
           width={sidebarWidth}
+          mode={sidebarMode}
           isResizing={isResizingState}
           onStartResize={startResizing}
           selectedAgentId={selectedAgentId}
@@ -630,6 +673,7 @@ const App: React.FC = () => {
               take over this pane now arrives as an excursion chip inside it. */}
           <WorkshopProgramView
             onNavigate={navigateTo}
+            onSidebarModeChange={setSidebarMode}
             excursion={excursion}
             onCloseExcursion={() => navigateTo("program")}
             excursionContent={

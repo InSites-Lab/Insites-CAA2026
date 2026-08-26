@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen } from 'lucide-react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { Modal, SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -23,15 +23,45 @@ const PROGRAM_TABS = [
 // so the audience can see the talk has an ending and not just a question period.
 const QA_TAB = { id: 'qa', label: 'Closing', icon: <MessageSquare size={18} /> } as const;
 
-// TEMPORARY — the second build of the closing, for a decision on a projector.
-// It is a sixth button in the bar on purpose: the two have to be compared by
-// clicking between them, which typing a URL does not give you.
-// TO REMOVE, when one wins: this constant, its button in the bar, its branch
-// in the switch, the QaTabDark component, 'tab-closing-b' in TAB_HASH, the
-// same key in App.tsx's hashRoutes, and the loser's knob in index.css.
+// The second build of the closing — the dark one. It was a sixth button in the
+// bar while the two were being compared on a projector; the light `Closing`
+// won, so it is now OFF.
+//
+// OFF means gone from the room, not gone from the repo: no button, and no way
+// to arrive on it — #tab-closing-b stops resolving, so a stale link or a back
+// button cannot drop the dark closing onto the screen mid-talk. The component,
+// its branch in the switch, and its --t5b-* knobs in index.css all stay exactly
+// where they are.
+//
+// Flip this to true and the comparison is back, whole, in one keystroke. That
+// is the point of leaving it: the decision can be revisited on a different
+// projector without rebuilding anything.
+const SHOW_CLOSING_B = false;
+
 const QA_B_TAB = { id: 'qa-b', label: 'Closing B', icon: <MessageSquare size={18} /> } as const;
 
 type TabId = typeof PROGRAM_TABS[number]['id'] | 'qa' | 'qa-b' | 'excursion';
+
+// ─── The sidebar's mode, per tab — set it here ─────────────────────
+// The process column beside the deck has two builds: `full` (500px, 20px
+// type, a role line under every stage) and `compact` (360px, 16px, stage
+// names only). Tab 1 is the tab that TALKS about the framework, so there it
+// is the subject and gets the full build. Everywhere else it is context, not
+// subject: it stays visible so the room can see where in the process we are,
+// at a weight that does not compete with the slide.
+//
+// Moving a tab between the two is one word on its line. The sizes themselves
+// live where sizes live — widths in App.tsx, type in index.css ([data-sb]).
+export type SidebarMode = 'full' | 'compact';
+
+const SIDEBAR_MODE: Record<string, SidebarMode> = {
+  insites: 'full',
+  tension: 'compact',
+  notation: 'compact',
+  inquiry: 'compact',
+  qa: 'compact',
+  'qa-b': 'compact',   // dies with QA_B_TAB
+};
 
 // ─── Tabs in the URL ──────────────────────────────────────────────
 // Every tab is addressable: #tab-notation opens the deck on Epistemic
@@ -54,8 +84,9 @@ const TAB_HASH: Record<string, TabId> = {
   'tab-notation': 'notation',
   'tab-landscape': 'inquiry',
   'tab-closing': 'qa',
-  // Temporary, with QA_B_TAB — dies with it.
-  'tab-closing-b': 'qa-b',
+  // Only while the dark closing is switched on. Left out otherwise, so the
+  // hash simply does not resolve and the deck stays on the slide it is on.
+  ...(SHOW_CLOSING_B ? { 'tab-closing-b': 'qa-b' as TabId } : {}),
 };
 
 const HASH_FOR_TAB = Object.fromEntries(
@@ -92,6 +123,10 @@ export interface WorkshopProgramViewProps {
   excursion?: ExcursionKey | null;
   excursionContent?: React.ReactNode;
   onCloseExcursion?: () => void;
+  /** The deck tells App how loud the sidebar beside it should be. It reports a
+   *  MODE, not a tab id, so the per-tab table stays here next to the tabs and
+   *  App never has to know what a tab is called. See SIDEBAR_MODE above. */
+  onSidebarModeChange?: (mode: SidebarMode) => void;
 }
 
 export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
@@ -99,6 +134,7 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   excursion,
   excursionContent,
   onCloseExcursion,
+  onSidebarModeChange,
 }) => {
   // The URL decides where the deck opens, so a reload and a sent link both
   // land on the same slide. No hash, or a hash that names something else —
@@ -163,6 +199,23 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
     if (!DECK_ALIASES.has(window.location.hash.slice(1))) return;
     window.history.replaceState(null, '', `#${HASH_FOR_TAB[activeTab]}`);
   }, [activeTab, excursion]);
+
+  // The sidebar's mode follows the talk. Keyed on lastDeckTab and NOT on
+  // activeTab, deliberately: an excursion is not a slide, and the column beside
+  // it should not change width because someone opened a CBSA stage. The deck
+  // returns to the same tab it left, at the same width it left it.
+  //
+  // lastDeckTab is already seeded from the URL and already updated by both
+  // selectDeckTab and the hashchange listener, so a link straight to
+  // #tab-notation opens compact with no flash of the wide build, and the back
+  // button carries the width with it. Nothing else to wire.
+  //
+  // useLayoutEffect, not useEffect: this runs before the browser paints, so a
+  // link opened straight onto tab 3 draws the narrow column once instead of
+  // painting the wide one and then animating it away.
+  useLayoutEffect(() => {
+    onSidebarModeChange?.(SIDEBAR_MODE[lastDeckTab] ?? 'compact');
+  }, [lastDeckTab, onSidebarModeChange]);
 
   // Tabs that must never scroll: the column is bounded to the frame instead of
   // being allowed to grow past it, and the tab yields height from its images.
@@ -241,20 +294,22 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
             <span>{QA_TAB.label}</span>
           </button>
 
-          {/* TEMPORARY — the dark closing, for the comparison. Amber when it is
-              the one showing, so there is never a moment where you cannot tell
-              which of the two you are looking at. Delete with QA_B_TAB. */}
-          <button
-            onClick={() => selectDeckTab(QA_B_TAB.id)}
-            className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${
-              activeTab === QA_B_TAB.id
-                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                : 'text-amber-600/70 hover:text-amber-700 hover:bg-white/60'
-            } flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer`}
-          >
-            {QA_B_TAB.icon}
-            <span>{QA_B_TAB.label}</span>
-          </button>
+          {/* The dark closing, off since the light one won — see SHOW_CLOSING_B.
+              Amber while it is showing, so there is never a moment where you
+              cannot tell which of the two you are looking at. */}
+          {SHOW_CLOSING_B && (
+            <button
+              onClick={() => selectDeckTab(QA_B_TAB.id)}
+              className={`flex-1 basis-0 sm:flex-none sm:shrink-0 ${
+                activeTab === QA_B_TAB.id
+                  ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                  : 'text-amber-600/70 hover:text-amber-700 hover:bg-white/60'
+              } flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-4 2xl:px-6 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer`}
+            >
+              {QA_B_TAB.icon}
+              <span>{QA_B_TAB.label}</span>
+            </button>
+          )}
         </div>
 
         {/* Tab Content */}
@@ -276,7 +331,10 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
               onOpenDesign={() => setIsDesignOpen(true)}
             />
           )}
-          {/* TEMPORARY — delete with QA_B_TAB. */}
+          {/* Stays wired even while SHOW_CLOSING_B is false — with no button and
+              no hash to reach it, activeTab never becomes 'qa-b', so this branch
+              simply waits. It is what makes turning the comparison back on a
+              one-line change. */}
           {activeTab === 'qa-b' && (
             <QaTabDark
               onNavigate={onNavigate}
@@ -321,15 +379,48 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 // ─── 1 · The Dual Tension ─────────────────────────────────────────
 
+// ─── The site, in pictures (tab 2) ────────────────────────────────
+// READ THIS AS THREE PAIRS, not seven pictures. The strip shows two panels at
+// once and now turns them like PAGES — see PhotoStrip — so each row of this
+// array is one click, and what matters is which two images stand together:
+//
+//   1  the dolmen, and the dolmen in its field   (what the object is)
+//   2  the field from the air, and the survey map (how many, and where)
+//   3  a collapsed one, and the whole one again   (what time does to them)
+//
+// The map is deliberately the RIGHT panel of pair 2: the aerial photograph
+// asks "what am I looking at" and the map answers it, so the answer sits where
+// the eye finishes. And the archive dolmen appears twice on purpose — it opens
+// the sequence and closes it, against the collapsed one.
+//
+// The files live in public/tab2/. Three of them are shared with tab 4's
+// PLATES, which is why the folder is not named for the photographs' subject:
+// tab 2 is where they were first shown. D-1.jpg and D-3.jpg are on disk and
+// out of the rotation — add a fourth pair here to bring them back.
 const SITE_PHOTOS = [
-  { src: './h40-tuba-field.jpg', alt: 'The dolmen field at Tuba-Zangariyye, seen from the ground' },
-  { src: './h40-tuba-aerial.jpg', alt: 'Aerial view of the dolmen field at Tuba-Zangariyye' },
-  { src: './h40-dolmen-archive.jpg', alt: 'A dolmen in the Upper Galilee landscape, archival photograph' },
+  { src: './tab2/h40-dolmen-archive.jpg', alt: 'A single dolmen standing in open grassland, capstone intact, hills behind — archival photograph' },
+  { src: './tab2/h40-tuba-field.jpg', alt: 'A dolmen and its collapsed tumulus at Tuba-Zangariyye, an Antiquities Authority marker among the stones and the village immediately behind' },
+
+  { src: './tab2/h40-tuba-aerial.jpg', alt: 'The dolmen field at Tuba-Zangariyye from the air: cairns scattered across the basalt plateau, cultivated fields and a reservoir beyond' },
+  { src: './tab2/Map-Tuba.jpg', alt: 'Survey map of the Korazim Plateau: every dolmen, tumulus and stone heap plotted between the village of Tuba-Zangariyye and the Jordan River, with the Tuba dolmen field marked at its densest' },
+
+  { src: './tab2/D-2L.jpg', alt: 'A collapsed dolmen under its cairn of basalt slabs, the plateau falling away to the horizon behind' },
+  { src: './tab2/h40-dolmen-archive.jpg', alt: 'The same intact dolmen again, for the contrast with the collapsed one beside it' },
 ];
 
 /**
- * Panels crossfading quietly through a photo set — no arrows, no dots. With two
- * panels they are offset by one, so the same picture is never on screen twice.
+ * Panels crossfading quietly through a photo set.
+ *
+ * With two panels the strip turns PAGES: the pair advances by two, so the
+ * images that stand together are the ones the array pairs up. It used to slide
+ * by one, which meant every picture appeared twice — once on the right, then
+ * again on the left — and no pair could be composed, because each state shared
+ * a photograph with the one before it. Pairing is the whole argument of the
+ * tab-2 sequence (see SITE_PHOTOS), so paging is what it needs.
+ *
+ * Below sm the second panel is hidden, so there the step drops back to one and
+ * every photograph is seen in turn — otherwise a phone would show only the
+ * left-hand half of the set.
  *
  * The strip always yields its height first: `basis-0` means it claims none of
  * its own and only takes what the tab has left over, so nothing below it is
@@ -353,18 +444,58 @@ const PhotoStrip: React.FC<{
   maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]',
 }) => {
   const [index, setIndex] = useState(0);
+  // The strip runs itself, and the speaker can take it. Clicking a panel
+  // advances AND stops the timer — the picture you just chose must not slide
+  // out from under the sentence you chose it for. The pause control puts it
+  // back. Same gesture as PlateFigure on tab 4, so the deck behaves the same
+  // way wherever a picture is being stepped through.
+  const [playing, setPlaying] = useState(true);
+
+  // How far one click moves: a whole pair where both panels are on screen, one
+  // picture where only the left one is. Tailwind's `sm` is 40rem, and this has
+  // to agree with the `sm:grid-cols-2` below or the pairing silently breaks.
+  const [step, setStep] = useState(columns === 2 ? 2 : 1);
+  useEffect(() => {
+    if (columns !== 2) return setStep(1);
+    const mq = window.matchMedia('(min-width: 40rem)');
+    const apply = () => {
+      const next = mq.matches ? 2 : 1;
+      setStep(next);
+      // Keep the cursor on a page boundary, or the pairs shift by one for the
+      // rest of the session after a resize across the breakpoint.
+      setIndex((i) => (next === 2 ? i - (i % 2) : i));
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [columns]);
+
+  const pages = Math.ceil(photos.length / step);
+  const advance = () => setIndex((i) => (i + step) % photos.length);
 
   useEffect(() => {
+    if (!playing) return;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % photos.length), 6000);
+    const id = window.setInterval(() => setIndex((i) => (i + step) % photos.length), 6000);
     return () => window.clearInterval(id);
-  }, [photos.length]);
+  }, [photos.length, playing, step]);
 
   const panel = (offset: number, panelCaption?: string, extra = '') => (
-    <div className={`relative rounded-2xl overflow-hidden bg-slate-100 ${extra}`}>
+    <button
+      type="button"
+      onClick={() => {
+        setPlaying(false);
+        advance();
+      }}
+      aria-label="Next photograph"
+      className={`relative rounded-2xl overflow-hidden bg-slate-100 cursor-pointer text-left ${extra}`}
+    >
       {photos.map((photo, i) => (
         <img
-          key={photo.src}
+          // Keyed by POSITION, not by src: the same photograph may legitimately
+          // appear twice in a sequence (it opens and closes the tab-2 set), and
+          // a duplicate key would make React drop one of the two.
+          key={i}
           src={photo.src}
           alt={i === (index + offset) % photos.length ? photo.alt : ''}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${
@@ -373,11 +504,11 @@ const PhotoStrip: React.FC<{
         />
       ))}
       {panelCaption && (
-        <div className="absolute inset-x-0 bottom-0 px-4 pt-7 pb-2.5 text-white text-[13px] font-semibold bg-gradient-to-t from-slate-900/75 to-transparent">
+        <div className="absolute inset-x-0 bottom-0 px-4 pt-7 pb-2.5 text-white text-[15px] lg:text-[17px] font-semibold bg-gradient-to-t from-slate-900/75 to-transparent">
           {panelCaption}
         </div>
       )}
-    </div>
+    </button>
   );
 
   return (
@@ -386,17 +517,59 @@ const PhotoStrip: React.FC<{
       // viewport cap. The cap is what actually bounds it — the app root is
       // `min-h-screen`, so the frame handed down here can be taller than the
       // window and `grow` alone would over-allocate.
-      // Two panels side by side on a phone are tall narrow slabs; below sm the
-      // strip drops to a single full-width frame and the second panel hides.
-      // `transition-all` so a tab can collapse the strip to `max-h-0` and get
-      // its height back smoothly — tab 2 does exactly that when its fold-out
-      // card opens.
-      className={`grid gap-2 sm:gap-3.5 grow min-h-0 basis-0 overflow-hidden w-full mx-auto transition-all duration-300 motion-reduce:transition-none ${maxWidth} ${maxHeight} ${
-        columns === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
-      }`}
+      // `transition-all` + overflow-hidden so a tab can collapse the strip to
+      // `max-h-0` and get its height back smoothly — tab 2 does exactly that
+      // when its fold-out card opens. The cap and the clip belong to THIS
+      // element, which is why the controls sit inside it: collapsing the strip
+      // has to take its controls with it.
+      className={`grow min-h-0 basis-0 overflow-hidden w-full mx-auto flex flex-col gap-1.5 transition-all duration-300 motion-reduce:transition-none ${maxWidth} ${maxHeight}`}
     >
-      {panel(0, caption)}
-      {columns === 2 && panel(1, undefined, 'hidden sm:block')}
+      {/* Two panels side by side on a phone are tall narrow slabs; below sm the
+          strip drops to a single full-width frame and the second panel hides. */}
+      <div
+        className={`grid gap-2 sm:gap-3.5 grow min-h-0 ${
+          columns === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+        }`}
+      >
+        {panel(0, caption)}
+        {columns === 2 && panel(1, undefined, 'hidden sm:block')}
+      </div>
+
+      {/* Under the strip, never on it — same rule as PlateFigure's dots: on a
+          photograph a corner overlay lands on whatever that photograph happens
+          to have in the corner.
+
+          The play/pause is the last thing on the row and the quietest: it is
+          for the speaker, not the audience, and from the back of a hall it
+          should read as one more dot until you are looking for it. */}
+      <div className="shrink-0 flex items-center justify-center gap-2">
+        {/* One dot per PAGE, not per photograph — three dots for three pairs.
+            Seven dots under a strip that turns in threes was a count of the
+            wrong thing, and told the speaker nothing about where they were. */}
+        {Array.from({ length: pages }, (_, p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => {
+              setPlaying(false);
+              setIndex(p * step);
+            }}
+            aria-label={`Show ${step === 2 ? 'pair' : 'photograph'} ${p + 1}`}
+            aria-current={p === Math.floor(index / step)}
+            className={`h-2 w-2 rounded-full transition-colors cursor-pointer ${
+              p === Math.floor(index / step) ? 'bg-slate-600' : 'bg-slate-300 hover:bg-slate-400'
+            }`}
+          />
+        ))}
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          aria-label={playing ? 'Pause the photographs' : 'Play the photographs'}
+          className="ms-1.5 text-slate-300 hover:text-slate-500 transition-colors cursor-pointer leading-none"
+        >
+          {playing ? <Pause size={11} /> : <Play size={11} />}
+        </button>
+      </div>
     </div>
   );
 };
@@ -411,19 +584,19 @@ const PhotoStrip: React.FC<{
 // anyone can go and see, and the diptych is what the session made of them.
 const PLATES = [
   {
-    src: './h40-dolmen-archive.jpg',
+    src: './tab2/h40-dolmen-archive.jpg',
     alt: 'A dolmen standing in open grassland, capstone intact, hills behind — archival photograph',
   },
   {
-    src: './h40-tuba-field.jpg',
+    src: './tab2/h40-tuba-field.jpg',
     alt: 'A dolmen and its collapsed tumulus at Tuba-Zangariyye, an Antiquities Authority marker among the stones and the village immediately behind',
   },
   {
-    src: './h40-tuba-aerial.jpg',
+    src: './tab2/h40-tuba-aerial.jpg',
     alt: 'The dolmen field from the air: cairns scattered across the basalt plateau, cultivated fields and a reservoir beyond',
   },
   {
-    src: './tab4-gpt.jpg',
+    src: './tab4/tab4-gpt.jpg',
     alt: "Two drawn panels of the same dolmen field, four millennia apart — the reading no source in the file had made. Left, BRONZE AGE PASTORALISTS: a herding family beside the dolmen's cairn, goats and sheep grazing. Right, BEDOUIN ENCAMPMENT: black tents, a coffee hearth, and sheep sheltering under the capstone.",
   },
 ];
@@ -493,9 +666,13 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
 }) => (
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
     <div className="space-y-1.5 shrink-0">
-      <Eyebrow>The challenge</Eyebrow>
-      {/* "hallucinates", not "fabricates" — the paper's own abstract wording. */}
+      {/* The eyebrow rides the first line instead of standing above it — the
+          same move as tab 4, and it buys the strip below a line of height.
+          Here it reads as a lead-in rather than a label, so it keeps the colon
+          and comes FIRST: "The challenge: Give it freedom — it hallucinates."
+          "hallucinates", not "fabricates" — the paper's own abstract wording. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
+        <span className="label text-slate-400 align-middle me-2.5 whitespace-nowrap">The challenge</span>
         Give it freedom — it hallucinates.
         <br />
         Lock it down — it loses the AI power to synthesize
@@ -594,7 +771,7 @@ const WorkedExample: React.FC = () => (
     </div>
 
     <img
-      src="./dolmen.jpg"
+      src="./tab2/dolmen.jpg"
       alt="An IAA archaeologist surveying a dolmen in the Tuba-Zangariyye field, the village behind"
       className="w-full rounded-xl border border-slate-200"
     />
@@ -634,7 +811,7 @@ const WorkedExample: React.FC = () => (
 
       <div>
         <p className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">
-          6. Intangible Heritage — "Layers of Narrative Across Traditions" <Inf />
+          6. Intangible Heritage — "A Landscape of Imagination Across Traditions" <Inf />
         </p>
 
         <EvidenceLabel>Evidence</EvidenceLabel>
@@ -648,8 +825,9 @@ const WorkedExample: React.FC = () => (
         <EvidenceLabel>Broader meaning</EvidenceLabel>
         <p className="text-[length:var(--t2-ex-body)] leading-relaxed">
           The intangible context (Stage 1) frames the dolmens as persistent stimuli for narrative
-          production. However, the evidence linking these specific textual traditions to the
-          Tuba-Zangariyye field (rather than to Korazim Plateau dolmens generally) is indirect{' '}
+          production. However, the evidence linking these specific
+          textual traditions to the Tuba-Zangariyye field (rather than to Korazim Plateau dolmens
+          generally) is indirect{' '}
           <Hyp /> — the association is plausible given proximity but not site-specific.
         </p>
       </div>
@@ -732,28 +910,39 @@ const challengeColors: Record<string, { border: string; bg: string; text: string
   emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-900/70', quote: 'text-emerald-900' },
 };
 
+// The tab scrolls, so its vertical budget is not a hard frame — but everything
+// spent above the challenge cards is something the room has to scroll past to
+// reach them. space-y-3 rather than 5 for that reason.
 const WhatIsInSitesTab: React.FC = () => (
-  <div className="space-y-5">
-    {/* Poster */}
-    <div className="max-w-3xl mx-auto">
+  <div className="space-y-3">
+    {/* Poster. The line is ON the picture, in its sky — which is the only
+        reason the picture could grow: a caption that costs no height of its own
+        gives its height to the image. Same overlay device as the photo strip on
+        tab 2, mirrored to the top edge, because up there the illustration is
+        clouds and the words have somewhere quiet to sit.
+
+        White on a scrim, not dark type on the sky: the sky is pale but it is
+        not uniform, and a gradient is the only way to promise legibility over
+        an image you did not draw for the purpose. rounded-t-2xl so the scrim
+        keeps the picture's own corners.
+
+        SIZE KNOB — max-w below. The picture is centred, so this is the one
+        number that grows it; 52rem is a step up from the 48rem it had. Sizes on
+        this tab come from --t1-* in index.css, tunable live in DevTools. */}
+    <div className="max-w-[48rem] mx-auto relative">
       <img
         src="./poster-light.jpg"
         alt="InSites-CAA — CBSA Workshop"
         className="w-full rounded-2xl border border-slate-200 shadow-sm"
       />
-      {/* Sizes on this tab come from --t1-* in index.css, so they can be
-          tried out live in DevTools. See the block there. */}
-      <p className="text-center text-[length:var(--t1-lead)] text-slate-500 italic mt-2">
+      <p className="absolute inset-x-0 top-0 rounded-t-2xl px-4 pt-3 pb-9 text-center text-[length:var(--t1-lead)] font-semibold text-white drop-shadow-sm bg-gradient-to-b from-slate-900/70 via-slate-900/35 to-transparent">
         "The LLM is a looking glass — more than a wonderland"
       </p>
-      {/* <p className="text-center text-[13px] sm:text-sm text-slate-400 mt-1">
-        CBSA and the transformer share a core idea: meaning emerges from context.
-      </p> */}
     </div>
 
     {/* Intro line */}
     <p className="text-[length:var(--t1-lead)] text-slate-600 leading-relaxed">
-      AI already speaks our language and is becoming an active partner in culture. We examine how it can help with the cultural assessment challenges:
+      AI already speaks our language and is becoming an active partner in culture. <br/> We examine how it can help with the cultural assessment challenges:
     </p>
 
     {/* 3 Challenge cards with character avatars */}
@@ -787,15 +976,15 @@ const WhatIsInSitesTab: React.FC = () => (
       })}
     </div>
 
-    {/* Lab intro */}
+    {/* Lab intro. What the LAB is — the three-way intersection — moved to the
+        closing tab, where it belongs beside the credit and the repository: it
+        is who to remember, and this tab is about what the tool is. What stays
+        here is the tool. */}
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 lg:p-5 space-y-2">
       <h4 className="font-bold text-[length:var(--t1-quote)] text-slate-800">InSites Knowledge Lab</h4>
       <p className="text-[length:var(--t1-answer)] text-slate-400">Technion — Israel Institute of Technology</p>
       <p className="text-[length:var(--t1-answer)] text-slate-700 leading-relaxed">
-        At the intersection of <strong>assessment methods</strong>, <strong>novel technologies</strong>, and <strong>built-heritage data</strong> — we develop computational methods for evidence-based heritage assessment.
-      </p>
-      <p className="text-[length:var(--t1-answer)] text-slate-700 leading-relaxed">
-        InSites-CAA is our research prototype: a multi-platform AI assistant that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
+        InSites is our research prototype: a multi-platform AI environment that structures heritage significance assessment through the CBSA method. Not a black box — a looking glass.
       </p>
     </div>
   </div>
@@ -830,33 +1019,116 @@ const NOTATION_KEY: { mark: React.ReactNode; meaning: string; rowClass: string }
   },
 ];
 
-// 24 + 14 + 4 + 3 = 45. The fifth tile is what used to be missing from the
-// sum: three claims counted apart because they are the ones that failed.
-// The second tile does NOT say "unmarked": in those 24 cases the model did
+// The tile row's partition, as the speaker counts the session: 24 citations +
+// 20 epistemic marks (16 〰️, of which 2 rejected → 14/16 accepted · 4 💭) +
+// 1 unmarked = 45. The marks pair sits inside ONE framed box (see the row in
+// the component) so the row itself draws the distinction that matters: marked
+// (whatever then happened to it) versus the single claim that carried nothing.
+// The 14/16 fraction is where the rejections live — no separate tile needed.
+// The "explicit" tile does NOT say "unmarked": in those 24 cases the model did
 // something — it pinned the claim to a page — and the word for that is the
 // citation, not the absence of a glyph.
-const CLAIM_COUNTS: { n: string; label: string; token?: string; tokenClass?: string; color: string }[] = [
-  { n: '45', label: 'claims', color: 'text-slate-900' },
-  // The citation format is a footnote on the tile; the glyphs are the point of
-  // it — so they are sized in opposite directions.
-  { n: '24', label: 'explicit', token: '[file:page]', tokenClass: 'font-mono text-[8px] sm:text-[10px] text-slate-400', color: 'text-slate-900' },
-  { n: '14', label: 'inferred', token: '〰️', tokenClass: 'text-[15px] sm:text-[19px]', color: 'text-amber-800' },
-  { n: '4', label: 'hypotheses', token: '💭', tokenClass: 'text-[15px] sm:text-[19px]', color: 'text-purple-800' },
-  // Same verb as the bottom line below ("the expert caught the other three"),
-  // so the tile and the sentence read as one statement.
-  { n: '3', label: 'caught', color: 'text-slate-900' },
-];
+//
+// NOTE, and it is not a discrepancy: the repo's claim-level files count what
+// the system MARKED (14 °), this slide counts what the claims WERE (16
+// inferences, 2 of which the expert rejected). Same 45 claims, two framings —
+// one measures the notation's output, the other the session's content. The
+// mapping between them is written out in docs/tab3-count-mapping.md, which is
+// where to send anyone who arrives at Q&A having added up the dataset.
+// (This slide superseded the "42 of 45 held / 3 caught" build, 2026-08-26.)
+
+// ─── The Rule, on demand ──────────────────────────────────────────
+// "When in doubt — mark it" is the sentence the whole notation rests on, and
+// it used to sit under the key permanently. Two costs: it is four lines of
+// small italic prose competing with the three rows it is a footnote to, and
+// once it is always there the room stops reading it. Now the table carries a
+// button and the sentence arrives when the speaker calls it.
+//
+// It expands IN FLOW rather than floating: the card around the key is
+// `overflow-y-auto`, so an absolutely-positioned panel would be clipped by it.
+// A block that pushes is also the honest shape here — this is the key's own
+// footnote, not an annotation hovering over something else.
+//
+// Closing: the X, Escape, or a click anywhere outside. Same three exits as
+// SpeakerNote, for the same reason — at a lectern you must be able to dismiss
+// a panel without aiming.
+const NotationRule: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    const onPointerDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    document.addEventListener('mousedown', onPointerDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mousedown', onPointerDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={`w-full flex items-center justify-between gap-3 px-3 sm:px-4 py-2 border-t border-slate-200 text-left transition-colors cursor-pointer ${
+          open ? 'bg-slate-50 text-slate-700' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+        }`}
+      >
+        <span className="label">The rule</span>
+        <ChevronDown
+          size={16}
+          className={`shrink-0 transition-transform duration-300 motion-reduce:transition-none ${
+            open ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="relative px-3 sm:px-4 pt-3 pb-3.5 bg-slate-50 border-t border-slate-200 animate-fade-in">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close the rule"
+            className="absolute top-2 right-2 sm:right-3 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-white transition-colors cursor-pointer"
+          >
+            <X size={16} />
+          </button>
+          <p className="pr-8 text-[length:var(--t3-rule)] text-slate-600 italic leading-snug">
+            "When in doubt — mark it. Better an unnecessary notation than an unmarked claim that
+            appears factual."
+            <span className="not-italic text-slate-400"> — Global Notation Key (Mandatory), InSites v10</span>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const EpistemicNotationTab: React.FC<{
   onNavigate?: (route: string) => void;
 }> = ({ onNavigate }) => (
-  // Frame-fit, like tabs 2 and 4: the 42-of-45 panel is this slide's payoff and
-  // must not sit below the fold when the speaker lands the sentence. Everything
+  // Frame-fit, like tabs 2 and 4: the false-negative panel is this slide's
+  // payoff and must not sit below the fold when the speaker lands it. Everything
   // is shrink-0 except the quoted key card, which is the one element allowed to
   // give up height (and scroll inside itself) on a short screen.
-  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-4">
+  //
+  // The gap is 14px and not 16 for a measured reason: this tab has six blocks,
+  // so every 2px on the gap is 10px off the bottom of the slide, and after the
+  // small type went up a step that was the margin between the payoff sitting in
+  // frame and sitting under it.
+  <div className="grow min-h-0 overflow-hidden flex flex-col gap-3 sm:gap-3.5">
     <div className="space-y-1.5 shrink-0">
-      <Eyebrow>The core mechanism</Eyebrow>
+      {/* No eyebrow. "The core mechanism" was a label for a headline that
+          already announces itself, and this is the tab with least room to
+          spare — the line it took is now the payoff's. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[41px] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
@@ -895,12 +1167,9 @@ const EpistemicNotationTab: React.FC<{
           ))}
         </tbody>
       </table>
-      {/* The Rule line is prompt text too, so it stays inside the border. The
-          attribution rides the same line — provenance at no height cost. */}
-      <p className="px-3 sm:px-4 py-2.5 text-[length:var(--t3-rule)] text-slate-500 italic leading-snug">
-        "When in doubt — mark it. Better an unnecessary notation than an unmarked claim that appears factual."
-        <span className="not-italic text-slate-400"> — Global Notation Key (Mandatory), InSites v10</span>
-      </p>
+      {/* The Rule is prompt text too, so it stays inside this border — but it
+          is now folded away behind a button. See NotationRule. */}
+      <NotationRule />
     </div>
 
     {/* The line that used to sit here — "the first tier's mark IS the citation"
@@ -930,7 +1199,9 @@ const EpistemicNotationTab: React.FC<{
           short on purpose — see the sublabel note in index.css: past about
           105 characters it wraps at the projector, and it wraps EARLIER on a
           1600-wide screen, so 70 is the safe neighbourhood. */}
-         <p style={{ padding: "10px" }}></p> 
+      {/* This used to be an empty <p> with 10px of padding — 20px of nothing,
+          which is exactly what the enlarged type needed back. The air above the
+          Test divider now comes from the column's own gap. */}
       <SectionDivider
         label="The Test:One site, one expert — hand vs. InSites assisted"
         sublabel="On the assisted route, the expert reviewed and approved every stage."
@@ -938,30 +1209,69 @@ const EpistemicNotationTab: React.FC<{
       />
     </div>
 
-    <div className="shrink-0 grid grid-cols-5 gap-1.5 sm:gap-3.5">
-      {CLAIM_COUNTS.map((c) => (
-        <div key={c.label} className="bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
-          <p className={`text-[length:var(--t3-tile-n)] leading-tight font-extrabold ${c.color}`}>{c.n}</p>
+    {/* The tile row — see the partition note above the component. Four cells,
+        one of them a framed PAIR: the frame is what says "these two are the
+        same kind of thing" (a claim that wore a mark), so the row reads left
+        to right as the epistemic spectrum — cited · marked · nothing. The
+        rejections live inside the 〰️ fraction, not in a tile of their own:
+        14/16 IS the reject count, one glance. */}
+    <div className="shrink-0 flex items-stretch gap-1.5 sm:gap-3.5">
+        <div className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
+          <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-slate-900">45</p>
+          <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">claims</p>
+        </div>
+        <div className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
+          <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-slate-900">24</p>
           <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
-            {c.label}
-            {c.token && (
-              // normal-case so the label's uppercase does not eat the token.
-              <span className={`normal-case align-middle ${c.tokenClass}`}> {c.token}</span>
-            )}
+            explicit <span className="normal-case align-middle font-mono text-[8px] sm:text-[10px] text-slate-400">[file:page]</span>
           </p>
         </div>
-      ))}
-    </div>
+        {/* The framed pair. The chip on the border carries the group's own
+            number — 20 — so the row still sums out loud: 24 + 20 + 1 = 45. */}
+        <div className="flex-[2] min-w-0 relative border-2 border-slate-300 rounded-xl bg-slate-50 px-1.5 pt-2 pb-1.5 sm:px-3.5 sm:pt-2.5 sm:pb-2.5">
+          <span className="absolute -top-2 sm:-top-2.5 left-2.5 sm:left-3.5 bg-white px-1.5 rounded label text-slate-500">
+            epistemic marks · 20
+          </span>
+          <div className="grid grid-cols-2 h-full">
+            <div className="pr-1.5 sm:pr-3">
+              <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-amber-800">
+                14<span className="text-[0.55em] font-bold text-amber-800/60">/16</span>
+              </p>
+              <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
+                accepted <span className="normal-case align-middle text-[15px] sm:text-[19px]"> 〰️</span>
+              </p>
+            </div>
+            <div className="pl-1.5 sm:pl-3 border-l border-slate-200">
+              <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-purple-800">4</p>
+              <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
+                hypotheses <span className="normal-case align-middle text-[15px] sm:text-[19px]"> 💭</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
+          <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-rose-800">1</p>
+          <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">unmarked · wrong</p>
+        </div>
+      </div>
 
-    {/* The bottom line on performance: what the marking was worth, and where
-        the three missing from the sum went. No percentage — the paper reports
-        none, and one case with one expert does not support one. */}
+    {/* The bottom line on performance — the notation's whole scorecard as a
+        detector: across the test, exactly one claim that needed a mark reached
+        the expert without one. The line under it says what that one was —
+        unmarked, an inference, and wrong on its content: the complete false
+        negative — and that the human layer caught it. "42 of 45 held" is the
+        speaker's line, not the screen's. The two content rejections keep their
+        own clause so the two axes (marking vs. validity) never blur into one
+        count. No percentage — the paper reports none, and one case with one
+        expert does not support one. */}
     <div className="shrink-0 border-l-4 border-indigo-500 bg-slate-50 rounded-r-xl px-5 py-4">
       <p className="text-[length:var(--t3-payoff)] font-bold text-slate-900 leading-snug">
-        42 of 45 held. The expert caught the other three — in the session.
+        One false negative in 45.
       </p>
       <p className="text-[length:var(--t3-payoff-sub)] text-slate-500 mt-1.5">
-        One claim was wrong · one did not belong · one inference went unmarked.
+        The one claim that slipped the notation was unmarked, inferred — and wrong. The expert
+        caught it in session; two marked inferences <span className="align-middle">〰️</span> she
+        rejected on content.
       </p>
     </div>
 
@@ -996,11 +1306,17 @@ const FromReportToInquiryTab: React.FC = () => (
   // which takes only what is left over.
   <div className="grow min-h-0 overflow-hidden flex flex-col gap-2.5 lg:gap-3">
     <div className="space-y-1 shrink-0">
-      <Eyebrow>The LLM insight</Eyebrow>
+      {/* The eyebrow rides the headline instead of standing on its own line.
+          It is a four-word attribution, not a section name, and a line of its
+          own gave it the weight of one — while costing the plate below the
+          height that line took. Same `.label` device as every other eyebrow on
+          the deck, just set inline; whitespace-nowrap so it breaks away from
+          the title as a unit rather than mid-phrase. */}
       <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
         A Landscape of Imagination.
+        <span className="label text-slate-400 align-middle ms-2.5 whitespace-nowrap">The LLM insight</span>
       </h3>
-      <p className="text-[15px] sm:text-base lg:text-[17px] text-slate-500 pt-0.5">
+      <p className="text-base sm:text-lg lg:text-[21px] text-slate-500 pt-0.5">
         Two values the manual assessment had not reached.
       </p>
     </div>
@@ -1025,7 +1341,7 @@ const FromReportToInquiryTab: React.FC = () => (
       </div>
       <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
         <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
-          Intangible Heritage — "Layers of Narrative Across Traditions"{' '}
+          Intangible Heritage — "A Landscape of Imagination Across Traditions"{' '}
           <Inf />
         </p>
       </div>
@@ -1037,14 +1353,17 @@ const FromReportToInquiryTab: React.FC = () => (
         own padding — costs roughly 30vh of a 1080 screen, and MORE when the
         two headings wrap to a second line, which they do at this width. So
         70vh here asked for a plate the frame could not seat: the photograph
-        ran to the bottom edge and its dots went off-screen. 58 leaves the
-        image whole with air under it.
+        ran to the bottom edge and its dots went off-screen.
+
+        It is now 62, up from 58: folding the eyebrow into the headline gave
+        the block back a line, and this is where that line went — the plate
+        is the slide's whole payload, so spare height belongs to it.
 
         Raise it only while watching the dots under the plate: the moment
         they touch the bottom edge you have taken back more than there is.
         Keep the /var(--app-zoom) divisor — a bare vh is painted 1.1x and
         overflows by exactly that 10%. */}
-    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[42vh] sm:max-h-[calc(58vh/var(--app-zoom))]" />
+    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(62vh/var(--app-zoom))]" />
 
     {/* Nothing after the plate. The imagination reading rose into the
         headline; its provenance — "the phrase is the expert's, not the
@@ -1053,17 +1372,6 @@ const FromReportToInquiryTab: React.FC = () => (
 );
 
 // ─── 5 · Q&A ──────────────────────────────────────────────────────
-
-type BackupItem = { label: string; note: string; route?: string; action?: 'worked-example' | 'design' };
-
-const BACKUP_MATERIAL: BackupItem[] = [
-  { label: 'The notation', note: 'Three tiers, prose coherence, where it activates', route: 'notation' },
-  { label: 'Worked example', note: 'The Tuba-Zangariyye assessment, claim by claim', action: 'worked-example' },
-  { label: 'Design principles', note: 'Transparency, control, evidence governance', action: 'design' },
-  { label: 'Knowledge graph', note: 'Contexts and values as a navigable graph', route: 'graph-view' },
-  { label: 'Assessment dashboard', note: 'The assessment read back as structured evidence', route: 'dashboard-preview' },
-  { label: 'Glossary', note: 'CBSA terms used in the talk', route: 'glossary' },
-];
 
 // ─── Speaker note ─────────────────────────────────────────────────
 // A note only the presenter reads. The browser's own `title` tooltip was the
@@ -1121,7 +1429,7 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
           // edge — it opens INWARD, away from the frame, and never clips.
           <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
             <p className="label text-slate-400 mb-2.5">Speaker note</p>
-            <div className="space-y-2.5 text-[15px] lg:text-base leading-relaxed text-slate-700">
+            <div className="space-y-2.5 text-[16px] lg:text-[18px] leading-relaxed text-slate-700">
               {children}
             </div>
           </div>
@@ -1146,9 +1454,9 @@ const QaTab: React.FC<{
     {/* ── The closing ─────────────────────────────────────────────────
         THREE BANDS, not six stacked blocks.
 
-          1  a full-width header — eyebrow, title, credit
+          1  a full-width header — eyebrow and title
           2  a row: the question on the left, the poster on the right
-          3  the repository, full width, tight underneath
+          3  the credit line and the repository, full width, tight underneath
 
         The old arrangement put all six in one column, which cost it three
         things. The poster was centred while everything else was flush left,
@@ -1172,7 +1480,9 @@ const QaTab: React.FC<{
         thing that line cannot do. */}
     <div className="space-y-4 lg:space-y-5">
       <div className="space-y-1.5">
-        <Eyebrow>Closing</Eyebrow>
+        {/* No eyebrow. The tab is called Closing and it is the last one lit in
+            the bar — labelling the slide "Closing" as well told the room what
+            it could already see, above the one line it should be reading. */}
         {/* The talk's own title, and the only place it appears. The conference
             says Heritage 4.0; this names what 4.0 means for one practice
             inside it, and final/open + report/inquiry is a double antithesis.
@@ -1183,28 +1493,19 @@ const QaTab: React.FC<{
             set at 0.8em — a ratio, not a size, so it stays proportional at
             every breakpoint. Set level it read as two titles competing. */}
         <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-          Significance Assessment 4.0 —
+          Significance Assessment 4.0:
           <br />
           <span className="text-[0.8em]">from a final report to an open inquiry</span>
         </h3>
-        {/* The credit line, which is also the contact line — a closing slide
-            is photographed, and the first author is who people write to. */}
-        <p className="text-sm sm:text-base lg:text-[17px] text-slate-500 pt-1">
-          Alef, Shafriri &amp; Berger · Heritage 4.0, Florence 2026 ·{' '}
-          <a
-            href="mailto:yaelalef@technion.ac.il"
-            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
-          >
-            yaelalef@technion.ac.il
-          </a>
-        </p>
       </div>
 
-      {/* Bands 2 and 3, kept as ONE unit: the row, then the repository 8px
-          under it. The picture and the address where it lives are the thing
-          you look at and the thing you type — a wider gap made them two
-          announcements instead of one. */}
-      <div className="space-y-2">
+      {/* Bands 2 and 3, still ONE unit — the picture, the names and the address
+          are what you look at and what you photograph, and they belong to each
+          other. But 8px was not "one unit", it was stacked: four full-width
+          strips touching, with no air to tell the room where one ends. 12px on
+          a laptop and 20px at the projector keeps them a group and lets them
+          breathe. */}
+      <div className="space-y-3 lg:space-y-5">
         {/* THE ROW — variant C, the undercut. Two boxes side by side read as a
             picture pasted next to a panel, however well aligned. So they now
             OVERLAP: the panel is pulled --t5-veil to the right over the image
@@ -1233,7 +1534,7 @@ const QaTab: React.FC<{
               afford both", and this closes it on the same verb.
               The speaker's script is one click away in the corner — see
               SpeakerNote; invisible to the hall. */}
-          <div className="relative z-10 lg:flex-1 min-w-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 lg:pr-[calc(var(--t5-veil)+40px)] lg:-mr-[var(--t5-veil)] lg:[mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] lg:[-webkit-mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] flex flex-col justify-center gap-2">
+          <div className="relative z-10 lg:flex-1 min-w-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 lg:pr-[calc(var(--t5-veil)+40px)] lg:-mr-[var(--t5-veil)] lg:[mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] lg:[-webkit-mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] flex flex-col justify-center gap-3 lg:gap-4">
             <SpeakerNote className="absolute top-2.5 right-2.5">
               <p>Let me end with the thought experiment the paper ends with.</p>
               <p>
@@ -1249,14 +1550,14 @@ const QaTab: React.FC<{
             </SpeakerNote>
 
             <p className="text-[22px] sm:text-[26px] lg:text-[34px] font-bold text-slate-900 leading-snug pr-8">
-              Imagine a perfect assessment machine —{' '}<br/>
+              Imagine a perfect assessment machine{' '}<br/>
               <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
             </p>
             {/* Subordinate on purpose, and by a clear step — this is the lens
                 the question is answered through, not a second headline. At 26px
                 it was standing level with the question and the slide had two
                 voices. */}
-            <p className="text-[15px] sm:text-[17px] lg:text-[21px] text-indigo-950/55">
+            <p className="text-[17px] sm:text-[19px] lg:text-[23px] text-indigo-950/55">
               Who assesses is part of what is assessed.
             </p>
           </div>
@@ -1277,6 +1578,8 @@ const QaTab: React.FC<{
           />
         </div>
 
+       
+
         {/* The link the paper carries, so it has to be findable and
             photographable: bigger mark, the repo name at headline weight, the
             path beside it. Full width under the row — see the band note above
@@ -1285,7 +1588,7 @@ const QaTab: React.FC<{
           href={REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-3.5 sm:px-6 sm:py-4 transition-colors"
+          className="flex items-center gap-5 sm:gap-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 py-4 sm:px-7 sm:py-5 transition-colors"
         >
           <Github size={44} className="shrink-0" />
           <span className="flex-1 min-w-0">
@@ -1294,64 +1597,68 @@ const QaTab: React.FC<{
             <span className="block font-mono text-[17px] sm:text-[21px] lg:text-[25px] font-bold leading-tight">
               {REPO_LABEL}
             </span>
-            <span className="block text-[13px] sm:text-[15px] lg:text-[17px] text-slate-400 mt-1">
+            <span className="block text-[15px] sm:text-[17px] lg:text-[19px] text-slate-400 mt-1.5">
               The <span className="font-mono text-slate-300">/system</span> folder — the workflow,
               the specs, and the claim-level evidence behind this talk
             </span>
           </span>
           <ExternalLink size={20} className="text-slate-400 shrink-0" />
         </a>
+ {/* Two addresses, and nothing else. It was a full credit line — names,
+            conference, city, year — and every word of that is already known to
+            the room: the names are in the header, the conference is the room
+            they are sitting in. What a closing slide is photographed FOR is the
+            way to reach someone afterwards, so the line was cut down to exactly
+            that, and the addresses are what got bigger when the rest went.
+
+            It sits HERE, under the row and immediately above the repository,
+            rather than under the title where a credit conventionally goes. The
+            headline is a claim and a question, and a credit directly beneath it
+            interrupted the talk's last sentence; and this is the other line
+            people photograph, so it belongs beside the address they type. */}
+        <p className="text-lg sm:text-xl lg:text-[23px] tracking-wide text-slate-500 mt-1">
+          <a
+            href="mailto:yaelalef@technion.ac.il"
+            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
+          >
+            yaelalef@technion.ac.il
+          </a>
+          <span aria-hidden="true"> · </span>
+          <a
+            href="mailto:yuval.shafriri@gmail.com"
+            className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700 hover:decoration-slate-500 transition-colors"
+          >
+            yuval.shafriri@gmail.com
+          </a>
+        </p>
+        {/* The lab, last and quietest — it came up from tab 1, where it was
+            explaining who we are on a slide about what the tool is. Here it
+            has the right neighbours: the names above it and the repository
+            beside it are the same question ("who made this, and where does
+            it live"), and this answers the half the other two cannot. */}
+        <p className="text-base sm:text-lg lg:text-[21px] text-slate-500 leading-relaxed">
+          <span className="font-bold text-slate-600">InSites Knowledge Lab</span> · Technion — at the
+          intersection of <strong className="font-semibold text-slate-600">assessment methods</strong>,{' '}
+          <strong className="font-semibold text-slate-600">novel technologies</strong>, and{' '}
+          <strong className="font-semibold text-slate-600">built-heritage data</strong>, we develop
+          computational methods for evidence-based heritage assessment.
+        </p>
       </div>
     </div>
-    <BelowTheFold
-      onNavigate={onNavigate}
-      onOpenWorkedExample={onOpenWorkedExample}
-      onOpenDesign={onOpenDesign}
-    />
   </div>
 );
 
-// Everything under the closing, shared by both closings while they are being
-// judged against each other. It was inline in QaTab; extracting it is what
-// keeps the two variants from drifting apart in the part that is NOT being
-// compared. When one closing wins, this can stay or be folded back in.
-const BelowTheFold: React.FC<{
-  onNavigate?: (route: string) => void;
-  onOpenWorkedExample: () => void;
-  onOpenDesign: () => void;
-}> = ({ onNavigate, onOpenWorkedExample, onOpenDesign }) => (
-  <>
-    {/* The gap that puts the toolbox below the fold. It was an <hr> inside a
-        <p>, which browsers un-nest — the paragraph closes before the rule and
-        the padding lands somewhere other than where it reads in the source. A
-        plain spacer does exactly what it says. */}
-    <div className="h-16 lg:h-28" aria-hidden="true"></div>
-
-    {/* ── Below the fold: the toolbox ─────────────────────────────── */}
-    <SectionDivider
-      label="During questions"
-      sublabel="The material behind the talk — every card opens live, in this deck."
-      colorClass="text-slate-800"
-    />
-
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-      {BACKUP_MATERIAL.map((item) => (
-        <button
-          key={item.label}
-          onClick={() => {
-            if (item.action === 'worked-example') return onOpenWorkedExample();
-            if (item.action === 'design') return onOpenDesign();
-            onNavigate?.(item.route!);
-          }}
-          className="text-left bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-xl px-3 py-2 sm:px-4 sm:py-3 transition-colors cursor-pointer"
-        >
-          <span className="block text-sm sm:text-[15px] font-bold text-slate-800">{item.label}</span>
-          <span className="hidden sm:block text-sm text-slate-500">{item.note}</span>
-        </button>
-      ))}
-    </div>
-  </>
-);
+// There is nothing below the closing any more. A "During questions" toolbox of
+// six buttons used to live here — the notation, the worked example, the design
+// principles, the graph, the dashboard, the glossary — one scroll under the
+// fold. It was removed on 2026-08-26: every one of those is still reachable
+// while the closing is up (the tab bar, the deck's own hashes, the fold-out on
+// tab 2), so the grid was a second door to rooms that already had one, sitting
+// under the slide that has to be the last thing on the screen.
+//
+// If the toolbox is ever wanted back, it was: a `h-16 lg:h-28` spacer to make
+// the fold, a SectionDivider labelled "During questions", and a 3-column grid
+// over a BACKUP_MATERIAL array of {label, note, route|action}.
 
 // ─── 5b · The closing, dark ───────────────────────────────────────
 // A SECOND BUILD OF THE SAME SLIDE, to be judged against the live one on a
@@ -1497,12 +1804,6 @@ const QaTabDark: React.FC<{
         <ExternalLink size={20} className="text-slate-400 shrink-0" />
       </a>
     </div>
-
-    <BelowTheFold
-      onNavigate={onNavigate}
-      onOpenWorkedExample={onOpenWorkedExample}
-      onOpenDesign={onOpenDesign}
-    />
   </div>
 );
 

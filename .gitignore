@@ -58,6 +58,11 @@ desktop.ini
 node_modules/
 workshop-site/dist/
 workshop-site/.vite/
+# Packed builds made for a manual upload. Never tracked: they are dist/ in a
+# wrapper, and a build carries whatever GEMINI_API_KEY was in the shell that
+# produced it (vite.config loadEnv reads process.env with an empty prefix).
+workshop-site/dist*.zip
+workshop-site/dist*.7z
 
 # Local tooling config
 .playwright-mcp/

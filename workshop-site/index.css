@@ -33,7 +33,7 @@ html {
 
 @media (min-width: 64rem) {
     :root {
-        --app-zoom: 1.1;
+        --app-zoom: 1.0;
     }
 }
 
@@ -41,8 +41,13 @@ html {
     zoom: var(--app-zoom);
 }
 
-/* ── SIDEBAR TYPE — four numbers, tunable without a rebuild ───────
-   Every piece of text in the process column reads its size from here.
+/* ── SIDEBAR TYPE, FULL BUILD (tab 1) — four numbers ──────────────
+   Every piece of text in the process column reads its size from here. These
+   are the numbers for the FULL build — the one on tab 1, where the framework
+   is what the talk is about. The compact build for tabs 2-5 overrides them a
+   few lines down; which build is on screen is decided by SIDEBAR_MODE in
+   WorkshopProgramView, and the widths that go with each live in App.tsx.
+
    Two ways to change them:
 
    1. LIVE, to try options — open DevTools, Elements, select the <html>
@@ -70,7 +75,83 @@ html {
     --sb-heading: 20px;  /* "Assessment Process (CBSA Approach)" */
     --sb-title: 20px;    /* stage name — the main driver of button height */
     --sb-role: 20px;     /* the line under the stage name */
-    --sb-legend: 13px;   /* the ○ / ● key at the bottom */
+    --sb-legend: 15px;   /* the ○ / ● key at the bottom */
+}
+
+/* ── SIDEBAR PALETTE — three colours that move together ───────────
+   The process column's own ground, and the two things drawn directly on
+   it. Everything else in that column sits on a CARD, not on the rail, so
+   it is untouched by these — which is what makes a dark rail a one-line
+   change instead of a re-theme.
+
+     --sb-bg    the rail's ground
+     --sb-ink   the quiet text ON the rail: the framework heading at the
+                top and the o / * key at the bottom
+     --sb-line  the spine's grey strokes, the rail's right border, and the
+                grip inside the resize handle
+
+   Change them as a SET — a row of the table below — or the rail goes
+   dark while its own hairlines stay light. Live in DevTools: select the
+   <html> element, edit this :root rule, watch it repaint.
+
+   PRESETS, light to dark. Copy a row.
+
+     white     #ffffff   #94a3b8   #e2e8f0
+     slate-50  #f8fafc   #94a3b8   #e2e8f0
+     shell     #f1f5f9   #94a3b8   #cbd5e1   (the app's own background)
+     tinted    #e9eef5   #7c8899   #cbd5e1   <- current
+     slate-200 #e2e8f0   #64748b   #cbd5e1
+     dusk      #334155   #cbd5e1   #475569
+     dark      #1e293b   #cbd5e1   #334155
+     ink       #0f172a   #94a3b8   #1e293b
+
+   The dark half of that table is a real option, not a courtesy: the stage
+   cards are white and stay white, so a dark rail reads as a dark rail
+   carrying pale chips. Two things to look at when you go down there —
+   the indigo core segment of the spine (deliberately NOT a variable: it
+   is a semantic mark for CBSA stages 1-5, and indigo-300 holds on either
+   ground), and the Extensions & Tools card, which stays pale indigo and
+   becomes the brightest thing in the column.
+
+   NOTE the rail also carries `backdrop-blur-md`, which does nothing once
+   this colour is opaque. Give a preset an alpha (#f8fafcE6) and the blur
+   comes back. */
+:root {
+    --sb-bg: #eef0f5;
+    --sb-ink: #6f8098;
+    --sb-line: #cbd5e1;
+}
+
+/* ── SIDEBAR TYPE, COMPACT BUILD (tabs 2-5) — the same four ───────
+   The same four numbers, quieter. On tabs 2-5 the process column is not the
+   subject, it is the reminder of where in the process we are, so it steps back
+   to 360px and this type. The stage DESCRIPTIONS are dropped there too (that
+   is markup, in Sidebar.tsx, not a size) — what is left is a list of names.
+
+   Scoped to [data-sb="compact"] rather than to a media query: the trigger is
+   which slide is up, not how wide the window is. The <aside> carries the
+   attribute and CSS variables inherit, so every --sb-* reader below it swaps
+   in one go. Tune these in DevTools exactly like the block above — select the
+   <aside data-sb="compact"> element instead of <html>.
+
+   WHAT BREAKS FIRST if you raise --sb-title: with no role line under it, the
+   longest STAGE NAME is now the line that governs — "0 - Pre-check & Data
+   Inventory", 30 characters at roughly 0.52 x --sb-title each. It has about
+   (360 - 100) = 260px, so 16px fits with a little to spare and 18px does not:
+   it wraps to two lines and the whole spine grows. Raise the compact width in
+   App.tsx with it, or leave it here.
+
+   --sb-role survives with a value because ONE card still uses it: Extensions &
+   Tools, which is off the spine and keeps its description in both builds. Keep
+   it well under --sb-title or the two lines read as one block.
+
+   Remember --app-zoom again: on a projector these are painted 1.1x, so 16px
+   lands as ~17.6px. Judge it on the screen. */
+[data-sb="compact"] {
+    --sb-heading: 15px;
+    --sb-title: 16px;
+    --sb-role: 14px;
+    --sb-legend: 13px;
 }
 
 /* ── THE LABEL — one uppercase device for the whole deck ───────────
@@ -91,20 +172,25 @@ html {
 
    Colour stays with the caller (slate-400 for a whisper, slate-500 when it
    labels something being read), because that is the one difference between
-   these uses that a room can actually see. */
+   these uses that a room can actually see.
+
+   Raised one step across the board (12/13/14 -> 13/15/16) in the 2026-08-26
+   pass over every small size on the deck: uppercase at 14px is legible on a
+   laptop and gone from row 15, and a label that cannot be read is not a
+   quiet label, it is a decoration. */
 :root {
-    --label: 12px;
+    --label: 13px;
 }
 
 @media (min-width: 40rem) {
     :root {
-        --label: 13px;
+        --label: 15px;
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --label: 14px;
+        --label: 16px;
     }
 }
 
@@ -138,12 +224,20 @@ html {
    lg, set in WorkshopProgramView because it is a width and a height at
    once, not a spacing. Take the padding to 0 and the cards still cannot
    be shorter than the circles. --t1-card-gap is the air between the
-   three of them. */
+   three of them.
+
+   The padding is deliberately close to that floor: 8px at lg against an
+   80px avatar means the card is 96px and reads as a portrait with a
+   question beside it, which is what it is. Earlier values (8/10/12) left
+   a visible margin of ground above and below each circle, and three
+   cards' worth of it pushed the lab card down the tab. Going below ~5px
+   buys almost nothing — the avatar is already the height — and starts to
+   crowd the question's descenders against the card edge. */
 :root {
     --t1-lead: 18px;    /* poster caption + the intro line above the cards */
     --t1-quote: 18px;   /* the question on each challenge card */
     --t1-answer: 16px;  /* the reply inside a card, and the lab paragraphs */
-    --t1-card-pad-y: 8px;   /* card height: avatar + twice this */
+    --t1-card-pad-y: 5px;   /* card height: avatar + twice this */
     --t1-card-gap: 8px;     /* between the three cards */
 }
 
@@ -152,7 +246,7 @@ html {
         --t1-lead: 21px;
         --t1-quote: 21px;
         --t1-answer: 19px;
-        --t1-card-pad-y: 10px;
+        --t1-card-pad-y: 6px;
         --t1-card-gap: 10px;
     }
 }
@@ -162,7 +256,7 @@ html {
         --t1-lead: 23px;
         --t1-quote: 23px;
         --t1-answer: 21px;
-        --t1-card-pad-y: 12px;
+        --t1-card-pad-y: 8px;
         --t1-card-gap: 12px;
     }
 }
@@ -207,7 +301,7 @@ html {
     --t2-ex-title: 20px;   /* the example's document title */
     --t2-ex-head: 17px;    /* section head + the numbered value names */
     --t2-ex-body: 16px;    /* the evidence paragraphs */
-    --t2-ex-small: 13px;   /* dates, citations, EVIDENCE labels */
+    --t2-ex-small: 14px;   /* dates, citations, EVIDENCE labels */
 }
 
 @media (min-width: 40rem) {
@@ -219,7 +313,7 @@ html {
         --t2-ex-title: 23px;
         --t2-ex-head: 19px;
         --t2-ex-body: 17px;
-        --t2-ex-small: 14px;
+        --t2-ex-small: 16px;
     }
 }
 
@@ -232,7 +326,7 @@ html {
         --t2-ex-title: 26px;
         --t2-ex-head: 21px;
         --t2-ex-body: 18px;
-        --t2-ex-small: 15px;
+        --t2-ex-small: 17px;
     }
 }
 
@@ -293,11 +387,11 @@ html {
     --t3-lead: 16px;
     --t3-key-body: 16px;
     --t3-key-mark: 30px;
-    --t3-key-cite: 14px;
-    --t3-rule: 14px;
+    --t3-key-cite: 15px;
+    --t3-rule: 15px;
     --t3-tile-n: 22px;
     --t3-payoff: 16px;
-    --t3-payoff-sub: 15px;
+    --t3-payoff-sub: 16px;
 }
 
 @media (min-width: 40rem) {
@@ -305,11 +399,11 @@ html {
         --t3-lead: 19px;
         --t3-key-body: 18px;
         --t3-key-mark: 32px;
-        --t3-key-cite: 15px;
-        --t3-rule: 15px;
+        --t3-key-cite: 17px;
+        --t3-rule: 17px;
         --t3-tile-n: 26px;
         --t3-payoff: 19px;
-        --t3-payoff-sub: 16px;
+        --t3-payoff-sub: 18px;
     }
 }
 
@@ -318,11 +412,11 @@ html {
         --t3-lead: 30px;
         --t3-key-body: 22px;
         --t3-key-mark: 40px;
-        --t3-key-cite: 18px;
+        --t3-key-cite: 19px;
         --t3-rule: 20px;
         --t3-tile-n: 30px;
         --t3-payoff: 24px;
-        --t3-payoff-sub: 18px;
+        --t3-payoff-sub: 20px;
     }
 }
 
@@ -370,7 +464,7 @@ html {
 }
 
 /* ── TAB 5 — the two closings, side by side for a decision ─────────
-   The closing slide exists in two builds at once so they can be judged on a
+   The  slide exists in two builds at once so they can be judged on a
    projector rather than argued about. #tab-closing is C, #tab-closing-b is B.
    WHEN ONE WINS, DELETE THE OTHER — the loser's tab button, its component,
    its hash route, and whichever of these two knobs belonged to it.

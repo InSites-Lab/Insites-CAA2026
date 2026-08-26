@@ -51,18 +51,25 @@ const SIZE = {
 // NOT here: the Cpu box, whose colour comes from localStorage
 // ('siteBrandColor', default #4F46E5) through the --brand variable below.
 
+// ONE colour for every word in the bar. It used to run 200 / 300 / 300 / 200
+// across title, subtitle, authors and lab — a hierarchy that exists in the
+// source and not in the room: two steps on the slate ramp, on a near-black bar,
+// at 20px, from the back of a hall, is a smudge rather than a distinction. What
+// separates these four is already weight, size and a rule between them, all of
+// which survive a projector. Change this one value and the whole bar moves.
+const TEXT = 'text-slate-200';
+
 const COLOR = {
   bar: 'bg-[#020617]',
   barBorder: 'border-slate-800',
 
-  title: 'text-slate-200',
+  title: TEXT,
   titleHover: 'group-hover:text-slate-100',
-  subtitle: 'text-slate-300',
   underline: 'bg-indigo-400',   // the rule that grows under the title on hover
 
   divider: 'bg-indigo-500',     // was a dim "|" glyph — now a real rule
-  authors: 'text-slate-300',
-  lab: 'text-slate-200',
+  authors: TEXT,
+  lab: TEXT,
 } as const;
 
 export interface HeaderProps {
@@ -127,7 +134,10 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
         improved. The talk's own claim — "Significance Assessment 4.0 — from a
         final report to an open inquiry" — is the headline of the closing tab,
         not of this bar. */}
-    From Report to Inquiry <span className={`hidden lg:inline ${COLOR.subtitle} ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— Governing Generative AI Insights in Heritage Significance Assessment</span>
+    {/* No colour class of its own: it INHERITS the h1's, which is what keeps
+        the two the same in every state — including the hover, where a span with
+        its own colour would have stayed behind while the title brightened. */}
+    From Report to Inquiry <span className={`hidden lg:inline ${SIZE.subtitleWeight} ${SIZE.subtitle}`}>— Governing Generative AI Insights in Heritage Significance Assessment</span>
     <span className={`absolute -bottom-0.5 left-0 w-0 h-px ${COLOR.underline} transition-all duration-300 group-hover:w-full`}></span>
   </h1>
 </button>
