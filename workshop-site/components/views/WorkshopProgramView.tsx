@@ -1369,126 +1369,122 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
 const QaTab: React.FC = () => (
   <div className="space-y-5">
     {/* ── The closing ─────────────────────────────────────────────────
-        THREE BANDS, not six stacked blocks.
+        THREE BLOCKS: the hero, the repository, the contact row.
 
-          1  a full-width header — the title alone
-          2  a row: the question on the left, the poster on the right
-          3  the credit line and the repository, full width, tight underneath
+        The hero is the whole top of the slide in ONE card — title, subtitle,
+        question, punchline, and the picture. It used to be a headline block
+        standing above a panel that overlapped a picture beside it: three
+        objects doing one job, with two seams between them. Now there is one
+        object and no seam at all. The picture is not placed ON the card, it
+        IS the card's right-hand side, and the text sits on the same ground
+        rather than in a box of its own.
 
-        EVERY element shares an edge with another: the header, the row and
-        the repository all start at the column's left edge; the poster's right
-        edge and the repository's right edge are the column's right edge; and
-        the poster sets the row's height, so the question panel and the
-        picture start and finish on the same two lines.
+        The repository stays FULL WIDTH under it. Its mono address is a string
+        people type from a photograph of this slide, and at 25px it needs about
+        450px of run — in a narrow column it would have to shrink or wrap,
+        which is the one thing that line cannot do. */}
+    <div className="space-y-3 lg:space-y-5">
+      {/* ── THE HERO ────────────────────────────────────────────────
+          Three layers, in this order: the picture, a fade over it, then the
+          text. The fade is what makes the text readable without a panel —
+          it holds the card's own colour flat to 42%, thins through the
+          middle, and is gone by 78%, so the painting emerges rather than
+          being cut off. The Hatter sits right where it thins, which is the
+          point: he is half-dissolved, not cropped away.
 
-        The repository stays FULL WIDTH rather than sitting in the right rail
-        under the poster. Its mono address is a string people type from a
-        photograph of this slide, and at 25px it needs about 450px of run —
-        in a 440px column it would have to shrink or wrap, which is the one
-        thing that line cannot do. */}
-    <div className="space-y-4 lg:space-y-5">
-      <div className="space-y-1.5">
-        {/* No label over the title: the tab is called Closing and it is the
-            last one lit in the bar, so the slide saying it too would only
-            tell the room what it can already see. */}
-        {/* The talk's own title, and the only place it appears. The conference
-            says Heritage 4.0; this names what 4.0 means for one practice
-            inside it, and final/open + report/inquiry is a double antithesis.
-            It stands alone — the paper's proceedings title is in the header,
-            and repeating it under here would only blunt this line. */}
-        {/* Two levels in one headline. "Significance Assessment 4.0" is the
-            subject; the second line is what the talk says about it, and it is
-            set at 0.8em — a ratio, not a size, so it stays proportional at
-            every breakpoint. Set level it read as two titles competing. */}
-        <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
-          Significance Assessment 4.0:
-          <br />
-          <span className="text-[0.8em]">from a final report to an open inquiry</span>
-        </h3>
-      </div>
+          object-position right: the picture is anchored to its right edge,
+          so what gets cropped when the card is short is the left side —
+          which is the side the fade covers anyway. Alice and the graph, the
+          two things the slide wants seen, are on the right and always
+          survive.
 
-      {/* Bands 2 and 3 are ONE unit — the picture, the names and the address
-          are what you look at and what you photograph. But four full-width
-          strips need air between them or they read as stacked rather than
-          grouped, and below about 12px there is none. */}
-      <div className="space-y-3 lg:space-y-5">
-        {/* THE ROW — variant C, the undercut. Two boxes side by side read as a
-            picture pasted next to a panel, however well aligned. So they now
-            OVERLAP: the panel is pulled --t5-veil to the right over the image
-            (the negative margin), sits above it, and its own right edge
-            dissolves through a mask. The painting surfaces as the tint
-            evaporates; there is no seam to see because there is no edge.
+          Everything here is lg-only. Below it the card is text on a flat
+          ground with the picture underneath in normal flow, because a
+          470px hero with an absolutely-placed image is a desktop object. */}
+      <div className="relative overflow-hidden rounded-2xl bg-[#f3f5fc] lg:min-h-[470px] flex flex-col lg:block">
+        <img
+          src="./poster-light.jpg"
+          alt="InSites-CAA — CBSA Workshop"
+          className="hidden lg:block absolute inset-y-0 right-0 h-full w-[70%] object-cover object-right"
+        />
+        <div
+          aria-hidden="true"
+          className="hidden lg:block absolute inset-0 bg-[linear-gradient(90deg,#f3f5fc_0%,#f3f5fc_50%,rgba(243,245,252,0.82)_62%,transparent_86%)]"
+        />
 
-            The panel is the layer that fades, not the image. Fading the image
-            into the tint instead would cost the Hatter, who lives in exactly
-            the strip that would be eaten — and he is the reason the picture is
-            charming enough to bring back here at all.
-
-            The mask takes the panel's right border with it. That is correct: a
-            box that dissolves should not keep an outline.
-
-            Below lg none of this happens — the row stacks, the negative margin
-            and the mask are lg-only, and the order is the reading order:
-            question, then poster. */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-3 lg:gap-0">
-          {/* The talk ENDS ON A QUESTION, and the answer stays in the speaker's
-              mouth. What is printed is the thought experiment the paper's own
-              conclusion opens with, plus the lens you answer it through — not
-              the conclusion itself ("the system that least needs the experts
-              most needs to keep them in"), which is now spoken.
-              "Afford" is deliberate: tab 2 opens the talk on "how can we
-              afford both", and this closes it on the same verb.
-              The speaker's script is one click away in the corner — see
-              SpeakerNote; invisible to the hall. */}
-          <div className="relative z-10 lg:flex-1 min-w-0 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-5 py-4 lg:px-7 lg:py-6 lg:pr-[calc(var(--t5-veil)+40px)] lg:-mr-[var(--t5-veil)] lg:[mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] lg:[-webkit-mask-image:linear-gradient(to_right,black_calc(100%-var(--t5-veil)),transparent)] flex flex-col justify-center gap-3 lg:gap-4">
-            <SpeakerNote className="absolute top-2.5 right-2.5">
-              <p>Let me end with the thought experiment the paper ends with.</p>
-              <p>
-                Imagine a system so capable that full automation looks fluent, complete, efficient —
-                a perfect assessment machine. Could heritage 4.0 — or 10.0 — afford it?
-              </p>
-              <p>
-                Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
-                assessment that is not human cannot count as good.
-              </p>
-              <p>So the system that least needs the experts, most needs to keep them in.</p>
-              <p>I'll leave the question on the screen.</p>
-            </SpeakerNote>
-
-            <p className="text-[22px] sm:text-[26px] lg:text-[34px] font-bold text-slate-900 leading-snug pr-8">
-              Imagine a perfect assessment machine{' '}<br/>
-              <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
+        {/* The talk ENDS ON A QUESTION, and the answer stays in the speaker's
+            mouth. What is printed is the thought experiment the paper's own
+            conclusion opens with, plus the lens you answer it through — not
+            the conclusion itself ("the system that least needs the experts
+            most needs to keep them in"), which is now spoken.
+            "Afford" is deliberate: tab 2 opens the talk on "how can we
+            afford both", and this closes it on the same verb.
+            The speaker's script is one click away in the corner — see
+            SpeakerNote; invisible to the hall. */}
+        <div className="relative z-10 max-w-full lg:max-w-[780px] px-5 py-6 lg:p-10 flex flex-col justify-center lg:h-[470px] gap-3 lg:gap-5">
+          <SpeakerNote className="absolute top-2.5 right-2.5 lg:right-auto lg:left-2.5">
+            <p>Let me end with the thought experiment the paper ends with.</p>
+            <p>
+              Imagine a system so capable that full automation looks fluent, complete, efficient —
+              a perfect assessment machine. Could heritage 4.0 — or 10.0 — afford it?
             </p>
-            {/* Subordinate on purpose, and by a clear step — this is the lens
-                the question is answered through, not a second headline. Set it
-                level with the question and the slide has two voices.
+            <p>
+              Here is the paradox: every gain in autonomy is a loss in humanity — and a cultural
+              assessment that is not human cannot count as good.
+            </p>
+            <p>So the system that least needs the experts, most needs to keep them in.</p>
+            <p>I'll leave the question on the screen.</p>
+          </SpeakerNote>
 
-                A step under, though, not a whisper: at 55% opacity it rendered
-                lighter than slate-400, and this is the sentence the talk turns
-                on. 26px at 80% keeps the step down from 34px and still reaches
-                the back of the room. */}
-            <p className="text-[18px] sm:text-[21px] lg:text-[26px] text-indigo-950/80">
-              Who assesses is part of what is assessed.
+          <div className="space-y-1 lg:space-y-1.5">
+            {/* The talk's own title, and the only place it appears. The
+                conference says Heritage 4.0; this names what 4.0 means for one
+                practice inside it, and final/open + report/inquiry is a double
+                antithesis. It stands alone — the paper's proceedings title is
+                in the header, and repeating it here would only blunt it.
+
+                ONE LINE from lg up: broken in two it read as two titles, and
+                the subtitle below already carries the second thought. The
+                nowrap is lg-only for the obvious reason.
+
+                46px is a MEASURED fit, not a preference: this line needs
+                677px and the column gives it 700. Raise it and it runs past
+                the column, out over the part of the fade that has started
+                letting the picture through — so the last characters of the
+                talk's own title would sit on a cloud. The column width and
+                the fade's first stop move together with this number. */}
+            <h3 className="font-display text-2xl sm:text-3xl lg:text-[46px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
+              Significance Assessment 4.0:
+            </h3>
+            <p className="font-display text-xl sm:text-2xl lg:text-[30px] leading-tight text-slate-600">
+              from a final report to an open inquiry
             </p>
           </div>
 
-          {/* The poster returns from tab 1 to close the loop: the talk opens on
-              it and ends on it. 48% of a 1150 column is about 550, and the file
-              is 672x384 native, so it is still never upscaled — it simply got
-              bigger when the panel started overlapping it instead of standing
-              beside it.
+          <p className="text-[22px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
+            Imagine a perfect assessment machine{' '}<br/>
+            <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
+          </p>
 
-              No border and no shadow any more. Both were the frame that made it
-              read as a pasted rectangle, and the point of the overlap is that
-              it stops being one. */}
-          <img
-            src="./poster-light.jpg"
-            alt="InSites-CAA — CBSA Workshop"
-            className="self-start w-full lg:w-[48%] shrink-0 rounded-2xl"
-          />
+          {/* The lens the question is answered through, not a second headline —
+              so it stays a clear step under it. The indigo rule on its left is
+              what keeps it from reading as a caption on the question: a quoted
+              aside has a mark of its own. */}
+          <p className="border-l-4 border-indigo-500 ps-4 text-[18px] sm:text-[21px] lg:text-[25px] italic text-indigo-950/90">
+            Who assesses is part of what is assessed.
+          </p>
         </div>
 
-       
+        {/* Below lg the picture is a plain block under the text — no absolute
+            placement, no fade, nothing to go wrong on a narrow screen. */}
+        <img
+          src="./poster-light.jpg"
+          alt=""
+          aria-hidden="true"
+          className="lg:hidden w-full"
+        />
+      </div>
+
 
         {/* The link the paper carries, so it has to be findable and
             photographable TWICE OVER: the address to type on the left, the
@@ -1526,14 +1522,21 @@ const QaTab: React.FC = () => (
           <ExternalLink size={20} className="text-slate-300 shrink-0" />
         </a>
 
-        {/* Below the repository, the two ways to reach a person: the addresses
-            and then the lab. Both answer "who is behind this", so they sit
-            together under the dark bar rather than being split by it.
+        {/* ONE row under the repository: who to write to, and who we are.
+            Both answer "who is behind this", and at this point in the talk
+            that is one question, not two — so it is one line rather than a
+            block of chips followed by a paragraph.
 
             Chips, not underlined links: a chip reads as something you may act
             on even in a photograph, where an underline just reads as emphasis.
-            The envelope says which kind of action without a word. */}
-        <div className="flex flex-wrap items-center gap-3 mt-1">
+            The envelope says which kind of action without a word.
+
+            The lab is a NAME here, not a description. The sentence about the
+            intersection of assessment methods, novel technologies and
+            built-heritage data was cut with it: on the slide the room looks
+            at longest, a paragraph nobody will read competes with the two
+            things they might act on. */}
+        <div className="flex flex-wrap items-center gap-3.5">
           {[
             'yaelalef@technion.ac.il',
             'yuval.shafriri@gmail.com',
@@ -1547,23 +1550,10 @@ const QaTab: React.FC = () => (
               {address}
             </a>
           ))}
+          <p className="text-lg sm:text-xl lg:text-[23px] text-slate-600 whitespace-nowrap">
+            <span className="font-bold text-slate-800">InSites Knowledge Lab</span> · Technion
+          </p>
         </div>
-
-        {/* The lab, last and quietest. Its neighbours are the reason it is
-            here rather than on tab 1: the addresses above it and the
-            repository above them answer "who made this, and where does it
-            live" — this answers the half neither of them can.
-
-            ONE bolded phrase. Four of them in a single sentence is not
-            emphasis, it is texture, and the eye stops resolving which of the
-            four was the point. 60ch so the line breaks where a reader expects
-            rather than at the column edge. */}
-        <p className="max-w-[60ch] text-base sm:text-lg lg:text-[21px] text-slate-600 leading-relaxed">
-          <span className="font-bold text-slate-800">InSites Knowledge Lab</span> · Technion — at the
-          intersection of assessment methods, novel technologies, and built-heritage data, we develop
-          computational methods for evidence-based heritage assessment.
-        </p>
-      </div>
     </div>
   </div>
 );
