@@ -224,6 +224,10 @@ export const WorkshopProgramView: React.FC<WorkshopProgramViewProps> = ({
   // classes from one group do not override by source order — a second
   // `text-*` appended by a caller loses to whichever the stylesheet emits
   // last, which is how the Closing tab's quieter grey silently never painted.
+  // Plain px, NOT routed through --type-scale: the tab bar is navigation
+  // chrome, like the header — the hall reads the slide, not the tray. Scaled,
+  // the long labels truncated to "The Dual Tensi..." at 125, which is a worse
+  // read than a smaller label.
   const tabClass = (id: TabId, restColor = 'text-slate-500') =>
     `flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 xl:gap-2 px-1 sm:px-2.5 xl:px-3 2xl:px-4 py-2 xl:py-2.5 2xl:py-3 rounded-lg text-[10px] sm:text-[13px] xl:text-[15px] 2xl:text-[17px] font-bold whitespace-nowrap min-w-0 transition-all cursor-pointer ${
       activeTab === id
@@ -427,7 +431,7 @@ const PhotoStrip: React.FC<{
         />
       ))}
       {panelCaption && (
-        <div className="absolute inset-x-0 bottom-0 px-4 pt-7 pb-2.5 text-white text-[15px] lg:text-[17px] font-semibold bg-gradient-to-t from-slate-900/75 to-transparent">
+        <div className="absolute inset-x-0 bottom-0 px-4 pt-7 pb-2.5 text-white text-[length:calc(15px*var(--type-scale))] lg:text-[length:calc(17px*var(--type-scale))] font-semibold bg-gradient-to-t from-slate-900/75 to-transparent">
           {panelCaption}
         </div>
       )}
@@ -594,7 +598,7 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
           tab 4's, because it reads as a lead-in and not as an attribution:
           "The challenge: Give it freedom — it hallucinates."
           "hallucinates", not "fabricates" — the paper's own abstract wording. */}
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
+      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-[length:calc(36px*var(--type-scale))] 2xl:text-[length:calc(44px*var(--type-scale))] leading-[1.15] text-slate-900">
         <span className="label text-slate-400 align-middle me-2.5 whitespace-nowrap">The challenge</span>
         Give it freedom — it hallucinates.
         <br />
@@ -1061,7 +1065,7 @@ const EpistemicNotationTab: React.FC<{
       {/* No lead-in over this headline: it announces itself, and this is the
           tab with least room to spare — every line here comes off the
           payoff at the bottom. */}
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[41px] leading-[1.15] text-slate-900">
+      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-[length:calc(36px*var(--type-scale))] 2xl:text-[length:calc(41px*var(--type-scale))] leading-[1.15] text-slate-900">
         A mark measures a claim's distance from its sources.
       </h3>
       <p className="text-[length:var(--t3-lead)] font-semibold text-slate-500">Validity remains human judgment.</p>
@@ -1148,7 +1152,7 @@ const EpistemicNotationTab: React.FC<{
         <div className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-1.5 py-1.5 sm:px-3.5 sm:py-2.5">
           <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-slate-900">24</p>
           <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
-            explicit <span className="normal-case align-middle font-mono text-[8px] sm:text-[10px] text-slate-400">[file:page]</span>
+            explicit <span className="normal-case align-middle font-mono text-[length:calc(8px*var(--type-scale))] sm:text-[length:calc(10px*var(--type-scale))] text-slate-400">[file:page]</span>
           </p>
         </div>
         {/* The framed pair. The chip on the border carries the group's own
@@ -1163,13 +1167,13 @@ const EpistemicNotationTab: React.FC<{
                 14<span className="text-[0.55em] font-bold text-amber-800/60">/16</span>
               </p>
               <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
-                accepted <span className="normal-case align-middle text-[15px] sm:text-[19px]"> 〰️</span>
+                accepted <span className="normal-case align-middle text-[length:calc(15px*var(--type-scale))] sm:text-[length:calc(19px*var(--type-scale))]"> 〰️</span>
               </p>
             </div>
             <div className="pl-1.5 sm:pl-3 border-l border-slate-200">
               <p className="text-[length:var(--t3-tile-n)] leading-tight font-extrabold text-purple-800">4</p>
               <p className="label tracking-tight sm:tracking-[0.1em] text-slate-400">
-                hypotheses <span className="normal-case align-middle text-[15px] sm:text-[19px]"> 💭</span>
+                hypotheses <span className="normal-case align-middle text-[length:calc(15px*var(--type-scale))] sm:text-[length:calc(19px*var(--type-scale))]"> 💭</span>
               </p>
             </div>
           </div>
@@ -1225,11 +1229,11 @@ const FromReportToInquiryTab: React.FC = () => (
           own would give it the weight of one — and cost the plate below that
           line. The `.label` device set inline; whitespace-nowrap so it breaks
           away from the title as a unit rather than mid-phrase. */}
-      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-[44px] leading-[1.15] text-slate-900">
+      <h3 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-[length:calc(36px*var(--type-scale))] 2xl:text-[length:calc(44px*var(--type-scale))] leading-[1.15] text-slate-900">
         A Landscape of Imagination.
         <span className="label text-slate-400 align-middle ms-2.5 whitespace-nowrap">The LLM insight</span>
       </h3>
-      <p className="text-base sm:text-lg lg:text-[21px] text-slate-500 pt-0.5">
+      <p className="text-base sm:text-lg lg:text-[length:calc(21px*var(--type-scale))] text-slate-500 pt-0.5">
         Two values the manual assessment had not reached.
       </p>
     </div>
@@ -1247,13 +1251,13 @@ const FromReportToInquiryTab: React.FC = () => (
         leave the mark alone on a line of its own. */}
     <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
       <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
-        <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
+        <p className="text-base lg:text-[length:calc(19px*var(--type-scale))] font-bold text-slate-900 leading-snug">
           Social — "4 Millennia Pastoralist Continuity"{' '}
           <Inf />
         </p>
       </div>
       <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
-        <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
+        <p className="text-base lg:text-[length:calc(19px*var(--type-scale))] font-bold text-slate-900 leading-snug">
           Intangible Heritage — "A Landscape of Imagination Across Traditions"{' '}
           <Inf />
         </p>
@@ -1350,7 +1354,7 @@ const SpeakerNote: React.FC<{ className?: string; children: React.ReactNode }> =
           // edge — it opens INWARD, away from the frame, and never clips.
           <div className="absolute right-0 top-full mt-2 z-30 w-[min(600px,78vw)] rounded-xl border border-slate-300 bg-white p-4 lg:p-5 text-left shadow-xl animate-fade-in">
             <p className="label text-slate-400 mb-2.5">Speaker note</p>
-            <div className="space-y-2.5 text-[16px] lg:text-[18px] leading-relaxed text-slate-700">
+            <div className="space-y-2.5 text-[length:calc(16px*var(--type-scale))] lg:text-[length:calc(18px*var(--type-scale))] leading-relaxed text-slate-700">
               {children}
             </div>
           </div>
@@ -1436,8 +1440,14 @@ const QaTab: React.FC = () => (
             the slide. 64px heads it.
 
             Change this and nothing else moves — the question and the
-            punchline follow the title down, and the card keeps its height. */}
-        <div className="relative z-10 max-w-full lg:max-w-[780px] px-5 py-6 lg:px-10 lg:pt-16 lg:pb-10 flex flex-col justify-start lg:h-[470px]">
+            punchline follow the title down, and the card keeps its height.
+
+            min-h, not h: at hall type scale the lines wrap and the column
+            wants more than 470px — a hard height clipped the punchline
+            clean off the slide (overflow-hidden card). At 1 the min is the
+            height, so nothing moves; scaled, the card grows and this tab
+            scrolls, which it is allowed to do — it is not frame-fit. */}
+        <div className="relative z-10 max-w-full lg:max-w-[780px] px-5 py-6 lg:px-10 lg:pt-16 lg:pb-10 flex flex-col justify-start lg:min-h-[470px]">
           <SpeakerNote className="absolute top-2.5 right-2.5 lg:right-auto lg:left-2.5">
             <p>Let me end with the thought experiment the paper ends with.</p>
             <p>
@@ -1472,16 +1482,16 @@ const QaTab: React.FC = () => (
                 letting the picture through — so the last characters of the
                 talk's own title would sit on a cloud. The column width and
                 the fade's first stop move together with this number. */}
-            <h3 className="font-display text-2xl sm:text-3xl lg:text-[38px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
+            <h3 className="font-display text-2xl sm:text-3xl lg:text-[length:calc(38px*var(--type-scale))] lg:whitespace-nowrap leading-[1.1] text-slate-900">
               Significance Assessment 4.0
             </h3>
-            <p className="font-display text-xl sm:text-2xl lg:text-[30px] leading-tight text-slate-600">
+            <p className="font-display text-xl sm:text-2xl lg:text-[length:calc(30px*var(--type-scale))] leading-tight text-slate-600">
               from a final report to an open inquiry
             </p>
           </div>
 
           {/* GAP 2 of 3 — the title block to the question. */}
-          <p className="mt-5 lg:mt-12 text-[20px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
+          <p className="mt-5 lg:mt-12 text-[length:calc(20px*var(--type-scale))] sm:text-[length:calc(26px*var(--type-scale))] lg:text-[length:calc(33px*var(--type-scale))] font-bold text-slate-900 leading-snug">
             Imagine a perfect assessment machine{' '}<br/>
             <span className="text-indigo-700">could heritage 4.0 or 10.0 afford it?</span>
           </p>
@@ -1492,7 +1502,7 @@ const QaTab: React.FC = () => (
               aside has a mark of its own.
 
               GAP 3 of 3 — the question to the punchline. */}
-          <p className="mt-5 lg:mt-8 border-l-4 border-indigo-500 ps-4 text-[18px] sm:text-[21px] lg:text-[25px] italic text-indigo-950/90">
+          <p className="mt-5 lg:mt-8 border-l-4 border-indigo-500 ps-4 text-[length:calc(18px*var(--type-scale))] sm:text-[length:calc(21px*var(--type-scale))] lg:text-[length:calc(25px*var(--type-scale))] italic text-indigo-950/90">
             Who assesses is part of what is assessed.<br />
             so how to design the Human-in-the-Loop? <br/>THAT IS THE QUESTION.
           </p>
@@ -1523,10 +1533,10 @@ const QaTab: React.FC = () => (
           <span className="flex-1 min-w-0">
             {/* Mono, because this is a string you TYPE. It is the one line on
                 the slide that has to survive being photographed from row 20. */}
-            <span className="block font-mono text-[17px] sm:text-[21px] lg:text-[25px] font-bold leading-tight">
+            <span className="block font-mono text-[length:calc(17px*var(--type-scale))] sm:text-[length:calc(21px*var(--type-scale))] lg:text-[length:calc(25px*var(--type-scale))] font-bold leading-tight">
               {REPO_LABEL}
             </span>
-            <span className="block text-[15px] sm:text-[17px] lg:text-[19px] text-slate-300 mt-1.5">
+            <span className="block text-[length:calc(15px*var(--type-scale))] sm:text-[length:calc(17px*var(--type-scale))] lg:text-[length:calc(19px*var(--type-scale))] text-slate-300 mt-1.5">
               The <span className="font-mono text-white">/system</span> folder — the workflow,
               the specs, and the claim-level evidence behind this talk
             </span>
@@ -1567,13 +1577,13 @@ const QaTab: React.FC = () => (
             <a
               key={address}
               href={`mailto:${address}`}
-              className="inline-flex items-center gap-2.5 rounded-lg border border-slate-300 px-3.5 py-2 lg:px-4 lg:py-2.5 text-lg sm:text-xl lg:text-[23px] tracking-wide text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors"
+              className="inline-flex items-center gap-2.5 rounded-lg border border-slate-300 px-3.5 py-2 lg:px-4 lg:py-2.5 text-lg sm:text-xl lg:text-[length:calc(23px*var(--type-scale))] tracking-wide text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors"
             >
               <Mail size={20} className="shrink-0 text-slate-400" />
               {address}
             </a>
           ))}
-          <p className="text-lg sm:text-xl lg:text-[23px] text-slate-600 whitespace-nowrap">
+          <p className="text-lg sm:text-xl lg:text-[length:calc(23px*var(--type-scale))] text-slate-600 whitespace-nowrap">
             <span className="font-bold text-slate-800">InSites Knowledge Lab</span> · Technion
           </p>
         </div>

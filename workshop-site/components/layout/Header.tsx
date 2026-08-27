@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Cpu } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Cpu, Type } from "lucide-react";
 
 // ─── Sizing — the only place to tune the header ────────────────────
 // Same idea as `SIZE` in Sidebar.tsx: every dimension in this bar comes from
@@ -9,8 +9,9 @@ import { Cpu } from "lucide-react";
 // the spine of the talk and this is a colophon. If you raise `height`, raise
 // `title` and `logo` with it or the row will look empty.
 //
-// NOTE: the app is scaled by `--app-zoom` (index.css), currently 1.1 — so 40px
-// here paints as 44px. Judge the size on screen, not from the number.
+// NOTE: the app can be scaled by `--app-zoom` (index.css), currently 1 — at
+// any other value 40px here paints as 40 x zoom. Judge the size on screen,
+// not from the number.
 
 // Each value is "phone lg:desktop". The header is a colophon on a large
 // screen and pure overhead on a small one, where every pixel it takes comes
@@ -72,6 +73,15 @@ const COLOR = {
   lab: TEXT,
 } as const;
 
+// ─── Hall type scale ───────────────────────────────────────────────
+// The tokens the Aa button cycles through. The CSS owns the actual factors —
+// the HALL TYPE SCALE block in index.css maps each token to a --type-scale
+// value — these strings are only the data-type-scale attribute states. Add or
+// change a step in BOTH places, then re-check the frame-fit tabs (2, 3, 4)
+// and the closing tab's nowrap title at the new step.
+const SCALE_STEPS = ["100", "110", "125"] as const;
+type ScaleStep = (typeof SCALE_STEPS)[number];
+
 export interface HeaderProps {
   onHomeClick: () => void;
 }
@@ -84,6 +94,32 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
       return "#4F46E5";
     }
   });
+
+  // Hall type scale — same lazy-read idiom as the brand colour above. The
+  // pref dies when the index.html version gate clears localStorage, which is
+  // fine: the button shows its state, and two clicks bring it back.
+  const [scaleStep, setScaleStep] = useState<ScaleStep>(() => {
+    try {
+      const v = localStorage.getItem("hallTypeScale");
+      return (SCALE_STEPS as readonly string[]).includes(v ?? "")
+        ? (v as ScaleStep)
+        : "100";
+    } catch {
+      return "100";
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.typeScale = scaleStep;
+    try {
+      localStorage.setItem("hallTypeScale", scaleStep);
+    } catch {}
+  }, [scaleStep]);
+
+  const cycleScale = () =>
+    setScaleStep(
+      (s) => SCALE_STEPS[(SCALE_STEPS.indexOf(s) + 1) % SCALE_STEPS.length]
+    );
 
   const lightenHex = (hex: string, percent: number) => {
     const h = hex.replace("#", "");
@@ -175,7 +211,22 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
             className={`${SIZE.logo} object-contain hidden lg:inline-block mr-1`}
           />
 
-          
+          {/* Hall type — a text-size control, not presentation chrome. The
+              speaker-note trick: 30% opacity, invisible from the hall,
+              findable at the podium — but lit whenever it is off 100 so the
+              presenter can read the state at a glance. Hidden below lg to
+              match the CSS: the presets only exist from 64rem up. */}
+          <button
+            onClick={cycleScale}
+            title="Hall type — cycles 100 / 110 / 125% text size"
+            aria-label={`Hall type scale: ${scaleStep}%`}
+            className={`hidden lg:flex items-center gap-1 ${TEXT} text-[13px] font-medium ${
+              scaleStep === "100" ? "opacity-30" : "opacity-100"
+            } hover:opacity-100 transition-opacity cursor-pointer rounded px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400`}
+          >
+            <Type size={SIZE.iconLg} />
+            <span>{scaleStep}%</span>
+          </button>
 
         </div>
       </div>

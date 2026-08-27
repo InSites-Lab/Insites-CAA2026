@@ -43,6 +43,44 @@ html {
     zoom: var(--app-zoom);
 }
 
+/* ── HALL TYPE SCALE — the presets behind the header's Aa button ───
+   What the lecture actually needed was not zoom: the room was far from
+   the screen and the TYPE was the problem, not the layout. This factor
+   scales the deck's text alone — every font-size knob below multiplies
+   by it, and the hard-px text classes in WorkshopProgramView are routed
+   through it as text-[length:calc(<n>px*var(--type-scale))]. Spacing,
+   cards, images and the frame never change size; the frame-fit tabs
+   absorb the bigger text the way they were built to, by letting the
+   image plates give way first.
+
+   Two knobs sit OUT of it on purpose: --t3-key-mark and --t3-tile-n,
+   tab 3's specimen glyphs and count numbers. They are display objects
+   already sized to be read from the back, and scaling them was what
+   pushed tab 3 past its frame (verified: +107px of overflow at 125
+   with them in, none with them out).
+
+   The steps are what the small Aa button in the header walks through:
+   it sets data-type-scale on <html> and remembers the choice
+   ('hallTypeScale' in localStorage — which the version gate in
+   index.html clears on deploy, deliberately). Scoped to >=64rem: a
+   phone never scales, so every base/sm size below stays exactly as
+   written there.
+
+   A step lives in two places — a rule here and its token in
+   SCALE_STEPS in Header.tsx; add or change both together. The known
+   ceiling is the closing tab's nowrap title: ~546px of glyphs in a
+   700px column at 1, 683px at 1.25 — so 125 fits with 17px to spare
+   and 130 would not. Check it, and the frame-fit tabs (2, 3, 4), at
+   every new step. */
+:root {
+    --type-scale: 1;
+}
+
+@media (min-width: 64rem) {
+    html[data-type-scale="110"] { --type-scale: 1.1; }
+    html[data-type-scale="125"] { --type-scale: 1.25; }
+}
+
 /* ── SIDEBAR TYPE, FULL BUILD (tab 1) — four numbers ──────────────
    Every piece of text in the process column reads its size from here. These
    are the numbers for the FULL build — the one on tab 1, where the framework
@@ -74,10 +112,10 @@ html {
      hall      heading 16  title 20  role 14  legend 13   (biggest that
                still keeps every role line unwrapped at a 430px sidebar) */
 :root {
-    --sb-heading: 20px;  /* "InSites CBSA Framework", at the top of the rail */
-    --sb-title: 20px;    /* stage name — the main driver of button height */
-    --sb-role: 20px;     /* the line under the stage name */
-    --sb-legend: 15px;   /* the ○ / ● key at the bottom */
+    --sb-heading: calc(20px * var(--type-scale));  /* "InSites CBSA Framework", at the top of the rail */
+    --sb-title: calc(20px * var(--type-scale));    /* stage name — the main driver of button height */
+    --sb-role: calc(20px * var(--type-scale));     /* the line under the stage name */
+    --sb-legend: calc(15px * var(--type-scale));   /* the ○ / ● key at the bottom */
 }
 
 /* ── SIDEBAR PALETTE — three colours that move together ───────────
@@ -153,10 +191,10 @@ html {
 
    As above, these are the sizes as painted — --app-zoom is 1. */
 [data-sb="compact"] {
-    --sb-heading: 15px;
-    --sb-title: 16px;
-    --sb-role: 14px;
-    --sb-legend: 13px;
+    --sb-heading: calc(15px * var(--type-scale));
+    --sb-title: calc(16px * var(--type-scale));
+    --sb-role: calc(14px * var(--type-scale));
+    --sb-legend: calc(13px * var(--type-scale));
 }
 
 /* ── THE LABEL — one uppercase device for the whole deck ───────────
@@ -182,18 +220,18 @@ html {
    laptop and gone from row 15, and a label that cannot be read is not a
    quiet label, it is a decoration. */
 :root {
-    --label: 13px;
+    --label: calc(13px * var(--type-scale));
 }
 
 @media (min-width: 40rem) {
     :root {
-        --label: 15px;
+        --label: calc(15px * var(--type-scale));
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --label: 16px;
+        --label: calc(16px * var(--type-scale));
     }
 }
 
@@ -237,18 +275,18 @@ html {
    the avatar being the height already, and starts to crowd the
    question's descenders against the card edge. */
 :root {
-    --t1-lead: 18px;    /* the line over the poster + the intro above the cards */
-    --t1-quote: 18px;   /* the question on each challenge card */
-    --t1-answer: 16px;  /* the reply inside a card, and the lab paragraphs */
+    --t1-lead: calc(18px * var(--type-scale));    /* the line over the poster + the intro above the cards */
+    --t1-quote: calc(18px * var(--type-scale));   /* the question on each challenge card */
+    --t1-answer: calc(16px * var(--type-scale));  /* the reply inside a card, and the lab paragraphs */
     --t1-card-pad-y: 5px;   /* card height: avatar + twice this */
     --t1-card-gap: 8px;     /* between the three cards */
 }
 
 @media (min-width: 40rem) {
     :root {
-        --t1-lead: 21px;
-        --t1-quote: 21px;
-        --t1-answer: 19px;
+        --t1-lead: calc(21px * var(--type-scale));
+        --t1-quote: calc(21px * var(--type-scale));
+        --t1-answer: calc(19px * var(--type-scale));
         --t1-card-pad-y: 6px;
         --t1-card-gap: 10px;
     }
@@ -256,9 +294,9 @@ html {
 
 @media (min-width: 64rem) {
     :root {
-        --t1-lead: 23px;
-        --t1-quote: 23px;
-        --t1-answer: 21px;
+        --t1-lead: calc(23px * var(--type-scale));
+        --t1-quote: calc(23px * var(--type-scale));
+        --t1-answer: calc(21px * var(--type-scale));
         --t1-card-pad-y: 8px;
         --t1-card-gap: 12px;
     }
@@ -297,39 +335,39 @@ html {
    The example scrolls INSIDE its own card, so making these bigger costs
    scrolling, never layout — nothing here can push the slide out of frame. */
 :root {
-    --t2-lead: 17px;       /* the line under the headline */
-    --t2-question: 20px;   /* the question the tab rests on */
-    --t2-card-title: 15px; /* fold-out strip — title */
-    --t2-card-sub: 13px;   /* fold-out strip — second line */
-    --t2-ex-title: 20px;   /* the example's document title */
-    --t2-ex-head: 17px;    /* section head + the numbered value names */
-    --t2-ex-body: 16px;    /* the evidence paragraphs */
-    --t2-ex-small: 14px;   /* dates, citations, EVIDENCE labels */
+    --t2-lead: calc(17px * var(--type-scale));       /* the line under the headline */
+    --t2-question: calc(20px * var(--type-scale));   /* the question the tab rests on */
+    --t2-card-title: calc(15px * var(--type-scale)); /* fold-out strip — title */
+    --t2-card-sub: calc(13px * var(--type-scale));   /* fold-out strip — second line */
+    --t2-ex-title: calc(20px * var(--type-scale));   /* the example's document title */
+    --t2-ex-head: calc(17px * var(--type-scale));    /* section head + the numbered value names */
+    --t2-ex-body: calc(16px * var(--type-scale));    /* the evidence paragraphs */
+    --t2-ex-small: calc(14px * var(--type-scale));   /* dates, citations, EVIDENCE labels */
 }
 
 @media (min-width: 40rem) {
     :root {
-        --t2-lead: 20px;
-        --t2-question: 24px;
-        --t2-card-title: 17px;
-        --t2-card-sub: 15px;
-        --t2-ex-title: 23px;
-        --t2-ex-head: 19px;
-        --t2-ex-body: 17px;
-        --t2-ex-small: 16px;
+        --t2-lead: calc(20px * var(--type-scale));
+        --t2-question: calc(24px * var(--type-scale));
+        --t2-card-title: calc(17px * var(--type-scale));
+        --t2-card-sub: calc(15px * var(--type-scale));
+        --t2-ex-title: calc(23px * var(--type-scale));
+        --t2-ex-head: calc(19px * var(--type-scale));
+        --t2-ex-body: calc(17px * var(--type-scale));
+        --t2-ex-small: calc(16px * var(--type-scale));
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --t2-lead: 26px;
-        --t2-question: 29px;
-        --t2-card-title: 24px;
-        --t2-card-sub: 22px;
-        --t2-ex-title: 26px;
-        --t2-ex-head: 21px;
-        --t2-ex-body: 18px;
-        --t2-ex-small: 17px;
+        --t2-lead: calc(26px * var(--type-scale));
+        --t2-question: calc(29px * var(--type-scale));
+        --t2-card-title: calc(24px * var(--type-scale));
+        --t2-card-sub: calc(22px * var(--type-scale));
+        --t2-ex-title: calc(26px * var(--type-scale));
+        --t2-ex-head: calc(21px * var(--type-scale));
+        --t2-ex-body: calc(18px * var(--type-scale));
+        --t2-ex-small: calc(17px * var(--type-scale));
     }
 }
 
@@ -341,18 +379,18 @@ html {
    as annotation and start breaking the line rhythm of the sentence they sit
    in. So raise this WITH --t2-ex-body, not on its own. */
 :root {
-    --mark-size: 19px;
+    --mark-size: calc(19px * var(--type-scale));
 }
 
 @media (min-width: 40rem) {
     :root {
-        --mark-size: 20px;
+        --mark-size: calc(20px * var(--type-scale));
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --mark-size: 22px;
+        --mark-size: calc(22px * var(--type-scale));
     }
 }
 
@@ -390,39 +428,39 @@ html {
    deck-wide `.label` device and are sized with every other small caps label
    on the talk, not with this tab. */
 :root {
-    --t3-lead: 16px;
-    --t3-key-body: 16px;
+    --t3-lead: calc(16px * var(--type-scale));
+    --t3-key-body: calc(16px * var(--type-scale));
     --t3-key-mark: 30px;
-    --t3-key-cite: 15px;
-    --t3-rule: 15px;
+    --t3-key-cite: calc(15px * var(--type-scale));
+    --t3-rule: calc(15px * var(--type-scale));
     --t3-tile-n: 22px;
-    --t3-payoff: 16px;
-    --t3-payoff-sub: 16px;
+    --t3-payoff: calc(16px * var(--type-scale));
+    --t3-payoff-sub: calc(16px * var(--type-scale));
 }
 
 @media (min-width: 40rem) {
     :root {
-        --t3-lead: 19px;
-        --t3-key-body: 18px;
+        --t3-lead: calc(19px * var(--type-scale));
+        --t3-key-body: calc(18px * var(--type-scale));
         --t3-key-mark: 32px;
-        --t3-key-cite: 17px;
-        --t3-rule: 17px;
+        --t3-key-cite: calc(17px * var(--type-scale));
+        --t3-rule: calc(17px * var(--type-scale));
         --t3-tile-n: 26px;
-        --t3-payoff: 19px;
-        --t3-payoff-sub: 18px;
+        --t3-payoff: calc(19px * var(--type-scale));
+        --t3-payoff-sub: calc(18px * var(--type-scale));
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --t3-lead: 30px;
-        --t3-key-body: 22px;
+        --t3-lead: calc(30px * var(--type-scale));
+        --t3-key-body: calc(22px * var(--type-scale));
         --t3-key-mark: 40px;
-        --t3-key-cite: 19px;
-        --t3-rule: 20px;
+        --t3-key-cite: calc(19px * var(--type-scale));
+        --t3-rule: calc(20px * var(--type-scale));
         --t3-tile-n: 30px;
-        --t3-payoff: 24px;
-        --t3-payoff-sub: 20px;
+        --t3-payoff: calc(24px * var(--type-scale));
+        --t3-payoff-sub: calc(20px * var(--type-scale));
     }
 }
 
@@ -451,21 +489,21 @@ html {
    Write to the line; do not shrink the type to fit a sentence that wants to
    be shorter. */
 :root {
-    --divider-label: 19px;
-    --divider-sub: 16px;
+    --divider-label: calc(19px * var(--type-scale));
+    --divider-sub: calc(16px * var(--type-scale));
 }
 
 @media (min-width: 40rem) {
     :root {
-        --divider-label: 22px;
-        --divider-sub: 19px;
+        --divider-label: calc(22px * var(--type-scale));
+        --divider-sub: calc(19px * var(--type-scale));
     }
 }
 
 @media (min-width: 64rem) {
     :root {
-        --divider-label: 26px;
-        --divider-sub: 22px;
+        --divider-label: calc(26px * var(--type-scale));
+        --divider-sub: calc(22px * var(--type-scale));
     }
 }
 

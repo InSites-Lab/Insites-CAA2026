@@ -580,7 +580,14 @@ const App: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col min-h-screen min-h-dvh bg-slate-100 text-slate-800 overflow-hidden"
+      // h-dvh, not min-h-dvh: a MINIMUM lets the shell grow past the screen
+      // whenever a tab's content wants more, so the frame-fit chain below it
+      // never actually clamps — the document scrolled instead of the key card
+      // on tab 3 (measured: +78px at 100% on a 900px-tall window, +89px at
+      // hall scale 125 on the projector). A definite height is what makes
+      // every min-h-0 absorber under it real. Long views still scroll — in
+      // the overflow-y-auto row below, not the document.
+      className="flex flex-col h-dvh bg-slate-100 text-slate-800 overflow-hidden"
       dir="ltr"
     >
       {/* Phone-only bottom tabs overlay: ensure scroll areas don't end under it */}
