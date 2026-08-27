@@ -469,23 +469,73 @@ html {
     }
 }
 
-/* ── TAB 5 — the closing's one knob ────────────────────────────────
-   THE UNDERCUT. The pale question panel and the poster do not sit side by
-   side: the poster slides underneath the panel's right edge, and the PANEL
-   dissolves on top of the picture — its last --t5-veil pixels thin out to
-   nothing, so the Hatter's rocks and columns surface as the tint evaporates.
-   Indigo over ochre in that strip mutes the warm palette toward grey-mauve,
-   which is why the clash reads as atmosphere rather than as an accident.
+/* ── TAB 5 — how much of the poster the closing hero lets through ──
+   THE UNDERCUT. The hero is one card: the poster IS its right-hand side, and
+   the text sits on the same ground with a fade between them. These five knobs
+   are that fade. All of them are percentages OF THE CARD'S WIDTH, not of the
+   picture — so they can be read straight off the slide left to right.
 
-   Tune it against ONE test: the strip must contain a recognisable painted
-   form, not just texture. Too wide and a weak projector renders it as
-   low-contrast mush that reads as a rendering fault; too narrow and there is
-   no dissolve, only a seam. 80-140px is the useful range.
+     --t5-photo-w      how far left the PICTURE ITSELF reaches. The img is
+                       anchored to the card's right edge, so 70% means its
+                       left edge is at 30% and nothing exists to the left of
+                       that — no fade setting can reveal what is not there.
+                       This is the knob to turn FIRST if the others stop
+                       helping. Raising it also pulls more of the painting's
+                       left side into the crop (object-right), so the Hatter
+                       grows rather than merely uncovering.
+     --t5-fade-hold    where the flat card colour ends. The text's safe zone:
+                       everything left of this is pure ground. LOWER = the
+                       picture starts showing sooner = the fade is longer and
+                       more gradual. This is the main knob.
+     --t5-fade-mid     the shaping stop, and --t5-fade-mid-alpha its opacity.
+                       Together they bend the ramp. An alpha HIGHER than the
+                       straight line between hold and clear keeps the veil
+                       heavy through the middle and clears it late (the text
+                       stays protected, the picture arrives suddenly); LOWER
+                       lets the picture in early and evenly.
+     --t5-fade-clear   where the picture is fully uncovered. RAISING it
+                       stretches the ramp rightward — gentler, but it also
+                       veils the right-hand end, and Alice and the graph are
+                       the two things the slide wants seen. Past ~95% they
+                       start to grey.
 
-   No text ever enters the strip. That is not this knob's job to protect —
-   the panel carries a hard right padding for it, in the component. */
+   Tune against ONE test: the strip under the text must hold a RECOGNISABLE
+   painted form — the Hatter half-dissolved — not just texture. Too much and a
+   weak projector renders it as low-contrast mush that reads as a rendering
+   fault; too little and there is no dissolve, only a seam.
+
+   THE LIMIT is the text, and it is measurable. The title and the italic
+   punchline are the widest lines; both are a FIXED 700px while the card is a
+   fraction of the window, so where they end IN PERCENT moves with the screen:
+   ~67% of the card at 1920, ~76% at 1440, ~79% at 1280. Whatever alpha the
+   gradient has at that point is what the last words are read through — 0.53
+   at 1920, but only 0.27 at 1280, where the punchline's tail already crosses
+   the Hatter's rocks with almost no veil on it.
+
+   So 1280 is the case to tune against, NOT the projector. It reads today, and
+   it read worse before these values (0.23), but it is the floor: going further
+   (hold 30 / mid 55 at .68 / clear 95) is fine at 1920 and loses the tail of
+   that line on a laptop. Measure it, do not eyeball it — and measure at the
+   NARROW end.
+
+   The 243,245,252 here IS the card's bg-[#f3f5fc] in the component. They must
+   stay equal or a seam appears where the flat part meets the card. */
 :root {
-    --t5-veil: 110px;
+    --t5-photo-w: 70%;
+    --t5-fade-hold: 25%;
+    --t5-fade-mid: 50%;
+    --t5-fade-mid-alpha: 0.72;
+    --t5-fade-clear: 99%;
+}
+
+.t5-hero-fade {
+    background-image: linear-gradient(
+        90deg,
+        #f3f5fc 0%,
+        #f3f5fc var(--t5-fade-hold),
+        rgba(243, 245, 252, var(--t5-fade-mid-alpha)) var(--t5-fade-mid),
+        transparent var(--t5-fade-clear)
+    );
 }
 
 /* ── TYPEFACE — the only place the site's faces are chosen ─────────

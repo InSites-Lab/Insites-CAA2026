@@ -707,7 +707,7 @@ const WorkedExample: React.FC = () => (
 
       <div className="border-b border-slate-200 pb-5 mb-5">
         <p className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">
-          5. Social — "4 Millennia Pastoralist Continuity"" <Inf />
+          5. Social — "4 Millennia Pastoralist Continuity" <Inf />
         </p>
 
         <EvidenceLabel>Evidence</EvidenceLabel>
@@ -1248,7 +1248,7 @@ const FromReportToInquiryTab: React.FC = () => (
     <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
       <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
         <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
-          Social — "4 Millennia Pastoralist Continuity""{' '}
+          Social — "4 Millennia Pastoralist Continuity"{' '}
           <Inf />
         </p>
       </div>
@@ -1387,10 +1387,16 @@ const QaTab: React.FC = () => (
       {/* ── THE HERO ────────────────────────────────────────────────
           Three layers, in this order: the picture, a fade over it, then the
           text. The fade is what makes the text readable without a panel —
-          it holds the card's own colour flat to 42%, thins through the
-          middle, and is gone by 78%, so the painting emerges rather than
+          it holds the card's own colour flat, thins through the middle, and
+          is gone before the right edge, so the painting emerges rather than
           being cut off. The Hatter sits right where it thins, which is the
           point: he is half-dissolved, not cropped away.
+
+          HOW MUCH of him shows is FIVE KNOBS, and they live in index.css
+          under "TAB 5" — the stops of the fade plus --t5-photo-w, the
+          picture's own reach. No number here: they are set in one place so
+          the comment explaining them cannot drift out of step with them,
+          which is exactly what this paragraph used to do.
 
           object-position right: the picture is anchored to its right edge,
           so what gets cropped when the card is short is the left side —
@@ -1405,11 +1411,11 @@ const QaTab: React.FC = () => (
         <img
           src="./poster-light.jpg"
           alt="InSites-CAA — CBSA Workshop"
-          className="hidden lg:block absolute inset-y-0 right-0 h-full w-[70%] object-cover object-right"
+          className="hidden lg:block absolute inset-y-0 right-0 h-full w-[var(--t5-photo-w)] object-cover object-right"
         />
         <div
           aria-hidden="true"
-          className="hidden lg:block absolute inset-0 bg-[linear-gradient(90deg,#f3f5fc_0%,#f3f5fc_50%,rgba(243,245,252,0.82)_62%,transparent_86%)]"
+          className="hidden lg:block absolute inset-0 t5-hero-fade"
         />
 
         {/* The talk ENDS ON A QUESTION, and the answer stays in the speaker's
@@ -1466,8 +1472,8 @@ const QaTab: React.FC = () => (
                 letting the picture through — so the last characters of the
                 talk's own title would sit on a cloud. The column width and
                 the fade's first stop move together with this number. */}
-            <h3 className="font-display text-2xl sm:text-3xl lg:text-[42px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
-              Significance Assessment 4.0:
+            <h3 className="font-display text-2xl sm:text-3xl lg:text-[38px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
+              Significance Assessment 4.0
             </h3>
             <p className="font-display text-xl sm:text-2xl lg:text-[30px] leading-tight text-slate-600">
               from a final report to an open inquiry
@@ -1475,9 +1481,9 @@ const QaTab: React.FC = () => (
           </div>
 
           {/* GAP 2 of 3 — the title block to the question. */}
-          <p className="mt-5 lg:mt-12 text-[22px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
+          <p className="mt-5 lg:mt-12 text-[20px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
             Imagine a perfect assessment machine{' '}<br/>
-            <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
+            <span className="text-indigo-700">could heritage 4.0 or 10.0 afford it?</span>
           </p>
 
           {/* The lens the question is answered through, not a second headline —
@@ -1487,7 +1493,8 @@ const QaTab: React.FC = () => (
 
               GAP 3 of 3 — the question to the punchline. */}
           <p className="mt-5 lg:mt-8 border-l-4 border-indigo-500 ps-4 text-[18px] sm:text-[21px] lg:text-[25px] italic text-indigo-950/90">
-            Who assesses is part of what is assessed. so how to design the Human-in-the-Loop? THAT IS THE QUESTION.
+            Who assesses is part of what is assessed.<br />
+            so how to design the Human-in-the-Loop? <br/>THAT IS THE QUESTION.
           </p>
         </div>
 
