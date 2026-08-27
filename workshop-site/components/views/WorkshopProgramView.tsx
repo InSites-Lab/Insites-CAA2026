@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X, Mail } from 'lucide-react';
+import { Scale, Layers, Activity, SearchCheck, MessageSquare, Github, ExternalLink, ChevronDown, FileSearch, NotebookPen, Play, Pause, X, Mail, Maximize2 } from 'lucide-react';
 import { ExcursionKey } from './ExcursionOutlet';
 import { SectionDivider } from '../common';
 import SwitchTransition from '../common/SwitchTransition';
@@ -532,8 +532,36 @@ const PlateFigure: React.FC<{
   /** Same two knobs as PhotoStrip, so the tab tunes them the same way. */
   maxWidth?: string;
   maxHeight?: string;
-}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]' }) => {
+  /** Rides the dots row, left of the dots — a row the figure already pays
+   *  for, so whatever the tab needs kept on screen (tab 4's notation key)
+   *  can live here at zero height instead of on a line of its own. */
+  keyLine?: React.ReactNode;
+}> = ({ maxWidth = 'max-w-full', maxHeight = 'max-h-[calc(44vh/var(--app-zoom))]', keyLine }) => {
   const [index, setIndex] = useState(0);
+
+  // The lightbox: the plate at the size of the SCREEN, not of the slide's
+  // leftover. It exists for hall type scale — bigger text is paid for by a
+  // smaller plate, and this is the speaker's way to buy the plate back for a
+  // moment ("here is the detail") without giving the text back. Fade in AND
+  // out: `closing` holds the overlay mounted for the fade before unmount.
+  const [expanded, setExpanded] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const close = () => {
+    setClosing(true);
+    window.setTimeout(() => {
+      setExpanded(false);
+      setClosing(false);
+    }, 160);
+  };
+
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [expanded]);
 
   return (
     // basis-0 + grow: claims no height of its own, takes only what the tab has
@@ -559,21 +587,80 @@ const PlateFigure: React.FC<{
       </button>
 
       {/* Under the plate, never on it: on a photograph a corner overlay lands
-          on whatever that photograph happens to have in the corner. */}
-      <div className="shrink-0 flex items-center justify-center gap-2">
-        {PLATES.map((p, i) => (
-          <button
-            key={p.src}
-            type="button"
-            onClick={() => setIndex(i)}
-            aria-label={`Show image ${i + 1}`}
-            aria-current={i === index}
-            className={`h-3 w-3 rounded-full transition-colors cursor-pointer ${
-              i === index ? 'bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'
-            }`}
-          />
-        ))}
+          on whatever that photograph happens to have in the corner. One row,
+          three tenants: the tab's key line on the left, the dots dead centre
+          (the 1fr flanks are what keeps them centred regardless of what the
+          sides hold), and the expand control on the right — quiet, like the
+          strip's pause: a speaker's control, not an audience's. */}
+      <div className="shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="min-w-0 justify-self-start">{keyLine}</div>
+        <div className="flex items-center gap-2">
+          {PLATES.map((p, i) => (
+            <button
+              key={p.src}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Show image ${i + 1}`}
+              aria-current={i === index}
+              className={`h-3 w-3 rounded-full transition-colors cursor-pointer ${
+                i === index ? 'bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'
+              }`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          aria-label="Show the image at full screen"
+          title="Full screen"
+          className="justify-self-end p-1 rounded text-slate-400 opacity-40 hover:opacity-100 hover:text-slate-600 transition-opacity cursor-pointer"
+        >
+          <Maximize2 size={16} />
+        </button>
       </div>
+
+      {expanded && (
+        <div
+          onClick={close}
+          className={`fixed inset-0 z-[100] bg-slate-950/95 flex flex-col items-center justify-center p-4 lg:p-8 transition-opacity duration-150 motion-reduce:transition-none ${
+            closing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close full screen"
+            className="absolute top-4 right-4 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <X size={28} />
+          </button>
+          {/* Same gesture as the plate itself: click steps to the next one.
+              stopPropagation so stepping does not also close the overlay. */}
+          <img
+            src={PLATES[index].src}
+            alt={PLATES[index].alt}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIndex((i) => (i + 1) % PLATES.length);
+            }}
+            className="min-h-0 flex-1 max-w-full object-contain cursor-pointer"
+          />
+          <div className="shrink-0 flex items-center gap-2.5 pt-4" onClick={(e) => e.stopPropagation()}>
+            {PLATES.map((p, i) => (
+              <button
+                key={p.src}
+                type="button"
+                onClick={() => setIndex(i)}
+                aria-label={`Show image ${i + 1}`}
+                aria-current={i === index}
+                className={`h-3 w-3 rounded-full transition-colors cursor-pointer ${
+                  i === index ? 'bg-indigo-400' : 'bg-slate-600 hover:bg-slate-500'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1264,17 +1351,6 @@ const FromReportToInquiryTab: React.FC = () => (
       </div>
     </div>
 
-    {/* The mark needs a key HERE. Tab 3 is where the notation is taught, and
-        tab 3 comes before this one in the bar but not necessarily in the room:
-        anyone arriving on #tab-landscape, or looking up mid-question, meets two
-        marks with nothing on screen that decodes them. One line, at label size,
-        so it explains without competing with the two values it annotates. */}
-    <p className="shrink-0 flex items-center gap-2 text-[length:var(--label)] text-slate-500">
-      <Inf />
-      <span className="label">inferred</span>
-      <span>— a claim built from two or more pieces of evidence</span>
-    </p>
-
     {/* ── TAB 4 IMAGE KNOBS — same two as tab 2, tuned separately ────
         maxHeight is the one number to touch. Everything above the plate —
         the tab bar, the headline block, the two value cards, and the page's
@@ -1287,8 +1363,26 @@ const FromReportToInquiryTab: React.FC = () => (
         it — but raise this only while watching the dots underneath: the
         moment they touch the bottom edge you have taken more than there is.
         Keep the /var(--app-zoom) divisor; it is a no-op while the zoom is 1
-        and the difference between fitting and overflowing when it is not. */}
-    <PlateFigure maxWidth="max-w-full" maxHeight="max-h-[46vh] sm:max-h-[calc(62vh/var(--app-zoom))]" />
+        and the difference between fitting and overflowing when it is not.
+
+        keyLine: the mark still needs a key ON THIS TAB — tab 3 teaches the
+        notation, but anyone arriving on #tab-landscape, or looking up
+        mid-question, meets two marks with nothing on screen that decodes
+        them. It used to be a line of its own between the cards and the
+        plate, which billed the key a full row of the plate's height; now it
+        rides the dots row the figure already pays for, smaller, and the
+        row it vacated went to the photograph. */}
+    <PlateFigure
+      maxWidth="max-w-full"
+      maxHeight="max-h-[46vh] sm:max-h-[calc(66vh/var(--app-zoom))]"
+      keyLine={
+        <span className="flex items-center gap-1.5 text-[length:calc(13px*var(--type-scale))] text-slate-500 whitespace-nowrap">
+          <Inf />
+          <span className="font-bold uppercase tracking-[0.1em]">inferred</span>
+          <span className="hidden xl:inline">— a claim built from two or more pieces of evidence</span>
+        </span>
+      }
+    />
 
     {/* Nothing after the plate. The imagination reading rose into the
         headline; its provenance — "the phrase is the expert's, not the
