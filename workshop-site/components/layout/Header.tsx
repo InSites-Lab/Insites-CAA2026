@@ -149,6 +149,10 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
             aria-hidden="true"
           />
           <span className={`hidden lg:inline ${COLOR.authors} ${SIZE.authorsWeight} ${SIZE.authors} whitespace-nowrap`}>Alef, Shafriri & Berger</span>
+        <span
+            className={`hidden lg:block shrink-0 rounded-full ${SIZE.divider} ${SIZE.dividerGap} ${COLOR.divider}`}
+            aria-hidden="true"
+          />
         </div>
         <div
           className="flex items-center gap-2 lg:gap-3 shrink-0 whitespace-nowrap justify-end"
@@ -162,15 +166,16 @@ export const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
           />
 
           {/* Desktop Technion logo (public/Technion_Logo.png) */}
+         <h2 className={`${COLOR.lab} ${SIZE.labWeight} ${SIZE.lab} leading-tight whitespace-nowrap`}>
+            InSites Lab &nbsp; 
+          </h2> 
           <img
             src="./Technion_Logo.png"
             alt="Technion"
             className={`${SIZE.logo} object-contain hidden lg:inline-block mr-1`}
           />
 
-          <h2 className={`${COLOR.lab} ${SIZE.labWeight} ${SIZE.lab} leading-tight whitespace-nowrap`}>
-            InSites Lab
-          </h2>
+          
 
         </div>
       </div>

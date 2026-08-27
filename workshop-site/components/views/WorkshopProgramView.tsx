@@ -604,7 +604,7 @@ const DualTensionTab: React.FC<{ isExampleOpen: boolean; onToggleExample: () => 
           risks into one mechanism — which is why suppression cannot be the
           answer, and governance has to be. Delete this line if it crowds. */}
       <p className="text-[length:var(--t2-lead)] text-slate-600 pt-1">
-        CBSA and the transformer share a core idea: meaning emerges from context.
+        CBSA and the transformer-architecture share a core idea: meaning emerges from context.
       </p>
     </div>
 
@@ -707,7 +707,7 @@ const WorkedExample: React.FC = () => (
 
       <div className="border-b border-slate-200 pb-5 mb-5">
         <p className="text-[length:var(--t2-ex-head)] font-bold text-slate-900">
-          5. Social — "Pastoralist Continuity and Community Presence" <Inf />
+          5. Social — "4 Millennia Pastoralist Continuity"" <Inf />
         </p>
 
         <EvidenceLabel>Evidence</EvidenceLabel>
@@ -1248,7 +1248,7 @@ const FromReportToInquiryTab: React.FC = () => (
     <div className="shrink-0 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
       <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 lg:px-5 lg:py-3">
         <p className="text-base lg:text-[19px] font-bold text-slate-900 leading-snug">
-          Social — "Pastoralist Continuity and Community Presence"{' '}
+          Social — "4 Millennia Pastoralist Continuity""{' '}
           <Inf />
         </p>
       </div>
@@ -1420,8 +1420,18 @@ const QaTab: React.FC = () => (
             "Afford" is deliberate: tab 2 opens the talk on "how can we
             afford both", and this closes it on the same verb.
             The speaker's script is one click away in the corner — see
-            SpeakerNote; invisible to the hall. */}
-        <div className="relative z-10 max-w-full lg:max-w-[780px] px-5 py-6 lg:p-10 flex flex-col justify-center lg:h-[470px] gap-3 lg:gap-5">
+            SpeakerNote; invisible to the hall.
+
+            VERTICAL POSITION — lg:pt-16 is the knob. The block is anchored to
+            the TOP of the card (justify-start), not centred in it, so this one
+            padding decides how high the title sits: smaller number, higher
+            block. Centring put the title at 125px down a 470px card, which
+            left it floating in the middle of the picture instead of heading
+            the slide. 64px heads it.
+
+            Change this and nothing else moves — the question and the
+            punchline follow the title down, and the card keeps its height. */}
+        <div className="relative z-10 max-w-full lg:max-w-[780px] px-5 py-6 lg:px-10 lg:pt-16 lg:pb-10 flex flex-col justify-start lg:h-[470px]">
           <SpeakerNote className="absolute top-2.5 right-2.5 lg:right-auto lg:left-2.5">
             <p>Let me end with the thought experiment the paper ends with.</p>
             <p>
@@ -1436,7 +1446,10 @@ const QaTab: React.FC = () => (
             <p>I'll leave the question on the screen.</p>
           </SpeakerNote>
 
-          <div className="space-y-1 lg:space-y-1.5">
+          {/* GAP 1 of 3 — title to subtitle. space-y-*, because these two
+              are one block and belong tighter than the blocks are to each
+              other. */}
+          <div className="space-y-1 lg:space-y-2">
             {/* The talk's own title, and the only place it appears. The
                 conference says Heritage 4.0; this names what 4.0 means for one
                 practice inside it, and final/open + report/inquiry is a double
@@ -1453,7 +1466,7 @@ const QaTab: React.FC = () => (
                 letting the picture through — so the last characters of the
                 talk's own title would sit on a cloud. The column width and
                 the fade's first stop move together with this number. */}
-            <h3 className="font-display text-2xl sm:text-3xl lg:text-[46px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
+            <h3 className="font-display text-2xl sm:text-3xl lg:text-[42px] lg:whitespace-nowrap leading-[1.1] text-slate-900">
               Significance Assessment 4.0:
             </h3>
             <p className="font-display text-xl sm:text-2xl lg:text-[30px] leading-tight text-slate-600">
@@ -1461,7 +1474,8 @@ const QaTab: React.FC = () => (
             </p>
           </div>
 
-          <p className="text-[22px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
+          {/* GAP 2 of 3 — the title block to the question. */}
+          <p className="mt-5 lg:mt-12 text-[22px] sm:text-[26px] lg:text-[33px] font-bold text-slate-900 leading-snug">
             Imagine a perfect assessment machine{' '}<br/>
             <span className="text-indigo-700">could heritage 4.0 (or 10.0) afford it?</span>
           </p>
@@ -1469,9 +1483,11 @@ const QaTab: React.FC = () => (
           {/* The lens the question is answered through, not a second headline —
               so it stays a clear step under it. The indigo rule on its left is
               what keeps it from reading as a caption on the question: a quoted
-              aside has a mark of its own. */}
-          <p className="border-l-4 border-indigo-500 ps-4 text-[18px] sm:text-[21px] lg:text-[25px] italic text-indigo-950/90">
-            Who assesses is part of what is assessed.
+              aside has a mark of its own.
+
+              GAP 3 of 3 — the question to the punchline. */}
+          <p className="mt-5 lg:mt-8 border-l-4 border-indigo-500 ps-4 text-[18px] sm:text-[21px] lg:text-[25px] italic text-indigo-950/90">
+            Who assesses is part of what is assessed. so how to design the Human-in-the-Loop? THAT IS THE QUESTION.
           </p>
         </div>
 
