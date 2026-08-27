@@ -197,6 +197,70 @@ html {
     --sb-legend: calc(13px * var(--type-scale));
 }
 
+/* ── SIDEBAR SPACING — the rail's vertical budget ──────────────────
+   The heights between the type: card padding, the connector's floor, the
+   air around the heading and above Extensions & Tools. They were literals
+   in Sidebar.tsx (p-2.5, min-h-[35px], pt-5); they are variables so the
+   LAPTOP block below can compress them, and spacing knobs is what they
+   are — none multiplies by --type-scale, by doctrine.
+
+     --sb-card-pad   inside every station card (the compact build tightens
+                     it on the <aside>, same as it does the type)
+     --sb-connector  the floor of the spine segment between stations. The
+                     segments are flex-1, so on a roomy screen they stretch
+                     and this floor is invisible; on a short one it is the
+                     whole segment.
+     --sb-head-pad   above and below "InSites CBSA Framework"
+     --sb-ext-gap    the air that sets Extensions & Tools off the spine */
+:root {
+    --sb-card-pad: 10px;
+    --sb-connector: 35px;
+    --sb-head-pad: 20px;
+    --sb-ext-gap: 20px;
+}
+
+[data-sb="compact"] {
+    --sb-card-pad: 8px;
+}
+
+/* ── THE LAPTOP — a HEIGHT breakpoint, the deck's only one ─────────
+   The full rail (tab 1) is ~950px of content: seven cards with role
+   lines, six connectors, the heading, Extensions, the legend. The
+   projector's 1080 holds it; a laptop lid does not — at 768 the rail
+   shows ~666px and Extensions & Tools simply is not on the screen. Width
+   breakpoints never see this: a 1536x793 laptop is `lg` by width and
+   projector-sized type was still being asked to fit a rail 300px
+   shorter.
+
+   So below 1050px of viewport height the rail steps down — type to the
+   file's own "current" preset (the table above), spacing to about half
+   its air. Measured: content 947px -> ~650px, which fits the 768-tall
+   worst case with the legend on screen. The deck's tabs are untouched:
+   they are flex against the same shortage and absorb it their own way.
+
+   1050 and not 1080: rails between 1050 and 1079 hold the full set with
+   the connectors barely stretched, so they keep it; at 1050 the rail is
+   ~948px and the full set no longer fits. The compact build (tabs 2-5)
+   already fits a laptop and carries its own overrides on the <aside>,
+   which beat these :root values wherever both apply — only tab 1's full
+   build actually changes.
+
+   Type steps keep the * var(--type-scale) factor: hall scale on a short
+   screen is unusual, but dropping the factor here would make the Aa
+   button silently dead for the rail on exactly those screens. */
+@media (max-height: 1050px) {
+    :root {
+        --sb-heading: calc(15px * var(--type-scale));
+        --sb-title: calc(18px * var(--type-scale));
+        --sb-role: calc(13px * var(--type-scale));
+        --sb-legend: calc(13px * var(--type-scale));
+        --sb-card-pad: 8px;
+        --sb-connector: 15px;
+        --sb-head-pad: 10px;
+        --sb-ext-gap: 10px;
+    }
+}
+
 /* ── THE LABEL — one uppercase device for the whole deck ───────────
    Every small caps label on the talk is this class: the lead-in riding the
    headline on tabs 2 and 4, EVIDENCE / BROADER MEANING in the worked

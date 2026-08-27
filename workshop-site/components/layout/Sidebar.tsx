@@ -33,8 +33,9 @@ export interface SidebarProps {
 // literal Tailwind classes, so changing one changes every station at once
 // (stages, gates and Extensions & Tools alike). Raising `title`/`role`
 // raises each button's height, which lengthens the whole spine.
-// Spacing between stations is NOT here — it is hand-tuned in the markup
-// (`pt-5`, `min-h-[35px]`, `pt-2`). Leave those alone unless you mean to.
+// Spacing between stations is NOT here either — it is the SIDEBAR SPACING
+// variables in index.css (--sb-card-pad, --sb-connector, --sb-head-pad,
+// --sb-ext-gap), which the LAPTOP height breakpoint compresses.
 
 // The four TEXT sizes are not here — they are CSS variables in index.css
 // (--sb-heading, --sb-title, --sb-role, --sb-legend), so they can be tried out
@@ -52,20 +53,23 @@ const TEXT = {
   legend: 'text-[length:var(--sb-legend)]',    // the ○ / ● key at the bottom
 } as const;
 
+// Card padding is not here any more: it is --sb-card-pad in index.css (the
+// compact build overrides it on the <aside> like the type, and the LAPTOP
+// height breakpoint compresses it), read below as p-[var(--sb-card-pad)].
 const SIZE = {
   full: {
     bubble: 'w-11 h-8',    // the round icon holder inside each button
     icon: 20,              // lucide icon size inside the bubble, in px
-    cardPad: 'p-2.5',      // padding inside every button
     chevron: 16,           // the Extensions & Tools arrow, in px
   },
   compact: {
     bubble: 'w-9 h-7',
     icon: 17,
-    cardPad: 'p-2',
     chevron: 14,
   },
 } as const;
+
+const CARD_PAD = 'p-[var(--sb-card-pad)]';
 
 // ─── Hover — tune the size step here ──────────────────────────────
 // The other half of the hover, and the half that survives a projector even
@@ -152,8 +156,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             past the rail on a short screen, which is what hands the
             overflow-y-auto above something to scroll. */}
         <div className="min-h-full px-2 pt-0 pb-2 text-left flex flex-col">
-          <h3 className={`${TEXT.heading} font-black uppercase tracking-widest text-[var(--sb-ink)] text-center pt-5 pb-5`}>
-              InSites CBSA Framework 
+          <h3 className={`${TEXT.heading} font-black uppercase tracking-widest text-[var(--sb-ink)] text-center py-[var(--sb-head-pad)]`}>
+              InSites CBSA Framework
           </h3>
 
           {/* Stations on the spine */}
@@ -175,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <div
                       onClick={() => onAgentSelect(agent.id)}
-                      className={`flex-1 relative flex items-center justify-between ${S.cardPad} rounded-xl border-2 cursor-pointer transition-all duration-300 ${HOVER} ${theme.card} ${isGate(agent.id) ? 'border-dashed' : ''}`}
+                      className={`flex-1 relative flex items-center justify-between ${CARD_PAD} rounded-xl border-2 cursor-pointer transition-all duration-300 ${HOVER} ${theme.card} ${isGate(agent.id) ? 'border-dashed' : ''}`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`${S.bubble} shrink-0 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${theme.icon}`}>
@@ -199,7 +203,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {/* Connector with the HITL stop */}
                   {idx < agents.length - 1 && (
-                    <div className="flex items-stretch flex-1 min-h-[35px]">
+                    <div className="flex items-stretch flex-1 min-h-[var(--sb-connector)]">
                       <div className="w-6 shrink-0 relative flex items-center justify-center">
                         <div className={`absolute left-1/2 -translate-x-1/2 top-0 bottom-0 ${connectorLine(agent.id)}`}></div>
                         <div
@@ -223,11 +227,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               This one KEEPS its description in both builds: it is not part of
               the process, so its name alone does not say what it opens — the
               three words underneath are the whole of what it is. */}
-          <div className="flex items-stretch pt-5 shrink-0">
+          <div className="flex items-stretch pt-[var(--sb-ext-gap)] shrink-0">
             <div className="w-6 shrink-0"></div>
             <div
               onClick={onResearchAidsClick}
-              className={`flex-1 relative flex items-center justify-between ${S.cardPad} rounded-xl border-2 cursor-pointer transition-all duration-300 ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50/60 border-indigo-200 hover:bg-indigo-100/70 hover:border-indigo-300 hover:shadow-md'}`}
+              className={`flex-1 relative flex items-center justify-between ${CARD_PAD} rounded-xl border-2 cursor-pointer transition-all duration-300 ${showResearchAids ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50/60 border-indigo-200 hover:bg-indigo-100/70 hover:border-indigo-300 hover:shadow-md'}`}
             >
               <div className="flex items-center gap-3">
                 <div className={`${S.bubble} shrink-0 rounded-full flex items-center justify-center border-2 border-white shadow-sm duration-500 ${showResearchAids ? 'bg-indigo-600 text-white shadow-indigo-200' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>
