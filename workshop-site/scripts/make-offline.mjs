@@ -41,16 +41,19 @@
 //   - The Gemini-backed AI query. A live feature; it cannot work offline.
 //
 // Usage:  npm run build  &&  node scripts/make-offline.mjs
+//         node scripts/make-offline.mjs <dist-dir>   (a build in another
+//         folder — e.g. when Explorer holds dist/ open and vite had to
+//         build elsewhere)
 // Output: dist-offline/ — copy the WHOLE folder to the stick, not just the HTML.
 
 import fs from 'fs';
 import path from 'path';
 
-const DIST = path.resolve('dist');
+const DIST = path.resolve(process.argv[2] || 'dist');
 const OUT = path.resolve('dist-offline');
 
 if (!fs.existsSync(path.join(DIST, 'index.html'))) {
-  console.error("No dist/index.html — run 'npm run build' first.");
+  console.error(`No index.html in ${DIST} — run 'npm run build' first.`);
   process.exit(1);
 }
 

@@ -58,6 +58,8 @@ desktop.ini
 node_modules/
 workshop-site/dist/
 workshop-site/dist-offline/
+# Fallback outDir for when Explorer holds dist/ open and vite cannot empty it
+workshop-site/dist-build/
 workshop-site/.vite/
 # Packed builds made for a manual upload. Never tracked: they are dist/ in a
 # wrapper, and a build carries whatever GEMINI_API_KEY was in the shell that
