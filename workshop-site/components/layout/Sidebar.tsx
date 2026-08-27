@@ -143,7 +143,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="h-full px-2 pt-0 pb-2 text-left flex flex-col">
+        {/* min-h-full, NOT h-full: with the app shell now a definite h-dvh,
+            a hard height here pinned this column to the rail even when its
+            content was taller — the flex children compressed and the cards
+            painted over each other instead of the rail scrolling. A MINIMUM
+            keeps the nice tall-screen behaviour (the spine's connectors
+            stretch, the legend sits at the bottom) and lets the column grow
+            past the rail on a short screen, which is what hands the
+            overflow-y-auto above something to scroll. */}
+        <div className="min-h-full px-2 pt-0 pb-2 text-left flex flex-col">
           <h3 className={`${TEXT.heading} font-black uppercase tracking-widest text-[var(--sb-ink)] text-center pt-5 pb-5`}>
               InSites CBSA Framework 
           </h3>
