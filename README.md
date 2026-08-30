@@ -1,5 +1,9 @@
 # InSites-CAA — AI-Assisted Heritage Significance Assessment
 
+> **Archived.** This repository is the frozen record of the CAA 2026 workshop
+> (Vienna, March 31, 2026) and is no longer maintained.
+> Active development of InSites continues at **[InSites-Lab/insites](https://github.com/InSites-Lab/insites)**.
+
 **InSites** is an AI assistant that guides you through a structured significance assessment of built heritage sites. Upload documents about a site, and the assistant walks you through 7 stages (0–6) — identifying what makes the place culturally significant, how authentic it remains, and how it compares to similar sites.
 
 Every claim is evidence-based. Every stage is reviewed by you. The AI proposes; you decide.
