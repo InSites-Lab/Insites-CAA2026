@@ -5,7 +5,7 @@
 Every claim is evidence-based. Every stage is reviewed by you. The AI proposes; you decide.
 
 > **Workshop:** [InSites: Significance Assessment through the Looking Glass of Gen-AI](https://bit.ly/insites-caa)
-> CAA 2026 — Athens, March 31, 2026
+> CAA 2026 — Vienna, March 31, 2026
 > **[bit.ly/insites-caa](https://bit.ly/insites-caa)**
 
 ---
